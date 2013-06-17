@@ -1,0 +1,40 @@
+{
+    "author": "basarat",
+    "name": "grunt-ts",
+    "description": "compile typescript to javascript using computer installed typescript",
+    "version": "0.2.0",
+    "homepage": "https://github.com/basarat/grunt-ts",
+    "repository": {
+        "type": "git",
+        "url": "git@github.com:basarat/grunt-ts.git"
+    },
+    "bugs": {
+        "url": "https://github.com/basarat/grunt-ts/issues"
+    },
+    "licenses": [
+        {
+            "type": "MIT",
+            "url": "https://github.com/basarat/grunt-ts/blob/master/LICENSE"
+        }
+    ],
+    "main": "grunt.js",
+    "engines": {
+        "node": ">= 0.8.0"
+    },
+    "dependencies": {
+        "grunt": "~0.4.0",
+        "typescript": "0.8.3",
+        "grunt-lib-contrib": "~0.5.2"
+    },
+    "devDependencies": {
+        "grunt": "~0.4.0",
+        "typescript": "0.8.3",
+        "grunt-contrib-clean": "~0.4.0",
+        "grunt-contrib-nodeunit": "~0.1.2"
+    },
+    "optionalDependencies": {},
+    "keywords": [
+        "gruntplugin",
+        "typescript"
+    ]
+}
