@@ -191,7 +191,11 @@ module.exports = function (grunt) {
                 files.push(filepath);
             });
 
-            compile(files, dest, grunt.util._.clone(options), extension);
+            for(key in files){
+				var tmp = [files[key]];
+				compile(tmp, dest, grunt.util._.clone(options), extension);
+			}            
+			
             if (grunt.task.current.errorCount) {
                 return false;
             }
