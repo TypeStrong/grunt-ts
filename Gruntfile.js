@@ -13,7 +13,7 @@ module.exports = function (grunt) {
         },
         ts:{
             simple:{
-                src:["test/fixtures/simple.ts"]
+                src:["test/simple/simple.ts"]
             },
             declaration:{
                 src:"test/fixtures/declaration.ts",

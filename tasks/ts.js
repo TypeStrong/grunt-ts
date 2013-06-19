@@ -23,20 +23,15 @@ function getTsc(binPath) {
 var tsc = getTsc(resolveTypeScriptBinPath(currentPath, 0));
 
 function compileFile(filepath) {
-    var args = [tsc, filepath];
+    var cmd = 'node ' + tsc + ' ' + filepath;
+    console.log(cmd);
 
-    var ls = exec('node ' + tsc + ' ' + args);
-
-    console.log("hey".green);
-    console.log(args);
+    exec(cmd);
 }
 
 var cmd = 'node "C:\\REPOS\\grunt-ts\\node_modules\\typescript\\bin\\tsc" "C:\\REPOS\\grunt-ts\\test\\fixtures\\simple.ts"';
-exec(cmd, function (error, stdout, stderr) {
-    if (!error) {
-        console.log("no error");
-    }
-});
+console.log(cmd);
+compileFile('"C:\\REPOS\\grunt-ts\\test\\simple\\simple.ts"');
 
 module.exports = function (grunt) {
 };
