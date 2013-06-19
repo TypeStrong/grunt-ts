@@ -3,11 +3,11 @@
  * Licensed under the MIT license.
  */
 
-declare var module; 
-declare var require; 
+declare var module;
+declare var require;
 declare var __dirname;
 declare var mapObj;
-declare var key; 
+declare var key;
 
 declare var TypeScript;
 
@@ -24,11 +24,11 @@ var path = require('path'),
     fs = require('fs'),
     vm = require('vm');
 
-var spawn = require('child_process').spawn;
+var exec = require('child_process').exec;
 
 var currentPath = path.resolve(".");
 
-function resolveTypeScriptBinPath(currentPath, depth):string {
+function resolveTypeScriptBinPath(currentPath, depth): string {
     var targetPath = path.resolve(__dirname,
         (new Array(depth + 1)).join("../../"),
         "../node_modules/typescript/bin");
@@ -43,189 +43,185 @@ function resolveTypeScriptBinPath(currentPath, depth):string {
 }
 
 function getTsc(binPath: string): string {
-    return '"'+ binPath + '\\'+'tsc" ';
+    return '"' + binPath + '\\' + 'tsc" ';
 }
 
-var tsc = getTsc( resolveTypeScriptBinPath(currentPath, 0) ) ;
+var tsc = getTsc(resolveTypeScriptBinPath(currentPath, 0));
 
-function compileFile(filepath: string) {    
+function compileFile(filepath: string) {
     var args = [tsc, filepath];
 
-    var ls = spawn('node', args);    
-    ls.stdout.on('data', function (data) {
-        console.log('stdout: ' + data);
-    });
-
-    ls.stderr.on('data', function (data) {
-        console.log('stderr: ' + data);
-    });
-
-    ls.on('close', function (code) {
-        console.log('child process exited with code ' + code);
-    });
+    var ls = exec('node '+ tsc+ ' ' + args);    
 
     console.log("hey".green);
     console.log(args);
 }
 
 
-compileFile('"C:\\REPOS\\grunt-ts\\test\\fixtures\\Simple.ts"');
+//compileFile('"C:\\REPOS\\grunt-ts\\test\\fixtures\\simple.ts"');
+
+var cmd = 'node "C:\\REPOS\\grunt-ts\\node_modules\\typescript\\bin\\tsc" "C:\\REPOS\\grunt-ts\\test\\fixtures\\simple.ts"';
+exec(cmd, function (error, stdout, stderr) {
+    if (!error) {
+        console.log("no error");
+    }
+});
 
 
 module.exports = function (grunt) {
-    
+    /*
     var gruntIO = function (currentPath, destPath, basePath, compSetting, outputOne) {
-            var createdFiles = [];
-            basePath = basePath || ".";
+        var createdFiles = [];
+        basePath = basePath || ".";
 
             return {
-                getCreatedFiles:function () {
-                    return createdFiles;
-                },
+            getCreatedFiles: function () {
+                return createdFiles;
+            },
 
-                resolvePath:path.resolve,
-                readFile:function (file){
-                    grunt.verbose.write('Reading ' + file + '...');
-                    try{
-                        var content = fs.readFileSync(file, 'utf8');
-                        // strip UTF BOM
-                        if(content.charCodeAt(0) === 0xFEFF){
-                            content = content.slice(1);
-                        }
-                        grunt.verbose.ok();
-                        return content;
-                    }catch(e){
-                        grunt.verbose.fail("CAN'T READ");
-                        throw e;
+            resolvePath: path.resolve,
+            readFile: function (file) {
+                grunt.verbose.write('Reading ' + file + '...');
+                try {
+                    var content = fs.readFileSync(file, 'utf8');
+                    // strip UTF BOM
+                    if (content.charCodeAt(0) === 0xFEFF) {
+                        content = content.slice(1);
                     }
-                },
-                dirName:path.dirname,
+                    grunt.verbose.ok();
+                    return content;
+                } catch (e) {
+                    grunt.verbose.fail("CAN'T READ");
+                    throw e;
+                }
+            },
+            dirName: path.dirname,
 
-                createFile:function (writeFile, useUTF8) {
-                    var code = "";
+            createFile: function (writeFile, useUTF8) {
+                var code = "";
                     return {
-                        Write:function (str) {
-                            code += str;
-                        },
-                        WriteLine:function (str) {
-                            code += str + grunt.util.linefeed;
-                        },
-                        Close:function () {
-                            var created:any = (function(){
-                                var source, type;
-                                if (/\.js$/.test(writeFile)) {
-                                    source = writeFile.substr(0, writeFile.length - 3) + ".ts";
-                                    type = "js";
-                                }
-                                else if (/\.js\.map$/.test(writeFile)) {
-                                    source = writeFile.substr(0, writeFile.length - 7) + ".ts";
-                                    type = "map";
-                                }
-                                else if (/\.d\.ts$/.test(writeFile)) {
-                                    source = writeFile.substr(0, writeFile.length - 5) + ".ts";
-                                    type = "declaration";
-                                }
-                                if(outputOne){
-                                    source = "";
-                                }
-                                return {
-                                    source: source,
-                                    type: type
-                                };
-                            })();
-                            if (code.trim().length < 1) {
-                                return;
-                            }
-                            if (!outputOne) {
-                                var g = path.join(currentPath, basePath);
-                                writeFile = writeFile.substr(g.length);
-                                writeFile = path.join(currentPath, destPath ? destPath.toString() : '', writeFile);
-                            }
-                            grunt.file.write(writeFile, code);
-                            created.dest = writeFile;
-                            createdFiles.push(created);
-                        }
-                    }
-                },
-                findFile: function (rootPath, partialFilePath) {
-                    var file = path.join(rootPath, partialFilePath);
-                    while(true) {
-                        if(fs.existsSync(file)) {
-                            try  {
-                                var content = grunt.file.read(file);
-                                // strip UTF BOM
-                                if(content.charCodeAt(0) === 0xFEFF){
-                                    content = content.slice(1);
-                                }
-                                return {
-                                    content: content,
-                                    path: file
-                                };
-                            } catch (err) {
-                            }
-                        } else {
-                            var parentPath = path.resolve(rootPath, "..");
-                            if(rootPath === parentPath) {
-                                return null;
-                            } else {
-                                rootPath = parentPath;
-                                file = path.resolve(rootPath, partialFilePath);
-                            }
-                        }
-                    }
-                },
-                directoryExists:function (path) {
-                    return fs.existsSync(path) && fs.lstatSync(path).isDirectory();
-                },
-                fileExists:function (path) {
-                    return fs.existsSync(path);
-                },
-                stderr:{
-                    Write:function (str) {
-                        grunt.log.error(str);
+                    Write: function (str) {
+                        code += str;
                     },
-                    WriteLine:function (str) {
-                        grunt.log.error(str);
+                    WriteLine: function (str) {
+                        code += str + grunt.util.linefeed;
                     },
-                    Close:function () {
+                    Close: function () {
+                        var created: any = (function () {
+                            var source, type;
+                            if (/\.js$/.test(writeFile)) {
+                                source = writeFile.substr(0, writeFile.length - 3) + ".ts";
+                                type = "js";
+                            }
+                            else if (/\.js\.map$/.test(writeFile)) {
+                                source = writeFile.substr(0, writeFile.length - 7) + ".ts";
+                                type = "map";
+                            }
+                            else if (/\.d\.ts$/.test(writeFile)) {
+                                source = writeFile.substr(0, writeFile.length - 5) + ".ts";
+                                type = "declaration";
+                            }
+                            if (outputOne) {
+                                source = "";
+                            }
+                            return {
+                                source: source,
+                                type: type
+                            };
+                        })();
+                        if (code.trim().length < 1) {
+                            return;
+                        }
+                        if (!outputOne) {
+                            var g = path.join(currentPath, basePath);
+                            writeFile = writeFile.substr(g.length);
+                            writeFile = path.join(currentPath, destPath ? destPath.toString() : '', writeFile);
+                        }
+                        grunt.file.write(writeFile, code);
+                        created.dest = writeFile;
+                        createdFiles.push(created);
                     }
                 }
+                },
+            findFile: function (rootPath, partialFilePath) {
+                var file = path.join(rootPath, partialFilePath);
+                while (true) {
+                    if (fs.existsSync(file)) {
+                        try {
+                            var content = grunt.file.read(file);
+                            // strip UTF BOM
+                            if (content.charCodeAt(0) === 0xFEFF) {
+                                content = content.slice(1);
+                            }
+                            return {
+                                content: content,
+                                path: file
+                            };
+                        } catch (err) {
+                        }
+                    } else {
+                        var parentPath = path.resolve(rootPath, "..");
+                        if (rootPath === parentPath) {
+                            return null;
+                        } else {
+                            rootPath = parentPath;
+                            file = path.resolve(rootPath, partialFilePath);
+                        }
+                    }
+                }
+            },
+            directoryExists: function (path) {
+                return fs.existsSync(path) && fs.lstatSync(path).isDirectory();
+            },
+            fileExists: function (path) {
+                return fs.existsSync(path);
+            },
+            stderr: {
+                Write: function (str) {
+                    grunt.log.error(str);
+                },
+                WriteLine: function (str) {
+                    grunt.log.error(str);
+                },
+                Close: function () {
+                }
             }
-        },        
+        }
+        },
         pluralizeFile = function (n) {
             if (n === 1) {
                 return "1 file";
             }
             return n + " files";
         },
-        prepareSourceMapPath = function(currentPath, options, createdFiles){
+        prepareSourceMapPath = function (currentPath, options, createdFiles) {
             var useFullPath = options.fullSourceMapPath;
 
-            if(!options.sourcemap){
+            if (!options.sourcemap) {
                 return;
             }
 
-            createdFiles.filter(function(item){
+            createdFiles.filter(function (item) {
                 return item.type === "map" || (useFullPath && item.type == "js");
-            }).forEach(function(item){
-                var mapOpj, lines, sourceMapLine;
-                if(item.type === "map"){
-                    mapObj = JSON.parse(grunt.file.read(item.dest));
-                    mapObj.sources.length = 0;
-                    mapObj.sources.push(path.relative(path.dirname(item.dest), item.source).replace(/\\/g, "/"));
-                    if(useFullPath){
-                        mapObj.file = "file:///" + (item.dest.substr(0, item.dest.length - 6) + "js").replace(/\\/g, "/");
+            }).forEach(function (item) {
+                    var mapOpj, lines, sourceMapLine;
+                    if (item.type === "map") {
+                        mapObj = JSON.parse(grunt.file.read(item.dest));
+                        mapObj.sources.length = 0;
+                        mapObj.sources.push(path.relative(path.dirname(item.dest), item.source).replace(/\\/g, "/"));
+                        if (useFullPath) {
+                            mapObj.file = "file:///" + (item.dest.substr(0, item.dest.length - 6) + "js").replace(/\\/g, "/");
+                        }
+                        grunt.file.write(item.dest, JSON.stringify(mapObj))
+                } else if (useFullPath && item.type === "js") {
+                        lines = grunt.file.read(item.dest).split(grunt.util.linefeed);
+                        sourceMapLine = lines[lines.length - 2];
+                        if (/^\/\/@ sourceMappingURL\=.+\.js\.map$/.test(sourceMapLine)) {
+                            lines[lines.length - 2] = "//@ sourceMappingURL=file:///" + item.dest.replace(/\\/g, "/") + ".map";
+                            grunt.file.write(item.dest, lines.join(grunt.util.linefeed));
+                        }
                     }
-                    grunt.file.write(item.dest, JSON.stringify(mapObj))
-                }else if(useFullPath && item.type === "js"){
-                    lines = grunt.file.read(item.dest).split(grunt.util.linefeed);
-                    sourceMapLine = lines[lines.length - 2];
-                    if(/^\/\/@ sourceMappingURL\=.+\.js\.map$/.test(sourceMapLine)){
-                        lines[lines.length - 2] = "//@ sourceMappingURL=file:///" + item.dest.replace(/\\/g, "/") + ".map";
-                        grunt.file.write(item.dest, lines.join(grunt.util.linefeed));
-                    }
-                }
-            });
+                });
         };
 
     grunt.registerMultiTask('ts', 'Compile TypeScript files', function () {
@@ -244,11 +240,15 @@ module.exports = function (grunt) {
                 files.push(filepath);
             });
 
-            for(key in files){
-				var tmp = [files[key]];
-				compile(tmp, dest, grunt.util._.clone(options), extension);
-			}            
-			
+            for (key in files) {
+                
+                //var tmp = [files[key]];
+                //compile(tmp, dest, grunt.util._.clone(options), extension);
+                
+                var file = files[key];
+                console.log(file.red);
+            }
+
             if (grunt.task.current.errorCount) {
                 return false;
             }
@@ -322,60 +322,60 @@ module.exports = function (grunt) {
 
         var units = [
             {
-                fileName:libDPath,
-                code:grunt.file.read(libDPath)
+                fileName: libDPath,
+                code: grunt.file.read(libDPath)
             }
         ];
         var compiler = new TypeScript.TypeScriptCompiler(io.stderr, new TypeScript.NullLogger(), setting),
             resolutionDispatcher = {
-                postResolutionError:function (errorFile, line, col, errorMessage) {
+                postResolutionError: function (errorFile, line, col, errorMessage) {
                     io.stderr.Write(errorFile + "(" + line + "," + col + ") " + (errorMessage == "" ? "" : ": " + errorMessage));
                     compiler.errorReporter.hasErrors = true;
                 },
-                postResolution:function (path, code) {
+                postResolution: function (path, code) {
                     if (!units.some(function (u) {
                         return u.fileName === path;
                     })) {
-                        units.push({fileName:path, code:code.content});
+                        units.push({ fileName: path, code: code.content });
                     }
                 }
             };
 
         srces.forEach(function (src) {
             resolver.resolveCode(path.resolve(currentPath, src), "", false, resolutionDispatcher);
-			console.log('here5');
+            console.log('here5');
         });
 
         compiler.setErrorOutput(io.stderr);
-        if(setting.emitComments){
+        if (setting.emitComments) {
             compiler.emitCommentsToOutput();
         }
         units.forEach(function (unit) {
-            try{
+            try {
                 if (!unit.code) {
                     unit.code = grunt.file.read(unit.fileName);
                 }
                 compiler.addUnit(unit.code, unit.fileName, false);
-            }catch(err){
+            } catch (err) {
                 compiler.errorReporter.hasErrors = true;
                 io.stderr.WriteLine(err.message);
             }
         });
         compiler.typeCheck();
-        if(compiler.errorReporter.hasErrors){
+        if (compiler.errorReporter.hasErrors) {
             return false;
         }
         compiler.emit(io);
 
         compiler.emitDeclarations();
-        if(compiler.errorReporter.hasErrors){
+        if (compiler.errorReporter.hasErrors) {
             return false;
         }
 
-        if(!outputOne){
+        if (!outputOne) {
             prepareSourceMapPath(currentPath, options, io.getCreatedFiles());
         }
-        var result = {js:[], m:[], d:[], other:[]};
+        var result = { js: [], m: [], d: [], other: [] };
         io.getCreatedFiles().forEach(function (item) {
             if (item.type === "js") result.js.push(item.dest);
             else if (item.type === "map") result.m.push(item.dest);
@@ -386,7 +386,7 @@ module.exports = function (grunt) {
             + ", map: " + pluralizeFile(result.m.length)
             + ", declaration: " + pluralizeFile(result.d.length);
         if (outputOne) {
-            if(result.js.length > 0){
+            if (result.js.length > 0) {
                 grunt.log.writeln("File " + (result.js[0]).cyan + " created.");
             }
             grunt.log.writeln(resultMessage);
@@ -395,5 +395,5 @@ module.exports = function (grunt) {
         }
         return true;
     };
-
+*/
 };
