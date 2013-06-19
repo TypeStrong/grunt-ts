@@ -1,1 +1,34 @@
-grunt-ts================Based on the grunt-typescript, but uses a seperate compilation step for each file. Compile TypeScript## DocumentationYou'll need to install `grunt-ts` first:    npm install grunt-tsThen modify your `grunt.js` file by adding the following line:    grunt.loadNpmTasks('grunt-ts');Then add some configuration for the plugin like so:    grunt.initConfig({        ...        ts: {          base: {            src: ['path/to/typescript/files/**/*.ts'],            dest: 'where/you/want/your/js/files',            options: {              module: 'amd', //or commonjs              target: 'es5', //or es3              base_path: 'path/to/typescript/files',              sourcemap: true,              fullSourceMapPath: true,              declaration: true,            }          }        },        ...    });   If you want to create a js file that is a concatenation of all the ts file (like -out option from tsc), you should specify the name of the file with the '.js' extension to dest option.    grunt.initConfig({        ...        ts: {          base: {            src: ['path/to/typescript/files/**/*.ts'],            dest: 'where/you/want/your/js/file.js',            options: {              module: 'amd', //or commonjs            }          }        },        ...    });
+grunt-ts
+================
+A written from scratch TypeScript compiler task for GruntJS. 
+
+It differs from grunt-typescript and grunt-type in *two key ways*: 
+
+- This is written in TypeScript 0.9 
+- It is super easy to extend and update 
+ - it simply uses tsc on the commandline.
+ - Super short and clear typescript code. 
+
+Compiles all files. Stops on a compilation error reporting it on the console. Makes for easier reading. 
+
+## Documentation
+You'll need to install `grunt-ts` first:
+
+    npm install grunt-ts
+
+Then modify your `grunt.js` file by adding the following line:
+
+    grunt.loadNpmTasks('grunt-ts');
+
+Then add some configuration for the plugin like so:
+
+    grunt.initConfig({
+        ...
+        ts: {
+          base: {
+            src: ['path/to/typescript/files/**/*.ts']            
+          }
+        },
+        ...
+    });
+   
