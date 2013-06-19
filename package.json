@@ -2,7 +2,7 @@
     "author": "basarat",
     "name": "grunt-ts",
     "description": "compile typescript to javascript using computer installed typescript",
-    "version": "0.2.1",
+    "version": "0.2.3",
     "homepage": "https://github.com/basarat/grunt-ts",
     "repository": {
         "type": "git",
@@ -25,6 +25,7 @@
         "grunt": "~0.4.0",
         "typescript": "0.9.0",
         "grunt-lib-contrib": "~0.5.2"
+		"shelljs":"0.1.4"
     },
     "devDependencies": {
         "grunt": "~0.4.0",
