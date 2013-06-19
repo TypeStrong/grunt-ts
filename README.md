@@ -9,7 +9,9 @@ It differs from grunt-typescript and grunt-type in *two key ways*:
  - it simply uses tsc on the commandline.
  - Super short and clear typescript code. 
 
-Compiles all files. Stops on a compilation error reporting it on the console. Makes for easier reading. 
+Check out the complete code: https://github.com/basarat/grunt-ts/blob/master/tasks/ts.ts 
+
+Compiles all files. Stops on a compilation error reporting it on the console. Makes for easier view. 
 
 ## Documentation
 You'll need to install `grunt-ts` first:
