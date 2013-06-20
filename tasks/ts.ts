@@ -66,8 +66,11 @@ module.exports = function (grunt) {
     var exec = shell.exec;
     var currentPath = path.resolve(".");
     var tsc = getTsc(resolveTypeScriptBinPath(currentPath, 0));
-        
+    
     grunt.registerMultiTask('ts', 'Compile TypeScript files', function () {
+        // Was the whole process successful
+        var success = true; 
+
         var that = this;
 
         this.files.forEach(function (f) {
@@ -89,11 +92,13 @@ module.exports = function (grunt) {
                 if (result.code != 0) {
                     grunt.fail.warn("Failed to compile file: " + file);
                     console.log("output: ".cyan); 
-                    console.log(result.output.yellow);
-                    return false;
+                    console.log(result.output.yellow);                    
+                    success = false;
                 }
             });
-            
+        
         });
+
+        return success;
     });
 };
