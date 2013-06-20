@@ -8,8 +8,14 @@ module.exports = function (grunt) {
             ]
         },
         ts:{            
-            src:["test/fail.ts","test/work.ts"]            
-        }
+			normal:{
+				src:["test/fail.ts","test/work.ts"]            
+			},
+			long:{
+				src:["test/fail.ts","test/work.ts"],
+				verbose: true			
+			}
+        },		
     });
 
     grunt.loadTasks("tasks");    

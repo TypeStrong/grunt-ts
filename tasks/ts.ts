@@ -28,7 +28,10 @@ interface IOptions{
     target: string; // es3 , es5 
     module: string; // amd, commonjs 
     sourcemap: boolean;
-    declaration: boolean;     
+    declaration: boolean;
+    verbose: boolean;
+    src: string[];
+    dest: string;
 }
 
 module.exports = function (grunt) {
@@ -57,7 +60,8 @@ module.exports = function (grunt) {
     }
 
 
-    function compileFile(filepath: string,options:IOptions):ICompileResult{
+    function compileFile(filepath: string, options: IOptions): ICompileResult{
+        // TODO: use options 
         var cmd = 'node ' + tsc + ' ' + filepath;
         var result = exec(cmd);
         return result;
@@ -73,9 +77,9 @@ module.exports = function (grunt) {
 
         var that = this;
 
-        this.files.forEach(function (f) {
+        this.files.forEach(function (f: IOptions) {
             var dest = f.dest,
-                options = that.options(),
+                //options:IOptions = that.options(),
                 extension = that.data.extension,
                 files = [];
 
@@ -86,11 +90,14 @@ module.exports = function (grunt) {
                 files.push(filepath);
             });
 
-            files.forEach(function (file) {
-                // TODO: use options 
-                var result = compileFile(file, options);
+            files.forEach(function (file) {                
+                //console.log(f);
+                if (f.verbose) {
+                    console.log('Compiling: ' + file.yellow);
+                }
+                var result = compileFile(file, f);                
                 if (result.code != 0) {
-                    var msg = "Continuing, But failed to compile file: " + file;
+                    var msg = "Failed to compile file: " + file;
                     console.log(msg.red);
                     success = false;
                 }

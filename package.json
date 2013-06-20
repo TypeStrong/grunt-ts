@@ -2,7 +2,7 @@
     "author": "basarat",
     "name": "grunt-ts",
     "description": "compile typescript to javascript using computer installed typescript",
-    "version": "0.2.5",
+    "version": "0.2.6",
     "homepage": "https://github.com/basarat/grunt-ts",
     "repository": {
         "type": "git",

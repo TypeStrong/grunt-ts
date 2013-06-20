@@ -33,7 +33,7 @@ module.exports = function (grunt) {
         var that = this;
 
         this.files.forEach(function (f) {
-            var dest = f.dest, options = that.options(), extension = that.data.extension, files = [];
+            var dest = f.dest, extension = that.data.extension, files = [];
 
             grunt.file.expand(f.src).forEach(function (filepath) {
                 if (filepath.substr(-5) === ".d.ts") {
@@ -43,9 +43,12 @@ module.exports = function (grunt) {
             });
 
             files.forEach(function (file) {
-                var result = compileFile(file, options);
+                if (f.verbose) {
+                    console.log('Compiling: ' + file.yellow);
+                }
+                var result = compileFile(file, f);
                 if (result.code != 0) {
-                    var msg = "Continuing, But failed to compile file: " + file;
+                    var msg = "Failed to compile file: " + file;
                     console.log(msg.red);
                     success = false;
                 }
