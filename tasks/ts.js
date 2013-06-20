@@ -45,14 +45,13 @@ module.exports = function (grunt) {
             files.forEach(function (file) {
                 var result = compileFile(file, options);
                 if (result.code != 0) {
-                    grunt.fail.warn("Failed to compile file: " + file);
-                    console.log("output: ".cyan);
-                    console.log(result.output.yellow);
+                    var msg = "Continuing, But failed to compile file: " + file;
+                    console.log(msg.red);
                     success = false;
                 }
             });
         });
 
-        return success;
+        return true;
     });
 };

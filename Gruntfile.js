@@ -7,19 +7,14 @@ module.exports = function (grunt) {
                 "test/**/*.js",                
             ]
         },
-        ts:{
-            work:{
-                src:["test/work.ts"]
-            },
-			fail:{
-				src:["test/fail.ts"]
-			}
+        ts:{            
+            src:["test/fail.ts","test/work.ts"]            
         }
     });
 
     grunt.loadTasks("tasks");    
     grunt.loadNpmTasks("grunt-contrib-clean");    
-	grunt.registerTask("test", ["clean", "ts:work", "ts:fail"]);
+	grunt.registerTask("test", ["clean", "ts"]);
     grunt.registerTask("default", ["test"]);
 
 };
