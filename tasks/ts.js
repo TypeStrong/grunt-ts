@@ -48,6 +48,8 @@ module.exports = function (grunt) {
                 var msg = "Compilation failed:";
                 console.log(msg.red);
                 success = false;
+            } else {
+                console.log((files.length + ' typescript files successfully processed.').cyan);
             }
         });
 
