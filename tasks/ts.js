@@ -17,7 +17,8 @@ module.exports = function (grunt) {
         return '"' + binPath + '\\' + 'tsc" ';
     }
 
-    function compileFile(filepath, options) {
+    function compileAllFiles(filepaths, options) {
+        var filepath = filepaths.join(' ');
         var cmd = 'node ' + tsc + ' ' + filepath;
         var result = exec(cmd);
         return result;
@@ -42,19 +43,14 @@ module.exports = function (grunt) {
                 files.push(filepath);
             });
 
-            files.forEach(function (file) {
-                if (f.verbose) {
-                    console.log('Compiling: ' + file.yellow);
-                }
-                var result = compileFile(file, f);
-                if (result.code != 0) {
-                    var msg = "Failed to compile file: " + file;
-                    console.log(msg.red);
-                    success = false;
-                }
-            });
+            var result = compileAllFiles(files, f);
+            if (result.code != 0) {
+                var msg = "Compilation failed:";
+                console.log(msg.red);
+                success = false;
+            }
         });
 
-        return true;
+        return success;
     });
 };

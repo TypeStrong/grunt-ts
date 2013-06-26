@@ -9,10 +9,11 @@ module.exports = function (grunt) {
         },
         ts:{            
 			normal:{
-				src:["test/fail.ts","test/work.ts"]            
+				src:["test/work/**/*.ts"],				
+				verbose: true
 			},
-			long:{
-				src:["test/fail.ts","test/work.ts"],
+			fail:{
+				src:["test/fail/*.ts"],
 				verbose: true			
 			}
         },		

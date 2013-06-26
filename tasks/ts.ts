@@ -24,7 +24,7 @@ interface ICompileResult {
     output: string;
 }
 
-interface IOptions{
+interface IOptions {
     target: string; // es3 , es5 
     module: string; // amd, commonjs 
     sourcemap: boolean;
@@ -32,6 +32,7 @@ interface IOptions{
     verbose: boolean;
     src: string[];
     dest: string;
+    single: boolean; // use a single command for compilation 
 }
 
 module.exports = function (grunt) {
@@ -59,21 +60,21 @@ module.exports = function (grunt) {
         return '"' + binPath + '\\' + 'tsc" ';
     }
 
-
-    function compileFile(filepath: string, options: IOptions): ICompileResult{
+    function compileAllFiles(filepaths: string[], options: IOptions): ICompileResult {
         // TODO: use options 
+        var filepath: string = filepaths.join(' ');
         var cmd = 'node ' + tsc + ' ' + filepath;
         var result = exec(cmd);
         return result;
-    }    
-    
+    }
+
     var exec = shell.exec;
     var currentPath = path.resolve(".");
     var tsc = getTsc(resolveTypeScriptBinPath(currentPath, 0));
-    
+
     grunt.registerMultiTask('ts', 'Compile TypeScript files', function () {
         // Was the whole process successful
-        var success = true; 
+        var success = true;
 
         var that = this;
 
@@ -90,23 +91,17 @@ module.exports = function (grunt) {
                 files.push(filepath);
             });
 
-            files.forEach(function (file) {                
-                //console.log(f);
-                if (f.verbose) {
-                    console.log('Compiling: ' + file.yellow);
-                }
-                var result = compileFile(file, f);                
-                if (result.code != 0) {
-                    var msg = "Failed to compile file: " + file;
-                    console.log(msg.red);
-                    success = false;
-                }
-            });
-        
+            var result = compileAllFiles(files, f);
+            if (result.code != 0) {
+                var msg = "Compilation failed:";
+                console.log(msg.red);
+                success = false;
+            }
+
         });
 
         // return success;
         // return true so that your watch continues and does not fail: 
-        return true; 
+        return success;
     });
 };
