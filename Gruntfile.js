@@ -10,7 +10,8 @@ module.exports = function (grunt) {
         ts:{            
 			normal:{
 				src:["test/work/**/*.ts"],				
-				verbose: true
+				verbose: true,
+				reference: "test/" // generate a reference.ts file at this place, Automatically manages relative file paths
 			},
 			fail:{
 				src:["test/fail/*.ts"],

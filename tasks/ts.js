@@ -34,7 +34,7 @@ module.exports = function (grunt) {
         var that = this;
 
         this.files.forEach(function (f) {
-            var dest = f.dest, extension = that.data.extension, files = [];
+            var dest = f.dest, files = [];
 
             grunt.file.expand(f.src).forEach(function (filepath) {
                 if (filepath.substr(-5) === ".d.ts") {
@@ -44,6 +44,16 @@ module.exports = function (grunt) {
             });
 
             var result = compileAllFiles(files, f);
+
+            var reference = f.reference;
+            if (!!reference) {
+                var contents = [];
+                files.forEach(function (filename) {
+                    contents.push('/// <reference path="' + path.relative(reference, filename).split('\\').join('/') + '" />');
+                });
+                fs.writeFileSync(reference + '/reference.ts', contents.join('\n'));
+            }
+
             if (result.code != 0) {
                 var msg = "Compilation failed:";
                 console.log(msg.red);
