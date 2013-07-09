@@ -2,7 +2,7 @@
     "author": "basarat",
     "name": "grunt-ts",
     "description": "compile typescript files to javascript using tsc command",
-    "version": "0.3.9",
+    "version": "0.4.1",
     "homepage": "https://github.com/basarat/grunt-ts",
     "repository": {
         "type": "git",
