@@ -14,7 +14,7 @@ module.exports = function (grunt) {
     }
 
     function getTsc(binPath) {
-        return '"' + binPath + '\\' + 'tsc" ';
+        return '"' + binPath + '/' + 'tsc" ';
     }
 
     function compileAllFiles(filepaths, options) {
