@@ -2,7 +2,7 @@
     "author": "basarat",
     "name": "grunt-ts",
     "description": "compile typescript files to javascript using tsc command",
-    "version": "0.4.2",
+    "version": "0.4.3",
     "homepage": "https://github.com/basarat/grunt-ts",
     "repository": {
         "type": "git",
@@ -24,14 +24,16 @@
     "dependencies": {
         "grunt": "~0.4.0",
         "typescript": "0.9.0",
-        "grunt-lib-contrib": "~0.5.2",
-		"shelljs":"0.1.4"
+        "grunt-lib-contrib": "0.5.2",
+		"shelljs":"0.1.4",
+		"matchdep": "0.1.1"
     },
     "devDependencies": {
         "grunt": "~0.4.0",
         "typescript": "0.9.0",
         "grunt-contrib-clean": "~0.4.0",
         "grunt-contrib-nodeunit": "~0.1.2",
+		"grunt-contrib-watch": "0.4.4",
 		"shelljs":"0.1.4"
     },
     "optionalDependencies": {},
