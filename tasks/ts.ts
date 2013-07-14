@@ -9,7 +9,6 @@ declare var __dirname;
 declare var mapObj;
 declare var key;
 
-declare var TypeScript;
 
 // What grunt adds to stirng 
 interface String {
@@ -25,15 +24,14 @@ interface ICompileResult {
 }
 
 interface IOptions {
+    reference: string; // path to a reference.ts 
+    src: string[]; // input files 
+    out: string; // if sepecified e.g. 'single.js' all output js files are merged into single.js using tsc --out command 
     target: string; // es3 , es5 
     module: string; // amd, commonjs 
     sourcemap: boolean;
     declaration: boolean;
-    verbose: boolean;
-    src: string[];
-    dest: string;
-    single: boolean; // use a single command for compilation 
-    reference: string;
+    verbose: boolean;    
 }
 
 module.exports = function (grunt) {
@@ -62,9 +60,13 @@ module.exports = function (grunt) {
     }
 
     function compileAllFiles(filepaths: string[], options: IOptions): ICompileResult {
-        // TODO: use options 
+        
         var filepath: string = filepaths.join(' ');
         var cmd = 'node ' + tsc + ' ' + filepath;
+        // TODO: use options 
+        if (options.out) {
+            cmd = cmd + ' --out ' + options.out;
+        }
         var result = exec(cmd);
         return result;
     }
@@ -80,8 +82,7 @@ module.exports = function (grunt) {
         var that = this;
 
         this.files.forEach(function (f: IOptions) {
-            var dest = f.dest,
-                files:string[] = f.src;
+            var files:string[] = f.src;
 
 
             // If you want to ignore .d.ts

@@ -2,3 +2,5 @@ node_modules
 npm-debug.log
 test/tmp
 /.idea
+tasks/ts.js.map
+test/out.js
