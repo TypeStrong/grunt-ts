@@ -1,5 +1,6 @@
 module.exports = function (grunt) {
     var path = require('path'), fs = require('fs'), vm = require('vm'), shell = require('shelljs');
+    var eol = require('os').EOL;
 
     function resolveTypeScriptBinPath(currentPath, depth) {
         var targetPath = path.resolve(__dirname, (new Array(depth + 1)).join("../../"), "../node_modules/typescript/bin");
@@ -33,7 +34,6 @@ module.exports = function (grunt) {
     var tsc = getTsc(resolveTypeScriptBinPath(currentPath, 0));
 
     grunt.registerMultiTask('ts', 'Compile TypeScript files', function () {
-        // Was the whole process successful
         var success = true;
 
         var that = this;
@@ -41,14 +41,6 @@ module.exports = function (grunt) {
         this.files.forEach(function (f) {
             var files = f.src;
 
-            // If you want to ignore .d.ts
-            //files = []
-            //grunt.file.expand(f.src).forEach(function (filepath) {
-            //    if (filepath.substr(-5) === ".d.ts") {
-            //        return;
-            //    }
-            //    files.push(filepath);
-            //});
             var reference = f.reference;
             if (!!reference) {
                 var contents = [];
@@ -56,7 +48,7 @@ module.exports = function (grunt) {
                     if (filename.indexOf('reference.ts') == -1)
                         contents.push('/// <reference path="' + path.relative(reference, filename).split('\\').join('/') + '" />');
                 });
-                fs.writeFileSync(reference + '/reference.ts', contents.join('\n'));
+                fs.writeFileSync(reference + '/reference.ts', contents.join(eol));
             }
 
             var result = compileAllFiles(files, f);
@@ -72,4 +64,3 @@ module.exports = function (grunt) {
         return success;
     });
 };
-//@ sourceMappingURL=ts.js.map

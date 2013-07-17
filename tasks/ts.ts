@@ -40,6 +40,7 @@ module.exports = function (grunt) {
         fs = require('fs'),
         vm = require('vm'),
         shell = require('shelljs');
+    var eol = require('os').EOL;
 
     function resolveTypeScriptBinPath(currentPath, depth): string {
         var targetPath = path.resolve(__dirname,
@@ -102,7 +103,7 @@ module.exports = function (grunt) {
                     if (filename.indexOf('reference.ts') == -1)
                         contents.push('/// <reference path="' + path.relative(reference, filename).split('\\').join('/') + '" />')
                 });
-                fs.writeFileSync(reference + '/reference.ts', contents.join('\n'));
+                fs.writeFileSync(reference + '/reference.ts', contents.join(eol));
             }
 
             var result = compileAllFiles(files, f);
