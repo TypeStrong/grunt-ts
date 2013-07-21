@@ -34,6 +34,7 @@ module.exports = function (grunt) {
     var tsc = getTsc(resolveTypeScriptBinPath(currentPath, 0));
 
     grunt.registerMultiTask('ts', 'Compile TypeScript files', function () {
+        // Was the whole process successful
         var success = true;
 
         var that = this;
@@ -41,6 +42,14 @@ module.exports = function (grunt) {
         this.files.forEach(function (f) {
             var files = f.src;
 
+            // If you want to ignore .d.ts
+            //files = []
+            //grunt.file.expand(f.src).forEach(function (filepath) {
+            //    if (filepath.substr(-5) === ".d.ts") {
+            //        return;
+            //    }
+            //    files.push(filepath);
+            //});
             var reference = f.reference;
             if (!!reference) {
                 var contents = [];
@@ -64,3 +73,4 @@ module.exports = function (grunt) {
         return success;
     });
 };
+//@ sourceMappingURL=ts.js.map

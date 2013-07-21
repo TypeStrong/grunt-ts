@@ -1,32 +1,27 @@
+/// <reference path="../defs/grunt.d.ts"/>
+
 /*
  * grunt-ts
  * Licensed under the MIT license.
  */
 
-declare var module;
+
 declare var require;
 declare var __dirname;
 declare var mapObj;
 declare var key;
-
-
-// What grunt adds to stirng 
-interface String {
-    yellow: any;
-    cyan: any;
-    green: any;
-    red: any;
-}
 
 interface ICompileResult {
     code: number;
     output: string;
 }
 
-interface IOptions {
-    reference: string; // path to a reference.ts 
+interface IOptions {    
     src: string[]; // input files 
+    reference: string; // path to a reference.ts 
     out: string; // if sepecified e.g. 'single.js' all output js files are merged into single.js using tsc --out command 
+
+
     target: string; // es3 , es5 
     module: string; // amd, commonjs 
     sourcemap: boolean;
@@ -34,8 +29,8 @@ interface IOptions {
     verbose: boolean;    
 }
 
-module.exports = function (grunt) {
-
+module.exports = function (grunt:IGrunt) {
+    
     var path = require('path'),
         fs = require('fs'),
         vm = require('vm'),
