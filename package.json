@@ -23,7 +23,7 @@
     },
     "dependencies": {
         "grunt": "~0.4.0",
-        "typescript": "0.9.0",
+        "typescript": "0.9.0-1",
         "grunt-lib-contrib": "0.5.2",
 		"shelljs":"0.1.4",
 		"matchdep": "0.1.1",
