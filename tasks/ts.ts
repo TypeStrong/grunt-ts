@@ -18,8 +18,9 @@ interface ICompileResult {
 
 interface IOptions {    
     src: string[]; // input files 
-    reference: string; // path to a reference.ts 
+    reference: string; // path to a reference.ts e.g. './approot/'
     out: string; // if sepecified e.g. 'single.js' all output js files are merged into single.js using tsc --out command 
+    watch: string; // if specified e.g. './appdir/' will watch the directory for changes. Note that specifing this makes the grunt task async (i.e. it keep running)
 
 
     target: string; // es3 , es5 
