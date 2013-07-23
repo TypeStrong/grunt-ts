@@ -23,16 +23,19 @@ module.exports = function (grunt) {
 
         ts: {
             normal: {
-                src: ["test/work/**/*.ts"],
-                verbose: true,
+                src: ["test/work/**/*.ts"],                
                 reference: "./test/", // If specified, generate a reference.ts file at this place, Automatically manages relative file paths                
-                out: 'test/out.js', // If specified, generate a out.js file which is the merged typescript output
-                watch: './test/'
+                out: 'test/out.js', // If specified, generate a out.js file which is the merged typescript output                
             },
             fail: {
-                src: ["test/fail/*.ts"],
-                verbose: true
-            }
+                src: ["test/fail/*.ts"],                
+            },
+            watch: {
+                src: ["test/work/**/*.ts"],                
+                reference: "./test/", // If specified, generate a reference.ts file at this place, Automatically manages relative file paths                
+                out: 'test/out.js', // If specified, generate a out.js file which is the merged typescript output                
+                watch: './test'
+            },
         },
     });
 

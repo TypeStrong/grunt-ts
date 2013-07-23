@@ -26,7 +26,8 @@
         "typescript": "0.9.0",
         "grunt-lib-contrib": "0.5.2",
 		"shelljs":"0.1.4",
-		"matchdep": "0.1.1"
+		"matchdep": "0.1.1",
+		"gaze": "0.4.1"
     },
     "devDependencies": {
         "grunt": "~0.4.0",

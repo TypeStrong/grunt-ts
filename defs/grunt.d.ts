@@ -1,9 +1,9 @@
 // What grunt adds to stirng 
 interface String {
-    yellow: any;
-    cyan: any;
-    green: any;
-    red: any;
+    yellow: string;
+    cyan: string;
+    green: string;
+    red: string;    
 }
 
 
