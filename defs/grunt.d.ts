@@ -44,7 +44,8 @@ interface IGrunt {
     fail: any;
     // Log
     log: {
-        writeln: (msg: string) => void;
+        writeln: (msg: string) => void; // green msg 
+        error: (msg: string) => void; // error msg 
     };
     // Options
     option: any;

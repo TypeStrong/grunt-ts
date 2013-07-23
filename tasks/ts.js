@@ -34,10 +34,10 @@ module.exports = function (grunt) {
     var tsc = getTsc(resolveTypeScriptBinPath(currentPath, 0));
 
     grunt.registerMultiTask('ts', 'Compile TypeScript files', function () {
+        var currenttask = this;
+
         // Was the whole process successful
         var success = true;
-
-        var that = this;
 
         this.files.forEach(function (f) {
             var files = f.src;
@@ -63,10 +63,10 @@ module.exports = function (grunt) {
             var result = compileAllFiles(files, f);
             if (result.code != 0) {
                 var msg = "Compilation failed:";
-                console.log(msg.red);
+                grunt.log.error(msg.red);
                 success = false;
             } else {
-                console.log((files.length + ' typescript files successfully processed.').cyan);
+                grunt.log.writeln((files.length + ' typescript files successfully processed.').green);
             }
         });
 
