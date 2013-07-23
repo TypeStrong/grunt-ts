@@ -143,14 +143,7 @@ module.exports = function (grunt: IGrunt) {
                     grunt.log.writeln('Compiling.'.yellow);
                     //runCompilation([filepath]); // Potential optimization, But we want the whole project to be compilable
                     runCompilation(files);
-                });
-
-                //var loop = function () {
-                //    // Let's simulate an error, sometimes.
-                //    console.log('hey');
-                //    setTimeout(loop, 1000);
-                //}
-                //setTimeout(loop, 1000);
+                });               
             }
 
         });
