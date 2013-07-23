@@ -32,9 +32,9 @@ module.exports = function (grunt) {
             },
             watch: {
                 src: ["test/work/**/*.ts"],                
-                reference: "./test/", // If specified, generate a reference.ts file at this place, Automatically manages relative file paths                
+                reference: "test/", // If specified, generate a reference.ts file at this place, Automatically manages relative file paths                
                 out: 'test/out.js', // If specified, generate a out.js file which is the merged typescript output                
-                watch: './test'
+                watch: 'test'
             },
         },
     });

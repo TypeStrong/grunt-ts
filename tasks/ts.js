@@ -89,10 +89,13 @@ module.exports = function (grunt) {
             if (!!watch) {
                 var watch = endWithSlash(watch);
                 var done = currenttask.async();
-                var Gaze = require('gaze').Gaze;
+
                 var watchpath = watch + '**/*.ts';
-                var gaze = new Gaze(watchpath);
                 grunt.log.writeln(('Watching all files: ' + watchpath).cyan);
+
+                var Gaze = require('gaze').Gaze;
+
+                var gaze = new Gaze(watchpath);
 
                 // A file has been added/changed/deleted has occurred
                 gaze.on('all', function (event, filepath) {
