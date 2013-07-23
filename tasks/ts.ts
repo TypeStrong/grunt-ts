@@ -16,7 +16,7 @@ interface ICompileResult {
     output: string;
 }
 
-interface IOptions {    
+interface IOptions {
     src: string[]; // input files 
     reference: string; // path to a reference.ts e.g. './approot/'
     out: string; // if sepecified e.g. 'single.js' all output js files are merged into single.js using tsc --out command 
@@ -27,11 +27,11 @@ interface IOptions {
     module: string; // amd, commonjs 
     sourcemap: boolean;
     declaration: boolean;
-    verbose: boolean;    
+    verbose: boolean;
 }
 
-module.exports = function (grunt:IGrunt) {
-    
+module.exports = function (grunt: IGrunt) {
+
     var path = require('path'),
         fs = require('fs'),
         vm = require('vm'),
@@ -56,8 +56,8 @@ module.exports = function (grunt:IGrunt) {
         return '"' + binPath + '/' + 'tsc" ';
     }
 
-    function compileAllFiles(filepaths: string[], options: IOptions): ICompileResult {
-        
+    function compileAllFiles(filepaths: string[], options: IOptions, task): ICompileResult {
+
         var filepath: string = filepaths.join(' ');
         var cmd = 'node ' + tsc + ' ' + filepath;
         // TODO: use options 
@@ -77,10 +77,11 @@ module.exports = function (grunt:IGrunt) {
         var currenttask = this;
 
         // Was the whole process successful
-        var success = true;        
+        var success = true;
+        var watch;
 
         this.files.forEach(function (f: IOptions) {
-            var files:string[] = f.src;
+            var files: string[] = f.src;
 
 
             // If you want to ignore .d.ts
@@ -103,17 +104,29 @@ module.exports = function (grunt:IGrunt) {
                 fs.writeFileSync(reference + '/reference.ts', contents.join(eol));
             }
 
-            var result = compileAllFiles(files, f);
+            watch = f.watch;
+            if (!!watch) {
+                var done = currenttask.async();
+                var loop = function () {
+                    // Let's simulate an error, sometimes.
+                    console.log('hey');                                    
+                    setTimeout(loop, 1000);
+                }
+                setTimeout(loop, 1000);
+            }
+
+            var result = compileAllFiles(files, f, currenttask);
             if (result.code != 0) {
                 var msg = "Compilation failed:";
                 grunt.log.error(msg.red);
                 success = false;
             }
             else {
-                grunt.log.writeln((files.length +' typescript files successfully processed.').green);
+                grunt.log.writeln((files.length + ' typescript files successfully processed.').green);
             }
         });
-                
-        return success;
+
+        if (!watch)
+            return success;
     });
 };

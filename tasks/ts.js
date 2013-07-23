@@ -18,7 +18,7 @@ module.exports = function (grunt) {
         return '"' + binPath + '/' + 'tsc" ';
     }
 
-    function compileAllFiles(filepaths, options) {
+    function compileAllFiles(filepaths, options, task) {
         var filepath = filepaths.join(' ');
         var cmd = 'node ' + tsc + ' ' + filepath;
 
@@ -38,6 +38,7 @@ module.exports = function (grunt) {
 
         // Was the whole process successful
         var success = true;
+        var watch;
 
         this.files.forEach(function (f) {
             var files = f.src;
@@ -60,7 +61,18 @@ module.exports = function (grunt) {
                 fs.writeFileSync(reference + '/reference.ts', contents.join(eol));
             }
 
-            var result = compileAllFiles(files, f);
+            watch = f.watch;
+            if (!!watch) {
+                var done = currenttask.async();
+                var loop = function () {
+                    // Let's simulate an error, sometimes.
+                    console.log('hey');
+                    setTimeout(loop, 1000);
+                };
+                setTimeout(loop, 1000);
+            }
+
+            var result = compileAllFiles(files, f, currenttask);
             if (result.code != 0) {
                 var msg = "Compilation failed:";
                 grunt.log.error(msg.red);
@@ -70,7 +82,8 @@ module.exports = function (grunt) {
             }
         });
 
-        return success;
+        if (!watch)
+            return success;
     });
 };
 //@ sourceMappingURL=ts.js.map
