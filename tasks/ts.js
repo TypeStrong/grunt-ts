@@ -18,8 +18,8 @@ module.exports = function (grunt) {
     }
 
     var exec = shell.exec;
-    var currentPath = path.resolve(".");
-    var tsc = getTsc(resolveTypeScriptBinPath(currentPath, 0));
+    var cwd = path.resolve(".");
+    var tsc = getTsc(resolveTypeScriptBinPath(cwd, 0));
 
     function compileAllFiles(files, target, task) {
         var filepath = files.join(' ');
@@ -72,10 +72,12 @@ module.exports = function (grunt) {
         var watch;
 
         // Some interesting logs:
+        //http://gruntjs.com/api/inside-tasks#inside-multi-tasks
+        //console.log(this)
         //console.log(this.files[0]); // An array of target files ( only one in our case )
         //console.log(this.files[0].src); // a getter for a resolved list of files
         //console.log(this.files[0].orig.src); // The original glob / array / !array / <% array %> for files. Can be very fancy :)
-        // this.files[0] is actually a single in our case as we support only one source / out per target
+        // this.files[0] is actually a single in our case as we gave examples of  one source / out per target
         this.files.forEach(function (target) {
             // Create a reference file
             var reference = target.reference;
@@ -97,7 +99,6 @@ module.exports = function (grunt) {
                     grunt.log.error(msg.red);
                     success = false;
                 } else {
-                    grunt.log.writeln(files);
                     grunt.log.writeln((files.length + ' typescript files successfully processed.').green);
                 }
             }
@@ -122,7 +123,9 @@ module.exports = function (grunt) {
                     grunt.log.writeln('Compiling.'.yellow);
 
                     //runCompilation([filepath]); // Potential optimization, But we want the whole project to be compilable
-                    runCompilation(target.src);
+                    // Reexpand the original file glob:
+                    var files = grunt.file.expand(currenttask.data.src);
+                    runCompilation(files);
                 });
             }
         });

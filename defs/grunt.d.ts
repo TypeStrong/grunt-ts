@@ -10,8 +10,12 @@ interface String {
 interface ITask{
     // options from user point : http://gruntjs.com/configuring-tasks#options
     // options from plugin dev point: http://gruntjs.com/api/inside-tasks#this.options
-    options<T>(defaults?: T):T;
-    async:()=>(ret: boolean)=>void;
+    options<T>(defaults?: T): T;
+    async: () => (ret: boolean) => void;
+    filesSrc: string[]; // a getter http://gruntjs.com/api/inside-tasks#inside-multi-tasks
+    data: {
+        src: any;
+    }
 }
 
 ////////////////
@@ -106,8 +110,8 @@ interface IGruntFileObject {
     recurse(rootdir, callback);
 
     // Globbing patterns
-    expand(patterns);
-    expand(options, patterns);
+    expand(patterns):string[];
+    expand(options, patterns):string[];
     expandMapping(patterns, dest, options?);
     match(patterns, filepaths);
     match(options, patterns, filepaths);

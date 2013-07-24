@@ -59,8 +59,8 @@ module.exports = function (grunt: IGrunt) {
     }
 
     var exec = shell.exec;
-    var currentPath = path.resolve(".");
-    var tsc = getTsc(resolveTypeScriptBinPath(currentPath, 0));
+    var cwd = path.resolve(".");
+    var tsc = getTsc(resolveTypeScriptBinPath(cwd, 0));
 
     function compileAllFiles(files:string[],target: ITargetOptions, task: ITaskOptions): ICompileResult {
 
@@ -117,11 +117,13 @@ module.exports = function (grunt: IGrunt) {
         var watch;
 
         // Some interesting logs: 
+        //http://gruntjs.com/api/inside-tasks#inside-multi-tasks
+        //console.log(this)
         //console.log(this.files[0]); // An array of target files ( only one in our case )
         //console.log(this.files[0].src); // a getter for a resolved list of files 
         //console.log(this.files[0].orig.src); // The original glob / array / !array / <% array %> for files. Can be very fancy :) 
-
-        // this.files[0] is actually a single in our case as we support only one source / out per target
+               
+        // this.files[0] is actually a single in our case as we gave examples of  one source / out per target
         this.files.forEach(function (target: ITargetOptions) {
                         
 
@@ -146,8 +148,7 @@ module.exports = function (grunt: IGrunt) {
                     grunt.log.error(msg.red);
                     success = false;
                 }
-                else {
-                    grunt.log.writeln(files);
+                else {                    
                     grunt.log.writeln((files.length + ' typescript files successfully processed.').green);
                 }
             }
@@ -169,11 +170,13 @@ module.exports = function (grunt: IGrunt) {
                 gaze.on('all', function (event, filepath) {
                     grunt.log.writeln(('    >>' + filepath + ' was ' + event).yellow);
                     grunt.log.writeln('Compiling.'.yellow);
-                    //runCompilation([filepath]); // Potential optimization, But we want the whole project to be compilable
-                    runCompilation(target.src);
+                    //runCompilation([filepath]); // Potential optimization, But we want the whole project to be compilable                    
+
+                    // Reexpand the original file glob: 
+                    var files = grunt.file.expand(currenttask.data.src);
+                    runCompilation(files);
                 });
             }
-
         });
 
         if (!watch)
