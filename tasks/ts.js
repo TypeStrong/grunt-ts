@@ -17,9 +17,26 @@ module.exports = function (grunt) {
         return '"' + binPath + '/' + 'tsc" ';
     }
 
+    var exec = shell.exec;
+    var currentPath = path.resolve(".");
+    var tsc = getTsc(resolveTypeScriptBinPath(currentPath, 0));
+
     function compileAllFiles(filepaths, target, task) {
         var filepath = filepaths.join(' ');
         var cmd = 'node ' + tsc + ' ' + filepath;
+
+        if (task.sourcemap)
+            cmd = cmd + ' --sourcemap';
+        if (task.declaration)
+            cmd = cmd + ' --declaration';
+        if (task.nolib)
+            cmd = cmd + ' --nolib';
+        if (task.comments)
+            cmd = cmd + ' --comments';
+
+        // string options
+        cmd = cmd + ' --target ' + task.target.toUpperCase();
+        cmd = cmd + ' --module ' + task.module.toLowerCase();
 
         if (target.out) {
             cmd = cmd + ' --out ' + target.out;
@@ -28,6 +45,7 @@ module.exports = function (grunt) {
         return result;
     }
 
+    // used to make sure string ends with a slash
     function endWithSlash(path) {
         var lastchar = path[path.length - 1];
         if (lastchar != '/' && lastchar != '\\') {
@@ -36,18 +54,19 @@ module.exports = function (grunt) {
         return path;
     }
 
-    var exec = shell.exec;
-    var currentPath = path.resolve(".");
-    var tsc = getTsc(resolveTypeScriptBinPath(currentPath, 0));
-
     grunt.registerMultiTask('ts', 'Compile TypeScript files', function () {
         var currenttask = this;
+
+        // setup default options
         var options = currenttask.options({
             module: 'commonjs',
             target: 'es3',
             declaration: false,
-            sourcemap: true
+            sourcemap: true,
+            nolib: false,
+            comments: false
         });
+        console.log(options);
 
         // Was the whole process successful
         var success = true;

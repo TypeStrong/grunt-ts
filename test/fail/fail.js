@@ -7,3 +7,4 @@ var Simple1;
 })(Simple1 || (Simple1 = {}));
 
 Simplebad.main();
+//@ sourceMappingURL=fail.js.map

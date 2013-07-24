@@ -28,6 +28,8 @@ interface ITaskOptions {
     module: string; // amd, commonjs 
     sourcemap: boolean;
     declaration: boolean;
+    nolib: boolean;
+    comments: boolean;
 }
 
 module.exports = function (grunt: IGrunt) {
@@ -56,11 +58,30 @@ module.exports = function (grunt: IGrunt) {
         return '"' + binPath + '/' + 'tsc" ';
     }
 
-    function compileAllFiles(filepaths: string[], target: ITargetOptions, task:ITaskOptions): ICompileResult {
+    var exec = shell.exec;
+    var currentPath = path.resolve(".");
+    var tsc = getTsc(resolveTypeScriptBinPath(currentPath, 0));
+
+    function compileAllFiles(filepaths: string[], target: ITargetOptions, task: ITaskOptions): ICompileResult {
 
         var filepath: string = filepaths.join(' ');
         var cmd = 'node ' + tsc + ' ' + filepath;
-        // TODO: use options 
+
+        // boolean options 
+        if (task.sourcemap)
+            cmd = cmd + ' --sourcemap';
+        if (task.declaration) 
+            cmd = cmd + ' --declaration';
+        if (task.nolib) 
+            cmd = cmd + ' --nolib';
+        if (task.comments) 
+            cmd = cmd + ' --comments';
+
+        // string options
+        cmd = cmd + ' --target ' + task.target.toUpperCase();
+        cmd = cmd + ' --module ' + task.module.toLowerCase();
+
+        // Target options: 
         if (target.out) {
             cmd = cmd + ' --out ' + target.out;
         }
@@ -68,28 +89,29 @@ module.exports = function (grunt: IGrunt) {
         return result;
     }
 
+    // used to make sure string ends with a slash 
     function endWithSlash(path: string): string {
         var lastchar = path[path.length - 1];
         if (lastchar != '/' && lastchar != '\\') {
             return path + '/';
         }
         return path;
-    }
-
-    var exec = shell.exec;
-    var currentPath = path.resolve(".");
-    var tsc = getTsc(resolveTypeScriptBinPath(currentPath, 0));
+    }    
 
     grunt.registerMultiTask('ts', 'Compile TypeScript files', function () {
 
         var currenttask: ITask = this;
+
+        // setup default options 
         var options = currenttask.options<ITaskOptions>({
             module: 'commonjs',
             target: 'es3',
             declaration: false,
-            sourcemap: true, 
+            sourcemap: true,
+            nolib: false,
+            comments: false
         });
-
+        console.log(options);
 
         // Was the whole process successful
         var success = true;
