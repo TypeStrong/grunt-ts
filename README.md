@@ -11,7 +11,9 @@ It differs from grunt-typescript and grunt-type in *two key ways*:
 
 Check out the complete code: https://github.com/basarat/grunt-ts/blob/master/tasks/ts.ts 
 
-Compiles all files. Stops on a compilation error reporting it on the console. Makes for easier view. 
+Compiles all files. Stops on a compilation error reporting it on the console. Makes for easier view.
+
+The npm package is available here : https://npmjs.org/package/grunt-ts
 
 ## Documentation
 You'll need to install `grunt-ts` first:
