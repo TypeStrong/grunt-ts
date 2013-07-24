@@ -17,7 +17,7 @@ interface ICompileResult {
 }
 
 interface ITargetOptions {
-    src: string[]; // input files 
+    src: string[]; // input files  // Note : this is a getter and returns a new "live globbed" array 
     reference: string; // path to a reference.ts e.g. './approot/'
     out: string; // if sepecified e.g. 'single.js' all output js files are merged into single.js using tsc --out command 
     watch: string; // if specified e.g. './appdir/' will watch the directory for changes. Note that specifing this makes the grunt task async (i.e. it keep running)
@@ -62,9 +62,9 @@ module.exports = function (grunt: IGrunt) {
     var currentPath = path.resolve(".");
     var tsc = getTsc(resolveTypeScriptBinPath(currentPath, 0));
 
-    function compileAllFiles(filepaths: string[], target: ITargetOptions, task: ITaskOptions): ICompileResult {
+    function compileAllFiles(files:string[],target: ITargetOptions, task: ITaskOptions): ICompileResult {
 
-        var filepath: string = filepaths.join(' ');
+        var filepath: string = files.join(' ');
         var cmd = 'node ' + tsc + ' ' + filepath;
 
         // boolean options 
@@ -110,32 +110,27 @@ module.exports = function (grunt: IGrunt) {
             sourcemap: true,
             nolib: false,
             comments: false
-        });
-        console.log(options);
+        });        
 
         // Was the whole process successful
         var success = true;
         var watch;
 
-        this.files.forEach(function (f: ITargetOptions) {
-            var files: string[] = f.src;
+        // Some interesting logs: 
+        //console.log(this.files[0]); // An array of target files ( only one in our case )
+        //console.log(this.files[0].src); // a getter for a resolved list of files 
+        //console.log(this.files[0].orig.src); // The original glob / array / !array / <% array %> for files. Can be very fancy :) 
 
-
-            // If you want to ignore .d.ts
-            //files = []
-            //grunt.file.expand(f.src).forEach(function (filepath) {
-            //    if (filepath.substr(-5) === ".d.ts") {
-            //        return;
-            //    }
-            //    files.push(filepath);
-            //});
+        // this.files[0] is actually a single in our case as we support only one source / out per target
+        this.files.forEach(function (target: ITargetOptions) {
+                        
 
             // Create a reference file 
-            var reference = f.reference;
+            var reference = target.reference;
             if (!!reference) {
                 reference = endWithSlash(reference);
                 var contents = [];
-                files.forEach((filename: string) => {
+                target.src.forEach((filename: string) => {
                     // do not add a reference to reference: 
                     if (filename.indexOf('reference.ts') == -1)
                         contents.push('/// <reference path="' + path.relative(reference, filename).split('\\').join('/') + '" />')
@@ -144,21 +139,22 @@ module.exports = function (grunt: IGrunt) {
             }
 
             // Compiles all the files 
-            function runCompilation(files) {
-                var result = compileAllFiles(files, f, options);
+            function runCompilation(files) {                
+                var result = compileAllFiles(files, target, options);
                 if (result.code != 0) {
                     var msg = "Compilation failed"/*+result.output*/;
                     grunt.log.error(msg.red);
                     success = false;
                 }
                 else {
+                    grunt.log.writeln(files);
                     grunt.log.writeln((files.length + ' typescript files successfully processed.').green);
                 }
             }
-            runCompilation(files);
+            runCompilation(target.src);
 
             // Watches all the files 
-            watch = f.watch;
+            watch = target.watch;
             if (!!watch) {
                 var watch = endWithSlash(watch);
                 var done = currenttask.async();
@@ -174,7 +170,7 @@ module.exports = function (grunt: IGrunt) {
                     grunt.log.writeln(('    >>' + filepath + ' was ' + event).yellow);
                     grunt.log.writeln('Compiling.'.yellow);
                     //runCompilation([filepath]); // Potential optimization, But we want the whole project to be compilable
-                    runCompilation(files);
+                    runCompilation(target.src);
                 });
             }
 
