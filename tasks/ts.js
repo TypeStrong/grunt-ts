@@ -117,15 +117,15 @@ module.exports = function (grunt) {
                 // make async
                 var done = currenttask.async();
 
-                var watchpath = watch + '/**/*';
-                grunt.log.writeln(('Watching all files: ' + watchpath).cyan);
+                var watchpath = watch;
+                grunt.log.writeln(('Watching all Typescript files under : ' + watchpath).cyan);
 
                 // create a gaze instance for path
-                var Gaze = require('gaze').Gaze;
-                var gaze = new Gaze(watchpath);
+                var chokidar = require('chokidar');
+                var watcher = chokidar.watch(watchpath, { ignoreInitial: true, persistent: true });
 
                 // local event to handle file event
-                function handleFileEvent(event, filepath) {
+                function handleFileEvent(event, filepath, displaystr) {
                     if (target.out && filepath.endsWith('.d.ts')) {
                         return;
                     }
@@ -134,20 +134,27 @@ module.exports = function (grunt) {
                     }
 
                     // console.log(gaze.watched()); // debug gaze
-                    grunt.log.writeln(('    >>' + filepath + ' was ' + event).yellow);
+                    grunt.log.writeln((displaystr + ' >>' + filepath + ' was ' + event).yellow);
                     grunt.log.writeln('Compiling.'.yellow);
 
                     //runCompilation([filepath]); // Potential optimization, But we want the whole project to be compilable
                     // Reexpand the original file glob:
                     var files = grunt.file.expand(currenttask.data.src);
 
-                    // unwatch
                     // compile
                     runCompilation(files);
                 }
 
                 // A file has been added/changed/deleted has occurred
-                gaze.on('all', handleFileEvent);
+                watcher.on('add', function (path) {
+                    handleFileEvent('added', path, '+++');
+                }).on('change', function (path) {
+                    handleFileEvent('changed', path, '###');
+                }).on('unlink', function (path) {
+                    handleFileEvent('removed', path, '---');
+                }).on('error', function (error) {
+                    console.error('Error happened', error);
+                });
             }
         });
 
