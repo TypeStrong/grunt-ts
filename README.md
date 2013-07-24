@@ -40,7 +40,8 @@ Then add some configuration for the plugin like so:
             dev: {                          // a particular target   
                 src: ["test/work/**/*.ts"], // The source typescript files, See : http://gruntjs.com/configuring-tasks#files
                 reference: "./test/",       // If specified, generate a reference.ts file at this place                
-                out: 'test/out.js',         // If specified, generate an out.js file which is the merged js file              
+                out: 'test/out.js',         // If specified, generate an out.js file which is the merged js file     
+                watch: 'test',              // configure this target to watch a dir 
                 options: {                  // override the main options, See : http://gruntjs.com/configuring-tasks#options
                     sourcemap: true,
                     declaration: true

@@ -33,7 +33,8 @@ module.exports = function (grunt) {
             dev: {                          // a particular target   
                 src: ["test/work/**/*.ts"], // The source typescript files, See : http://gruntjs.com/configuring-tasks#files
                 reference: "./test/",       // If specified, generate a reference.ts file at this place                
-                out: 'test/out.js',         // If specified, generate an out.js file which is the merged js file              
+                out: 'test/out.js',         // If specified, generate an out.js file which is the merged js file     
+                watch: './test',              // configure this target to watch a dir 
                 options: {                  // override the main options, See : http://gruntjs.com/configuring-tasks#options
                     sourcemap: true,
                     declaration: true
@@ -44,16 +45,7 @@ module.exports = function (grunt) {
                 options: {                  // overide the main options for this target 
                     sourcemap: false,
                 }
-            },
-            watch: {                        // another target
-                src: ["test/work/**/*.ts"],
-                reference: "test/",         // If specified, generate a reference.ts file at this place, Automatically manages relative file paths                
-                out: 'test/out.js',         // If specified, generate a out.js file which is the merged typescript output                
-                watch: 'test',              // configure this target to watch a dir 
-                options: {
-                    sourcemap: true
-                }
-            },
+            },            
         },
     });
 

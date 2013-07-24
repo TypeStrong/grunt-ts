@@ -32,6 +32,14 @@ interface ITaskOptions {
     comments: boolean;
 }
 
+// Just annoying: 
+interface String{
+    endsWith(suffix: string): boolean;
+}
+String.prototype.endsWith = function (suffix) {
+    return this.indexOf(suffix, this.length - suffix.length) !== -1;
+};
+
 module.exports = function (grunt: IGrunt) {
 
     var path = require('path'),
@@ -130,7 +138,7 @@ module.exports = function (grunt: IGrunt) {
             // Create a reference file 
             var reference = target.reference;
             if (!!reference) {
-                reference = endWithSlash(reference);
+                reference = endWithSlash(reference); // probably not required
                 var contents = [];
                 target.src.forEach((filename: string) => {
                     // do not add a reference to reference: 
@@ -157,25 +165,49 @@ module.exports = function (grunt: IGrunt) {
             // Watches all the files 
             watch = target.watch;
             if (!!watch) {
-                var watch = endWithSlash(watch);
+                // get path                
+                watch = path.resolve(watch);
+
+                // make async 
                 var done = currenttask.async();
 
-                var watchpath = watch + '**/*.ts';
+                var watchpath = watch + '/**/*';
                 grunt.log.writeln(('Watching all files: ' + watchpath).cyan);
 
+                // create a gaze instance for path 
                 var Gaze = require('gaze').Gaze;
-
                 var gaze = new Gaze(watchpath);
-                // A file has been added/changed/deleted has occurred
-                gaze.on('all', function (event, filepath) {
+
+                // local event to handle file event 
+                function handleFileEvent(event: string, filepath: string) {
+                    // Ignore the special case for generated out.d.ts :)                     
+                    if (target.out && filepath.endsWith('.d.ts')) {
+                        return;
+                    }
+                    if (!filepath.endsWith('.ts')) { // should not happen
+                        return;
+                    }
+
+                    // console.log(gaze.watched()); // debug gaze 
+
                     grunt.log.writeln(('    >>' + filepath + ' was ' + event).yellow);
                     grunt.log.writeln('Compiling.'.yellow);
                     //runCompilation([filepath]); // Potential optimization, But we want the whole project to be compilable                    
 
                     // Reexpand the original file glob: 
                     var files = grunt.file.expand(currenttask.data.src);
+                    
+                    // unwatch 
+                    
+                    // compile 
                     runCompilation(files);
-                });
+                    
+                    // rewatch                   
+                    
+                }
+                
+                // A file has been added/changed/deleted has occurred
+                gaze.on('all', handleFileEvent);
             }
         });
 

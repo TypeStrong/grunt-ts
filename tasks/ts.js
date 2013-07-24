@@ -1,3 +1,7 @@
+String.prototype.endsWith = function (suffix) {
+    return this.indexOf(suffix, this.length - suffix.length) !== -1;
+};
+
 module.exports = function (grunt) {
     var path = require('path'), fs = require('fs'), vm = require('vm'), shell = require('shelljs'), eol = require('os').EOL;
 
@@ -107,26 +111,43 @@ module.exports = function (grunt) {
             // Watches all the files
             watch = target.watch;
             if (!!watch) {
-                var watch = endWithSlash(watch);
+                // get path
+                watch = path.resolve(watch);
+
+                // make async
                 var done = currenttask.async();
 
-                var watchpath = watch + '**/*.ts';
+                var watchpath = watch + '/**/*';
                 grunt.log.writeln(('Watching all files: ' + watchpath).cyan);
 
+                // create a gaze instance for path
                 var Gaze = require('gaze').Gaze;
-
                 var gaze = new Gaze(watchpath);
 
-                // A file has been added/changed/deleted has occurred
-                gaze.on('all', function (event, filepath) {
+                // local event to handle file event
+                function handleFileEvent(event, filepath) {
+                    if (target.out && filepath.endsWith('.d.ts')) {
+                        return;
+                    }
+                    if (!filepath.endsWith('.ts')) {
+                        return;
+                    }
+
+                    // console.log(gaze.watched()); // debug gaze
                     grunt.log.writeln(('    >>' + filepath + ' was ' + event).yellow);
                     grunt.log.writeln('Compiling.'.yellow);
 
                     //runCompilation([filepath]); // Potential optimization, But we want the whole project to be compilable
                     // Reexpand the original file glob:
                     var files = grunt.file.expand(currenttask.data.src);
+
+                    // unwatch
+                    // compile
                     runCompilation(files);
-                });
+                }
+
+                // A file has been added/changed/deleted has occurred
+                gaze.on('all', handleFileEvent);
             }
         });
 
