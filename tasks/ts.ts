@@ -16,18 +16,18 @@ interface ICompileResult {
     output: string;
 }
 
-interface IOptions {
+interface ITargetOptions {
     src: string[]; // input files 
     reference: string; // path to a reference.ts e.g. './approot/'
     out: string; // if sepecified e.g. 'single.js' all output js files are merged into single.js using tsc --out command 
     watch: string; // if specified e.g. './appdir/' will watch the directory for changes. Note that specifing this makes the grunt task async (i.e. it keep running)
+}
 
-
+interface ITaskOptions {
     target: string; // es3 , es5 
     module: string; // amd, commonjs 
     sourcemap: boolean;
     declaration: boolean;
-    verbose: boolean;
 }
 
 module.exports = function (grunt: IGrunt) {
@@ -35,8 +35,8 @@ module.exports = function (grunt: IGrunt) {
     var path = require('path'),
         fs = require('fs'),
         vm = require('vm'),
-        shell = require('shelljs');
-    var eol = require('os').EOL;
+        shell = require('shelljs'),
+        eol = require('os').EOL;
 
     function resolveTypeScriptBinPath(currentPath, depth): string {
         var targetPath = path.resolve(__dirname,
@@ -56,13 +56,13 @@ module.exports = function (grunt: IGrunt) {
         return '"' + binPath + '/' + 'tsc" ';
     }
 
-    function compileAllFiles(filepaths: string[], options: IOptions, task): ICompileResult {
+    function compileAllFiles(filepaths: string[], target: ITargetOptions, task:ITaskOptions): ICompileResult {
 
         var filepath: string = filepaths.join(' ');
         var cmd = 'node ' + tsc + ' ' + filepath;
         // TODO: use options 
-        if (options.out) {
-            cmd = cmd + ' --out ' + options.out;
+        if (target.out) {
+            cmd = cmd + ' --out ' + target.out;
         }
         var result = exec(cmd);
         return result;
@@ -70,7 +70,7 @@ module.exports = function (grunt: IGrunt) {
 
     function endWithSlash(path: string): string {
         var lastchar = path[path.length - 1];
-        if (lastchar != '/' && lastchar != '\\') {            
+        if (lastchar != '/' && lastchar != '\\') {
             return path + '/';
         }
         return path;
@@ -82,13 +82,20 @@ module.exports = function (grunt: IGrunt) {
 
     grunt.registerMultiTask('ts', 'Compile TypeScript files', function () {
 
-        var currenttask = this;
+        var currenttask: ITask = this;
+        var options = currenttask.options<ITaskOptions>({
+            module: 'commonjs',
+            target: 'es3',
+            declaration: false,
+            sourcemap: true, 
+        });
+
 
         // Was the whole process successful
         var success = true;
         var watch;
 
-        this.files.forEach(function (f: IOptions) {
+        this.files.forEach(function (f: ITargetOptions) {
             var files: string[] = f.src;
 
 
@@ -116,7 +123,7 @@ module.exports = function (grunt: IGrunt) {
 
             // Compiles all the files 
             function runCompilation(files) {
-                var result = compileAllFiles(files, f, currenttask);
+                var result = compileAllFiles(files, f, options);
                 if (result.code != 0) {
                     var msg = "Compilation failed"/*+result.output*/;
                     grunt.log.error(msg.red);
@@ -137,16 +144,16 @@ module.exports = function (grunt: IGrunt) {
                 var watchpath = watch + '**/*.ts';
                 grunt.log.writeln(('Watching all files: ' + watchpath).cyan);
 
-                var Gaze = require('gaze').Gaze;                
+                var Gaze = require('gaze').Gaze;
 
-                var gaze = new Gaze(watchpath);                
+                var gaze = new Gaze(watchpath);
                 // A file has been added/changed/deleted has occurred
                 gaze.on('all', function (event, filepath) {
                     grunt.log.writeln(('    >>' + filepath + ' was ' + event).yellow);
                     grunt.log.writeln('Compiling.'.yellow);
                     //runCompilation([filepath]); // Potential optimization, But we want the whole project to be compilable
                     runCompilation(files);
-                });               
+                });
             }
 
         });

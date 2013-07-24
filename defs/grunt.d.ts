@@ -7,6 +7,13 @@ interface String {
 }
 
 
+interface ITask{
+    // options from user point : http://gruntjs.com/configuring-tasks#options
+    // options from plugin dev point: http://gruntjs.com/api/inside-tasks#this.options
+    options<T>(defaults?: T):T;
+    async:()=>(ret: boolean)=>void;
+}
+
 ////////////////
 // Main Grunt object 
 // http://gruntjs.com/api/grunt
@@ -18,7 +25,7 @@ interface IGrunt {
 
 
     // Tasks
-    task: any;
+    task: ITask;
     // Creating
     registerTask: Function;
     registerMultiTask: Function;
@@ -47,8 +54,8 @@ interface IGrunt {
         writeln: (msg: string) => void; // green msg 
         error: (msg: string) => void; // error msg 
     };
-    // Options
-    option: any;
+    // Options https://github.com/gruntjs/grunt/wiki/grunt.option
+    option: { (key: string):any; init: Function; flags:Function};
     // Template
     template: any;
     // Util

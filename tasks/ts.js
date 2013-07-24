@@ -1,6 +1,5 @@
 module.exports = function (grunt) {
-    var path = require('path'), fs = require('fs'), vm = require('vm'), shell = require('shelljs');
-    var eol = require('os').EOL;
+    var path = require('path'), fs = require('fs'), vm = require('vm'), shell = require('shelljs'), eol = require('os').EOL;
 
     function resolveTypeScriptBinPath(currentPath, depth) {
         var targetPath = path.resolve(__dirname, (new Array(depth + 1)).join("../../"), "../node_modules/typescript/bin");
@@ -18,12 +17,12 @@ module.exports = function (grunt) {
         return '"' + binPath + '/' + 'tsc" ';
     }
 
-    function compileAllFiles(filepaths, options, task) {
+    function compileAllFiles(filepaths, target, task) {
         var filepath = filepaths.join(' ');
         var cmd = 'node ' + tsc + ' ' + filepath;
 
-        if (options.out) {
-            cmd = cmd + ' --out ' + options.out;
+        if (target.out) {
+            cmd = cmd + ' --out ' + target.out;
         }
         var result = exec(cmd);
         return result;
@@ -43,6 +42,12 @@ module.exports = function (grunt) {
 
     grunt.registerMultiTask('ts', 'Compile TypeScript files', function () {
         var currenttask = this;
+        var options = currenttask.options({
+            module: 'commonjs',
+            target: 'es3',
+            declaration: false,
+            sourcemap: true
+        });
 
         // Was the whole process successful
         var success = true;
@@ -73,7 +78,7 @@ module.exports = function (grunt) {
 
             // Compiles all the files
             function runCompilation(files) {
-                var result = compileAllFiles(files, f, currenttask);
+                var result = compileAllFiles(files, f, options);
                 if (result.code != 0) {
                     var msg = "Compilation failed"/*+result.output*/ ;
                     grunt.log.error(msg.red);
