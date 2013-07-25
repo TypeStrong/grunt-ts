@@ -40,7 +40,11 @@ module.exports = function (grunt) {
         },
     });
 
-    grunt.loadTasks("tasks");
+    // Loading it for testing since I have in a local "tasks" folder 
+    grunt.loadTasks("tasks"); 
+    // in your configuration you would load this like: 
+    //grunt.loadNpmTasks("grunt-ts")
+    
     grunt.loadNpmTasks("grunt-contrib-clean");
     grunt.registerTask("test", ["clean", "ts"]);
     grunt.registerTask("default", ["test"]);
