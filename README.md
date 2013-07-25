@@ -81,6 +81,8 @@ Then add some configuration for the plugin like so:
         },
         ...
     });
+    
+You can see a sample grunt file here : https://github.com/basarat/grunt-ts/blob/master/Gruntfile.js
    
 ### Different configurations per target   
 Configuration options are per target. You can see how you can have one set of default options and then override
