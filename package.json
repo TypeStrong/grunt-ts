@@ -25,16 +25,16 @@
         "grunt": "~0.4.0",
         "typescript": "0.9.0-1",
         "grunt-lib-contrib": "0.5.2",
-		"shelljs":"0.1.4",		
-		"chokidar": "0.6.2"
+        "shelljs":"0.1.4",		
+        "chokidar": "0.6.2"
     },
     "devDependencies": {
         "grunt": "~0.4.0",
         "typescript": "0.9.0",
         "grunt-contrib-clean": "~0.4.0",
         "grunt-contrib-nodeunit": "~0.1.2",		
-		"shelljs":"0.1.4",
-		"matchdep": "0.1.1"
+        "shelljs":"0.1.4",
+        "matchdep": "0.1.1"
     },
     "optionalDependencies": {},
     "keywords": [
