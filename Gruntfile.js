@@ -4,16 +4,7 @@ module.exports = function (grunt) {
     // load all grunt tasks
     require('matchdep').filterDev('grunt-*').forEach(grunt.loadNpmTasks);
 
-    grunt.initConfig({
-        watch: {
-            /*
-             * watch and compile typescript to javascript
-             */
-            typescript: {
-                files: ['test/work/**/*.ts'],
-                tasks: ['ts:normal']
-            }
-        },
+    grunt.initConfig({      
 
         clean: {
             test: [
