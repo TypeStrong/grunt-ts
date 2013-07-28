@@ -4,7 +4,7 @@ module.exports = function (grunt) {
     // load all grunt tasks
     require('matchdep').filterDev('grunt-*').forEach(grunt.loadNpmTasks);
 
-    grunt.initConfig({      
+    grunt.initConfig({
 
         clean: {
             test: [
@@ -42,15 +42,22 @@ module.exports = function (grunt) {
                 reference: 'test/abtest',
                 out: 'test/abtest/out.js',
                 watch: 'test/abtest'
+            },
+            amdtest: {
+                src: ['test/amdtest/**/*.ts'],
+                watch: 'test/amdtest',
+                options: {
+                    module: 'amd'
+                }
             }
         },
     });
 
     // Loading it for testing since I have in a local "tasks" folder 
-    grunt.loadTasks("tasks"); 
+    grunt.loadTasks("tasks");
     // in your configuration you would load this like: 
     //grunt.loadNpmTasks("grunt-ts")
-    
+
     grunt.loadNpmTasks("grunt-contrib-clean");
     grunt.registerTask("test", ["clean", "ts"]);
     grunt.registerTask("default", ["test"]);
