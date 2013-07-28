@@ -63,6 +63,8 @@ function pluginFn(grunt) {
         return path;
     }
 
+    // Note: this funciton is called once for each target
+    // so task + target options are a bit blurred inside this function
     grunt.registerMultiTask('ts', 'Compile TypeScript files', function () {
         var currenttask = this;
 
@@ -148,7 +150,7 @@ function pluginFn(grunt) {
             // Find out which files to compile
             // Then calls the compile function on those files
             // Also this funciton is debounced
-            var debouncedCompile = _.debounce(function () {
+            function filterFilesAndCompile() {
                 // Reexpand the original file glob:
                 var files = grunt.file.expand(currenttask.data.src);
 
@@ -159,10 +161,11 @@ function pluginFn(grunt) {
 
                 // compile
                 runCompilation(files);
-            }, 150);
+            }
+            var debouncedCompile = _.debounce(filterFilesAndCompile, 150);
 
             // Initial compilation:
-            debouncedCompile();
+            filterFilesAndCompile();
 
             // Watches all the files
             watch = target.watch;

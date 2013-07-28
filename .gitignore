@@ -14,3 +14,5 @@ test/work/out.d.ts
 test/work/out.js
 test/work/reference.ts
 *.map
+test/fail/fail.js
+test/fail/work.js

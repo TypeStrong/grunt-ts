@@ -109,7 +109,8 @@ function pluginFn(grunt: IGrunt) {
         return path;
     }
 
-
+    // Note: this funciton is called once for each target 
+    // so task + target options are a bit blurred inside this function 
     grunt.registerMultiTask('ts', 'Compile TypeScript files', function () {
 
         var currenttask: ITask = this;
@@ -122,7 +123,7 @@ function pluginFn(grunt: IGrunt) {
             sourcemap: true,
             nolib: false,
             comments: false
-        });
+        });        
 
         // Was the whole process successful
         var success = true;
@@ -202,21 +203,22 @@ function pluginFn(grunt: IGrunt) {
             // Find out which files to compile
             // Then calls the compile function on those files 
             // Also this funciton is debounced
-            var debouncedCompile = _.debounce(() => {
-                // Reexpand the original file glob: 
-                var files = grunt.file.expand(currenttask.data.src);
+            function filterFilesAndCompile() {                
+                    // Reexpand the original file glob: 
+                    var files = grunt.file.expand(currenttask.data.src);
 
-                // Clear the files of output.d.ts and reference.ts 
-                files = _.filter(files, (filename) => {
-                    return (!isReferenceFile(filename) && !isOutFile(filename));
-                });
+                    // Clear the files of output.d.ts and reference.ts 
+                    files = _.filter(files, (filename) => {
+                        return (!isReferenceFile(filename) && !isOutFile(filename));
+                    });
 
-                // compile 
-                runCompilation(files);
-            }, 150); // randomly chosen 150. Choice was made because chokidar looks at file system every 100ms 
+                    // compile 
+                    runCompilation(files);                
+            }
+            var debouncedCompile = _.debounce(filterFilesAndCompile, 150); // randomly chosen 150. Choice was made because chokidar looks at file system every 100ms 
 
             // Initial compilation: 
-            debouncedCompile();
+            filterFilesAndCompile();
 
             // Watches all the files 
             watch = target.watch;
