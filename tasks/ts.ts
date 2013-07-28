@@ -182,6 +182,14 @@ function pluginFn(grunt: IGrunt) {
                 var chokidar = require('chokidar');
                 var watcher = chokidar.watch(watchpath, { ignoreInitial: true, persistent: true });
 
+                var debouncedCompile = _.debounce(() => {
+                    // Reexpand the original file glob: 
+                    var files = grunt.file.expand(currenttask.data.src);
+
+                    // compile 
+                    runCompilation(files);
+                },150); // randomly 150 as chokidar looks at file system every 100ms 
+
                 // local event to handle file event 
                 function handleFileEvent(filepath: string, displaystr: string) {
                     // Ignore the special case for generated out.d.ts :)                     
@@ -190,17 +198,10 @@ function pluginFn(grunt: IGrunt) {
                     }
                     if (!endsWith(filepath,'.ts')) { // should not happen
                         return;
-                    }
-
-                    // console.log(gaze.watched()); // debug gaze 
+                    }                   
 
                     grunt.log.writeln((displaystr + ' >>' + filepath).yellow);
-                    
-                    // Reexpand the original file glob: 
-                    var files = grunt.file.expand(currenttask.data.src);
-
-                    // compile 
-                    runCompilation(files);
+                    debouncedCompile();
                 }
 
                 // A file has been added/changed/deleted has occurred
