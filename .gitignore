@@ -10,3 +10,7 @@ test/out.d.ts
 test/out.js.map
 tasks/scratch.js
 tasks/scratch.js.map
+test/work/out.d.ts
+test/work/out.js
+test/work/reference.ts
+*.map

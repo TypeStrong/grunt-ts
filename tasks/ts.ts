@@ -45,7 +45,7 @@ function pluginFn(grunt: IGrunt) {
         vm = require('vm'),
         shell = require('shelljs'),
         eol = require('os').EOL;
-    
+
 
     function resolveTypeScriptBinPath(currentPath, depth): string {
         var targetPath = path.resolve(__dirname,
@@ -101,13 +101,13 @@ function pluginFn(grunt: IGrunt) {
     function endsWith(str: string, suffix: string) {
         return str.indexOf(suffix, str.length - suffix.length) !== -1;
     };
-    function endWithSlash(path: string): string {        
-        if (!endsWith(path, '/') && !endsWith(path,'\\')) {
+    function endWithSlash(path: string): string {
+        if (!endsWith(path, '/') && !endsWith(path, '\\')) {
             return path + '/';
         }
         return path;
     }
-    
+
 
     grunt.registerMultiTask('ts', 'Compile TypeScript files', function () {
 
@@ -138,26 +138,49 @@ function pluginFn(grunt: IGrunt) {
         this.files.forEach(function (target: ITargetOptions) {
 
 
-            // Create a reference file 
+            // Create a reference file? 
             var reference = target.reference;
+            var referenceFile;
+            var referencePath;
             if (!!reference) {
-                reference = endWithSlash(reference); // probably not required
-                var contents = [];
-                target.src.forEach((filename: string) => {
-                    // do not add a reference to reference: 
-                    if (filename.indexOf('reference.ts') == -1)
-                        contents.push('/// <reference path="' + path.relative(reference, filename).split('\\').join('/') + '" />')
-                });
-                fs.writeFileSync(reference + '/reference.ts', contents.join(eol));
+                referencePath = path.resolve(reference);
+                referenceFile = path.resolve(referencePath, 'reference.ts');
+            }
+            function isReferenceFile(filename: string) {
+                return path.resolve(filename) == referenceFile;
+            }
+
+            // Create an output file? 
+            var out = target.out;
+            var outFile;
+            var outFile_d_ts;
+            if (!!out) {
+                outFile = path.resolve(out);
+                outFile_d_ts = outFile.replace('.js', '.d.ts');
+            }
+            function isOutFile(filename: string): boolean {
+                return path.resolve(filename) == outFile_d_ts;
             }
 
             // Compiles all the files 
             function runCompilation(files) {
                 grunt.log.writeln('Compiling.'.yellow);
 
-                // Customize the targets based on file contents
+                // TODO: Idea: Customize the targets based on file contents
 
+                // Time the task and go 
                 var starttime = new Date().getTime();
+
+                // Create a reference file if specified
+                if (!!referencePath) {
+                    var contents = [];
+                    files.forEach((filename: string) => {
+                        contents.push('/// <reference path="' + path.relative(referencePath, filename).split('\\').join('/') + '" />');
+                    });
+                    fs.writeFileSync(referenceFile, contents.join(eol));
+                }
+
+                // Compile all the files
                 var result = compileAllFiles(files, target, options);
                 if (result.code != 0) {
                     var msg = "Compilation failed"/*+result.output*/;
@@ -166,11 +189,26 @@ function pluginFn(grunt: IGrunt) {
                 }
                 else {
                     var endtime = new Date().getTime();
-                    var time = (endtime - starttime)/1000;
-                    grunt.log.writeln(('Success: '+time.toFixed(2) +'s for '+files.length + ' typescript files').green);
+                    var time = (endtime - starttime) / 1000;
+                    grunt.log.writeln(('Success: ' + time.toFixed(2) + 's for ' + files.length + ' typescript files').green);
                 }
-            }
-            runCompilation(target.src);
+            }           
+
+            var debouncedCompile = _.debounce(() => {
+                // Reexpand the original file glob: 
+                var files = grunt.file.expand(currenttask.data.src);
+
+                // Clear the files of output.d.ts and reference.ts 
+                files = _.filter(files, (filename) => {
+                    return (!isReferenceFile(filename) && !isOutFile(filename));
+                });
+
+                // compile 
+                runCompilation(files);
+            }, 150); // randomly 150 as chokidar looks at file system every 100ms 
+
+            // Initial compilation: 
+            debouncedCompile();
 
             // Watches all the files 
             watch = target.watch;
@@ -186,25 +224,17 @@ function pluginFn(grunt: IGrunt) {
 
                 // create a gaze instance for path 
                 var chokidar = require('chokidar');
-                var watcher = chokidar.watch(watchpath, { ignoreInitial: true, persistent: true });
-
-                var debouncedCompile = _.debounce(() => {
-                    // Reexpand the original file glob: 
-                    var files = grunt.file.expand(currenttask.data.src);
-
-                    // compile 
-                    runCompilation(files);
-                },150); // randomly 150 as chokidar looks at file system every 100ms 
+                var watcher = chokidar.watch(watchpath, { ignoreInitial: true, persistent: true });                
 
                 // local event to handle file event 
                 function handleFileEvent(filepath: string, displaystr: string) {
-                    // Ignore the special case for generated out.d.ts :)                     
-                    if (target.out && endsWith(filepath,'.d.ts')) {
+                    // Ignore the special cases for files we generate
+                    if (isOutFile(filepath) || isReferenceFile(filepath)) {
                         return;
                     }
-                    if (!endsWith(filepath,'.ts')) { // should not happen
+                    if (!endsWith(filepath, '.ts')) { // should not happen
                         return;
-                    }                   
+                    }
 
                     grunt.log.writeln((displaystr + ' >>' + filepath).yellow);
                     debouncedCompile();

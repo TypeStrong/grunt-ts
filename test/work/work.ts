@@ -4,4 +4,4 @@ module Simple1 {
     }
 }
 
-Simple1.main();
+Simple1.main();  
