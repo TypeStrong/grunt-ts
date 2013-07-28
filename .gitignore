@@ -16,3 +16,8 @@ test/work/reference.ts
 *.map
 test/fail/fail.js
 test/fail/work.js
+test/abtest/a.js
+test/abtest/b.js
+test/abtest/c.js
+test/abtest/out.js
+test/abtest/reference.ts

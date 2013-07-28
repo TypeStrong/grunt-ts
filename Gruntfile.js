@@ -31,12 +31,18 @@ module.exports = function (grunt) {
                     declaration: true
                 },
             },
-            build: {                        // another target 
+            fail: {                        // another target 
                 src: ["test/fail/*.ts"],
                 options: {                  // overide the main options for this target 
                     sourcemap: false,
                 }
-            },            
+            },
+            abtest: {
+                src: ['test/abtest/**/*.ts'],
+                reference: 'test/abtest',
+                out: 'test/abtest/out.js',
+                watch: 'test/abtest'
+            }
         },
     });
 
