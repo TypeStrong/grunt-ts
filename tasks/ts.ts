@@ -154,6 +154,10 @@ function pluginFn(grunt: IGrunt) {
             // Compiles all the files 
             function runCompilation(files) {
                 grunt.log.writeln('Compiling.'.yellow);
+
+                // Customize the targets based on file contents
+
+                var starttime = new Date().getTime();
                 var result = compileAllFiles(files, target, options);
                 if (result.code != 0) {
                     var msg = "Compilation failed"/*+result.output*/;
@@ -161,7 +165,9 @@ function pluginFn(grunt: IGrunt) {
                     success = false;
                 }
                 else {
-                    grunt.log.writeln((files.length + ' typescript files successfully processed.').green);
+                    var endtime = new Date().getTime();
+                    var time = (endtime - starttime)/1000;
+                    grunt.log.writeln(('Success: '+time.toFixed(2) +'s for '+files.length + ' typescript files').green);
                 }
             }
             runCompilation(target.src);
