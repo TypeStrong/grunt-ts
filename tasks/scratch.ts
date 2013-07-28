@@ -1,4 +1,3 @@
-
 interface String {
     endsWith(suffix: string): boolean;
 }
