@@ -69,6 +69,7 @@ function pluginFn(grunt: IGrunt) {
     var cwd = path.resolve(".");
     var tsc = getTsc(resolveTypeScriptBinPath(cwd, 0));
 
+    // Blindly runs the tsc task using provided options 
     function compileAllFiles(files: string[], target: ITargetOptions, task: ITaskOptions): ICompileResult {
 
         var filepath: string = files.join(' ');
@@ -163,6 +164,10 @@ function pluginFn(grunt: IGrunt) {
             }
 
             // Compiles all the files 
+            // Uses the blind tsc compile task
+            // Creates custom files
+            // logs errors
+            // Time the whole process
             function runCompilation(files) {
                 grunt.log.writeln('Compiling.'.yellow);
 
@@ -194,6 +199,9 @@ function pluginFn(grunt: IGrunt) {
                 }
             }           
 
+            // Find out which files to compile
+            // Then calls the compile function on those files 
+            // Also this funciton is debounced
             var debouncedCompile = _.debounce(() => {
                 // Reexpand the original file glob: 
                 var files = grunt.file.expand(currenttask.data.src);
@@ -205,7 +213,7 @@ function pluginFn(grunt: IGrunt) {
 
                 // compile 
                 runCompilation(files);
-            }, 150); // randomly 150 as chokidar looks at file system every 100ms 
+            }, 150); // randomly chosen 150. Choice was made because chokidar looks at file system every 100ms 
 
             // Initial compilation: 
             debouncedCompile();

@@ -25,6 +25,7 @@ function pluginFn(grunt) {
     var cwd = path.resolve(".");
     var tsc = getTsc(resolveTypeScriptBinPath(cwd, 0));
 
+    // Blindly runs the tsc task using provided options
     function compileAllFiles(files, target, task) {
         var filepath = files.join(' ');
         var cmd = 'node ' + tsc + ' ' + filepath;
@@ -112,6 +113,10 @@ function pluginFn(grunt) {
             }
 
             // Compiles all the files
+            // Uses the blind tsc compile task
+            // Creates custom files
+            // logs errors
+            // Time the whole process
             function runCompilation(files) {
                 grunt.log.writeln('Compiling.'.yellow);
 
@@ -140,6 +145,9 @@ function pluginFn(grunt) {
                 }
             }
 
+            // Find out which files to compile
+            // Then calls the compile function on those files
+            // Also this funciton is debounced
             var debouncedCompile = _.debounce(function () {
                 // Reexpand the original file glob:
                 var files = grunt.file.expand(currenttask.data.src);
