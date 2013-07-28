@@ -4,3 +4,7 @@ test/tmp
 /.idea
 tasks/ts.js.map
 test/out.js
+test/fail/fail.js.map
+test/fail/work.js.map
+test/out.d.ts
+test/out.js.map

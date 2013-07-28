@@ -1,4 +1,5 @@
-/// <reference path="../defs/grunt.d.ts"/>
+/// <reference path="../defs/grunt/grunt.d.ts"/>
+/// <reference path="../defs/underscore/underscore.d.ts"/>
 
 /*
  * grunt-ts
@@ -32,21 +33,19 @@ interface ITaskOptions {
     comments: boolean;
 }
 
-// Just annoying: 
-interface String {
-    endsWith(suffix: string): boolean;
-}
-String.prototype.endsWith = function (suffix) {
-    return this.indexOf(suffix, this.length - suffix.length) !== -1;
-};
 
-module.exports = function (grunt: IGrunt) {
+// Typescript imports 
+import _ = require("underscore");
 
+function pluginFn(grunt: IGrunt) {
+
+    // plain vanilla imports
     var path = require('path'),
         fs = require('fs'),
         vm = require('vm'),
         shell = require('shelljs'),
         eol = require('os').EOL;
+    
 
     function resolveTypeScriptBinPath(currentPath, depth): string {
         var targetPath = path.resolve(__dirname,
@@ -97,14 +96,18 @@ module.exports = function (grunt: IGrunt) {
         return result;
     }
 
+    // Useful string functions 
     // used to make sure string ends with a slash 
-    function endWithSlash(path: string): string {
-        var lastchar = path[path.length - 1];
-        if (lastchar != '/' && lastchar != '\\') {
+    function endsWith(str: string, suffix: string) {
+        return str.indexOf(suffix, str.length - suffix.length) !== -1;
+    };
+    function endWithSlash(path: string): string {        
+        if (!endsWith(path, '/') && !endsWith(path,'\\')) {
             return path + '/';
         }
         return path;
     }
+    
 
     grunt.registerMultiTask('ts', 'Compile TypeScript files', function () {
 
@@ -150,6 +153,7 @@ module.exports = function (grunt: IGrunt) {
 
             // Compiles all the files 
             function runCompilation(files) {
+                grunt.log.writeln('Compiling.'.yellow);
                 var result = compileAllFiles(files, target, options);
                 if (result.code != 0) {
                     var msg = "Compilation failed"/*+result.output*/;
@@ -179,21 +183,19 @@ module.exports = function (grunt: IGrunt) {
                 var watcher = chokidar.watch(watchpath, { ignoreInitial: true, persistent: true });
 
                 // local event to handle file event 
-                function handleFileEvent(event: string, filepath: string, displaystr: string) {
+                function handleFileEvent(filepath: string, displaystr: string) {
                     // Ignore the special case for generated out.d.ts :)                     
-                    if (target.out && filepath.endsWith('.d.ts')) {
+                    if (target.out && endsWith(filepath,'.d.ts')) {
                         return;
                     }
-                    if (!filepath.endsWith('.ts')) { // should not happen
+                    if (!endsWith(filepath,'.ts')) { // should not happen
                         return;
                     }
 
                     // console.log(gaze.watched()); // debug gaze 
 
-                    grunt.log.writeln((displaystr+' >>' + filepath + ' was ' + event).yellow);
-                    grunt.log.writeln('Compiling.'.yellow);
-                    //runCompilation([filepath]); // Potential optimization, But we want the whole project to be compilable                    
-
+                    grunt.log.writeln((displaystr + ' >>' + filepath).yellow);
+                    
                     // Reexpand the original file glob: 
                     var files = grunt.file.expand(currenttask.data.src);
 
@@ -202,9 +204,9 @@ module.exports = function (grunt: IGrunt) {
                 }
 
                 // A file has been added/changed/deleted has occurred
-                watcher.on('add', function (path) { handleFileEvent('added', path,'+++'); })
-                    .on('change', function (path) { handleFileEvent('changed', path,'###'); })
-                    .on('unlink', function (path) { handleFileEvent('removed', path,'---'); })
+                watcher.on('add', function (path) { handleFileEvent(path, '+++ added  '); })
+                    .on('change', function (path) { handleFileEvent(path, '### changed'); })
+                    .on('unlink', function (path) { handleFileEvent(path, '--- removed'); })
                     .on('error', function (error) { console.error('Error happened', error); });
             }
         });
@@ -213,3 +215,4 @@ module.exports = function (grunt: IGrunt) {
             return success;
     });
 };
+export = pluginFn;
