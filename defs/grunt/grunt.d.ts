@@ -136,15 +136,6 @@ interface IGruntFileObject {
     findup: any;
 }
 
-
-////////////////
-/// Globally called export function module.exports
-////////////////
-declare var module: {
-    exports(grunt: IGrunt): void;
-}
-
-
 ////////////////
 /// To add plugins update the IGruntConfig using open ended interface syntax
 ////////////////

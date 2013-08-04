@@ -1,3 +1,4 @@
+/// <reference path="../defs/node/node.d.ts"/>
 /// <reference path="../defs/grunt/grunt.d.ts"/>
 /// <reference path="../defs/underscore/underscore.d.ts"/>
 
@@ -35,17 +36,16 @@ interface ITaskOptions {
 
 
 // Typescript imports 
-import _ = require("underscore");
+import _ = require('underscore');
+import path = require('path');
+import fs = require('fs');
+import os = require('os');
 
 function pluginFn(grunt: IGrunt) {
 
     // plain vanilla imports
-    var path = require('path'),
-        fs = require('fs'),
-        vm = require('vm'),
-        shell = require('shelljs'),
-        eol = require('os').EOL;
-
+    var shell = require('shelljs'),
+        eol = os.EOL;
 
     function resolveTypeScriptBinPath(currentPath, depth): string {
         var targetPath = path.resolve(__dirname,

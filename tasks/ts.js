@@ -1,9 +1,12 @@
 // Typescript imports
-var _ = require("underscore");
+var _ = require('underscore');
+var path = require('path');
+var fs = require('fs');
+var os = require('os');
 
 function pluginFn(grunt) {
     // plain vanilla imports
-    var path = require('path'), fs = require('fs'), vm = require('vm'), shell = require('shelljs'), eol = require('os').EOL;
+    var shell = require('shelljs'), eol = os.EOL;
 
     function resolveTypeScriptBinPath(currentPath, depth) {
         var targetPath = path.resolve(__dirname, (new Array(depth + 1)).join("../../"), "../node_modules/typescript/bin");
