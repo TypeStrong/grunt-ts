@@ -1,2 +1,2 @@
-/// <reference path="b.ts"/>
+/// <reference path="reference.ts"/>
 class A extends B { }

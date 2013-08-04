@@ -20,7 +20,6 @@ test/abtest/a.js
 test/abtest/b.js
 test/abtest/c.js
 test/abtest/out.js
-test/abtest/reference.ts
 test/amdtest/a.js
 test/amdtest/b.js
 test/amdtest/c.js
