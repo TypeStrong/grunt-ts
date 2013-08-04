@@ -64,7 +64,7 @@ Then add some configuration for the plugin like so:
             },
             dev: {                          // a particular target   
                 src: ["test/work/**/*.ts"], // The source typescript files, http://gruntjs.com/configuring-tasks#files
-                reference: "./test/referenct.ts",  // If specified, generate a reference.ts file at this place                
+                reference: "./test/reference.ts",  // If specified, generate this file that you can use for your reference management
                 out: 'test/out.js',         // If specified, generate an out.js file which is the merged js file     
                 watch: 'test',              // If specified, configures this target to watch the specified director for ts changes and reruns itself.
                 options: {                  // override the main options, http://gruntjs.com/configuring-tasks#options
