@@ -1,6 +1,7 @@
 /// <reference path="../defs/node/node.d.ts"/>
 /// <reference path="../defs/grunt/grunt.d.ts"/>
 /// <reference path="../defs/underscore/underscore.d.ts"/>
+/// <reference path="../defs/underscore.string/underscore.string.d.ts"/>
 
 /*
  * grunt-ts
@@ -34,18 +35,35 @@ interface ITaskOptions {
     comments: boolean;
 }
 
+// General util functions 
+function insertArrayAt(array:string[], index:number, arrayToInsert:string[]) {
+    Array.prototype.splice.apply(array, [index, 0].concat(arrayToInsert));
+    return array;
+}
+// Useful string functions 
+// used to make sure string ends with a slash 
+function endsWith(str: string, suffix: string) {
+    return str.indexOf(suffix, str.length - suffix.length) !== -1;
+};
+function endWithSlash(path: string): string {
+    if (!endsWith(path, '/') && !endsWith(path, '\\')) {
+        return path + '/';
+    }
+    return path;
+}
+
 
 // Typescript imports 
 import _ = require('underscore');
+import _str = require('underscore.string');
 import path = require('path');
 import fs = require('fs');
 import os = require('os');
+// plain vanilla imports
+var shell = require('shelljs');
+var eol = os.EOL;
 
 function pluginFn(grunt: IGrunt) {
-
-    // plain vanilla imports
-    var shell = require('shelljs'),
-        eol = os.EOL;
 
     function resolveTypeScriptBinPath(currentPath, depth): string {
         var targetPath = path.resolve(__dirname,
@@ -93,21 +111,86 @@ function pluginFn(grunt: IGrunt) {
         if (target.out) {
             cmd = cmd + ' --out ' + target.out;
         }
+
+        // To debug the tsc command
+        //console.log(cmd);
+
         var result = exec(cmd);
         return result;
     }
 
-    // Useful string functions 
-    // used to make sure string ends with a slash 
-    function endsWith(str: string, suffix: string) {
-        return str.indexOf(suffix, str.length - suffix.length) !== -1;
-    };
-    function endWithSlash(path: string): string {
-        if (!endsWith(path, '/') && !endsWith(path, '\\')) {
-            return path + '/';
+    // Updates the reference file 
+    function updateReferenceFile(files: string[], referenceFile: string, referencePath: string) {        
+        var referenceIntro = '/// <reference path="';
+        var referenceEnd = '" />';
+        var referenceMatch = /\/\/\/ <reference path=\"(.*?)\"/;
+        var ourSignatureStart = '//grunt-start';
+        var ourSignatureEnd = '//grunt-end';
+
+        var origFileLines = []; // The lines we do not modify and send out as is. Lines will we reach grunt-ts generated
+        var origFileReferences = []; // The list of files already there that we do not need to manage 
+
+        // Location of our generated references
+        // By default at start of file
+        var signatureSectionPosition = 0; 
+
+        // Read the original file if it exists 
+        if (fs.existsSync(referenceFile)) {
+            var lines = fs.readFileSync(referenceFile).toString().split('\n');            
+
+            var inSignatureSection = false;           
+            // By default at end of file
+            signatureSectionPosition = lines.length; 
+            for (var i = 0; i < lines.length; i++) {
+
+                var line = _str.trim(lines[i]);
+
+                // Skip logic for our generated section 
+                if (_str.include(line, ourSignatureStart)) {
+                    //Wait for the end signature: 
+                    signatureSectionPosition = i;
+                    inSignatureSection = true;
+                    continue;
+                }
+                if (_str.include(line, ourSignatureEnd)) {
+                    inSignatureSection = false;                    
+                    continue;
+                }
+                if (inSignatureSection) continue;
+                
+                // store the line     
+                origFileLines.push(line);
+
+                // Fetch the existing reference's filename if any: 
+                if (_str.include(line, referenceIntro)) {
+                    var match = line.match(referenceMatch);                    
+                    var filename = match[1];
+                    origFileReferences.push(filename);
+                }
+            }
         }
-        return path;
-    }
+
+        var contents = [ourSignatureStart];
+        files.forEach((filename: string) => {
+            // The file we are about to add 
+            var filepath = path.relative(referencePath, filename).split('\\').join('/');
+
+            // If there are orig references 
+            if (origFileReferences.length) {                
+                if (_.contains(origFileReferences, filepath)) {                    
+                    return;
+                }
+            }
+
+            // Finally add the filepath 
+            contents.push(referenceIntro + filepath + referenceEnd);
+        });
+        contents.push(ourSignatureEnd);
+        
+        // Modify the orig contents to put in our contents 
+        origFileLines = insertArrayAt(origFileLines, signatureSectionPosition, contents);
+        fs.writeFileSync(referenceFile, origFileLines.join(eol));
+    }    
 
     // Note: this funciton is called once for each target 
     // so task + target options are a bit blurred inside this function 
@@ -123,7 +206,7 @@ function pluginFn(grunt: IGrunt) {
             sourcemap: true,
             nolib: false,
             comments: false
-        });        
+        });
 
         // Was the whole process successful
         var success = true;
@@ -145,8 +228,8 @@ function pluginFn(grunt: IGrunt) {
             var referenceFile;
             var referencePath;
             if (!!reference) {
-                referencePath = path.resolve(reference);
-                referenceFile = path.resolve(referencePath, 'reference.ts');
+                referenceFile = path.resolve(reference);
+                referencePath = path.dirname(referenceFile)
             }
             function isReferenceFile(filename: string) {
                 return path.resolve(filename) == referenceFile;
@@ -172,22 +255,26 @@ function pluginFn(grunt: IGrunt) {
             function runCompilation(files) {
                 grunt.log.writeln('Compiling.'.yellow);
 
-                // TODO: Idea: Customize the targets based on file contents
-
                 // Time the task and go 
                 var starttime = new Date().getTime();
 
                 // Create a reference file if specified
                 if (!!referencePath) {
-                    var contents = [];
-                    files.forEach((filename: string) => {
-                        contents.push('/// <reference path="' + path.relative(referencePath, filename).split('\\').join('/') + '" />');
-                    });
-                    fs.writeFileSync(referenceFile, contents.join(eol));
+                    updateReferenceFile(files, referenceFile, referencePath);
                 }
 
-                // Compile all the files
-                var result = compileAllFiles(files, target, options);
+                // The files to compile 
+                var filesToCompile = files;      
+
+                // If reference and out are both specified.
+                // Then only compile the udpated reference file as that contains the correct order                           
+                if (!!referencePath && target.out) { filesToCompile = [referenceFile] };
+                
+                // Quote the files to compile 
+                filesToCompile = _.map(filesToCompile, (item) => {return '"' + item + '"' });
+
+                // Compile the files 
+                var result = compileAllFiles(filesToCompile, target, options);
                 if (result.code != 0) {
                     var msg = "Compilation failed"/*+result.output*/;
                     grunt.log.error(msg.red);
@@ -198,22 +285,22 @@ function pluginFn(grunt: IGrunt) {
                     var time = (endtime - starttime) / 1000;
                     grunt.log.writeln(('Success: ' + time.toFixed(2) + 's for ' + files.length + ' typescript files').green);
                 }
-            }           
+            }
 
             // Find out which files to compile
             // Then calls the compile function on those files 
             // Also this funciton is debounced
-            function filterFilesAndCompile() {                
-                    // Reexpand the original file glob: 
-                    var files = grunt.file.expand(currenttask.data.src);
+            function filterFilesAndCompile() {
+                // Reexpand the original file glob: 
+                var files = grunt.file.expand(currenttask.data.src);
 
-                    // Clear the files of output.d.ts and reference.ts 
-                    files = _.filter(files, (filename) => {
-                        return (!isReferenceFile(filename) && !isOutFile(filename));
-                    });
+                // Clear the files of output.d.ts and reference.ts 
+                files = _.filter(files, (filename) => {
+                    return (!isReferenceFile(filename) && !isOutFile(filename));
+                });
 
-                    // compile 
-                    runCompilation(files);                
+                // compile 
+                runCompilation(files);
             }
             var debouncedCompile = _.debounce(filterFilesAndCompile, 150); // randomly chosen 150. Choice was made because chokidar looks at file system every 100ms 
 
@@ -234,7 +321,7 @@ function pluginFn(grunt: IGrunt) {
 
                 // create a gaze instance for path 
                 var chokidar = require('chokidar');
-                var watcher = chokidar.watch(watchpath, { ignoreInitial: true, persistent: true });                
+                var watcher = chokidar.watch(watchpath, { ignoreInitial: true, persistent: true });
 
                 // local event to handle file event 
                 function handleFileEvent(filepath: string, displaystr: string) {

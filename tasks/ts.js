@@ -1,13 +1,34 @@
+// General util functions
+function insertArrayAt(array, index, arrayToInsert) {
+    Array.prototype.splice.apply(array, [index, 0].concat(arrayToInsert));
+    return array;
+}
+
+// Useful string functions
+// used to make sure string ends with a slash
+function endsWith(str, suffix) {
+    return str.indexOf(suffix, str.length - suffix.length) !== -1;
+}
+;
+function endWithSlash(path) {
+    if (!endsWith(path, '/') && !endsWith(path, '\\')) {
+        return path + '/';
+    }
+    return path;
+}
+
 // Typescript imports
 var _ = require('underscore');
+var _str = require('underscore.string');
 var path = require('path');
 var fs = require('fs');
 var os = require('os');
 
-function pluginFn(grunt) {
-    // plain vanilla imports
-    var shell = require('shelljs'), eol = os.EOL;
+// plain vanilla imports
+var shell = require('shelljs');
+var eol = os.EOL;
 
+function pluginFn(grunt) {
     function resolveTypeScriptBinPath(currentPath, depth) {
         var targetPath = path.resolve(__dirname, (new Array(depth + 1)).join("../../"), "../node_modules/typescript/bin");
         if (path.resolve(currentPath, "node_modules/typescript/bin").length > targetPath.length) {
@@ -49,21 +70,81 @@ function pluginFn(grunt) {
         if (target.out) {
             cmd = cmd + ' --out ' + target.out;
         }
+
+        // To debug the tsc command
+        //console.log(cmd);
         var result = exec(cmd);
         return result;
     }
 
-    // Useful string functions
-    // used to make sure string ends with a slash
-    function endsWith(str, suffix) {
-        return str.indexOf(suffix, str.length - suffix.length) !== -1;
-    }
-    ;
-    function endWithSlash(path) {
-        if (!endsWith(path, '/') && !endsWith(path, '\\')) {
-            return path + '/';
+    // Updates the reference file
+    function updateReferenceFile(files, referenceFile, referencePath) {
+        var referenceIntro = '/// <reference path="';
+        var referenceEnd = '" />';
+        var referenceMatch = /\/\/\/ <reference path=\"(.*?)\"/;
+        var ourSignatureStart = '//grunt-start';
+        var ourSignatureEnd = '//grunt-end';
+
+        var origFileLines = [];
+        var origFileReferences = [];
+
+        // Location of our generated references
+        // By default at start of file
+        var signatureSectionPosition = 0;
+
+        if (fs.existsSync(referenceFile)) {
+            var lines = fs.readFileSync(referenceFile).toString().split('\n');
+
+            var inSignatureSection = false;
+
+            // By default at end of file
+            signatureSectionPosition = lines.length;
+            for (var i = 0; i < lines.length; i++) {
+                var line = _str.trim(lines[i]);
+
+                if (_str.include(line, ourSignatureStart)) {
+                    //Wait for the end signature:
+                    signatureSectionPosition = i;
+                    inSignatureSection = true;
+                    continue;
+                }
+                if (_str.include(line, ourSignatureEnd)) {
+                    inSignatureSection = false;
+                    continue;
+                }
+                if (inSignatureSection)
+                    continue;
+
+                // store the line
+                origFileLines.push(line);
+
+                if (_str.include(line, referenceIntro)) {
+                    var match = line.match(referenceMatch);
+                    var filename = match[1];
+                    origFileReferences.push(filename);
+                }
+            }
         }
-        return path;
+
+        var contents = [ourSignatureStart];
+        files.forEach(function (filename) {
+            // The file we are about to add
+            var filepath = path.relative(referencePath, filename).split('\\').join('/');
+
+            if (origFileReferences.length) {
+                if (_.contains(origFileReferences, filepath)) {
+                    return;
+                }
+            }
+
+            // Finally add the filepath
+            contents.push(referenceIntro + filepath + referenceEnd);
+        });
+        contents.push(ourSignatureEnd);
+
+        // Modify the orig contents to put in our contents
+        origFileLines = insertArrayAt(origFileLines, signatureSectionPosition, contents);
+        fs.writeFileSync(referenceFile, origFileLines.join(eol));
     }
 
     // Note: this funciton is called once for each target
@@ -98,8 +179,8 @@ function pluginFn(grunt) {
             var referenceFile;
             var referencePath;
             if (!!reference) {
-                referencePath = path.resolve(reference);
-                referenceFile = path.resolve(referencePath, 'reference.ts');
+                referenceFile = path.resolve(reference);
+                referencePath = path.dirname(referenceFile);
             }
             function isReferenceFile(filename) {
                 return path.resolve(filename) == referenceFile;
@@ -125,20 +206,28 @@ function pluginFn(grunt) {
             function runCompilation(files) {
                 grunt.log.writeln('Compiling.'.yellow);
 
-                // TODO: Idea: Customize the targets based on file contents
                 // Time the task and go
                 var starttime = new Date().getTime();
 
                 if (!!referencePath) {
-                    var contents = [];
-                    files.forEach(function (filename) {
-                        contents.push('/// <reference path="' + path.relative(referencePath, filename).split('\\').join('/') + '" />');
-                    });
-                    fs.writeFileSync(referenceFile, contents.join(eol));
+                    updateReferenceFile(files, referenceFile, referencePath);
                 }
 
-                // Compile all the files
-                var result = compileAllFiles(files, target, options);
+                // The files to compile
+                var filesToCompile = files;
+
+                if (!!referencePath && target.out) {
+                    filesToCompile = [referenceFile];
+                }
+                ;
+
+                // Quote the files to compile
+                filesToCompile = _.map(filesToCompile, function (item) {
+                    return '"' + item + '"';
+                });
+
+                // Compile the files
+                var result = compileAllFiles(filesToCompile, target, options);
                 if (result.code != 0) {
                     var msg = "Compilation failed"/*+result.output*/ ;
                     grunt.log.error(msg.red);
