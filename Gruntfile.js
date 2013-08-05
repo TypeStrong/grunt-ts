@@ -12,7 +12,7 @@ module.exports = function (grunt) {
         ts: {
             options: {                    // use to override the default options, See : http://gruntjs.com/configuring-tasks#options
                 target: 'es3',            // es3 (default) / or es5
-                module: 'commonjs',       // amd (default), commonjs
+                module: 'commonjs',       // amd , commonjs (default)
                 sourcemap: true,          // true  (default) | false
                 declaration: false,       // true | false  (default)
                 nolib: false,             // true | false (default)
