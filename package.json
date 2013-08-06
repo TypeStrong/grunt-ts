@@ -2,7 +2,7 @@
     "author": "basarat",
     "name": "grunt-ts",
     "description": "Compile and manage your complete typescript workflow",    
-    "version": "0.9.0",
+    "version": "0.9.1",
     "homepage": "https://github.com/basarat/grunt-ts",
     "repository": {
         "type": "git",
@@ -30,9 +30,12 @@
         "underscore": "1.5.1",
         "underscore.string": "2.3.3"
     },
+    "peerDependencies": {
+        "grunt": "~0.4.0"
+    },
     "devDependencies": {
         "grunt": "~0.4.0",
-        "typescript": "0.9.0",
+        "typescript": "0.9.0-1",
         "grunt-contrib-clean": "~0.4.0",
         "grunt-contrib-nodeunit": "~0.1.2",		
         "shelljs":"0.1.4",
