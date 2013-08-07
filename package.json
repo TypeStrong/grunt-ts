@@ -1,7 +1,7 @@
 {
     "author": "basarat",
     "name": "grunt-ts",
-    "description": "Compile and manage your complete typescript workflow",    
+    "description": "Compile and manage your TypeScript project",    
     "version": "0.9.2",
     "homepage": "https://github.com/basarat/grunt-ts",
     "repository": {
