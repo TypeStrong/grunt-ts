@@ -7,7 +7,9 @@ It differs from grunt-typescript and following are the reasons why it was create
 - This is written in [clear TypeScript code](https://github.com/basarat/grunt-ts/blob/master/tasks/ts.ts)
 - Gives a typescript development workflow in addition to simple file compilation. 
 - Super simple to update to the [latest version of the typescript](https://github.com/basarat/grunt-ts/commit/6636f95b9d45b69e64771c603d3b08ec829e01e6)
- 
+
+Comes with a video introduction : http://youtu.be/Km0DpfX5ZxM , 
+If you already know grunt then skip to http://youtu.be/Km0DpfX5ZxM?t=11m16s
 
 Following are some key features: 
 ======================
