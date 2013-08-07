@@ -43,7 +43,7 @@ After you have grunt installed, you can install `grunt-ts` first:
 
     npm install grunt-ts
 
-Then modify your `grunt.js` file by adding the following line:
+Then modify your `Gruntfile.js` file by adding the following line:
 
     grunt.loadNpmTasks('grunt-ts');
 
