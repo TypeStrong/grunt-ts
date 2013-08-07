@@ -2,14 +2,12 @@ grunt-ts
 ================
 Written from scratch TypeScript compiler task for GruntJS. 
 
-It differs from grunt-typescript and grunt-type in *two key ways*: 
+It differs from grunt-typescript and following are the reasons why it was created. 
 
-- This is written in TypeScript.
-- Always stays updated to the latest stable release of TypesScript because:
- - It simply uses tsc on the commandline.
- - Super short and clear typescript code. 
-
-Check out the complete code: https://github.com/basarat/grunt-ts/blob/master/tasks/ts.ts 
+- This is written in [clear TypeScript code](https://github.com/basarat/grunt-ts/blob/master/tasks/ts.ts)
+- Gives a typescript development workflow in addition to simple file compilation. 
+- Super simple to update to the [latest version of the typescript](https://github.com/basarat/grunt-ts/commit/6636f95b9d45b69e64771c603d3b08ec829e01e6)
+ 
 
 Following are some key features: 
 ======================
