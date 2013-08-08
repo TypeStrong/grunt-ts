@@ -23,3 +23,5 @@ test/abtest/out.js
 test/amdtest/a.js
 test/amdtest/b.js
 test/amdtest/c.js
+test/**/*.js
+test/html/test.tpl.html.ts

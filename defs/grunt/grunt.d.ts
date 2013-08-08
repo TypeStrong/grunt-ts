@@ -15,6 +15,7 @@ interface ITask{
     filesSrc: string[]; // a getter http://gruntjs.com/api/inside-tasks#inside-multi-tasks
     data: {
         src: any;
+        html: any; // SPECIFIC TO GRUNT-TS         
     }
 }
 

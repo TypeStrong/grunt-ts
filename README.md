@@ -59,9 +59,19 @@ var orEvenCode = 123; // That you want to come before or after all your files
 
 /// <reference path="main.ts" />
 ```
-###Live file watching and building
-Can watch a directory for you and recompile your typescript files when any typescript file changes, gets added, gets removed. 
-This makes sure your project is always build ready :) 
+
+###Html 2 TypeScript support 
+Can reencode html files into typescript and makes them available as a variable. e.g.
+a file called `test.html` containing
+```html
+<div> Some Content </div>
+```
+is compiled to a typescript file `test.html.ts` containing: 
+```typescript
+module test { export var html =  '<div> Some content </div>' } 
+``` 
+so that you can use use the variable `test.html` within your typescript to get the content of test.html 
+as a string :) 
 
 npm install
 ======================
@@ -92,15 +102,14 @@ Then add some configuration for the plugin like so:
             dev: {                          // a particular target   
                 src: ["test/work/**/*.ts"], // The source typescript files, http://gruntjs.com/configuring-tasks#files
                 reference: "./test/reference.ts",  // If specified, generate this file that you can use for your reference management
-                out: 'test/out.js',         // If specified, generate an out.js file which is the merged js file     
-                watch: 'test',              // If specified, configures this target to watch the specified director for ts changes and reruns itself.
+                out: 'test/out.js',         // If specified, generate an out.js file which is the merged js file                     
                 options: {                  // override the main options, http://gruntjs.com/configuring-tasks#options
                     sourcemap: true,
                     declaration: true
                 },
             },
             build: {                        // another target 
-                src: ["test/fail/*.ts"],
+                src: ["test/work/**/*.ts"],
                 options: {                  // overide the main options for this target 
                     sourcemap: false,
                 }

@@ -29,6 +29,9 @@ var shell = require('shelljs');
 var eol = os.EOL;
 
 function pluginFn(grunt) {
+    /////////////////////////////////////////////////////////////////////
+    // tsc handling.
+    ////////////////////////////////////////////////////////////////////
     function resolveTypeScriptBinPath(currentPath, depth) {
         var targetPath = path.resolve(__dirname, (new Array(depth + 1)).join("../../"), "../node_modules/typescript/bin");
         if (path.resolve(currentPath, "node_modules/typescript/bin").length > targetPath.length) {
@@ -40,11 +43,9 @@ function pluginFn(grunt) {
 
         return resolveTypeScriptBinPath(currentPath, ++depth);
     }
-
     function getTsc(binPath) {
         return '"' + binPath + '/' + 'tsc" ';
     }
-
     var exec = shell.exec;
     var cwd = path.resolve(".");
     var tsc = getTsc(resolveTypeScriptBinPath(cwd, 0));
@@ -75,8 +76,11 @@ function pluginFn(grunt) {
         return result;
     }
 
+    /////////////////////////////////////////////////////////////////////
+    // Reference file logic
+    ////////////////////////////////////////////////////////////////////
     // Updates the reference file
-    function updateReferenceFile(files, referenceFile, referencePath) {
+    function updateReferenceFile(files, generatedFiles, referenceFile, referencePath) {
         var referenceIntro = '/// <reference path="';
         var referenceEnd = '" />';
         var referenceMatch = /\/\/\/ <reference path=\"(.*?)\"/;
@@ -124,10 +128,21 @@ function pluginFn(grunt) {
             }
         }
 
-        var contents = [ourSignatureStart];
+        // The path string within a single reference
+        function makeReferencePath(filename) {
+            return path.relative(referencePath, filename).split('\\').join('/');
+        }
+
+        // the generated files:
+        generatedFiles = _.map(generatedFiles, function (file) {
+            return referenceIntro + makeReferencePath(file) + referenceEnd;
+        });
+
+        // the new / observed missing files:
+        var contents = insertArrayAt([ourSignatureStart], 1, generatedFiles);
         files.forEach(function (filename) {
             // The file we are about to add
-            var filepath = path.relative(referencePath, filename).split('\\').join('/');
+            var filepath = makeReferencePath(filename);
 
             if (origFileReferences.length) {
                 if (_.contains(origFileReferences, filepath)) {
@@ -145,6 +160,43 @@ function pluginFn(grunt) {
         fs.writeFileSync(referenceFile, origFileLines.join(eol));
     }
 
+    /////////////////////////////////////////////////////////////////////
+    // HTML -> TS
+    ////////////////////////////////////////////////////////////////////
+    //html -> js processing functions:
+    // Originally from karma-html2js-preprocessor
+    // Refactored nicely in html2js grunt task
+    // https://github.com/karlgoldstein/grunt-html2js/blob/master/tasks/html2js.js
+    var escapeContent = function (content, quoteChar, indentString) {
+        if (typeof quoteChar === "undefined") { quoteChar = "'"; }
+        if (typeof indentString === "undefined") { indentString = '  '; }
+        var quoteRegexp = new RegExp('\\' + quoteChar, 'g');
+        var nlReplace = '\\n' + quoteChar + ' +\n' + indentString + indentString + quoteChar;
+        return content.replace(quoteRegexp, '\\' + quoteChar).replace(/\r?\n/g, nlReplace);
+    };
+
+    var htmlTemplate = _.template("module <%= modulename %> { export var <%= varname %> =  '<%= content %>' } ");
+
+    // Compile an HTML file to a TS file
+    // Return the filename. This filename will be required by reference.ts
+    function compileHTML(filename) {
+        var htmlContent = escapeContent(fs.readFileSync(filename).toString());
+
+        // TODO: place a minification pipeline here if you want.
+        var ext = path.extname(filename);
+        var extFreename = path.basename(filename, ext);
+        var fileContent = htmlTemplate({ modulename: extFreename, varname: ext.replace('.', ''), content: htmlContent });
+
+        // Write the content to a file
+        var outputfile = filename + ".ts";
+
+        fs.writeFileSync(outputfile, fileContent);
+        return outputfile;
+    }
+
+    /////////////////////////////////////////////////////////////////////
+    // The grunt task
+    ////////////////////////////////////////////////////////////////////
     // Note: this funciton is called once for each target
     // so task + target options are a bit blurred inside this function
     grunt.registerMultiTask('ts', 'Compile TypeScript files', function () {
@@ -161,7 +213,6 @@ function pluginFn(grunt) {
 
         // Was the whole process successful
         var success = true;
-        var watch;
 
         // Some interesting logs:
         //http://gruntjs.com/api/inside-tasks#inside-multi-tasks
@@ -200,14 +251,14 @@ function pluginFn(grunt) {
             // Creates custom files
             // logs errors
             // Time the whole process
-            function runCompilation(files) {
+            function runCompilation(files, generatedHtmlFiles) {
                 grunt.log.writeln('Compiling.'.yellow);
 
                 // Time the task and go
                 var starttime = new Date().getTime();
 
                 if (!!referencePath) {
-                    updateReferenceFile(files, referenceFile, referencePath);
+                    updateReferenceFile(files, generatedHtmlFiles, referenceFile, referencePath);
                 }
 
                 // The files to compile
@@ -240,66 +291,39 @@ function pluginFn(grunt) {
             // Then calls the compile function on those files
             // Also this funciton is debounced
             function filterFilesAndCompile() {
+                // Html files:
+                // Note:
+                //    compile html files before reference file creation. Which is done in runCompilation
+                //    compile html files before globbing the file system again
+                var htmlFiles = grunt.file.expand(currenttask.data.html);
+                var generatedHtmlFiles = [];
+                if (htmlFiles.length > 0) {
+                    generatedHtmlFiles = _.map(htmlFiles, function (filename) {
+                        return compileHTML(filename);
+                    });
+                }
+
                 // Reexpand the original file glob:
                 var files = grunt.file.expand(currenttask.data.src);
+
+                // remove the generated files from files:
+                files = _.difference(files, generatedHtmlFiles);
 
                 // Clear the files of output.d.ts and reference.ts
                 files = _.filter(files, function (filename) {
                     return (!isReferenceFile(filename) && !isOutFile(filename));
                 });
 
-                // compile
-                runCompilation(files);
+                if (files.length > 0)
+                    runCompilation(files, generatedHtmlFiles); else
+                    grunt.log.writeln('No files to compile'.red);
             }
-            var debouncedCompile = _.debounce(filterFilesAndCompile, 150);
 
             // Initial compilation:
             filterFilesAndCompile();
-
-            // Watches all the files
-            watch = target.watch;
-            if (!!watch) {
-                // get path
-                watch = path.resolve(watch);
-
-                // make async
-                var done = currenttask.async();
-
-                var watchpath = watch;
-                grunt.log.writeln(('Watching all Typescript files under : ' + watchpath).cyan);
-
-                // create a gaze instance for path
-                var chokidar = require('chokidar');
-                var watcher = chokidar.watch(watchpath, { ignoreInitial: true, persistent: true });
-
-                // local event to handle file event
-                function handleFileEvent(filepath, displaystr) {
-                    if (isOutFile(filepath) || isReferenceFile(filepath)) {
-                        return;
-                    }
-                    if (!endsWith(filepath, '.ts')) {
-                        return;
-                    }
-
-                    grunt.log.writeln((displaystr + ' >>' + filepath).yellow);
-                    debouncedCompile();
-                }
-
-                // A file has been added/changed/deleted has occurred
-                watcher.on('add', function (path) {
-                    handleFileEvent(path, '+++ added  ');
-                }).on('change', function (path) {
-                    handleFileEvent(path, '### changed');
-                }).on('unlink', function (path) {
-                    handleFileEvent(path, '--- removed');
-                }).on('error', function (error) {
-                    console.error('Error happened', error);
-                });
-            }
         });
 
-        if (!watch)
-            return success;
+        return success;
     });
 }
 ;

@@ -6,7 +6,16 @@ module.exports = function (grunt) {
         clean: {
             test: [
                 "test/**/*.js",
+                "test/**/*.html.ts",
             ]
+        },
+
+        watch: {
+            files:['test/**/*.ts'],
+            tasks: ['test'],
+            options:{
+                spawn:false,                
+            }
         },
 
         ts: {
@@ -20,15 +29,14 @@ module.exports = function (grunt) {
             },
             dev: {                          // a particular target   
                 src: ["test/work/**/*.ts"], // The source typescript files, See : http://gruntjs.com/configuring-tasks#files                
-                out: 'test/work/out.js',    // If specified, generate an out.js file which is the merged js file     
-                watch: 'test/work',         // If specified, configures this target to watch the specified director for ts changes and reruns itself.
+                out: 'test/work/out.js',    // If specified, generate an out.js file which is the merged js file                     
                 options: {                  // override the main options, See : http://gruntjs.com/configuring-tasks#options
                     sourcemap: true,
                     declaration: true
                 },
             },
             fail: {                        // another target 
-                src: ["test/fail/*.ts"],
+                src: ["test/fail/**/*.ts"],
                 options: {                  // overide the main options for this target 
                     sourcemap: false,
                 }
@@ -36,15 +44,18 @@ module.exports = function (grunt) {
             abtest: {
                 src: ['test/abtest/**/*.ts'],
                 reference: 'test/abtest/reference.ts',
-                out: 'test/abtest/out.js',
-                watch: 'test/abtest'
+                out: 'test/abtest/out.js',                
             },
             amdtest: {
-                src: ['test/amdtest/**/*.ts'],
-                watch: 'test/amdtest',
+                src: ['test/amdtest/**/*.ts'],                
                 options: {
                     module: 'amd'
                 }
+            },
+            htmltest: {
+                src: ['test/html/**/*.ts'],
+                html: ['test/html/**/*.tpl.html'],
+                reference: 'test/html/reference.ts'
             }
         },
     });
@@ -55,7 +66,9 @@ module.exports = function (grunt) {
     //grunt.loadNpmTasks("grunt-ts")
 
     grunt.loadNpmTasks("grunt-contrib-clean");
-    grunt.registerTask("test", ["clean", "ts"]);
-    grunt.registerTask("default", ["test"]);
+    grunt.loadNpmTasks("grunt-contrib-watch");
+
+    grunt.registerTask("test", ["clean", "ts:htmltest"]);
+    grunt.registerTask("default", ["test","watch"]);
 
 };
