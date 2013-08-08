@@ -40,14 +40,17 @@ for you. If there is no `grunt-start` section found, it is created for you. If f
 exist originally, it is created for you. 
 
 ```typescript
-// You can event put comments here and they are preserved
+
 /// <reference path="someBaseClass.ts" />
-var orEvenCode = 123; // That you want to come before all your files
+
+// You can even put comments here and they are preserved
+var orEvenCode = 123; // That you want to come before or after all your files
 
 //grunt-start
 /// <reference path="autoreference.ts" />
 /// <reference path="someOtherFile.ts" />
 //grunt-end
+
 
 /// <reference path="main.ts" />
 ```
