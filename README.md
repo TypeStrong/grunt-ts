@@ -31,12 +31,17 @@ Can also do js *file concatenation* using `--out`
 Can generate a reference.ts file for you which contains a reference to all your ts files.
 This means you never need to cross reference files manually. Just reference `reference.ts` :) 
 
+
+####Javascript generation and ordering
 Also if you specify both an out js file via `out` && a reference file via `reference` 
-it uses the generated reference file to order the code in the generated javascript. In your `reference.ts` file you 
-can specify the order for the few files you care about and leave the rest to be maintained by grunt-ts. 
-E.g. in the following case `someBaseClass.ts` is guaranteed to be the first file, and `main.ts`
-is guaranteed to be the last file. Everything between `grunt-start` and `grunt-end` is generated and maintained
-for you. If there is no `grunt-start` section found, it is created for you. If file `reference.ts` does not 
+it uses the generated reference file to *order the code in the generated javascript*. 
+
+In your `reference.ts` file you can specify the order for the few files you care about
+and leave the rest to be maintained by grunt-ts. 
+E.g. in the following case the generated javascript for `someBaseClass.ts` is guaranteed to be at the top,
+and the generated javascript for  `main.ts`is guaranteed to be at the bottom of the single merged js file. 
+Everything between `grunt-start` and `grunt-end` is generated and maintained
+for you. If there is no `grunt-start` section found, it is created for you. If `reference.ts` does not 
 exist originally, it is created for you. 
 
 ```typescript
