@@ -30,8 +30,7 @@ interface ITaskOptions {
     target: string; // es3 , es5 
     module: string; // amd, commonjs 
     sourcemap: boolean;
-    declaration: boolean;
-    nolib: boolean;
+    declaration: boolean;    
     comments: boolean;
 }
 
@@ -97,11 +96,9 @@ function pluginFn(grunt: IGrunt) {
         if (task.sourcemap)
             cmd = cmd + ' --sourcemap';
         if (task.declaration)
-            cmd = cmd + ' --declaration';
-        if (task.nolib)
-            cmd = cmd + ' --nolib';
-        if (task.comments)
-            cmd = cmd + ' --comments';
+            cmd = cmd + ' --declaration';        
+        if (!task.comments)
+            cmd = cmd + ' --removeComments';
 
         // string options
         cmd = cmd + ' --target ' + task.target.toUpperCase();
@@ -200,11 +197,10 @@ function pluginFn(grunt: IGrunt) {
 
         // setup default options 
         var options = currenttask.options<ITaskOptions>({
-            module: 'commonjs',
+            module: 'amd',
             target: 'es3',
             declaration: false,
-            sourcemap: true,
-            nolib: false,
+            sourcemap: true,            
             comments: false
         });
 

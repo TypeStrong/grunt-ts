@@ -58,10 +58,8 @@ function pluginFn(grunt) {
             cmd = cmd + ' --sourcemap';
         if (task.declaration)
             cmd = cmd + ' --declaration';
-        if (task.nolib)
-            cmd = cmd + ' --nolib';
-        if (task.comments)
-            cmd = cmd + ' --comments';
+        if (!task.comments)
+            cmd = cmd + ' --removeComments';
 
         // string options
         cmd = cmd + ' --target ' + task.target.toUpperCase();
@@ -154,11 +152,10 @@ function pluginFn(grunt) {
 
         // setup default options
         var options = currenttask.options({
-            module: 'commonjs',
+            module: 'amd',
             target: 'es3',
             declaration: false,
             sourcemap: true,
-            nolib: false,
             comments: false
         });
 

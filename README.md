@@ -83,11 +83,10 @@ Then add some configuration for the plugin like so:
         ...
         ts: {
             options: {                    // use to override the default options, http://gruntjs.com/configuring-tasks#options
-                target: 'es3',            // es3 (default) / or es5
-                module: 'commonjs',       // amd , commonjs (default)
+                target: 'es3',            // 'es3' (default) | 'es5'
+                module: 'commonjs',       // 'amd' (default) | 'commonjs'
                 sourcemap: true,          // true  (default) | false
-                declaration: false,       // true | false  (default)
-                nolib: false,             // true | false (default)
+                declaration: false,       // true | false  (default)                
                 comments: false           // true | false (default)
             },
             dev: {                          // a particular target   
