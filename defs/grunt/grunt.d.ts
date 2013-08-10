@@ -1,13 +1,18 @@
-// What grunt adds to stirng 
+// What grunt adds to string
+// https://github.com/marak/colors.js/
 interface String {
     yellow: string;
     cyan: string;
+    white: string;
+    magenta: string;
     green: string;
-    red: string;    
+    red: string;
+    grey: string;
+    blue: string;
 }
 
 
-interface ITask{
+interface ITask {
     // options from user point : http://gruntjs.com/configuring-tasks#options
     // options from plugin dev point: http://gruntjs.com/api/inside-tasks#this.options
     options<T>(defaults?: T): T;
@@ -60,7 +65,7 @@ interface IGrunt {
         error: (msg: string) => void; // error msg 
     };
     // Options https://github.com/gruntjs/grunt/wiki/grunt.option
-    option: { (key: string):any; init: Function; flags:Function};
+    option: { (key: string): any; init: Function; flags: Function };
     // Template
     template: any;
     // Util
@@ -111,8 +116,8 @@ interface IGruntFileObject {
     recurse(rootdir, callback);
 
     // Globbing patterns
-    expand(patterns):string[];
-    expand(options, patterns):string[];
+    expand(patterns): string[];
+    expand(options, patterns): string[];
     expandMapping(patterns, dest, options?);
     match(patterns, filepaths);
     match(options, patterns, filepaths);

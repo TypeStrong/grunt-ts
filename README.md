@@ -22,9 +22,8 @@ Supports all important compiler flags:
 - sourcemaps
 - declaration
 - comments
-- nolib 
- 
-Can also do js *file concatenation* using `--out`
+
+Can also do js *file concatenation* using `--out`. For file ordering look at Javascript Generation below. 
 
 
 ###Reference file generation 
@@ -72,6 +71,11 @@ module test { export var html =  '<div> Some content </div>' }
 ``` 
 so that you can use use the variable `test.html` within your typescript to get the content of test.html 
 as a string :) 
+
+###Live file watching and building
+Can watch a directory for you and recompile your typescript files when any typescript file changes, gets added, gets removed. 
+This makes sure your project is always build ready :) 
+
 
 npm install
 ======================

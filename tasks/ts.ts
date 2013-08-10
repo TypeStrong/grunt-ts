@@ -24,6 +24,7 @@ interface ITargetOptions {
     reference: string; // path to a reference.ts e.g. './approot/'
     out: string; // if sepecified e.g. 'single.js' all output js files are merged into single.js using tsc --out command     
     html: string[];  // if specified this is used to generate typescript files with a single variable which contains the content of the html
+    watch: string;
 }
 
 interface ITaskOptions {
@@ -257,6 +258,7 @@ function pluginFn(grunt: IGrunt) {
 
         // Was the whole process successful
         var success = true;        
+        var watch;        
 
         // Some interesting logs: 
         //http://gruntjs.com/api/inside-tasks#inside-multi-tasks
@@ -298,11 +300,13 @@ function pluginFn(grunt: IGrunt) {
             // Creates custom files
             // logs errors
             // Time the whole process
+            var starttime; 
+            var endtime; 
             function runCompilation(files:string[],generatedHtmlFiles:string[]) {
                 grunt.log.writeln('Compiling.'.yellow);
 
                 // Time the task and go 
-                var starttime = new Date().getTime();
+                starttime = new Date().getTime();
 
                 // Create a reference file if specified
                 if (!!referencePath) {                    
@@ -327,7 +331,7 @@ function pluginFn(grunt: IGrunt) {
                     success = false;
                 }
                 else {
-                    var endtime = new Date().getTime();
+                    endtime = new Date().getTime();
                     var time = (endtime - starttime) / 1000;
                     grunt.log.writeln(('Success: ' + time.toFixed(2) + 's for ' + files.length + ' typescript files').green);
                 }
@@ -368,9 +372,57 @@ function pluginFn(grunt: IGrunt) {
 
             // Initial compilation: 
             filterFilesAndCompile();
+            
+            
+            // Watch a folder? 
+            watch = target.watch;
+            if (!!watch) {
+
+                // make async 
+                var done = currenttask.async();
+                
+                // A debounced version of compile                 
+                var debouncedCompile = _.debounce(filterFilesAndCompile, 150);
+
+                // local event to handle file event 
+                function handleFileEvent(filepath: string, displaystr: string) {
+                    // Only ts and html : 
+                    if (!endsWith(filepath.toLowerCase(), '.ts') && !endsWith(filepath.toLowerCase(), '.html'))
+                        return;
+
+                    // Do not run if just ran, behaviour same as grunt-watch 
+                    // These are the files our run modified 
+                    if ((new Date().getTime() - endtime) <=100) {
+                        //grunt.log.writeln((' ///'  + ' >>' + filepath).grey);
+                        return; 
+                    }
+                    // Log and run the debounced version. 
+                    grunt.log.writeln((displaystr + ' >>' + filepath).yellow);                    
+                    debouncedCompile();
+                }
+
+                // get path                
+                var watchpath = path.resolve(watch);                
+
+                // create a file watcher for path 
+                var chokidar = require('chokidar');
+                var watcher = chokidar.watch(watchpath, { ignoreInitial: true, persistent: true });
+
+                // Log what we are doing 
+                grunt.log.writeln(('Watching all TypeScript / Html files under : ' + watchpath).cyan);
+
+                // A file has been added/changed/deleted has occurred
+                watcher.on('add', function (path) { handleFileEvent(path, '+++ added   '); })
+                    .on('change', function (path) { handleFileEvent(path, '### changed '); })
+                    .on('unlink', function (path) { handleFileEvent(path, '--- removed '); })
+                    .on('error', function (error) { console.error('Error happened in chokidar: ', error); });
+            }
+
         });
-        
-        return success;        
+
+        if (!watch) {            
+            return success;    
+        }
     });
 };
 export = pluginFn;

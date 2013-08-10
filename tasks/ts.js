@@ -213,6 +213,7 @@ function pluginFn(grunt) {
 
         // Was the whole process successful
         var success = true;
+        var watch;
 
         // Some interesting logs:
         //http://gruntjs.com/api/inside-tasks#inside-multi-tasks
@@ -251,11 +252,13 @@ function pluginFn(grunt) {
             // Creates custom files
             // logs errors
             // Time the whole process
+            var starttime;
+            var endtime;
             function runCompilation(files, generatedHtmlFiles) {
                 grunt.log.writeln('Compiling.'.yellow);
 
                 // Time the task and go
-                var starttime = new Date().getTime();
+                starttime = new Date().getTime();
 
                 if (!!referencePath) {
                     updateReferenceFile(files, generatedHtmlFiles, referenceFile, referencePath);
@@ -281,7 +284,7 @@ function pluginFn(grunt) {
                     grunt.log.error(msg.red);
                     success = false;
                 } else {
-                    var endtime = new Date().getTime();
+                    endtime = new Date().getTime();
                     var time = (endtime - starttime) / 1000;
                     grunt.log.writeln(('Success: ' + time.toFixed(2) + 's for ' + files.length + ' typescript files').green);
                 }
@@ -321,9 +324,57 @@ function pluginFn(grunt) {
 
             // Initial compilation:
             filterFilesAndCompile();
+
+            // Watch a folder?
+            watch = target.watch;
+            if (!!watch) {
+                // make async
+                var done = currenttask.async();
+
+                // A debounced version of compile
+                var debouncedCompile = _.debounce(filterFilesAndCompile, 150);
+
+                // local event to handle file event
+                function handleFileEvent(filepath, displaystr) {
+                    if (!endsWith(filepath.toLowerCase(), '.ts') && !endsWith(filepath.toLowerCase(), '.html'))
+                        return;
+
+                    if ((new Date().getTime() - endtime) <= 100) {
+                        //grunt.log.writeln((' ///'  + ' >>' + filepath).grey);
+                        return;
+                    }
+
+                    // Log and run the debounced version.
+                    grunt.log.writeln((displaystr + ' >>' + filepath).yellow);
+                    debouncedCompile();
+                }
+
+                // get path
+                var watchpath = path.resolve(watch);
+
+                // create a file watcher for path
+                var chokidar = require('chokidar');
+                var watcher = chokidar.watch(watchpath, { ignoreInitial: true, persistent: true });
+
+                // Log what we are doing
+                grunt.log.writeln(('Watching all TypeScript / Html files under : ' + watchpath).cyan);
+
+                // A file has been added/changed/deleted has occurred
+                watcher.on('add', function (path) {
+                    handleFileEvent(path, '+++ added   ');
+                }).on('change', function (path) {
+                    handleFileEvent(path, '### changed ');
+                }).on('unlink', function (path) {
+                    handleFileEvent(path, '--- removed ');
+                }).on('error', function (error) {
+                    console.error('Error happened in chokidar: ', error);
+                });
+            }
         });
 
-        return success;
+        if (!watch) {
+            return success;
+        }
     });
 }
 ;

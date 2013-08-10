@@ -10,14 +10,6 @@ module.exports = function (grunt) {
             ]
         },
 
-        watch: {
-            files:['test/**/*.ts'],
-            tasks: ['test'],
-            options:{
-                spawn:false,                
-            }
-        },
-
         ts: {
             options: {                    // use to override the default options, See : http://gruntjs.com/configuring-tasks#options
                 target: 'es3',            // es3 (default) / or es5
@@ -55,7 +47,8 @@ module.exports = function (grunt) {
             htmltest: {
                 src: ['test/html/**/*.ts'],
                 html: ['test/html/**/*.tpl.html'],
-                reference: 'test/html/reference.ts'
+                reference: 'test/html/reference.ts',
+                watch: 'test'
             }
         },
     });
@@ -65,10 +58,9 @@ module.exports = function (grunt) {
     // in your configuration you would load this like: 
     //grunt.loadNpmTasks("grunt-ts")
 
-    grunt.loadNpmTasks("grunt-contrib-clean");
-    grunt.loadNpmTasks("grunt-contrib-watch");
+    grunt.loadNpmTasks("grunt-contrib-clean");    
 
     grunt.registerTask("test", ["clean", "ts:htmltest"]);
-    grunt.registerTask("default", ["test","watch"]);
+    grunt.registerTask("default", ["test"]);
 
 };
