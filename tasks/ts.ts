@@ -325,13 +325,17 @@ function pluginFn(grunt: IGrunt) {
 
                 // Compile the files 
                 var result = compileAllFiles(filesToCompile, target, options);
+
+                // End the timer 
+                endtime = new Date().getTime();
+
+                // Evaluate the result
                 if (result.code != 0) {
                     var msg = "Compilation failed"/*+result.output*/;
                     grunt.log.error(msg.red);
                     success = false;
                 }
-                else {
-                    endtime = new Date().getTime();
+                else {                    
                     var time = (endtime - starttime) / 1000;
                     grunt.log.writeln(('Success: ' + time.toFixed(2) + 's for ' + files.length + ' typescript files').green);
                 }
