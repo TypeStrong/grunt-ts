@@ -27,12 +27,6 @@ module.exports = function (grunt) {
                     declaration: true
                 },
             },
-            fail: {                        // another target 
-                src: ["test/fail/**/*.ts"],
-                options: {                  // overide the main options for this target 
-                    sourcemap: false,
-                }
-            },
             abtest: {
                 src: ['test/abtest/**/*.ts'],
                 reference: 'test/abtest/reference.ts',
@@ -48,9 +42,15 @@ module.exports = function (grunt) {
                 src: ['test/html/**/*.ts'],                            
                 html: ['test/html/**/*.tpl.html'],    
                 reference: 'test/html/reference.ts',
-                out: 'test/html/out.js',
+                out: 'test/html/out.js',                
+            },
+            fail: {                        // a designed to fail target
+                src: ["test/fail/**/*.ts"],
                 watch: 'test',                
-            }
+                options: {                  // overide the main options for this target 
+                    sourcemap: false,
+                }
+            },
         },
     });
 
@@ -60,7 +60,7 @@ module.exports = function (grunt) {
     //grunt.loadNpmTasks("grunt-ts")
 
     grunt.loadNpmTasks("grunt-contrib-clean");    
-
+    
     grunt.registerTask("test", ["clean", "ts:htmltest"]);
     grunt.registerTask("default", ["test"]);
 

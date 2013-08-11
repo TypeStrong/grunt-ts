@@ -351,10 +351,10 @@ function pluginFn(grunt: IGrunt) {
                 // Html files: 
                 // Note: 
                 //    compile html files before reference file creation. Which is done in runCompilation                 
-                //    compile html files before globbing the file system again
-                var htmlFiles = grunt.file.expand(currenttask.data.html);
+                //    compile html files before globbing the file system again                                
                 var generatedHtmlFiles = [];
-                if (htmlFiles.length > 0) {
+                if (currenttask.data.html) {
+                    var htmlFiles = grunt.file.expand(currenttask.data.html);
                     generatedHtmlFiles = _.map(htmlFiles, (filename) =>  compileHTML(filename));                    
                 }
 
