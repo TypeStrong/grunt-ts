@@ -70,7 +70,15 @@ is compiled to a typescript file `test.html.ts` containing:
 module test { export var html =  '<div> Some content </div>' } 
 ``` 
 so that you can use use the variable `test.html` within your typescript to get the content of test.html 
-as a string :) 
+as a string. The motivatation is to remove http requests to load templates in various front end frameworks. 
+
+####Html 2 TypeScript usage in AngularJS 
+This is great for putting variables in templateCache : http://docs.angularjs.org/api/ng.$templateCache 
+or even using the html string directly by setting it to the `template` properties (directives/views) instead of `templateUrl`
+
+####Html 2 TypeScript usage in EmberJS
+You can specify this string to the template on a view : http://emberjs.com/api/classes/Ember.View.html 
+Specifically: http://stackoverflow.com/a/9867375/390330
 
 ###Live file watching and building
 Can watch a directory for you and recompile your typescript files when any typescript file changes, gets added, gets removed. 
