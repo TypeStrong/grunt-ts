@@ -45,10 +45,11 @@ module.exports = function (grunt) {
                 }
             },
             htmltest: {
-                src: ['test/html/**/*.ts'],
-                html: ['test/html/**/*.tpl.html'],
+                src: ['test/html/**/*.ts'],                            
+                html: ['test/html/**/*.tpl.html'],    
                 reference: 'test/html/reference.ts',
-                watch: 'test'
+                out: 'test/html/out.js',
+                watch: 'test',                
             }
         },
     });

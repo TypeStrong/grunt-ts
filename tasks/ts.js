@@ -99,8 +99,9 @@ function pluginFn(grunt) {
 
             var inSignatureSection = false;
 
-            // By default at end of file
+            // By default our signature goes at end of file
             signatureSectionPosition = lines.length;
+
             for (var i = 0; i < lines.length; i++) {
                 var line = _str.trim(lines[i]);
 

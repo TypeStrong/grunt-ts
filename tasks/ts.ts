@@ -135,15 +135,17 @@ function pluginFn(grunt: IGrunt) {
 
         // Location of our generated references
         // By default at start of file
-        var signatureSectionPosition = 0; 
+        var signatureSectionPosition = 0;         
 
         // Read the original file if it exists 
         if (fs.existsSync(referenceFile)) {
             var lines = fs.readFileSync(referenceFile).toString().split('\n');            
 
             var inSignatureSection = false;           
-            // By default at end of file
+            
+            // By default our signature goes at end of file
             signatureSectionPosition = lines.length; 
+            
             for (var i = 0; i < lines.length; i++) {
 
                 var line = _str.trim(lines[i]);
