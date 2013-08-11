@@ -219,6 +219,13 @@ function pluginFn(grunt: IGrunt) {
         var nlReplace = '\\n' + quoteChar + ' +\n' + indentString + indentString + quoteChar;
         return content.replace(quoteRegexp, '\\' + quoteChar).replace(/\r?\n/g, nlReplace);
     };
+
+    // Remove bom when reading utf8 files
+    function stripBOM(str) {
+        return 0xFEFF == str.charCodeAt(0)
+            ? str.substring(1)
+            : str;
+    }
         
     var htmlTemplate = _.template("module <%= modulename %> { export var <%= varname %> =  '<%= content %>' } ");
 
@@ -226,6 +233,7 @@ function pluginFn(grunt: IGrunt) {
     // Return the filename. This filename will be required by reference.ts
     function compileHTML(filename: string):string {
         var htmlContent = escapeContent(fs.readFileSync(filename).toString());
+        htmlContent = stripBOM(htmlContent);
         // TODO: place a minification pipeline here if you want.
 
         var ext = path.extname(filename);
