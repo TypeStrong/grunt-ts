@@ -91,7 +91,7 @@ npm install
 The npm package is available here : https://npmjs.org/package/grunt-ts
 
 ## Installation Documentation
-Install nodejs. Then install grunt-cli using `npm install -g grunt-cli`. Next you can install `grunt` and `grunt-ts` by createing a `package.json`
+Install nodejs. Then install grunt-cli using `npm install -g grunt-cli`. Next you can install `grunt` and `grunt-ts` by creating a `package.json`
 file containing the following: 
 
 ```javascript
@@ -105,9 +105,15 @@ file containing the following:
 and run `npm install` from the same directory. This will download both grunt and grunt-ts for you. 
 
 ## Configuration Documentation
-Create a `Gruntfile.js`. Modify it to load grunt-ts by adding the following line:
+Create a `Gruntfile.js`. Modify it to load grunt-ts by adding the following lines:
 
-    grunt.loadNpmTasks('grunt-ts');
+    module.exports = function (grunt) {
+    
+        // load the task 
+        grunt.loadNpmTasks("grunt-ts");
+        
+        // Configure grunt here
+    }
 
 Then add some configuration for the plugin like so:
 
@@ -137,6 +143,11 @@ Then add some configuration for the plugin like so:
         },
         ...
     });
+
+I also recommend adding a default taget you want to run in case you do not want to specify any arguments to grunt: 
+```
+grunt.registerTask("default", ["ts:dev"]);
+```
     
 You can see a sample grunt file here : https://github.com/basarat/grunt-ts/blob/master/Gruntfile.js
    
