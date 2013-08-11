@@ -214,9 +214,10 @@ function pluginFn(grunt: IGrunt) {
     // Originally from karma-html2js-preprocessor
     // Refactored nicely in html2js grunt task
     // https://github.com/karlgoldstein/grunt-html2js/blob/master/tasks/html2js.js
-    var escapeContent = function (content: string, quoteChar="'",indentString='  '):string {
-        var quoteRegexp = new RegExp('\\' + quoteChar, 'g');
-        var nlReplace = '\\n' + quoteChar + ' +\n' + indentString + indentString + quoteChar;
+    // Modified nlReplace to be an empty string
+    var escapeContent = function (content: string, quoteChar="'"):string {
+        var quoteRegexp = new RegExp('\\' + quoteChar, 'g');        
+        var nlReplace = '';
         return content.replace(quoteRegexp, '\\' + quoteChar).replace(/\r?\n/g, nlReplace);
     };
 

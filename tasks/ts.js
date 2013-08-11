@@ -168,11 +168,11 @@ function pluginFn(grunt) {
     // Originally from karma-html2js-preprocessor
     // Refactored nicely in html2js grunt task
     // https://github.com/karlgoldstein/grunt-html2js/blob/master/tasks/html2js.js
-    var escapeContent = function (content, quoteChar, indentString) {
+    // Modified nlReplace to be an empty string
+    var escapeContent = function (content, quoteChar) {
         if (typeof quoteChar === "undefined") { quoteChar = "'"; }
-        if (typeof indentString === "undefined") { indentString = '  '; }
         var quoteRegexp = new RegExp('\\' + quoteChar, 'g');
-        var nlReplace = '\\n' + quoteChar + ' +\n' + indentString + indentString + quoteChar;
+        var nlReplace = '';
         return content.replace(quoteRegexp, '\\' + quoteChar).replace(/\r?\n/g, nlReplace);
     };
 
