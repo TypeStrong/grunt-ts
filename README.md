@@ -90,12 +90,22 @@ npm install
 
 The npm package is available here : https://npmjs.org/package/grunt-ts
 
+## Installation Documentation
+Install nodejs. Then install grunt-cli using `npm install -g grunt-cli`. Next you can install `grunt` and `grunt-ts` by createing a `package.json`
+file containing the following: 
+
+```javascript
+{
+  "devDependencies": {
+    "grunt" : "0.4.1",
+    "grunt-ts" : "latest"
+  }
+}
+```
+and run `npm install` from the same directory. This will download both grunt and grunt-ts for you. 
+
 ## Configuration Documentation
-After you have grunt installed, you can install `grunt-ts` first:
-
-    npm install grunt-ts
-
-Then modify your `Gruntfile.js` file by adding the following line:
+Create a `Gruntfile.js`. Modify it to load grunt-ts by adding the following line:
 
     grunt.loadNpmTasks('grunt-ts');
 
