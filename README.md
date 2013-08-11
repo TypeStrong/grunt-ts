@@ -105,8 +105,10 @@ Then add some configuration for the plugin like so:
             },
             dev: {                          // a particular target   
                 src: ["test/work/**/*.ts"], // The source typescript files, http://gruntjs.com/configuring-tasks#files
+                html: ["test/work/**/*.tpl.html"], // The source html files, https://github.com/basarat/grunt-ts#html-2-typescript-support
                 reference: "./test/reference.ts",  // If specified, generate this file that you can use for your reference management
                 out: 'test/out.js',         // If specified, generate an out.js file which is the merged js file                     
+                watch: 'test',              // If specified, watches this directory for changes, and re-runs the current target  
                 options: {                  // override the main options, http://gruntjs.com/configuring-tasks#options
                     sourcemap: true,
                     declaration: true
