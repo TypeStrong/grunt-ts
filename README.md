@@ -8,8 +8,9 @@ It differs from grunt-typescript and following are the reasons why it was create
 - Gives a typescript development workflow in addition to simple file compilation. 
 - Super simple to update to the [latest version of the typescript](https://github.com/basarat/grunt-ts/commit/6636f95b9d45b69e64771c603d3b08ec829e01e6)
 
-Comes with a video introduction : http://youtu.be/Km0DpfX5ZxM , 
-If you already know grunt then skip to http://youtu.be/Km0DpfX5ZxM?t=11m16s
+Check how it can help streamline your front end development : [Sample usage with AngularJS](http://www.youtube.com/watch?v=0-6vT7xgE4Y&hd=1)
+
+Additional / longer / more basic video tutorial : http://youtu.be/Km0DpfX5ZxM
 
 Following are some key features: 
 ======================
