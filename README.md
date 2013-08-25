@@ -6,7 +6,7 @@ It differs from grunt-typescript and following are the reasons why it was create
 
 - This is written in [clear TypeScript code](https://github.com/basarat/grunt-ts/blob/master/tasks/ts.ts)
 - Gives a typescript development workflow in addition to simple file compilation. 
-- Super simple to update to the [latest version of the typescript](https://github.com/basarat/grunt-ts/commit/6636f95b9d45b69e64771c603d3b08ec829e01e6)
+- Super simple to update to the [latest version of the typescript](https://github.com/basarat/grunt-ts/commit/ffede564f2b20bc4dc207cb1a30dc57db7c44fe5)
 
 Check how it can help streamline your front end development : [Sample usage with AngularJS](http://www.youtube.com/watch?v=0-6vT7xgE4Y&hd=1)
 
