@@ -1,10 +1,11 @@
 grunt-ts
 ================
 Written from scratch TypeScript compiler task for GruntJS. 
+It differs from grunt-typescript which is another excellent [grunt plugin for typescript](https://npmjs.org/package/grunt-typescript).
 
-It differs from grunt-typescript and following are the reasons why it was created. 
+Following are the reasons why it was created. 
 
-- This is written in [clear TypeScript code](https://github.com/basarat/grunt-ts/blob/master/tasks/ts.ts)
+- This is written in [TypeScript](https://github.com/basarat/grunt-ts/blob/master/tasks/ts.ts)
 - Gives a typescript development workflow in addition to simple file compilation. 
 - Super simple to update to the [latest version of the typescript](https://github.com/basarat/grunt-ts/commit/ffede564f2b20bc4dc207cb1a30dc57db7c44fe5)
 
