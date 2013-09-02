@@ -44,6 +44,12 @@ module.exports = function (grunt) {
                 reference: 'test/html/reference.ts',
                 out: 'test/html/out.js',                
             },
+            definitelyTypedTest: {
+                src: ['test/DefinitelyTypedTest/**/*.ts'],
+                html: ['test/DefinitelyTypedTest/**/*.tpl.html'],
+                reference: 'test/DefinitelyTypedTest/reference.ts',
+                out: 'test/html/out.js',
+            },
             fail: {                        // a designed to fail target
                 src: ["test/fail/**/*.ts"],
                 watch: 'test',                
@@ -62,6 +68,7 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks("grunt-contrib-clean");    
     
     grunt.registerTask("test", ["clean", "ts:htmltest"]);
+    grunt.registerTask("test", ["clean", "ts:htmltest", "ts:definitelyTypedTest"]);
     grunt.registerTask("default", ["test"]);
 
 };

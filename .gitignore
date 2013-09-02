@@ -28,3 +28,5 @@ test/html/test.tpl.html.ts
 test/*/*.js
 test/*/*/*.js
 test/html/src/test.tpl.html.ts
+
+test/definitelytypedtest/reference.ts
