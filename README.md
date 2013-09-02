@@ -161,3 +161,10 @@ This is provided by grunt : http://gruntjs.com/configuring-tasks#options
 ### Awesome file globs
 You can do pretty fancy stuff with your src file selection. 
 Again provided by grunt : http://gruntjs.com/configuring-tasks#files
+
+# Contributing
+
+How to build the project:
+
+    tsc .\tasks\ts.ts --sourcemap --allowimportmodule --allowbool --module commonjs;
+    grunt test
