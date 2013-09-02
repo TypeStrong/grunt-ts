@@ -319,6 +319,12 @@ function pluginFn(grunt) {
                 // Reexpand the original file glob:
                 var files = grunt.file.expand(currenttask.data.src);
 
+                // ignore directories
+                files = files.filter(function (file) {
+                    var stats = fs.lstatSync(file);
+                    return !stats.isDirectory();
+                });
+
                 // remove the generated files from files:
                 files = _.difference(files, generatedHtmlFiles);
 
@@ -328,7 +334,8 @@ function pluginFn(grunt) {
                 });
 
                 if (files.length > 0)
-                    runCompilation(files, generatedHtmlFiles); else
+                    runCompilation(files, generatedHtmlFiles);
+else
                     grunt.log.writeln('No files to compile'.red);
             }
 
@@ -391,4 +398,4 @@ function pluginFn(grunt) {
 
 module.exports = pluginFn;
 
-//@ sourceMappingURL=ts.js.map
+//# sourceMappingURL=ts.js.map

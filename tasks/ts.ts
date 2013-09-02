@@ -370,6 +370,12 @@ function pluginFn(grunt: IGrunt) {
                 // Reexpand the original file glob: 
                 var files = grunt.file.expand(currenttask.data.src);
 
+                // ignore directories
+                files = files.filter(function(file){
+                    var stats = fs.lstatSync(file);
+                    return !stats.isDirectory();
+                });
+
                 // remove the generated files from files: 
                 files = _.difference(files, generatedHtmlFiles);
 
