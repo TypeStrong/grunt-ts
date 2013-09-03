@@ -48,7 +48,7 @@ module.exports = function (grunt) {
                 src: ['test/DefinitelyTypedTest/**/*.ts'],
                 html: ['test/DefinitelyTypedTest/**/*.tpl.html'],
                 reference: 'test/DefinitelyTypedTest/reference.ts',
-                out: 'test/html/out.js',
+                out: 'test/DefinitelyTypedTest/out.js',
             },
             fail: {                        // a designed to fail target
                 src: ["test/fail/**/*.ts"],
