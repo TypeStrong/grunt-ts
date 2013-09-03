@@ -151,7 +151,7 @@ I also recommend adding a default taget you want to run in case you do not want 
 grunt.registerTask("default", ["ts:dev"]);
 ```
     
-You can see a sample grunt file here : https://github.com/basarat/grunt-ts/blob/master/Gruntfile.js
+You can see/grab a sample grunt file here : https://github.com/basarat/grunt-ts/blob/master/sample/Gruntfile.js
    
 ### Different configurations per target   
 Configuration options are per target. You can see how you can have one set of default options and then override
