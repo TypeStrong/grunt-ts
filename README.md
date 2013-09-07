@@ -122,12 +122,13 @@ Then add some configuration for the plugin like so:
     grunt.initConfig({
         ...
         ts: {            
-            dev: {                          // a particular target   
-                src: ["test/work/**/*.ts"], // The source typescript files, http://gruntjs.com/configuring-tasks#files
+            dev: {                                 // a particular target   
+                src: ["test/work/**/*.ts"],        // The source typescript files, http://gruntjs.com/configuring-tasks#files
                 html: ["test/work/**/*.tpl.html"], // The source html files, https://github.com/basarat/grunt-ts#html-2-typescript-support
                 reference: "./test/reference.ts",  // If specified, generate this file that you can use for your reference management
-                out: 'test/out.js',         // If specified, generate an out.js file which is the merged js file                     
-                watch: 'test',              // If specified, watches this directory for changes, and re-runs the current target  
+                out: 'test/out.js',                // If specified, generate an out.js file which is the merged js file                     
+				outDir: 'test/outputdirectory',    // If specified, the generate javascript files are placed here. Only works if out is not specified
+                watch: 'test',                     // If specified, watches this directory for changes, and re-runs the current target  
                 options: {                    // use to override the default options, http://gruntjs.com/configuring-tasks#options
 					target: 'es3',            // 'es3' (default) | 'es5'
 					module: 'commonjs',       // 'amd' (default) | 'commonjs'
@@ -166,5 +167,5 @@ Again provided by grunt : http://gruntjs.com/configuring-tasks#files
 
 How to build the project:
 
-    tsc .\tasks\ts.ts --sourcemap --allowimportmodule --allowbool --module commonjs;
-    grunt test
+    tsc "./tasks/ts.ts" --sourcemap --module commonjs
+    

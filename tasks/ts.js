@@ -1,3 +1,7 @@
+/// <reference path="../defs/node/node.d.ts"/>
+/// <reference path="../defs/grunt/grunt.d.ts"/>
+/// <reference path="../defs/underscore/underscore.d.ts"/>
+/// <reference path="../defs/underscore.string/underscore.string.d.ts"/>
 // General util functions
 function insertArrayAt(array, index, arrayToInsert) {
     Array.prototype.splice.apply(array, [index, 0].concat(arrayToInsert));
@@ -68,6 +72,11 @@ function pluginFn(grunt) {
 
         if (target.out) {
             cmd = cmd + ' --out ' + target.out;
+        }
+        if (target.outDir) {
+            if (target.out)
+                console.log('option out and outDir should not be use together'.red);
+            cmd = cmd + ' --outDir ' + target.outDir;
         }
 
         // To debug the tsc command

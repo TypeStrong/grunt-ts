@@ -45,10 +45,14 @@ module.exports = function (grunt) {
                 out: 'test/html/out.js',                
             },
             definitelyTypedTest: {
-                src: ['test/DefinitelyTypedTest/**/*.ts'],
-                html: ['test/DefinitelyTypedTest/**/*.tpl.html'],
-                reference: 'test/DefinitelyTypedTest/reference.ts',
-                out: 'test/DefinitelyTypedTest/out.js',
+                src: ['test/definitelytypedtest/**/*.ts'],
+                html: ['test/definitelytypedtest/**/*.tpl.html'],
+                reference: 'test/definitelytypedtest/reference.ts',
+                out: 'test/definitelytypedtest/out.js',
+            },
+            outdirtest:{
+                src: ['test/outdirtest/**/*.ts'],                                          
+                outDir: 'test/outdirtest/js',
             },
             fail: {                        // a designed to fail target
                 src: ["test/fail/**/*.ts"],

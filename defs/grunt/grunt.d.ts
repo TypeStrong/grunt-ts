@@ -109,7 +109,7 @@ interface IGruntFileObject {
     readYAML(filepath, options?: IGruntFileObjectOptionsSimple);
     write(filepath, contents, options?: IGruntFileObjectOptionsSimple);
     copy(srcpath, destpath, options?: IGruntFileObjectOptions);
-    delete(filepath, options?: { force?: bool; });
+    delete(filepath, options?: { force?: boolean; });
 
     // Directories
     mkdir(dirpath, mode?);
@@ -121,8 +121,8 @@ interface IGruntFileObject {
     expandMapping(patterns, dest, options?);
     match(patterns, filepaths);
     match(options, patterns, filepaths);
-    isMatch(patterns, filepaths): bool;
-    isMatch(options, patterns, filepaths): bool;
+    isMatch(patterns, filepaths): boolean;
+    isMatch(options, patterns, filepaths): boolean;
 
     // file types
     exists(...paths: any[]);

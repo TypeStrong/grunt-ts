@@ -8,12 +8,6 @@
  * Licensed under the MIT license.
  */
 
-
-declare var require;
-declare var __dirname;
-declare var mapObj;
-declare var key;
-
 interface ICompileResult {
     code: number;
     output: string;
@@ -23,6 +17,7 @@ interface ITargetOptions {
     src: string[]; // input files  // Note : this is a getter and returns a new "live globbed" array 
     reference: string; // path to a reference.ts e.g. './approot/'
     out: string; // if sepecified e.g. 'single.js' all output js files are merged into single.js using tsc --out command     
+    outDir: string; // if sepecified e.g. '/build/js' all output js files are put in this location
     html: string[];  // if specified this is used to generate typescript files with a single variable which contains the content of the html
     watch: string;
 }
@@ -109,6 +104,10 @@ function pluginFn(grunt: IGrunt) {
         // Target options: 
         if (target.out) {
             cmd = cmd + ' --out ' + target.out;
+        }
+        if (target.outDir) {
+            if(target.out)console.log('option out and outDir should not be used together'.red); 
+            cmd = cmd + ' --outDir ' + target.outDir;
         }
 
         // To debug the tsc command
