@@ -52,7 +52,7 @@ module.exports = function (grunt) {
             },
             outdirtest:{
                 src: ['test/outdirtest/**/*.ts'],                                          
-                outDir: 'test/outdirtest/js',
+                outDir: 'test/outdirtest/js',                
             },
             fail: {                        // a designed to fail target
                 src: ["test/fail/**/*.ts"],

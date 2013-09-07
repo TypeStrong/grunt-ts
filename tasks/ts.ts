@@ -106,7 +106,9 @@ function pluginFn(grunt: IGrunt) {
             cmd = cmd + ' --out ' + target.out;
         }
         if (target.outDir) {
-            if(target.out)console.log('option out and outDir should not be used together'.red); 
+            if (target.out) {
+                console.log('WARNING: Option "out" and "outDir" should not be used together'.magenta);
+            } 
             cmd = cmd + ' --outDir ' + target.outDir;
         }
 
