@@ -19,7 +19,8 @@ interface ITargetOptions {
     out: string; // if sepecified e.g. 'single.js' all output js files are merged into single.js using tsc --out command     
     outDir: string; // if sepecified e.g. '/build/js' all output js files are put in this location
     html: string[];  // if specified this is used to generate typescript files with a single variable which contains the content of the html
-    watch: string;
+    watch: string; // if specified watches all files in this directory for changes. 
+    amdloader: string;  // if specified creates a js file to load all the generated typescript files in order using requirejs + order
 }
 
 interface ITaskOptions {
@@ -206,7 +207,13 @@ function pluginFn(grunt: IGrunt) {
         origFileLines = insertArrayAt(origFileLines, signatureSectionPosition, contents);
         fs.writeFileSync(referenceFile, origFileLines.join(eol));
     }    
+    
 
+    /////////////////////////////////////////////////////////////////////    
+    // AMD Loader, creates a js file that loads a few files in order 
+    // and the rest un orderded, based on the reference.ts spec
+    ////////////////////////////////////////////////////////////////////
+    
     /////////////////////////////////////////////////////////////////////    
     // HTML -> TS     
     ////////////////////////////////////////////////////////////////////
@@ -247,7 +254,7 @@ function pluginFn(grunt: IGrunt) {
         
         fs.writeFileSync(outputfile, fileContent);
         return outputfile;
-    }
+    }        
 
     /////////////////////////////////////////////////////////////////////    
     // The grunt task 
