@@ -106,10 +106,10 @@ define(function (require) {
 });
 ```
 
-#####Why
+#####Why would you use amdloader instead of import statements
 The following combination of circumstances are why you would use it instead of Compiler supported AMD. 
 
-You want to use RequireJS since you prefer to debug "js" files instead of "ts" files. But: 
+You want to use RequireJS since you prefer to debug "js" files instead of "ts" files (=> amd). But: 
 * File order doesn't matter (e.g. dependency injection is handled at runtime e.t. AngularJS)
 * You want inter file Type Information without using `import` statements. 
 
