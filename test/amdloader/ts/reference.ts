@@ -6,5 +6,4 @@
 //grunt-end
 
 /// <reference path="deep/deeper/classd.ts" />
-
 /// <reference path="app.ts" />
