@@ -13,6 +13,8 @@ Check how it can help streamline your front end development : [Sample usage with
 
 Additional / longer / more basic video tutorial : http://youtu.be/Km0DpfX5ZxM
 
+*If you know Grunt. Here is a quickstart full featured [Gruntfile](https://github.com/basarat/grunt-ts/blob/master/sample/Gruntfile.js)*
+
 Following are some key features: 
 ======================
 
@@ -25,7 +27,9 @@ Supports all important compiler flags:
 - declaration
 - comments
 
-Can also do js *file concatenation* using `--out`. For file ordering look at Javascript Generation below. 
+Can also do js *file concatenation* using `--out`. Additionally supports an output directory for the generated
+javascript using `--outDir` flag. 
+For file ordering look at Javascript Generation below. 
 
 
 ###Reference file generation 
@@ -50,7 +54,6 @@ exist originally, it is created for you.
 /// <reference path="someBaseClass.ts" />
 
 // You can even put comments here and they are preserved
-var orEvenCode = 123; // That you want to come before or after all your files
 
 //grunt-start
 /// <reference path="autoreference.ts" />
@@ -60,6 +63,62 @@ var orEvenCode = 123; // That you want to come before or after all your files
 
 /// <reference path="main.ts" />
 ```
+
+####Javscript generation Redirect
+If you specify `outDir` all output javascript are redirectied to this folder. 
+This helps keep your source folder clean.
+
+####AMD / RequireJS support 
+If you specify both `outDir` and `amdloader` option a Javascript requireJS loader file is created using the information
+available from `reference.ts`. The file consists of three sections. 
+* The initial ordered section. 
+* A middle order independent section loaded asynchronously. 
+* And a final ordered section.
+
+e.g the following `reference` file
+
+```typescript
+/// <reference path="classa.ts" />
+
+//grunt-start
+/// <reference path="deep/classb.ts" />
+/// <reference path="deep/classc.ts" />
+//grunt-end
+
+/// <reference path="deep/deeper/classd.ts" />
+/// <reference path="app.ts" />
+```
+
+Corresponds to an `amdloader`: 
+
+```typescript 
+define(function (require) { 
+	 require(["./classa"],function (){ // initial ordered files 
+	 require(["./deep/classb",                      // grunt-ts start / end unordered async loaded files 
+		  "./deep/classc"],function (){
+	 require(["./deep/deeper/classd"],function (){  // final ordered files 
+	 require(["./app"],function (){                 // another final ordered file
+
+	 });
+	 });
+	 });
+	 });
+});
+```
+
+#####Why
+The following combination of circumstances are why you would use it instead of Compiler supported AMD. 
+
+You want to use RequireJS since you prefer to debug "js" files instead of "ts" files. But: 
+* File order doesn't matter (e.g. dependency injection is handled at runtime e.t. AngularJS)
+* You want inter file Type Information without using `import` statements. 
+
+If you use `export class Foo{}` at the root level of your file the only way to use the type information 
+of Foo is via an import statement `import foo = require('./potentially/long/path/to/Foo');` 
+The ordering implied by this isn't necessary when using a runtime Dependency injection framework like AngularJS.
+ Having a loader gives you the js debugging (+ async) advantages
+of RequireJS without the overhead of constantly requesting via `import` to get the TypeScript type inference. 
+
 
 ###Html 2 TypeScript support 
 Can reencode html files into typescript and makes them available as a variable. e.g.
@@ -127,7 +186,7 @@ Then add some configuration for the plugin like so:
                 html: ["test/work/**/*.tpl.html"], // The source html files, https://github.com/basarat/grunt-ts#html-2-typescript-support
                 reference: "./test/reference.ts",  // If specified, generate this file that you can use for your reference management
                 out: 'test/out.js',                // If specified, generate an out.js file which is the merged js file                     
-				outDir: 'test/outputdirectory',    // If specified, the generate javascript files are placed here. Only works if out is not specified
+                outDir: 'test/outputdirectory',    // If specified, the generate javascript files are placed here. Only works if out is not specified
                 watch: 'test',                     // If specified, watches this directory for changes, and re-runs the current target  
                 options: {                    // use to override the default options, http://gruntjs.com/configuring-tasks#options
 					target: 'es3',            // 'es3' (default) | 'es5'
