@@ -110,6 +110,7 @@ function pluginFn(grunt) {
         var referenceMatch = /\/\/\/ <reference path=\"(.*?)\"/;
         var ourSignatureStart = '//grunt-start';
         var ourSignatureEnd = '//grunt-end';
+        var generatedSignature = "// generated";
 
         var origFileLines = [];
         var origFileReferences = [];
@@ -153,13 +154,13 @@ function pluginFn(grunt) {
             }
         }
 
-        // the generated files:
+        // Put in the generated files
         generatedFiles = _.map(generatedFiles, function (file) {
-            return referenceIntro + makeReferencePath(referencePath, file) + referenceEnd;
+            return referenceIntro + makeReferencePath(referencePath, file) + referenceEnd + generatedSignature;
         });
-
-        // the new / observed missing files:
         var contents = insertArrayAt([ourSignatureStart], 1, generatedFiles);
+
+        // Put in the new / observed missing files:
         files.forEach(function (filename) {
             // The file we are about to add
             var filepath = makeReferencePath(referencePath, filename);
@@ -187,6 +188,7 @@ function pluginFn(grunt) {
     function getReferencesInOrder(referenceFile, referencePath) {
         var toreturn = {
             before: [],
+            generated: [],
             unordered: [],
             after: []
         };
@@ -201,6 +203,9 @@ function pluginFn(grunt) {
         // The section of unordered files
         var ourSignatureStart = '//grunt-start';
         var ourSignatureEnd = '//grunt-end';
+
+        // The generated files. These must go on top
+        var generatedSignature = "// generated";
 
         var lines = fs.readFileSync(referenceFile).toString().split('\n');
 
@@ -226,7 +231,11 @@ function pluginFn(grunt) {
                         toreturn.before.push(filename);
                         break;
                     case referenceFileLoopState.unordered:
-                        toreturn.unordered.push(filename);
+                        if (endsWith(line, generatedSignature)) {
+                            toreturn.generated.push(filename);
+                        } else {
+                            toreturn.unordered.push(filename);
+                        }
                         break;
                     case referenceFileLoopState.after:
                         toreturn.after.push(filename);
@@ -237,6 +246,9 @@ function pluginFn(grunt) {
 
         // Fix the references to be absolute:
         toreturn.before = _.map(toreturn.before, function (relativepath) {
+            return path.resolve(referencePath, relativepath);
+        });
+        toreturn.generated = _.map(toreturn.generated, function (relativepath) {
             return path.resolve(referencePath, relativepath);
         });
         toreturn.unordered = _.map(toreturn.unordered, function (relativepath) {
@@ -274,13 +286,22 @@ function pluginFn(grunt) {
             var files = getReferencesInOrder(referenceFile, referencePath);
 
             // Filter.d.ts,
+            files.before = _.filter(files.before, function (file) {
+                return !endsWith(file, '.d.ts');
+            });
+            files.generated = _.filter(files.generated, function (file) {
+                return !endsWith(file, '.d.ts');
+            });
             files.unordered = _.filter(files.unordered, function (file) {
+                return !endsWith(file, '.d.ts');
+            });
+            files.after = _.filter(files.after, function (file) {
                 return !endsWith(file, '.d.ts');
             });
 
             if (outDir) {
                 // Find common path
-                var commonPath = findCommonPath(files.before.concat(files.unordered.concat(files.after)));
+                var commonPath = findCommonPath(files.before.concat(files.generated.concat(files.unordered.concat(files.after))));
 
                 // Make sure outDir is absolute:
                 outDir = path.resolve(outDir);
@@ -304,6 +325,7 @@ function pluginFn(grunt) {
                     return files;
                 }
                 files.before = makeRelativeToOutDir(files.before);
+                files.generated = makeRelativeToOutDir(files.generated);
                 files.unordered = makeRelativeToOutDir(files.unordered);
                 files.after = makeRelativeToOutDir(files.after);
 
@@ -318,6 +340,9 @@ function pluginFn(grunt) {
                 // initial sub item
                 var subitem = '';
 
+                //
+                // Notice that we build inside out in the below sections:
+                //
                 // Generate fileTemplate from inside out
                 // Start with after
                 // Build the subitem for ordered after items
@@ -330,6 +355,11 @@ function pluginFn(grunt) {
                 // For these we will use just one require call
                 var unorderFileNames = files.unordered.join('",' + eol + '\t\t  "');
                 subitem = singleRequireTemplate({ filename: '"' + unorderFileNames + '"', subitem: subitem });
+
+                // Next the generated files
+                // For these we will use just one require call
+                var generatedFileNames = files.generated.join('",' + eol + '\t\t  "');
+                subitem = singleRequireTemplate({ filename: '"' + generatedFileNames + '"', subitem: subitem });
 
                 // Build the subitem for ordered before items
                 files.before = files.before.reverse();

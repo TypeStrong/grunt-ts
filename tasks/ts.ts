@@ -139,6 +139,7 @@ function pluginFn(grunt: IGrunt) {
         var referenceMatch = /\/\/\/ <reference path=\"(.*?)\"/;
         var ourSignatureStart = '//grunt-start';
         var ourSignatureEnd = '//grunt-end';
+        var generatedSignature = "// generated";
 
         var origFileLines = []; // The lines we do not modify and send out as is. Lines will we reach grunt-ts generated
         var origFileReferences = []; // The list of files already there that we do not need to manage 
@@ -185,11 +186,11 @@ function pluginFn(grunt: IGrunt) {
             }
         }
 
-        // the generated files:  
-        generatedFiles = _.map(generatedFiles, (file) => referenceIntro + makeReferencePath(referencePath, file) + referenceEnd);
-
-        // the new / observed missing files: 
+        // Put in the generated files 
+        generatedFiles = _.map(generatedFiles, (file) => referenceIntro + makeReferencePath(referencePath, file) + referenceEnd + generatedSignature);
         var contents = insertArrayAt([ourSignatureStart], 1, generatedFiles);
+
+        // Put in the new / observed missing files:         
         files.forEach((filename: string) => {
             // The file we are about to add 
             var filepath = makeReferencePath(referencePath, filename);
@@ -217,9 +218,10 @@ function pluginFn(grunt: IGrunt) {
     // and the rest un orderded, based on the reference.ts spec
     ////////////////////////////////////////////////////////////////////
 
-    function getReferencesInOrder(referenceFile: string, referencePath: string): { before: string[]; unordered: string[]; after: string[]; } {
+    function getReferencesInOrder(referenceFile: string, referencePath: string): { before: string[]; generated: string[]; unordered: string[]; after: string[]; } {
         var toreturn = {
             before: [],
+            generated: [],
             unordered: [],
             after: []
         };
@@ -234,6 +236,9 @@ function pluginFn(grunt: IGrunt) {
         // The section of unordered files 
         var ourSignatureStart = '//grunt-start';
         var ourSignatureEnd = '//grunt-end';
+
+        // The generated files. These must go on top 
+        var generatedSignature = "// generated";
 
         var lines = fs.readFileSync(referenceFile).toString().split('\n');
 
@@ -262,7 +267,12 @@ function pluginFn(grunt: IGrunt) {
                         toreturn.before.push(filename);
                         break;
                     case referenceFileLoopState.unordered:
-                        toreturn.unordered.push(filename);
+                        if(endsWith(line, generatedSignature)) {
+                            toreturn.generated.push(filename);
+                        }
+                        else {
+                            toreturn.unordered.push(filename);
+                        }
                         break;
                     case referenceFileLoopState.after:
                         toreturn.after.push(filename);
@@ -273,6 +283,7 @@ function pluginFn(grunt: IGrunt) {
 
         // Fix the references to be absolute: 
         toreturn.before = _.map(toreturn.before, (relativepath) => { return path.resolve(referencePath, relativepath); });
+        toreturn.generated = _.map(toreturn.generated, (relativepath) => { return path.resolve(referencePath, relativepath); });
         toreturn.unordered = _.map(toreturn.unordered, (relativepath) => { return path.resolve(referencePath, relativepath); });
         toreturn.after = _.map(toreturn.after, (relativepath) => { return path.resolve(referencePath, relativepath); });
 
@@ -307,7 +318,10 @@ function pluginFn(grunt: IGrunt) {
             var files = getReferencesInOrder(referenceFile, referencePath);
 
             // Filter.d.ts,             
+            files.before = _.filter(files.before, (file) => { return !endsWith(file, '.d.ts'); });
+            files.generated = _.filter(files.generated, (file) => { return !endsWith(file, '.d.ts'); });
             files.unordered = _.filter(files.unordered, (file) => { return !endsWith(file, '.d.ts'); });
+            files.after = _.filter(files.after, (file) => { return !endsWith(file, '.d.ts'); });
 
             // If target has outDir we need to make adjust the path             
             // c:/somefolder/ts/a , c:/somefolder/ts/inside/b  + c:/somefolder/build/js => c:/somefolder/build/js/a , c:/somefolder/build/js/inside/b
@@ -316,7 +330,7 @@ function pluginFn(grunt: IGrunt) {
             //          Finally: outDir path + remainder section 
             if (outDir) {
                 // Find common path 
-                var commonPath = findCommonPath(files.before.concat(files.unordered.concat(files.after)));
+                var commonPath = findCommonPath(files.before.concat(files.generated.concat(files.unordered.concat(files.after))));
 
                 // Make sure outDir is absolute: 
                 outDir = path.resolve(outDir);
@@ -340,38 +354,47 @@ function pluginFn(grunt: IGrunt) {
                     return files;
                 }
                 files.before = makeRelativeToOutDir(files.before);
+                files.generated = makeRelativeToOutDir(files.generated);
                 files.unordered = makeRelativeToOutDir(files.unordered);
                 files.after = makeRelativeToOutDir(files.after);
-
 
                 var mainTemplate = _.template('define(function (require) { '
                     + eol + '<%= body %>'
                     + eol + '});');
-                
+
                 // The order in the before and after files is important
                 var singleRequireTemplate = _.template('\t require([<%= filename %>],function (){'
                     + eol + '<%= subitem %>'
-                    + eol + '\t });');                
+                    + eol + '\t });');
 
 
                 // The final body of the function 
                 var body = '';
-                
+
                 // initial sub item 
-                var subitem = '';    
+                var subitem = '';
+
+                // 
+                // Notice that we build inside out in the below sections:  
+                //
 
                 // Generate fileTemplate from inside out                 
                 // Start with after 
                 // Build the subitem for ordered after items                 
                 files.after = files.after.reverse();     // Important to build inside out                        
                 _.forEach(files.after, (file) => {
-                    subitem = singleRequireTemplate({ filename: '"'+file+'"', subitem: subitem});
+                    subitem = singleRequireTemplate({ filename: '"' + file + '"', subitem: subitem });
                 });
 
                 // Next up add the unordered items: 
                 // For these we will use just one require call
-                var unorderFileNames = files.unordered.join('",'+eol+'\t\t  "'); 
-                subitem = singleRequireTemplate({filename:'"'+unorderFileNames+'"',subitem:subitem});
+                var unorderFileNames = files.unordered.join('",' + eol + '\t\t  "');
+                subitem = singleRequireTemplate({ filename: '"' + unorderFileNames + '"', subitem: subitem });
+                
+                // Next the generated files 
+                // For these we will use just one require call
+                var generatedFileNames = files.generated.join('",' + eol + '\t\t  "');
+                subitem = singleRequireTemplate({ filename: '"' + generatedFileNames + '"', subitem: subitem });
 
                 // Build the subitem for ordered before items                 
                 files.before = files.before.reverse();
@@ -533,7 +556,7 @@ function pluginFn(grunt: IGrunt) {
                 var result = compileAllFiles(filesToCompile, target, options);
 
                 // Create the loader if specified & compiliation succeeded
-                if (!!amdloaderPath && result.code==0) {
+                if (!!amdloaderPath && result.code == 0) {
                     updateAmdLoader(referenceFile, referencePath, amdloaderFile, amdloaderPath, target.outDir);
                 }
 

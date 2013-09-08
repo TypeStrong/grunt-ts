@@ -12,4 +12,5 @@ var ClassB = (function (_super) {
     }
     return ClassB;
 })(ClassA);
+console.log('reading html:', test.tpl.html);
 //# sourceMappingURL=classb.js.map

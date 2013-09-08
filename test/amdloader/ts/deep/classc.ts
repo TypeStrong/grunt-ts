@@ -5,3 +5,4 @@ class ClassC extends ClassA {
         console.log('class c'); 
     }
 }
+console.log('reading html:', test.tpl.html);

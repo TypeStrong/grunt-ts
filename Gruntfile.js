@@ -56,6 +56,7 @@ module.exports = function (grunt) {
             },
             amdloadertest: {
                 src: ['test/amdloader/**/*.ts'],
+                html: ['test/amdloader/**/*.tpl.html'],                
                 reference: 'test/amdloader/ts/reference.ts',
                 outDir: 'test/amdloader/js',
                 amdloader: 'test/amdloader/js/loader.js',
