@@ -58,8 +58,8 @@ module.exports = function (grunt) {
                 src: ['test/amdloader/**/*.ts'],
                 reference: 'test/amdloader/ts/reference.ts',
                 outDir: 'test/amdloader/js',
-                amdloader: 'test/amdloader/loader.js',
-                watch: 'test/amdloader'
+                amdloader: 'test/amdloader/js/loader.js',
+              //  watch: 'test/amdloader'
             },
             fail: {                        // a designed to fail target
                 src: ["test/fail/**/*.ts"],

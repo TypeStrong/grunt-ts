@@ -27,12 +27,12 @@ interface ITaskOptions {
     target: string; // es3 , es5 
     module: string; // amd, commonjs 
     sourcemap: boolean;
-    declaration: boolean;    
+    declaration: boolean;
     comments: boolean;
 }
 
 // General util functions 
-function insertArrayAt(array:string[], index:number, arrayToInsert:string[]) {
+function insertArrayAt(array: string[], index: number, arrayToInsert: string[]) {
     Array.prototype.splice.apply(array, [index, 0].concat(arrayToInsert));
     return array;
 }
@@ -57,13 +57,14 @@ import os = require('os');
 // plain vanilla imports
 var shell = require('shelljs');
 var eol = os.EOL;
+var pathSeperator = path.sep;
 
 function pluginFn(grunt: IGrunt) {
 
     /////////////////////////////////////////////////////////////////////    
     // tsc handling. 
     ////////////////////////////////////////////////////////////////////
-    
+
     function resolveTypeScriptBinPath(currentPath, depth): string {
         var targetPath = path.resolve(__dirname,
             (new Array(depth + 1)).join("../../"),
@@ -94,7 +95,7 @@ function pluginFn(grunt: IGrunt) {
         if (task.sourcemap)
             cmd = cmd + ' --sourcemap';
         if (task.declaration)
-            cmd = cmd + ' --declaration';        
+            cmd = cmd + ' --declaration';
         if (!task.comments)
             cmd = cmd + ' --removeComments';
 
@@ -109,7 +110,7 @@ function pluginFn(grunt: IGrunt) {
         if (target.outDir) {
             if (target.out) {
                 console.log('WARNING: Option "out" and "outDir" should not be used together'.magenta);
-            } 
+            }
             cmd = cmd + ' --outDir ' + target.outDir;
         }
 
@@ -124,8 +125,13 @@ function pluginFn(grunt: IGrunt) {
     // Reference file logic
     ////////////////////////////////////////////////////////////////////
 
+    // Converts "C:\boo" , "C:\boo\foo.ts" => "./foo.ts"; Works on unix as well. 
+    function makeReferencePath(folderpath: string, filename: string) {
+        return path.relative(folderpath, filename).split('\\').join('/');
+    }
+
     // Updates the reference file 
-    function updateReferenceFile(files: string[], generatedFiles:string[], referenceFile: string, referencePath: string) {        
+    function updateReferenceFile(files: string[], generatedFiles: string[], referenceFile: string, referencePath: string) {
         var referenceIntro = '/// <reference path="';
         var referenceEnd = '" />';
         var referenceMatch = /\/\/\/ <reference path=\"(.*?)\"/;
@@ -137,17 +143,17 @@ function pluginFn(grunt: IGrunt) {
 
         // Location of our generated references
         // By default at start of file
-        var signatureSectionPosition = 0;         
+        var signatureSectionPosition = 0;
 
         // Read the original file if it exists 
         if (fs.existsSync(referenceFile)) {
-            var lines = fs.readFileSync(referenceFile).toString().split('\n');            
+            var lines = fs.readFileSync(referenceFile).toString().split('\n');
 
-            var inSignatureSection = false;           
-            
+            var inSignatureSection = false;
+
             // By default our signature goes at end of file
-            signatureSectionPosition = lines.length; 
-            
+            signatureSectionPosition = lines.length;
+
             for (var i = 0; i < lines.length; i++) {
 
                 var line = _str.trim(lines[i]);
@@ -160,40 +166,35 @@ function pluginFn(grunt: IGrunt) {
                     continue;
                 }
                 if (_str.include(line, ourSignatureEnd)) {
-                    inSignatureSection = false;                    
+                    inSignatureSection = false;
                     continue;
                 }
                 if (inSignatureSection) continue;
-                
+
                 // store the line     
                 origFileLines.push(line);
 
                 // Fetch the existing reference's filename if any: 
                 if (_str.include(line, referenceIntro)) {
-                    var match = line.match(referenceMatch);                    
+                    var match = line.match(referenceMatch);
                     var filename = match[1];
                     origFileReferences.push(filename);
                 }
             }
         }
-        
-        // The path string within a single reference
-        function makeReferencePath(filename:string) {
-            return path.relative(referencePath, filename).split('\\').join('/');
-        }
 
         // the generated files:  
-        generatedFiles = _.map(generatedFiles, (file) => referenceIntro + makeReferencePath(file) + referenceEnd);
+        generatedFiles = _.map(generatedFiles, (file) => referenceIntro + makeReferencePath(referencePath, file) + referenceEnd);
 
         // the new / observed missing files: 
-        var contents = insertArrayAt([ourSignatureStart],1,generatedFiles);
+        var contents = insertArrayAt([ourSignatureStart], 1, generatedFiles);
         files.forEach((filename: string) => {
             // The file we are about to add 
-            var filepath = makeReferencePath(filename);
+            var filepath = makeReferencePath(referencePath, filename);
 
             // If there are orig references 
-            if (origFileReferences.length) {                
-                if (_.contains(origFileReferences, filepath)) {                    
+            if (origFileReferences.length) {
+                if (_.contains(origFileReferences, filepath)) {
                     return;
                 }
             }
@@ -202,18 +203,135 @@ function pluginFn(grunt: IGrunt) {
             contents.push(referenceIntro + filepath + referenceEnd);
         });
         contents.push(ourSignatureEnd);
-        
+
         // Modify the orig contents to put in our contents 
         origFileLines = insertArrayAt(origFileLines, signatureSectionPosition, contents);
         fs.writeFileSync(referenceFile, origFileLines.join(eol));
-    }    
-    
+    }
+
 
     /////////////////////////////////////////////////////////////////////    
     // AMD Loader, creates a js file that loads a few files in order 
     // and the rest un orderded, based on the reference.ts spec
     ////////////////////////////////////////////////////////////////////
-    
+
+    function getReferencesInOrder(referenceFile: string, referencePath: string): string[] {
+        var toreturn = [];
+
+        var referenceMatch = /\/\/\/ <reference path=\"(.*?)\"/;
+        var referenceIntro = '/// <reference path="';
+
+        var lines = fs.readFileSync(referenceFile).toString().split('\n');
+
+        var inSignatureSection = false;
+
+        for (var i = 0; i < lines.length; i++) {
+
+            var line = _str.trim(lines[i]);
+
+            // Fetch the existing reference's filename if any: 
+            if (_str.include(line, referenceIntro)) {
+                var match = line.match(referenceMatch);
+                var filename = match[1];
+                toreturn.push(filename);
+            }
+        }
+
+        // Fix the references to be absolute: 
+        toreturn = _.map(toreturn, (relativepath) => { return path.resolve(referencePath, relativepath); });
+
+        return toreturn;
+    }
+
+    // Finds the longest common section of a collection of strings. 
+    // Simply sorting and comparing first and last http://stackoverflow.com/a/1917041/390330
+    function sharedStart(array: string[]) {
+        var A = array.slice(0).sort(),
+            word1 = A[0], word2 = A[A.length - 1],
+            i = 0;
+        while (word1.charAt(i) == word2.charAt(i))++i;
+        return word1.substring(0, i);
+    }
+
+    // Explanation inline 
+    function findCommonPath(paths: string[]) {
+        // Now for "C:\u\starter" "C:\u\started" => "C:\u\starte" 
+        var largetStartSegement = sharedStart(paths);
+
+        // For "C:\u\starte" => C:\u\
+        var ending = largetStartSegement.lastIndexOf(pathSeperator);
+        return largetStartSegement.substr(0, ending);
+    }
+
+    // It updates based on the order of reference files 
+    function updateAmdLoader(referenceFile: string, referencePath: string, loaderFile: string, loaderPath: string, outDir: string) {
+
+        // Read the original file if it exists 
+        if (fs.existsSync(referenceFile)) {
+            var files = getReferencesInOrder(referenceFile, referencePath);
+
+            // Filter.d.ts,             
+            files = _.filter(files, (file) => { return !endsWith(file, '.d.ts'); });
+
+            // If target has outDir we need to make adjust the path             
+            // c:/somefolder/ts/a , c:/somefolder/ts/inside/b  + c:/somefolder/build/js => c:/somefolder/build/js/a , c:/somefolder/build/js/inside/b
+            // Logic: 
+            //     find the common structure in the source files ,and remove it 
+            //          Finally: outDir path + remainder section 
+            if (outDir) {
+                // Find common path 
+                var commonPath = findCommonPath(files);
+
+                // Make sure outDir is absolute: 
+                outDir = path.resolve(outDir);
+
+                files = _.map(files, (file) => {
+                    // Remove common path and replace with absolute outDir 
+                    file = file.replace(commonPath, outDir);
+
+                    //remove ts extension: 
+                    file = file.substr(0, file.length - 3);
+
+                    // Make relative to amd loader 
+                    file = makeReferencePath(loaderPath, file);
+
+                    // Prepend "./" to prevent "basePath" requirejs setting from interferring: 
+                    file = "./" + file;
+
+                    return file;
+                });
+
+                var mainTemplate = _.template('define(function (require) { '
+                    + eol + '<%= body %>'
+                    + eol + '});');                    
+                var fileTemplate = _.template('\t require(["<%= filename %>"],function (){'
+                    + eol + '<%= subitem %>'
+                    + eol + '\t });');
+
+                // Generate fileTemplate from inside out 
+                files = files.reverse();
+
+                // inital sub item 
+                var subitem = '';
+                var body = '';
+
+                _.forEach(files, (file) => {
+                    subitem = fileTemplate({ filename: file, subitem: subitem });
+                });
+
+                // The last subitem is now the body 
+                body = subitem;
+                var output = mainTemplate({ body: body });
+
+                // Finally write it out 
+                fs.writeFileSync(loaderFile,output);
+            }
+        }
+        else {
+            grunt.log.writeln('Cannot generate amd loader unless a reference file is present'.red);
+        }
+    }
+
     /////////////////////////////////////////////////////////////////////    
     // HTML -> TS     
     ////////////////////////////////////////////////////////////////////
@@ -223,8 +341,8 @@ function pluginFn(grunt: IGrunt) {
     // Refactored nicely in html2js grunt task
     // https://github.com/karlgoldstein/grunt-html2js/blob/master/tasks/html2js.js
     // Modified nlReplace to be an empty string
-    var escapeContent = function (content: string, quoteChar="'"):string {
-        var quoteRegexp = new RegExp('\\' + quoteChar, 'g');        
+    var escapeContent = function (content: string, quoteChar= "'"): string {
+        var quoteRegexp = new RegExp('\\' + quoteChar, 'g');
         var nlReplace = '';
         return content.replace(quoteRegexp, '\\' + quoteChar).replace(/\r?\n/g, nlReplace);
     };
@@ -235,26 +353,26 @@ function pluginFn(grunt: IGrunt) {
             ? str.substring(1)
             : str;
     }
-        
+
     var htmlTemplate = _.template("module <%= modulename %> { export var <%= varname %> =  '<%= content %>' } ");
 
     // Compile an HTML file to a TS file 
     // Return the filename. This filename will be required by reference.ts
-    function compileHTML(filename: string):string {
+    function compileHTML(filename: string): string {
         var htmlContent = escapeContent(fs.readFileSync(filename).toString());
         htmlContent = stripBOM(htmlContent);
         // TODO: place a minification pipeline here if you want.
 
         var ext = path.extname(filename);
-        var extFreename = path.basename(filename,ext);
-        var fileContent = htmlTemplate({ modulename: extFreename, varname: ext.replace('.',''), content: htmlContent});
+        var extFreename = path.basename(filename, ext);
+        var fileContent = htmlTemplate({ modulename: extFreename, varname: ext.replace('.', ''), content: htmlContent });
 
         // Write the content to a file                 
-        var outputfile = filename + ".ts";                
-        
+        var outputfile = filename + ".ts";
+
         fs.writeFileSync(outputfile, fileContent);
         return outputfile;
-    }        
+    }
 
     /////////////////////////////////////////////////////////////////////    
     // The grunt task 
@@ -271,13 +389,13 @@ function pluginFn(grunt: IGrunt) {
             module: 'amd',
             target: 'es3',
             declaration: false,
-            sourcemap: true,            
+            sourcemap: true,
             comments: false
         });
 
         // Was the whole process successful
-        var success = true;        
-        var watch;        
+        var success = true;
+        var watch;
 
         // Some interesting logs: 
         //http://gruntjs.com/api/inside-tasks#inside-multi-tasks
@@ -314,31 +432,45 @@ function pluginFn(grunt: IGrunt) {
                 return path.resolve(filename) == outFile_d_ts;
             }
 
+            // Create an amd loader? 
+            var amdloader = target.amdloader;
+            var amdloaderFile;
+            var amdloaderPath;
+            if (!!amdloader) {
+                amdloaderFile = path.resolve(amdloader);
+                amdloaderPath = path.dirname(amdloaderFile);
+            }
+
             // Compiles all the files 
             // Uses the blind tsc compile task
             // Creates custom files
             // logs errors
             // Time the whole process
-            var starttime; 
-            var endtime; 
-            function runCompilation(files:string[],generatedHtmlFiles:string[]) {
+            var starttime;
+            var endtime;
+            function runCompilation(files: string[], generatedHtmlFiles: string[]) {
                 grunt.log.writeln('Compiling.'.yellow);
 
                 // Time the task and go 
                 starttime = new Date().getTime();
 
                 // Create a reference file if specified
-                if (!!referencePath) {                    
-                    updateReferenceFile(files,generatedHtmlFiles, referenceFile, referencePath);
+                if (!!referencePath) {
+                    updateReferenceFile(files, generatedHtmlFiles, referenceFile, referencePath);
+                }
+
+                // Create the loader if specified 
+                if (!!amdloaderPath) {
+                    updateAmdLoader(referenceFile, referencePath, amdloaderFile, amdloaderPath, target.outDir);
                 }
 
                 // The files to compile 
-                var filesToCompile = files;      
+                var filesToCompile = files;
 
                 // If reference and out are both specified.
                 // Then only compile the udpated reference file as that contains the correct order                           
                 if (!!referencePath && target.out) { filesToCompile = [referenceFile] };
-                
+
                 // Quote the files to compile 
                 filesToCompile = _.map(filesToCompile, (item) => {return '"' + item + '"' });
 
@@ -354,7 +486,7 @@ function pluginFn(grunt: IGrunt) {
                     grunt.log.error(msg.red);
                     success = false;
                 }
-                else {                    
+                else {
                     var time = (endtime - starttime) / 1000;
                     grunt.log.writeln(('Success: ' + time.toFixed(2) + 's for ' + files.length + ' typescript files').green);
                 }
@@ -372,14 +504,14 @@ function pluginFn(grunt: IGrunt) {
                 var generatedHtmlFiles = [];
                 if (currenttask.data.html) {
                     var htmlFiles = grunt.file.expand(currenttask.data.html);
-                    generatedHtmlFiles = _.map(htmlFiles, (filename) =>  compileHTML(filename));                    
+                    generatedHtmlFiles = _.map(htmlFiles, (filename) => compileHTML(filename));
                 }
 
                 // Reexpand the original file glob: 
                 var files = grunt.file.expand(currenttask.data.src);
 
                 // ignore directories
-                files = files.filter(function(file){
+                files = files.filter(function (file) {
                     var stats = fs.lstatSync(file);
                     return !stats.isDirectory();
                 });
@@ -394,22 +526,22 @@ function pluginFn(grunt: IGrunt) {
 
                 // compile, If there are any files to compile! 
                 if (files.length > 0)
-                    runCompilation(files,generatedHtmlFiles);
+                    runCompilation(files, generatedHtmlFiles);
                 else
                     grunt.log.writeln('No files to compile'.red);
-            }            
+            }
 
             // Initial compilation: 
             filterFilesAndCompile();
-            
-            
+
+
             // Watch a folder? 
             watch = target.watch;
             if (!!watch) {
 
                 // make async 
                 var done = currenttask.async();
-                
+
                 // A debounced version of compile                 
                 var debouncedCompile = _.debounce(filterFilesAndCompile, 150);
 
@@ -421,17 +553,17 @@ function pluginFn(grunt: IGrunt) {
 
                     // Do not run if just ran, behaviour same as grunt-watch 
                     // These are the files our run modified 
-                    if ((new Date().getTime() - endtime) <=100) {
+                    if ((new Date().getTime() - endtime) <= 100) {
                         //grunt.log.writeln((' ///'  + ' >>' + filepath).grey);
-                        return; 
+                        return;
                     }
                     // Log and run the debounced version. 
-                    grunt.log.writeln((displaystr + ' >>' + filepath).yellow);                    
+                    grunt.log.writeln((displaystr + ' >>' + filepath).yellow);
                     debouncedCompile();
                 }
 
                 // get path                
-                var watchpath = path.resolve(watch);                
+                var watchpath = path.resolve(watch);
 
                 // create a file watcher for path 
                 var chokidar = require('chokidar');
@@ -449,8 +581,8 @@ function pluginFn(grunt: IGrunt) {
 
         });
 
-        if (!watch) {            
-            return success;    
+        if (!watch) {
+            return success;
         }
     });
 };

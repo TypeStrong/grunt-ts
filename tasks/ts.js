@@ -31,6 +31,7 @@ var os = require('os');
 // plain vanilla imports
 var shell = require('shelljs');
 var eol = os.EOL;
+var pathSeperator = path.sep;
 
 function pluginFn(grunt) {
     /////////////////////////////////////////////////////////////////////
@@ -89,6 +90,11 @@ function pluginFn(grunt) {
     /////////////////////////////////////////////////////////////////////
     // Reference file logic
     ////////////////////////////////////////////////////////////////////
+    // Converts "C:\boo" , "C:\boo\foo.ts" => "./foo.ts"; Works on unix as well.
+    function makeReferencePath(folderpath, filename) {
+        return path.relative(folderpath, filename).split('\\').join('/');
+    }
+
     // Updates the reference file
     function updateReferenceFile(files, generatedFiles, referenceFile, referencePath) {
         var referenceIntro = '/// <reference path="';
@@ -139,21 +145,16 @@ function pluginFn(grunt) {
             }
         }
 
-        // The path string within a single reference
-        function makeReferencePath(filename) {
-            return path.relative(referencePath, filename).split('\\').join('/');
-        }
-
         // the generated files:
         generatedFiles = _.map(generatedFiles, function (file) {
-            return referenceIntro + makeReferencePath(file) + referenceEnd;
+            return referenceIntro + makeReferencePath(referencePath, file) + referenceEnd;
         });
 
         // the new / observed missing files:
         var contents = insertArrayAt([ourSignatureStart], 1, generatedFiles);
         files.forEach(function (filename) {
             // The file we are about to add
-            var filepath = makeReferencePath(filename);
+            var filepath = makeReferencePath(referencePath, filename);
 
             if (origFileReferences.length) {
                 if (_.contains(origFileReferences, filepath)) {
@@ -169,6 +170,116 @@ function pluginFn(grunt) {
         // Modify the orig contents to put in our contents
         origFileLines = insertArrayAt(origFileLines, signatureSectionPosition, contents);
         fs.writeFileSync(referenceFile, origFileLines.join(eol));
+    }
+
+    /////////////////////////////////////////////////////////////////////
+    // AMD Loader, creates a js file that loads a few files in order
+    // and the rest un orderded, based on the reference.ts spec
+    ////////////////////////////////////////////////////////////////////
+    function getReferencesInOrder(referenceFile, referencePath) {
+        var toreturn = [];
+
+        var referenceMatch = /\/\/\/ <reference path=\"(.*?)\"/;
+        var referenceIntro = '/// <reference path="';
+
+        var lines = fs.readFileSync(referenceFile).toString().split('\n');
+
+        var inSignatureSection = false;
+
+        for (var i = 0; i < lines.length; i++) {
+            var line = _str.trim(lines[i]);
+
+            if (_str.include(line, referenceIntro)) {
+                var match = line.match(referenceMatch);
+                var filename = match[1];
+                toreturn.push(filename);
+            }
+        }
+
+        // Fix the references to be absolute:
+        toreturn = _.map(toreturn, function (relativepath) {
+            return path.resolve(referencePath, relativepath);
+        });
+
+        return toreturn;
+    }
+
+    // Finds the longest common section of a collection of strings.
+    // Simply sorting and comparing first and last http://stackoverflow.com/a/1917041/390330
+    function sharedStart(array) {
+        var A = array.slice(0).sort(), word1 = A[0], word2 = A[A.length - 1], i = 0;
+        while (word1.charAt(i) == word2.charAt(i))
+            ++i;
+        return word1.substring(0, i);
+    }
+
+    // Explanation inline
+    function findCommonPath(paths) {
+        // Now for "C:\u\starter" "C:\u\started" => "C:\u\starte"
+        var largetStartSegement = sharedStart(paths);
+
+        // For "C:\u\starte" => C:\u\
+        var ending = largetStartSegement.lastIndexOf(pathSeperator);
+        return largetStartSegement.substr(0, ending);
+    }
+
+    // It updates based on the order of reference files
+    function updateAmdLoader(referenceFile, referencePath, loaderFile, loaderPath, outDir) {
+        if (fs.existsSync(referenceFile)) {
+            var files = getReferencesInOrder(referenceFile, referencePath);
+
+            // Filter.d.ts,
+            files = _.filter(files, function (file) {
+                return !endsWith(file, '.d.ts');
+            });
+
+            if (outDir) {
+                // Find common path
+                var commonPath = findCommonPath(files);
+
+                // Make sure outDir is absolute:
+                outDir = path.resolve(outDir);
+
+                files = _.map(files, function (file) {
+                    // Remove common path and replace with absolute outDir
+                    file = file.replace(commonPath, outDir);
+
+                    //remove ts extension:
+                    file = file.substr(0, file.length - 3);
+
+                    // Make relative to amd loader
+                    file = makeReferencePath(loaderPath, file);
+
+                    // Prepend "./" to prevent "basePath" requirejs setting from interferring:
+                    file = "./" + file;
+
+                    return file;
+                });
+
+                var mainTemplate = _.template('define(function (require) { ' + eol + '<%= body %>' + eol + '});');
+                var fileTemplate = _.template('\t require(["<%= filename %>"],function (){' + eol + '<%= subitem %>' + eol + '\t });');
+
+                // Generate fileTemplate from inside out
+                files = files.reverse();
+
+                // inital sub item
+                var subitem = '';
+                var body = '';
+
+                _.forEach(files, function (file) {
+                    subitem = fileTemplate({ filename: file, subitem: subitem });
+                });
+
+                // The last subitem is now the body
+                body = subitem;
+                var output = mainTemplate({ body: body });
+
+                // Finally write it out
+                fs.writeFileSync(loaderFile, output);
+            }
+        } else {
+            grunt.log.writeln('Cannot generate amd loader unless a reference file is present'.red);
+        }
     }
 
     /////////////////////////////////////////////////////////////////////
@@ -264,6 +375,15 @@ function pluginFn(grunt) {
                 return path.resolve(filename) == outFile_d_ts;
             }
 
+            // Create an amd loader?
+            var amdloader = target.amdloader;
+            var amdloaderFile;
+            var amdloaderPath;
+            if (!!amdloader) {
+                amdloaderFile = path.resolve(amdloader);
+                amdloaderPath = path.dirname(amdloaderFile);
+            }
+
             // Compiles all the files
             // Uses the blind tsc compile task
             // Creates custom files
@@ -279,6 +399,10 @@ function pluginFn(grunt) {
 
                 if (!!referencePath) {
                     updateReferenceFile(files, generatedHtmlFiles, referenceFile, referencePath);
+                }
+
+                if (!!amdloaderPath) {
+                    updateAmdLoader(referenceFile, referencePath, amdloaderFile, amdloaderPath, target.outDir);
                 }
 
                 // The files to compile
