@@ -33,6 +33,14 @@ var shell = require('shelljs');
 var eol = os.EOL;
 var pathSeperator = path.sep;
 
+var referenceFileLoopState;
+(function (referenceFileLoopState) {
+    referenceFileLoopState[referenceFileLoopState["before"] = 0] = "before";
+    referenceFileLoopState[referenceFileLoopState["unordered"] = 1] = "unordered";
+    referenceFileLoopState[referenceFileLoopState["after"] = 2] = "after";
+})(referenceFileLoopState || (referenceFileLoopState = {}));
+;
+
 function pluginFn(grunt) {
     /////////////////////////////////////////////////////////////////////
     // tsc handling.
@@ -177,27 +185,64 @@ function pluginFn(grunt) {
     // and the rest un orderded, based on the reference.ts spec
     ////////////////////////////////////////////////////////////////////
     function getReferencesInOrder(referenceFile, referencePath) {
-        var toreturn = [];
+        var toreturn = {
+            before: [],
+            unordered: [],
+            after: []
+        };
 
+        // When reading
         var referenceMatch = /\/\/\/ <reference path=\"(.*?)\"/;
+
+        // When writing
         var referenceIntro = '/// <reference path="';
+        var referenceEnd = '" />';
+
+        // The section of unordered files
+        var ourSignatureStart = '//grunt-start';
+        var ourSignatureEnd = '//grunt-end';
 
         var lines = fs.readFileSync(referenceFile).toString().split('\n');
 
-        var inSignatureSection = false;
+        // Which of the three sections we are in
+        var loopState = referenceFileLoopState.before;
 
         for (var i = 0; i < lines.length; i++) {
             var line = _str.trim(lines[i]);
 
+            if (_str.include(line, ourSignatureStart)) {
+                //Wait for the end signature:
+                loopState = referenceFileLoopState.unordered;
+            }
+            if (_str.include(line, ourSignatureEnd)) {
+                loopState = referenceFileLoopState.after;
+            }
+
             if (_str.include(line, referenceIntro)) {
                 var match = line.match(referenceMatch);
                 var filename = match[1];
-                toreturn.push(filename);
+                switch (loopState) {
+                    case referenceFileLoopState.before:
+                        toreturn.before.push(filename);
+                        break;
+                    case referenceFileLoopState.unordered:
+                        toreturn.unordered.push(filename);
+                        break;
+                    case referenceFileLoopState.after:
+                        toreturn.after.push(filename);
+                        break;
+                }
             }
         }
 
         // Fix the references to be absolute:
-        toreturn = _.map(toreturn, function (relativepath) {
+        toreturn.before = _.map(toreturn.before, function (relativepath) {
+            return path.resolve(referencePath, relativepath);
+        });
+        toreturn.unordered = _.map(toreturn.unordered, function (relativepath) {
+            return path.resolve(referencePath, relativepath);
+        });
+        toreturn.after = _.map(toreturn.after, function (relativepath) {
             return path.resolve(referencePath, relativepath);
         });
 
@@ -229,45 +274,67 @@ function pluginFn(grunt) {
             var files = getReferencesInOrder(referenceFile, referencePath);
 
             // Filter.d.ts,
-            files = _.filter(files, function (file) {
+            files.unordered = _.filter(files.unordered, function (file) {
                 return !endsWith(file, '.d.ts');
             });
 
             if (outDir) {
                 // Find common path
-                var commonPath = findCommonPath(files);
+                var commonPath = findCommonPath(files.before.concat(files.unordered.concat(files.after)));
 
                 // Make sure outDir is absolute:
                 outDir = path.resolve(outDir);
 
-                files = _.map(files, function (file) {
-                    // Remove common path and replace with absolute outDir
-                    file = file.replace(commonPath, outDir);
+                function makeRelativeToOutDir(files) {
+                    files = _.map(files, function (file) {
+                        // Remove common path and replace with absolute outDir
+                        file = file.replace(commonPath, outDir);
 
-                    //remove ts extension:
-                    file = file.substr(0, file.length - 3);
+                        //remove ts extension '.ts':
+                        file = file.substr(0, file.length - 3);
 
-                    // Make relative to amd loader
-                    file = makeReferencePath(loaderPath, file);
+                        // Make relative to amd loader
+                        file = makeReferencePath(loaderPath, file);
 
-                    // Prepend "./" to prevent "basePath" requirejs setting from interferring:
-                    file = "./" + file;
+                        // Prepend "./" to prevent "basePath" requirejs setting from interferring:
+                        file = "./" + file;
 
-                    return file;
-                });
+                        return file;
+                    });
+                    return files;
+                }
+                files.before = makeRelativeToOutDir(files.before);
+                files.unordered = makeRelativeToOutDir(files.unordered);
+                files.after = makeRelativeToOutDir(files.after);
 
                 var mainTemplate = _.template('define(function (require) { ' + eol + '<%= body %>' + eol + '});');
-                var fileTemplate = _.template('\t require(["<%= filename %>"],function (){' + eol + '<%= subitem %>' + eol + '\t });');
 
-                // Generate fileTemplate from inside out
-                files = files.reverse();
+                // The order in the before and after files is important
+                var singleRequireTemplate = _.template('\t require([<%= filename %>],function (){' + eol + '<%= subitem %>' + eol + '\t });');
 
-                // inital sub item
-                var subitem = '';
+                // The final body of the function
                 var body = '';
 
-                _.forEach(files, function (file) {
-                    subitem = fileTemplate({ filename: file, subitem: subitem });
+                // initial sub item
+                var subitem = '';
+
+                // Generate fileTemplate from inside out
+                // Start with after
+                // Build the subitem for ordered after items
+                files.after = files.after.reverse();
+                _.forEach(files.after, function (file) {
+                    subitem = singleRequireTemplate({ filename: '"' + file + '"', subitem: subitem });
+                });
+
+                // Next up add the unordered items:
+                // For these we will use just one require call
+                var unorderFileNames = files.unordered.join('",' + eol + '\t\t  "');
+                subitem = singleRequireTemplate({ filename: '"' + unorderFileNames + '"', subitem: subitem });
+
+                // Build the subitem for ordered before items
+                files.before = files.before.reverse();
+                _.forEach(files.before, function (file) {
+                    subitem = singleRequireTemplate({ filename: '"' + file + '"', subitem: subitem });
                 });
 
                 // The last subitem is now the body
@@ -275,6 +342,7 @@ function pluginFn(grunt) {
                 var output = mainTemplate({ body: body });
 
                 // Finally write it out
+                console.log(output);
                 fs.writeFileSync(loaderFile, output);
             }
         } else {
