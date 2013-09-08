@@ -117,7 +117,7 @@ In such a case you can either create a `loader.js` manually or have grunt create
 
 **Further Explanation** If you use `export class Foo{}` at the root level of your file the only 
 way to use the type information 
-of Foo is via an import statement `import foo = require('./potentially/long/path/to/Foo');` 
+of Foo in another file is via an import statement `import foo = require('./potentially/long/path/to/Foo');` 
 The ordering implied by this isn't necessary when using a runtime Dependency injection framework like AngularJS.
  Having a loader gives you the js debugging (+ async) advantages
 of RequireJS without the overhead of constantly requesting via `import` to get the TypeScript type inference and 
