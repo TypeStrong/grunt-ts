@@ -106,18 +106,24 @@ define(function (require) {
 });
 ```
 
-#####Why would you use amdloader instead of import statements
+#####Advantage of using amdloader option
 The following combination of circumstances are why you would use it instead of Compiler supported AMD. 
 
-You want to use RequireJS since you prefer to debug "js" files instead of "ts" files (=> amd). But: 
-* File order doesn't matter (e.g. dependency injection is handled at runtime e.t. AngularJS)
-* You want inter file Type Information without using `import` statements. 
+* You want to use RequireJS since you prefer to debug "js" files instead of "ts" files. 
+This is useful in some cases and the most common way is using AMD
+* However, File order doesn't matter to you, even when you have inter file depenendency (e.g. AngularJS runtime Dependency injection)
 
-If you use `export class Foo{}` at the root level of your file the only way to use the type information 
+In such a case you can either create a `loader.js` manually or have grunt create it for you. 
+
+**Further Explanation** If you use `export class Foo{}` at the root level of your file the only 
+way to use the type information 
 of Foo is via an import statement `import foo = require('./potentially/long/path/to/Foo');` 
 The ordering implied by this isn't necessary when using a runtime Dependency injection framework like AngularJS.
  Having a loader gives you the js debugging (+ async) advantages
-of RequireJS without the overhead of constantly requesting via `import` to get the TypeScript type inference. 
+of RequireJS without the overhead of constantly requesting via `import` to get the TypeScript type inference and 
+worrying about file paths when they are not relevant. 
+
+PS: your individual file SourceMaps will continue to work. So now you can debug individual "JS" or "TS" files :)
 
 
 ###Html 2 TypeScript support 
