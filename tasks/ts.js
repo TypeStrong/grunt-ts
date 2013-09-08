@@ -342,7 +342,6 @@ function pluginFn(grunt) {
                 var output = mainTemplate({ body: body });
 
                 // Finally write it out
-                console.log(output);
                 fs.writeFileSync(loaderFile, output);
             }
         } else {
