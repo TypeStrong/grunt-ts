@@ -519,11 +519,6 @@ function pluginFn(grunt: IGrunt) {
                     updateReferenceFile(files, generatedHtmlFiles, referenceFile, referencePath);
                 }
 
-                // Create the loader if specified 
-                if (!!amdloaderPath) {
-                    updateAmdLoader(referenceFile, referencePath, amdloaderFile, amdloaderPath, target.outDir);
-                }
-
                 // The files to compile 
                 var filesToCompile = files;
 
@@ -536,6 +531,11 @@ function pluginFn(grunt: IGrunt) {
 
                 // Compile the files 
                 var result = compileAllFiles(filesToCompile, target, options);
+
+                // Create the loader if specified & compiliation succeeded
+                if (!!amdloaderPath && result.code==0) {
+                    updateAmdLoader(referenceFile, referencePath, amdloaderFile, amdloaderPath, target.outDir);
+                }
 
                 // End the timer 
                 endtime = new Date().getTime();
