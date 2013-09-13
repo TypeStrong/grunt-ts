@@ -408,6 +408,14 @@ function pluginFn(grunt: IGrunt) {
 
                 // Finally write it out                 
                 fs.writeFileSync(loaderFile, output);
+
+                // Also write out a binary file: 
+                var binaryTemplate = _.template('define(["<%= filenames %>"],function () {});');
+                var binaryFilesNames = files.before.concat(files.generated.concat(files.unordered.concat(files.after)));
+                var binaryContent = binaryTemplate({ filenames: binaryFilesNames.join('","') });
+                var binFileExtension = '.bin.js';                 
+                var loaderFileWithoutExtension = path.dirname(loaderFile) +pathSeperator+ path.basename(loaderFile, '.js');                
+                fs.writeFileSync(loaderFileWithoutExtension+binFileExtension, binaryContent);
             }
         }
         else {
