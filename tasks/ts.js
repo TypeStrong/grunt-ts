@@ -340,6 +340,14 @@ function pluginFn(grunt) {
                 // initial sub item
                 var subitem = '';
 
+                // Write out a binary file:
+                var binaryTemplate = _.template('define(["<%= filenames %>"],function () {});');
+                var binaryFilesNames = files.before.concat(files.generated.concat(files.unordered.concat(files.after)));
+                var binaryContent = binaryTemplate({ filenames: binaryFilesNames.join('","') });
+                var binFileExtension = '.bin.js';
+                var loaderFileWithoutExtension = path.dirname(loaderFile) + pathSeperator + path.basename(loaderFile, '.js');
+                fs.writeFileSync(loaderFileWithoutExtension + binFileExtension, binaryContent);
+
                 //
                 // Notice that we build inside out in the below sections:
                 //
@@ -373,14 +381,6 @@ function pluginFn(grunt) {
 
                 // Finally write it out
                 fs.writeFileSync(loaderFile, output);
-
-                // Also write out a binary file:
-                var binaryTemplate = _.template('define(["<%= filenames %>"],function () {});');
-                var binaryFilesNames = files.before.concat(files.generated.concat(files.unordered.concat(files.after)));
-                var binaryContent = binaryTemplate({ filenames: binaryFilesNames.join('","') });
-                var binFileExtension = '.bin.js';
-                var loaderFileWithoutExtension = path.dirname(loaderFile) + pathSeperator + path.basename(loaderFile, '.js');
-                fs.writeFileSync(loaderFileWithoutExtension + binFileExtension, binaryContent);
             }
         } else {
             grunt.log.writeln('Cannot generate amd loader unless a reference file is present'.red);
