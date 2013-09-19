@@ -29,6 +29,7 @@ interface ITaskOptions {
     sourcemap: boolean;
     declaration: boolean;
     comments: boolean;
+    verbose: boolean;
 }
 
 // General util functions 
@@ -91,8 +92,9 @@ function pluginFn(grunt: IGrunt) {
     function compileAllFiles(files: string[], target: ITargetOptions, task: ITaskOptions): ICompileResult {
 
         var filepath: string = files.join(' ');
-        var cmd = 'node ' + tsc + ' ' + filepath;
+        var tscExecCommand = 'node ' + tsc;
 
+        var cmd = filepath;
         // boolean options 
         if (task.sourcemap)
             cmd = cmd + ' --sourcemap';
@@ -117,9 +119,16 @@ function pluginFn(grunt: IGrunt) {
         }
 
         // To debug the tsc command
-        //console.log(cmd);
+        if (task.verbose) {
+            console.log(cmd);
+        }
 
-        var result = exec(cmd);
+        // Create a temp last command file 
+        var tempfilename = 'tscommand.tmp.txt';
+        fs.writeFileSync(tempfilename, cmd);       
+        tscExecCommand = tscExecCommand + ' @'+tempfilename;
+                
+        var result = exec(tscExecCommand);
         return result;
     }
 
@@ -482,7 +491,8 @@ function pluginFn(grunt: IGrunt) {
             target: 'es3',
             declaration: false,
             sourcemap: true,
-            comments: false
+            comments: false,
+            verbose:false,
         });
 
         // Was the whole process successful

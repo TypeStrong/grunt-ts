@@ -66,7 +66,9 @@ function pluginFn(grunt) {
     // Blindly runs the tsc task using provided options
     function compileAllFiles(files, target, task) {
         var filepath = files.join(' ');
-        var cmd = 'node ' + tsc + ' ' + filepath;
+        var tscExecCommand = 'node ' + tsc;
+
+        var cmd = filepath;
 
         if (task.sourcemap)
             cmd = cmd + ' --sourcemap';
@@ -89,9 +91,16 @@ function pluginFn(grunt) {
             cmd = cmd + ' --outDir ' + target.outDir;
         }
 
-        // To debug the tsc command
-        //console.log(cmd);
-        var result = exec(cmd);
+        if (task.verbose) {
+            console.log(cmd);
+        }
+
+        // Create a temp last command file
+        var tempfilename = 'tscommand.tmp.txt';
+        fs.writeFileSync(tempfilename, cmd);
+        tscExecCommand = tscExecCommand + ' @' + tempfilename;
+
+        var result = exec(tscExecCommand);
         return result;
     }
 
@@ -441,7 +450,8 @@ function pluginFn(grunt) {
             target: 'es3',
             declaration: false,
             sourcemap: true,
-            comments: false
+            comments: false,
+            verbose: false
         });
 
         // Was the whole process successful
