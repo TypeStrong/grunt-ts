@@ -78,7 +78,7 @@ function pluginFn(grunt: IGrunt) {
             (new Array(depth + 1)).join("../../"),
             "../node_modules/typescript/bin");
         if (path.resolve(currentPath, "node_modules/typescript/bin").length > targetPath.length) {
-            return;
+            return null;
         }
         if (fs.existsSync(path.resolve(targetPath, "typescript.js"))) {
             return targetPath;
@@ -521,9 +521,9 @@ function pluginFn(grunt: IGrunt) {
 
     // Note: this funciton is called once for each target 
     // so task + target options are a bit blurred inside this function 
-    grunt.registerMultiTask('ts', 'Compile TypeScript files', function () {
+    grunt.registerMultiTask('ts', 'Compile TypeScript files', () => {
 
-        var currenttask: ITask = this;
+        var currenttask: grunt.task.IMultiTask<ITargetOptions> = <grunt.task.IMultiTask<ITargetOptions>> this;
 
         // setup default options 
         var options = currenttask.options<ITaskOptions>({
@@ -532,7 +532,7 @@ function pluginFn(grunt: IGrunt) {
             declaration: false,
             sourcemap: true,
             comments: false,
-            verbose: false,
+            verbose:false,
         });
 
         // Was the whole process successful
@@ -742,6 +742,10 @@ function pluginFn(grunt: IGrunt) {
         if (!watch) {
             return success;
         }
+        else {
+            return false;
+        }
     });
-};
+}
+
 export = pluginFn;
