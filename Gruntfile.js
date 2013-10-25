@@ -62,6 +62,17 @@ module.exports = function (grunt) {
                 amdloader: 'test/amdloader/js/loader.js',
               //  watch: 'test/amdloader'
             },
+            templatecache: {
+                src: ['test/templatecache/**/*.ts'],         
+                reference: 'test/templatecache/ts/reference.ts',                
+                amdloader: 'test/templatecache/js/loader.js',                
+                outDir: 'test/templatecache/js',
+                templateCache: {
+                    baseUrl : 'test/templatecache/js/',
+                    src: ['test/templatecache/ts/**/*.html'],
+                    dest: 'test/templatecache/ts/templateCache.ts',
+                },
+            },
             fail: {                        // a designed to fail target
                 src: ["test/fail/**/*.ts"],
                 watch: 'test',                

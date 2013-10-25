@@ -21,6 +21,11 @@ interface ITargetOptions {
     html: string[];  // if specified this is used to generate typescript files with a single variable which contains the content of the html
     watch: string; // if specified watches all files in this directory for changes. 
     amdloader: string;  // if specified creates a js file to load all the generated typescript files in order using requirejs + order
+    templateCache: { // if specified search thought all the html file at this location
+        src: string[];
+        dest: string;
+        baseUrl: string; 
+    }
 }
 
 interface ITaskOptions {
@@ -474,6 +479,19 @@ function pluginFn(grunt: IGrunt) {
         fs.writeFileSync(outputfile, fileContent);
         return outputfile;
     }
+    
+    /////////////////////////////////////////////////////////////////////    
+    // AngularJS templateCache
+    ////////////////////////////////////////////////////////////////////
+
+    // templateCache processing function
+    function generateTemplateCache(src: string[], dest:string, basePath: string) {
+        console.log('compiling ', src, dest, basePath);
+        
+        // Resolve the relative path from basePath to each src file 
+        var relativePaths: string[] = _.map(src, (anHtmlFile) => path.relative(anHtmlFile, basePath));
+        console.log(relativePaths);
+    }
 
     /////////////////////////////////////////////////////////////////////    
     // The grunt task 
@@ -505,6 +523,9 @@ function pluginFn(grunt: IGrunt) {
         //console.log(this.files[0]); // An array of target files ( only one in our case )
         //console.log(this.files[0].src); // a getter for a resolved list of files 
         //console.log(this.files[0].orig.src); // The original glob / array / !array / <% array %> for files. Can be very fancy :) 
+        
+        // NOTE: to access the specified src files we use
+        // currenttaks.data as that is the raw (non interpolated) string that we reinterpolate ourselves in case the file system as changed since this task was started 
 
         // this.files[0] is actually a single in our case as we gave examples of  one source / out per target
         this.files.forEach(function (target: ITargetOptions) {
@@ -607,6 +628,19 @@ function pluginFn(grunt: IGrunt) {
                 if (currenttask.data.html) {
                     var htmlFiles = grunt.file.expand(currenttask.data.html);
                     generatedHtmlFiles = _.map(htmlFiles, (filename) => compileHTML(filename));
+                }
+                // The template cache files do not go into generated files. 
+                // You are free to generate a `ts OR js` file, both should just work 
+                if (currenttask.data.templateCache) {
+                    if (!currenttask.data.templateCache.src || !currenttask.data.templateCache.dest || !currenttask.data.templateCache.baseUrl) {
+                        grunt.log.writeln('templateCache : src, dest, baseUrl must be specified if templateCache option is used'.red);
+                    }
+                    else{
+                        var templateCacheSrc = grunt.file.expand(currenttask.data.templateCache.src); // manual reinterpolation
+                        var templateCacheDest = path.resolve(target.templateCache.dest);
+                        var templateCacheBasePath = path.resolve(target.templateCache.baseUrl);
+                        generateTemplateCache(templateCacheSrc, templateCacheDest, templateCacheBasePath);
+                    }
                 }
 
                 // Reexpand the original file glob: 

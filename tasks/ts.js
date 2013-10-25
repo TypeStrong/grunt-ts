@@ -437,6 +437,20 @@ function pluginFn(grunt) {
     }
 
     /////////////////////////////////////////////////////////////////////
+    // AngularJS templateCache
+    ////////////////////////////////////////////////////////////////////
+    // templateCache processing function
+    function generateTemplateCache(src, dest, basePath) {
+        console.log('compiling ', src, dest, basePath);
+
+        // Resolve the relative path from basePath to each src file
+        var relativePaths = _.map(src, function (anHtmlFile) {
+            return path.relative(anHtmlFile, basePath);
+        });
+        console.log(relativePaths);
+    }
+
+    /////////////////////////////////////////////////////////////////////
     // The grunt task
     ////////////////////////////////////////////////////////////////////
     // Note: this funciton is called once for each target
@@ -464,6 +478,8 @@ function pluginFn(grunt) {
         //console.log(this.files[0]); // An array of target files ( only one in our case )
         //console.log(this.files[0].src); // a getter for a resolved list of files
         //console.log(this.files[0].orig.src); // The original glob / array / !array / <% array %> for files. Can be very fancy :)
+        // NOTE: to access the specified src files we use
+        // currenttaks.data as that is the raw (non interpolated) string that we reinterpolate ourselves in case the file system as changed since this task was started
         // this.files[0] is actually a single in our case as we gave examples of  one source / out per target
         this.files.forEach(function (target) {
             // Create a reference file?
@@ -563,6 +579,17 @@ function pluginFn(grunt) {
                     generatedHtmlFiles = _.map(htmlFiles, function (filename) {
                         return compileHTML(filename);
                     });
+                }
+
+                if (currenttask.data.templateCache) {
+                    if (!currenttask.data.templateCache.src || !currenttask.data.templateCache.dest || !currenttask.data.templateCache.baseUrl) {
+                        grunt.log.writeln('templateCache : src, dest, baseUrl must be specified if templateCache option is used'.red);
+                    } else {
+                        var templateCacheSrc = grunt.file.expand(currenttask.data.templateCache.src);
+                        var templateCacheDest = path.resolve(target.templateCache.dest);
+                        var templateCacheBasePath = path.resolve(target.templateCache.baseUrl);
+                        generateTemplateCache(templateCacheSrc, templateCacheDest, templateCacheBasePath);
+                    }
                 }
 
                 // Reexpand the original file glob:

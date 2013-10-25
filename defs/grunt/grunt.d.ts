@@ -21,6 +21,11 @@ interface ITask {
     data: {
         src: any;
         html: any; // SPECIFIC TO GRUNT-TS         
+        templateCache: {
+            src: any;
+            dest:any;
+            baseUrl:any;
+        }
     }
 }
 
