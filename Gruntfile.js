@@ -69,8 +69,8 @@ module.exports = function (grunt) {
                 outDir: 'test/templatecache/js',
                 templateCache: {
                     baseUrl : 'test/templatecache/js/',
-                    src: ['test/templatecache/ts/**/*.html'],
-                    dest: 'test/templatecache/ts/templateCache.ts',
+                    src: ['test/templatecache/js/**/*.html'],
+                    dest: 'test/templatecache/js/templateCache.js',
                 },
             },
             fail: {                        // a designed to fail target

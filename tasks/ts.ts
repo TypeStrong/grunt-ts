@@ -24,7 +24,7 @@ interface ITargetOptions {
     templateCache: { // if specified search thought all the html file at this location
         src: string[];
         dest: string;
-        baseUrl: string; 
+        baseUrl: string;
     }
 }
 
@@ -130,9 +130,9 @@ function pluginFn(grunt: IGrunt) {
 
         // Create a temp last command file 
         var tempfilename = 'tscommand.tmp.txt';
-        fs.writeFileSync(tempfilename, cmd);       
-        tscExecCommand = tscExecCommand + ' @'+tempfilename;
-                
+        fs.writeFileSync(tempfilename, cmd);
+        tscExecCommand = tscExecCommand + ' @' + tempfilename;
+
         var result = exec(tscExecCommand);
         return result;
     }
@@ -281,7 +281,7 @@ function pluginFn(grunt: IGrunt) {
                         toreturn.before.push(filename);
                         break;
                     case referenceFileLoopState.unordered:
-                        if(endsWith(line, generatedSignature)) {
+                        if (endsWith(line, generatedSignature)) {
                             toreturn.generated.push(filename);
                         }
                         else {
@@ -413,7 +413,7 @@ function pluginFn(grunt: IGrunt) {
                 // For these we will use just one require call
                 var unorderFileNames = files.unordered.join('",' + eol + '\t\t  "');
                 subitem = singleRequireTemplate({ filename: '"' + unorderFileNames + '"', subitem: subitem });
-                
+
                 // Next the generated files 
                 // For these we will use just one require call
                 var generatedFileNames = files.generated.join('",' + eol + '\t\t  "');
@@ -479,18 +479,40 @@ function pluginFn(grunt: IGrunt) {
         fs.writeFileSync(outputfile, fileContent);
         return outputfile;
     }
-    
+
     /////////////////////////////////////////////////////////////////////    
     // AngularJS templateCache
     ////////////////////////////////////////////////////////////////////
 
     // templateCache processing function
-    function generateTemplateCache(src: string[], dest:string, basePath: string) {
-        console.log('compiling ', src, dest, basePath);
-        
+
+    function generateTemplateCache(src: string[], dest: string, basePath: string) {
+
+        if (!src.length) return;
+
         // Resolve the relative path from basePath to each src file 
-        var relativePaths: string[] = _.map(src, (anHtmlFile) => path.relative(anHtmlFile, basePath));
-        console.log(relativePaths);
+        var relativePaths: string[] = _.map(src, (anHtmlFile) => 'text!' + makeReferencePath(basePath, anHtmlFile));
+        var fileNames: string[] = _.map(src, (anHtmlFile) => path.basename(anHtmlFile));
+        var fileVarialbeName = (anHtmlFile) => anHtmlFile.split('.').join('_');
+        var fileVariableNames: string[] = _.map(fileNames, fileVarialbeName);
+
+
+        var templateCacheTemplate = _.template('// You must have requirejs + text plugin loaded for this to work.'
+            + eol + 'var define;'
+            + eol + 'define([<%=relativePathSection%>],function(<%=fileNameVariableSection%>){'
+            + eol + 'angular.module("ng").run(["$templateCache",function($templateCache) {'
+            + eol + '<%=templateCachePut%>'
+            + eol + '}]);'
+            + eol + '});');
+
+        var relativePathSection = '"' + relativePaths.join('",' + eol + '"') + '"';
+        var fileNameVariableSection = fileVariableNames.join(',' + eol);
+
+        var templateCachePutTemplate = _.template('$templateCache.put("<%= fileName %>", <%=fileVariableName%>);');
+        var templateCachePut = _.map(fileNames, (fileName) => templateCachePutTemplate({ fileName: fileName, fileVariableName: fileVarialbeName(fileName) })).join(eol);
+
+        var fileContent = templateCacheTemplate({ relativePathSection: relativePathSection, fileNameVariableSection: fileNameVariableSection, templateCachePut: templateCachePut });
+        fs.writeFileSync(dest, fileContent);
     }
 
     /////////////////////////////////////////////////////////////////////    
@@ -510,7 +532,7 @@ function pluginFn(grunt: IGrunt) {
             declaration: false,
             sourcemap: true,
             comments: false,
-            verbose:false,
+            verbose: false,
         });
 
         // Was the whole process successful
@@ -523,7 +545,7 @@ function pluginFn(grunt: IGrunt) {
         //console.log(this.files[0]); // An array of target files ( only one in our case )
         //console.log(this.files[0].src); // a getter for a resolved list of files 
         //console.log(this.files[0].orig.src); // The original glob / array / !array / <% array %> for files. Can be very fancy :) 
-        
+
         // NOTE: to access the specified src files we use
         // currenttaks.data as that is the raw (non interpolated) string that we reinterpolate ourselves in case the file system as changed since this task was started 
 
@@ -635,7 +657,7 @@ function pluginFn(grunt: IGrunt) {
                     if (!currenttask.data.templateCache.src || !currenttask.data.templateCache.dest || !currenttask.data.templateCache.baseUrl) {
                         grunt.log.writeln('templateCache : src, dest, baseUrl must be specified if templateCache option is used'.red);
                     }
-                    else{
+                    else {
                         var templateCacheSrc = grunt.file.expand(currenttask.data.templateCache.src); // manual reinterpolation
                         var templateCacheDest = path.resolve(target.templateCache.dest);
                         var templateCacheBasePath = path.resolve(target.templateCache.baseUrl);
