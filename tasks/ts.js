@@ -452,7 +452,7 @@ function pluginFn(grunt) {
             return path.basename(anHtmlFile);
         });
         var fileVarialbeName = function (anHtmlFile) {
-            return anHtmlFile.split('.').join('_');
+            return anHtmlFile.split('.').join('_').split('-').join('_');
         };
         var fileVariableNames = _.map(fileNames, fileVarialbeName);
 
@@ -466,7 +466,8 @@ function pluginFn(grunt) {
             return templateCachePutTemplate({ fileName: fileName, fileVariableName: fileVarialbeName(fileName) });
         }).join(eol);
 
-        console.log('put'.red, templateCacheTemplate({ relativePathSection: relativePathSection, fileNameVariableSection: fileNameVariableSection, templateCachePut: templateCachePut }));
+        var fileContent = templateCacheTemplate({ relativePathSection: relativePathSection, fileNameVariableSection: fileNameVariableSection, templateCachePut: templateCachePut });
+        fs.writeFileSync(dest, fileContent);
     }
 
     /////////////////////////////////////////////////////////////////////

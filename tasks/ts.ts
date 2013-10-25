@@ -493,7 +493,7 @@ function pluginFn(grunt: IGrunt) {
         // Resolve the relative path from basePath to each src file 
         var relativePaths: string[] = _.map(src, (anHtmlFile) => 'text!' + makeReferencePath(basePath, anHtmlFile));
         var fileNames: string[] = _.map(src, (anHtmlFile) => path.basename(anHtmlFile));
-        var fileVarialbeName = (anHtmlFile) => anHtmlFile.split('.').join('_');
+        var fileVarialbeName = (anHtmlFile) => anHtmlFile.split('.').join('_').split('-').join('_');
         var fileVariableNames: string[] = _.map(fileNames, fileVarialbeName);
 
 
