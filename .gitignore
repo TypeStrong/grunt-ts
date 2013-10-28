@@ -2,6 +2,7 @@ node_modules
 npm-debug.log
 test/tmp
 /.idea
+*.iml
 tasks/ts.js.map
 test/out.js
 test/fail/fail.js.map
