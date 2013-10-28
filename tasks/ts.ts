@@ -509,9 +509,15 @@ function pluginFn(grunt: IGrunt) {
         var fileNameVariableSection = fileVariableNames.join(',' + eol);
 
         var templateCachePutTemplate = _.template('$templateCache.put("<%= fileName %>", <%=fileVariableName%>);');
-        var templateCachePut = _.map(fileNames, (fileName) => templateCachePutTemplate({ fileName: fileName, fileVariableName: fileVarialbeName(fileName) })).join(eol);
+        var templateCachePut = _.map(fileNames, (fileName) => templateCachePutTemplate({ 
+                fileName: fileName, 
+                fileVariableName: fileVarialbeName(fileName) 
+            })).join(eol);
 
-        var fileContent = templateCacheTemplate({ relativePathSection: relativePathSection, fileNameVariableSection: fileNameVariableSection, templateCachePut: templateCachePut });
+        var fileContent = templateCacheTemplate({ 
+            relativePathSection: relativePathSection, 
+            fileNameVariableSection: fileNameVariableSection, 
+            templateCachePut: templateCachePut });
         fs.writeFileSync(dest, fileContent);
     }
 
