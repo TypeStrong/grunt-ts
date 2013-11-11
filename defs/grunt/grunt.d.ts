@@ -17,6 +17,7 @@ interface ITask {
     // options from plugin dev point: http://gruntjs.com/api/inside-tasks#this.options
     options<T>(defaults?: T): T;
     async: () => (ret: boolean) => void;
+    files: any[]; // a getter http://gruntjs.com/api/inside-tasks#inside-multi-tasks
     filesSrc: string[]; // a getter http://gruntjs.com/api/inside-tasks#inside-multi-tasks
     data: {
         src: any;
