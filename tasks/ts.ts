@@ -29,18 +29,22 @@ interface ITargetOptions {
 }
 
 interface ITaskOptions {
-    target: string; // es3 , es5 
-    module: string; // amd, commonjs 
+    compile: boolean;
+    target: string; // es3 , es5
+    module: string; // amd, commonjs
     sourcemap: boolean;
     declaration: boolean;
     comments: boolean;
     verbose: boolean;
 }
 
-// General util functions 
-function insertArrayAt(array: string[], index: number, arrayToInsert: string[]) {
-    Array.prototype.splice.apply(array, [index, 0].concat(arrayToInsert));
-    return array;
+/**
+ * Returns the result of an array inserted into another, starting at the given index.
+ */
+function insertArrayAt(array: string[], index: number, arrayToInsert: string[]): string[] {
+    var updated = array.slice(0);
+    Array.prototype.splice.apply(updated, [index, 0].concat(arrayToInsert));
+    return updated;
 }
 // Useful string functions 
 // used to make sure string ends with a slash 
@@ -52,6 +56,31 @@ function endWithSlash(path: string): string {
         return path + '/';
     }
     return path;
+}
+
+/**
+ * Time a function and print the result.
+ *
+ * @param makeIt the code to time
+ * @returns the result of the block of code
+ */
+function timeIt<R>(makeIt: () => R): {
+    /**
+     * The result of the computation
+     */
+        it: R
+    /**
+     * Time in milliseconds.
+     */
+        time: number
+} {
+    var starttime = new Date().getTime();
+    var it = makeIt();
+    var endtime = new Date().getTime();
+    return {
+        it: it,
+        time: endtime - starttime
+    };
 }
 
 // Typescript imports 
@@ -69,7 +98,7 @@ enum referenceFileLoopState { before, unordered, after };
 
 function pluginFn(grunt: IGrunt) {
 
-    /////////////////////////////////////////////////////////////////////    
+    /////////////////////////////////////////////////////////////////////
     // tsc handling. 
     ////////////////////////////////////////////////////////////////////
 
@@ -147,7 +176,7 @@ function pluginFn(grunt: IGrunt) {
     }
 
     // Updates the reference file 
-    function updateReferenceFile(files: string[], generatedFiles: string[], referenceFile: string, referencePath: string) {
+    function updateReferenceFile(files: string[], generatedFiles: string[], referenceFile: string, referencePath: string): boolean {
         var referenceIntro = '/// <reference path="';
         var referenceEnd = '" />';
         var referenceMatch = /\/\/\/ <reference path=\"(.*?)\"/;
@@ -155,6 +184,7 @@ function pluginFn(grunt: IGrunt) {
         var ourSignatureEnd = '//grunt-end';
         var generatedSignature = "// generated";
 
+        var lines = []; // All lines of the file
         var origFileLines = []; // The lines we do not modify and send out as is. Lines will we reach grunt-ts generated
         var origFileReferences = []; // The list of files already there that we do not need to manage 
 
@@ -164,7 +194,7 @@ function pluginFn(grunt: IGrunt) {
 
         // Read the original file if it exists 
         if (fs.existsSync(referenceFile)) {
-            var lines = fs.readFileSync(referenceFile).toString().split('\n');
+            lines = fs.readFileSync(referenceFile).toString().split('\n');
 
             var inSignatureSection = false;
 
@@ -221,9 +251,23 @@ function pluginFn(grunt: IGrunt) {
         });
         contents.push(ourSignatureEnd);
 
-        // Modify the orig contents to put in our contents 
-        origFileLines = insertArrayAt(origFileLines, signatureSectionPosition, contents);
-        fs.writeFileSync(referenceFile, origFileLines.join(eol));
+        // Modify the orig contents to put in our contents
+        var updatedFileLines = insertArrayAt(origFileLines, signatureSectionPosition, contents);
+        fs.writeFileSync(referenceFile, updatedFileLines.join(eol));
+
+        // Return whether the file was changed
+        if (lines.length == updatedFileLines.length) {
+            var updated = false;
+            for (var i = 0; i < lines.length; i++) {
+                if (lines[i] != updatedFileLines[i]) {
+                    updated = true;
+                }
+            }
+            return updated;
+        }
+        else {
+            return true;
+        }
     }
 
 
@@ -533,6 +577,7 @@ function pluginFn(grunt: IGrunt) {
 
         // setup default options 
         var options = currenttask.options<ITaskOptions>({
+            compile: true,
             module: 'amd',
             target: 'es3',
             declaration: false,
@@ -594,52 +639,44 @@ function pluginFn(grunt: IGrunt) {
 
             // Compiles all the files 
             // Uses the blind tsc compile task
-            // Creates custom files
             // logs errors
             // Time the whole process
             var starttime;
             var endtime;
-            function runCompilation(files: string[], generatedHtmlFiles: string[]) {
+            function runCompilation(files: string[], target: ITargetOptions, options: ITaskOptions) {
                 grunt.log.writeln('Compiling.'.yellow);
 
-                // Time the task and go 
+                // Time the task and go
                 starttime = new Date().getTime();
 
-                // Create a reference file if specified
-                if (!!referencePath) {
-                    updateReferenceFile(files, generatedHtmlFiles, referenceFile, referencePath);
-                }
-
-                // The files to compile 
+                // The files to compile
                 var filesToCompile = files;
 
                 // If reference and out are both specified.
-                // Then only compile the udpated reference file as that contains the correct order                           
-                if (!!referencePath && target.out) { filesToCompile = [referenceFile] };
-
-                // Quote the files to compile 
-                filesToCompile = _.map(filesToCompile, (item) => {return '"' + item + '"' });
-
-                // Compile the files 
-                var result = compileAllFiles(filesToCompile, target, options);
-
-                // Create the loader if specified & compiliation succeeded
-                if (!!amdloaderPath && result.code == 0) {
-                    updateAmdLoader(referenceFile, referencePath, amdloaderFile, amdloaderPath, target.outDir);
+                // Then only compile the udpated reference file as that contains the correct order
+                if (!!referencePath && target.out) {
+                    filesToCompile = [referenceFile]
                 }
 
-                // End the timer 
+                // Quote the files to compile
+                filesToCompile = _.map(filesToCompile, (item) => '"' + item + '"');
+
+                // Compile the files
+                var result = compileAllFiles(filesToCompile, target, options);
+
+                // End the timer
                 endtime = new Date().getTime();
 
                 // Evaluate the result
                 if (result.code != 0) {
                     var msg = "Compilation failed"/*+result.output*/;
                     grunt.log.error(msg.red);
-                    success = false;
+                    return false;
                 }
                 else {
                     var time = (endtime - starttime) / 1000;
                     grunt.log.writeln(('Success: ' + time.toFixed(2) + 's for ' + files.length + ' typescript files').green);
+                    return true;
                 }
             }
 
@@ -671,31 +708,51 @@ function pluginFn(grunt: IGrunt) {
                     }
                 }
 
-                // Reexpand the original file glob: 
-                var files = grunt.file.expand(currenttask.data.src);
+                if (!!options.compile) {
+                    // Reexpand the original file glob:
+                    var files = grunt.file.expand(currenttask.data.src);
 
-                // ignore directories
-                files = files.filter(function (file) {
-                    var stats = fs.lstatSync(file);
-                    return !stats.isDirectory();
-                });
+                    // ignore directories
+                    files = files.filter(function (file) {
+                        var stats = fs.lstatSync(file);
+                        return !stats.isDirectory();
+                    });
 
-                // remove the generated files from files: 
-                files = _.difference(files, generatedHtmlFiles);
+                    // remove the generated files from files:
+                    files = _.difference(files, generatedHtmlFiles);
 
-                // Clear the files of output.d.ts and reference.ts 
-                files = _.filter(files, (filename) => {
-                    return (!isReferenceFile(filename) && !isOutFile(filename));
-                });
+                    // Clear the files of output.d.ts and reference.ts
+                    files = _.filter(files, (filename) => {
+                        return (!isReferenceFile(filename) && !isOutFile(filename));
+                    });
 
-                // compile, If there are any files to compile! 
-                if (files.length > 0)
-                    runCompilation(files, generatedHtmlFiles);
-                else
-                    grunt.log.writeln('No files to compile'.red);
+                    // Generate the reference file
+                    // Create a reference file if specified
+                    if (!!referencePath) {
+                        var result = timeIt(() => {
+                            return updateReferenceFile(files, generatedHtmlFiles, referenceFile, referencePath)
+                        });
+                        if (result.it === true) {
+                            grunt.log.writeln(('Updated reference file (' + result.time + 'ms).').green);
+                        }
+                    }
+
+                    // compile, If there are any files to compile!
+                    if (files.length > 0) {
+                        success = runCompilation(files, target, options);
+
+                        // Create the loader if specified & compiliation succeeded
+                        if (success && !!amdloaderPath) {
+                            updateAmdLoader(referenceFile, referencePath, amdloaderFile, amdloaderPath, target.outDir);
+                        }
+                    }
+                    else {
+                        grunt.log.writeln('No files to compile'.red);
+                    }
+                }
             }
 
-            // Initial compilation: 
+            // Initial compilation:
             filterFilesAndCompile();
 
 

@@ -50,6 +50,14 @@ module.exports = function (grunt) {
                 reference: 'test/definitelytypedtest/reference.ts',
                 out: 'test/definitelytypedtest/out.js',
             },
+            nocompile: {
+                src: ['test/nocompile/**/*.ts'],
+                reference: 'test/nocompile/reference.ts',
+                out: 'test/nocompile/out.js',
+                options: {
+                    compile: false,
+                }
+            },
             outdirtest:{
                 src: ['test/outdirtest/**/*.ts'],                                          
                 outDir: 'test/outdirtest/js',                
@@ -75,7 +83,7 @@ module.exports = function (grunt) {
             },
             fail: {                        // a designed to fail target
                 src: ["test/fail/**/*.ts"],
-                watch: 'test',                
+//                watch: 'test',
                 options: {                  // overide the main options for this target 
                     sourcemap: false,
                 }
