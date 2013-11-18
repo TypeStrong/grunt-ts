@@ -109,6 +109,12 @@ function pluginFn(grunt) {
             }
             cmd = cmd + ' --outDir ' + target.outDir;
         }
+        if (task.sourceRoot) {
+            cmd = cmd + ' --sourceRoot ' + task.sourceRoot;
+        }
+        if (task.mapRoot) {
+            cmd = cmd + ' --mapRoot ' + task.mapRoot;
+        }
 
         if (task.verbose) {
             console.log(cmd);
@@ -524,6 +530,8 @@ function pluginFn(grunt) {
             target: 'es3',
             declaration: false,
             sourcemap: true,
+            sourceRoot: '',
+            mapRoot: '',
             comments: false,
             verbose: false
         });

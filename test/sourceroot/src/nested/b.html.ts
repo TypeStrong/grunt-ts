@@ -1,0 +1,1 @@
+module b { export var html =  '<div> Some content </div>    <span> some other content </span>' } 
