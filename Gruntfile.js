@@ -70,6 +70,16 @@ module.exports = function (grunt) {
                 amdloader: 'test/amdloader/js/loader.js',
               //  watch: 'test/amdloader'
             },
+            sourceroottest: {
+                src: ['test/sourceroot/src/**/*.ts'],
+                html: ['test/sourceroot/src/**/*.html'],
+                reference: 'test/sourceroot/src/reference.ts',
+                out: 'test/sourceroot/public/app.js',
+                options: {
+                    sourceRoot: '',
+                    mapRoot: 'map',
+                },
+            },
             templatecache: {
                 src: ['test/templatecache/**/*.ts'],         
                 reference: 'test/templatecache/ts/reference.ts',                

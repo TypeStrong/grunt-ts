@@ -33,6 +33,8 @@ interface ITaskOptions {
     target: string; // es3 , es5
     module: string; // amd, commonjs
     sourcemap: boolean;
+    mapRoot: String;
+    sourceRoot: String;
     declaration: boolean;
     comments: boolean;
     verbose: boolean;
@@ -150,6 +152,12 @@ function pluginFn(grunt: IGrunt) {
                 console.log('WARNING: Option "out" and "outDir" should not be used together'.magenta);
             }
             cmd = cmd + ' --outDir ' + target.outDir;
+        }
+        if (task.sourceRoot) {
+            cmd = cmd + ' --sourceRoot ' + task.sourceRoot;
+        }
+        if (task.mapRoot) {
+            cmd = cmd + ' --mapRoot ' + task.mapRoot;
         }
 
         // To debug the tsc command
@@ -582,6 +590,8 @@ function pluginFn(grunt: IGrunt) {
             target: 'es3',
             declaration: false,
             sourcemap: true,
+            sourceRoot: '',
+            mapRoot: '',
             comments: false,
             verbose: false,
         });
