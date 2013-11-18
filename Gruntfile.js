@@ -74,10 +74,10 @@ module.exports = function (grunt) {
                 src: ['test/sourceroot/src/**/*.ts'],
                 html: ['test/sourceroot/src/**/*.html'],
                 reference: 'test/sourceroot/src/reference.ts',
-                out: 'test/sourceroot/public/app.js',
+                out: 'test/sourceroot/public/js/app.js',
                 options: {
-                    sourceRoot: '',
-                    mapRoot: 'map',
+                    sourceRoot: 'js',
+                    mapRoot: 'map',  // assuming we move all map files with some other grunt task
                 },
             },
             templatecache: {
