@@ -89,20 +89,24 @@ e.g the following `reference` file
 /// <reference path="app.ts" />
 ```
 
-Corresponds to an `amdloader`: 
+Corresponds to an `amdloader` (edited for readability): 
 
-```typescript 
-define(function (require) { 
-	 require(["./classa"],function (){ // initial ordered files 
-	 require(["./deep/classb",                      // grunt-ts start / end unordered async loaded files 
-		  "./deep/classc"],function (){
-	 require(["./deep/deeper/classd"],function (){  // final ordered files 
-	 require(["./app"],function (){                 // another final ordered file
-
-	 });
-	 });
-	 });
-	 });
+```typescript
+// initial ordered files
+define(function (require) {
+  require(["./classa"],function () {
+    // grunt-ts start
+    require(["./deep/classb",                       
+             "./deep/classc"],function () {
+      // grunt-ts end
+      // final ordered files
+      require(["./deep/deeper/classd"],function () {  
+        require(["./app"],function () {
+          // final ordered file loaded
+        });
+      });
+    });
+  });
 });
 ```
 
