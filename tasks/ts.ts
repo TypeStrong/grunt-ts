@@ -28,15 +28,36 @@ interface ITargetOptions {
     }
 }
 
+/**
+ * Version 0.9.1.1
+ *
+ * Bare Options Supported:
+ * --allowbool                   Allow 'bool' as a synonym for 'boolean'.
+ * --allowimportmodule           Allow 'module(...)' as a synonym for 'require(...)'.
+ * --declaration                 Generates corresponding .d.ts file
+ * --mapRoot LOCATION            Specifies the location where debugger should locate map files instead of generated locations.
+ * --module KIND                 Specify module code generation: "commonjs" or "amd"
+ * --noImplicitAny               Warn on expressions and declarations with an implied 'any' type.
+ * --noResolve                   Skip resolution and preprocessing
+ * --removeComments              Do not emit comments to output
+ * --sourcemap                   Generates corresponding .map file
+ * --sourceRoot LOCATION         Specifies the location where debugger should locate TypeScript files instead of source locations.
+ * --target VERSION              Specify ECMAScript target version: "ES3" (default), or "ES5"
+ */
 interface ITaskOptions {
+    allowBool: boolean;
+    allowImportModule: boolean;
     compile: boolean;
-    target: string; // es3 , es5
-    module: string; // amd, commonjs
-    sourcemap: boolean;
-    mapRoot: String;
-    sourceRoot: String;
     declaration: boolean;
-    comments: boolean;
+    mapRoot: string;
+    module: string; // amd, commonjs
+    noImplicitAny: boolean;
+    noResolve: boolean;
+    comments: boolean; // false to remove comments
+    removeComments: boolean; // true to remove comments
+    sourceMap: boolean;
+    sourceRoot: string;
+    target: string; // es3 , es5
     verbose: boolean;
 }
 
@@ -109,7 +130,7 @@ function pluginFn(grunt: IGrunt) {
             (new Array(depth + 1)).join("../../"),
             "../node_modules/typescript/bin");
         if (path.resolve(currentPath, "node_modules/typescript/bin").length > targetPath.length) {
-            return;
+            return null;
         }
         if (fs.existsSync(path.resolve(targetPath, "typescript.js"))) {
             return targetPath;
@@ -132,12 +153,16 @@ function pluginFn(grunt: IGrunt) {
 
         var cmd = filepath;
         // boolean options 
-        if (task.sourcemap)
+        if (task.sourceMap)
             cmd = cmd + ' --sourcemap';
         if (task.declaration)
             cmd = cmd + ' --declaration';
-        if (!task.comments)
+        if (task.removeComments)
             cmd = cmd + ' --removeComments';
+        if (task.noImplicitAny)
+            cmd = cmd + ' --noImplicitAny';
+        if (task.noResolve)
+            cmd = cmd + ' --noResolve';
 
         // string options
         cmd = cmd + ' --target ' + task.target.toUpperCase();
@@ -149,7 +174,7 @@ function pluginFn(grunt: IGrunt) {
         }
         if (target.outDir) {
             if (target.out) {
-                console.log('WARNING: Option "out" and "outDir" should not be used together'.magenta);
+                console.warn('WARNING: Option "out" and "outDir" should not be used together'.magenta);
             }
             cmd = cmd + ' --outDir ' + target.outDir;
         }
@@ -585,16 +610,40 @@ function pluginFn(grunt: IGrunt) {
 
         // setup default options 
         var options = currenttask.options<ITaskOptions>({
+            allowBool: false,
+            allowImportModule: false,
             compile: true,
-            module: 'amd',
-            target: 'es3',
             declaration: false,
-            sourcemap: true,
-            sourceRoot: '',
             mapRoot: '',
-            comments: false,
+            module: 'amd', // amd, commonjs
+            noImplicitAny: false,
+            noResolve: false,
+            comments: null, // false to remove comments
+            removeComments: null, // true to remove comments
+            sourceMap: true,
+            sourceRoot: '',
+            target: 'es5', // es3 , es5
             verbose: false,
         });
+
+        // fix the properly cased options to their appropriate values
+        options.allowBool = options['allowbool'] || options.allowBool;
+        options.allowImportModule = options['allowimportmodule'] || options.allowImportModule;
+        options.sourceMap = options['sourcemap'] || options.sourceMap;
+
+        // Remove comments based on the removeComments flag first then based on the comments flag, otherwise true
+        if (options.removeComments !== null && options.comments !== null) {
+            console.warn('WARNING: Option "comments" and "removeComments" should not be used together'.magenta);
+            if (options.removeComments === options.comments) {
+                console.warn('Either option will suffice (and removing the other will have no effect).'.magenta);
+            }
+            else {
+                console.warn(('The --removeComments value of "' + options.removeComments + '" ' +
+                    'supercedes the --comments value of ' + options.comments + '"').magenta)
+            }
+        }
+        // Remove comments based on the removeComments flag first then based on the comments flag, otherwise true
+        options.removeComments = options.removeComments === true || options.comments === false || true;
 
         // Was the whole process successful
         var success = true;
@@ -654,7 +703,7 @@ function pluginFn(grunt: IGrunt) {
             var starttime;
             var endtime;
             function runCompilation(files: string[], target: ITargetOptions, options: ITaskOptions) {
-                grunt.log.writeln('Compiling.'.yellow);
+                grunt.log.writeln('Compiling...'.yellow);
 
                 // Time the task and go
                 starttime = new Date().getTime();

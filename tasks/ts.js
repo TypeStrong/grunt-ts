@@ -67,7 +67,7 @@ function pluginFn(grunt) {
     function resolveTypeScriptBinPath(currentPath, depth) {
         var targetPath = path.resolve(__dirname, (new Array(depth + 1)).join("../../"), "../node_modules/typescript/bin");
         if (path.resolve(currentPath, "node_modules/typescript/bin").length > targetPath.length) {
-            return;
+            return null;
         }
         if (fs.existsSync(path.resolve(targetPath, "typescript.js"))) {
             return targetPath;
@@ -89,12 +89,16 @@ function pluginFn(grunt) {
 
         var cmd = filepath;
 
-        if (task.sourcemap)
+        if (task.sourceMap)
             cmd = cmd + ' --sourcemap';
         if (task.declaration)
             cmd = cmd + ' --declaration';
-        if (!task.comments)
+        if (task.removeComments)
             cmd = cmd + ' --removeComments';
+        if (task.noImplicitAny)
+            cmd = cmd + ' --noImplicitAny';
+        if (task.noResolve)
+            cmd = cmd + ' --noResolve';
 
         // string options
         cmd = cmd + ' --target ' + task.target.toUpperCase();
@@ -105,7 +109,7 @@ function pluginFn(grunt) {
         }
         if (target.outDir) {
             if (target.out) {
-                console.log('WARNING: Option "out" and "outDir" should not be used together'.magenta);
+                console.warn('WARNING: Option "out" and "outDir" should not be used together'.magenta);
             }
             cmd = cmd + ' --outDir ' + target.outDir;
         }
@@ -525,16 +529,38 @@ function pluginFn(grunt) {
 
         // setup default options
         var options = currenttask.options({
+            allowBool: false,
+            allowImportModule: false,
             compile: true,
-            module: 'amd',
-            target: 'es3',
             declaration: false,
-            sourcemap: true,
-            sourceRoot: '',
             mapRoot: '',
-            comments: false,
+            module: 'amd',
+            noImplicitAny: false,
+            noResolve: false,
+            comments: null,
+            removeComments: null,
+            sourceMap: true,
+            sourceRoot: '',
+            target: 'es5',
             verbose: false
         });
+
+        // fix the properly cased options to their appropriate values
+        options.allowBool = options['allowbool'] || options.allowBool;
+        options.allowImportModule = options['allowimportmodule'] || options.allowImportModule;
+        options.sourceMap = options['sourcemap'] || options.sourceMap;
+
+        if (options.removeComments !== null && options.comments !== null) {
+            console.warn('WARNING: Option "comments" and "removeComments" should not be used together'.magenta);
+            if (options.removeComments === options.comments) {
+                console.warn('Either option will suffice (and removing the other will have no effect).'.magenta);
+            } else {
+                console.warn('The --removeComments value of "' + options.removeComments + '" ' + 'supercedes the --comments value of ' + options.comments + '"');
+            }
+        }
+
+        // Remove comments based on the removeComments flag first then based on the comments flag, otherwise true
+        options.removeComments = options.removeComments === true || options.comments === false || true;
 
         // Was the whole process successful
         var success = true;
@@ -590,7 +616,7 @@ function pluginFn(grunt) {
             var starttime;
             var endtime;
             function runCompilation(files, target, options) {
-                grunt.log.writeln('Compiling.'.yellow);
+                grunt.log.writeln('Compiling...'.yellow);
 
                 // Time the task and go
                 starttime = new Date().getTime();
