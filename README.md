@@ -24,13 +24,13 @@ Supports the following compiler flags in both original format and camelCase (pre
  * --allowImportModule           Allow 'module(...)' as a synonym for 'require(...)'.
  * --declaration                 Generates corresponding .d.ts file
  * --mapRoot LOCATION            Specifies the location where debugger should locate map files instead of generated locations.
- * --module KIND                 Specify module code generation: "commonjs" or "amd"
+ * --module KIND                 Specify module code generation: "commonjs" or "amd" (grunt-ts default)
  * --noImplicitAny               Warn on expressions and declarations with an implied 'any' type.
  * --noResolve                   Skip resolution and preprocessing
- * --removeComments              Do not emit comments to output
- * --sourceMap                   Generates corresponding .map file
+ * --removeComments              Do not emit comments to output (grunt-ts default)
+ * --sourceMap                   Generates corresponding .map file (grunt-ts default)
  * --sourceRoot LOCATION         Specifies the location where debugger should locate TypeScript files instead of source locations.
- * --target VERSION              Specify ECMAScript target version: "ES3" (default), or "ES5"
+ * --target VERSION              Specify ECMAScript target version: "ES3" (tsc default), or "ES5" (grunt-ts default)
 
 Can also do js *file concatenation* using `--out`. Additionally supports an output directory for the generated
 javascript using `--outDir` flag. 
@@ -239,6 +239,16 @@ Again provided by grunt : http://gruntjs.com/configuring-tasks#files
 
 # Contributing
 
-How to build the project:
+## Building the project:
 
     tsc "./tasks/ts.ts" --sourcemap --module commonjs
+
+## Running the tests:
+
+With npm and grunt-cli installed, run the following from the root of the repository,
+
+    grunt ts
+
+Some tests expect failures and will be labelled.
+
+We welcome new methods for writing automated tests that are a little less of a manual process.
