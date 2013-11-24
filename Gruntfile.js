@@ -11,13 +11,14 @@ module.exports = function (grunt) {
         },
 
         ts: {
-            options: {                    // use to override the default options, See : http://gruntjs.com/configuring-tasks#options
-                target: 'es3',            // es3 (default) / or es5
-                module: 'commonjs',       // amd , commonjs (default)
-                sourcemap: true,          // true  (default) | false
-                declaration: false,       // true | false  (default)
-                nolib: false,             // true | false (default)
-                comments: false           // true | false (default)
+            options: {
+                target: 'es3',            // 'es3' (default) | 'es5'
+                module: 'commonjs',       // use amd for asynchonous loading or commonjs  'amd' (default) | 'commonjs'
+                sourcemap: true,          // generate a source map file for each result js file (true (default) | false)
+                declaration: false,       // generate a declaration .d.ts file for each resulting js file (true | false  (default))
+                nolib: false,             // ??? (true | false (default))
+                comments: false,          // leave comments in compiled js code (true | false (default))
+                verbose: true             // print the tsc command (true | false (default))
             },
             dev: {                          // a particular target   
                 src: ["test/work/**/*.ts"], // The source typescript files, See : http://gruntjs.com/configuring-tasks#files                
@@ -37,6 +38,16 @@ module.exports = function (grunt) {
                 options: {
                     module: 'amd'
                 }
+            },
+            bothcomments: {
+                src: ['test/abtest/**/*.ts'],
+                reference: 'test/abtest/reference.ts',
+                out: 'test/abtest/out.js',
+                options: {
+                    // this should cause a warning
+                    comments: true,
+                    removeComments: false,
+                },
             },
             htmltest: {
                 src: ['test/html/**/*.ts'],                            

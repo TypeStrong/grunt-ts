@@ -19,13 +19,18 @@ Following are some key features:
 ======================
 
 ###Compiler support 
-Supports all important compiler flags: 
-
-- es3/es5
-- commonjs/amd
-- sourcemaps
-- declaration
-- comments
+Supports the following compiler flags:
+ * --allowbool                   Allow 'bool' as a synonym for 'boolean'.
+ * --allowimportmodule           Allow 'module(...)' as a synonym for 'require(...)'.
+ * --declaration                 Generates corresponding .d.ts file
+ * --mapRoot LOCATION            Specifies the location where debugger should locate map files instead of generated locations.
+ * --module KIND                 Specify module code generation: "commonjs" or "amd"
+ * --noImplicitAny               Warn on expressions and declarations with an implied 'any' type.
+ * --noResolve                   Skip resolution and preprocessing
+ * --removeComments              Do not emit comments to output
+ * --sourcemap                   Generates corresponding .map file
+ * --sourceRoot LOCATION         Specifies the location where debugger should locate TypeScript files instead of source locations.
+ * --target VERSION              Specify ECMAScript target version: "ES3" (default), or "ES5"
 
 Can also do js *file concatenation* using `--out`. Additionally supports an output directory for the generated
 javascript using `--outDir` flag. 
