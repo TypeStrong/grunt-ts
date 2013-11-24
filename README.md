@@ -19,18 +19,18 @@ Following are some key features:
 ======================
 
 ###Compiler support 
-Supports the following compiler flags:
- * --allowbool                   Allow 'bool' as a synonym for 'boolean'.
- * --allowimportmodule           Allow 'module(...)' as a synonym for 'require(...)'.
+Supports the following compiler flags in both original format and camelCase (preferred):
+ * --allowBool                   Allow 'bool' as a synonym for 'boolean'.
+ * --allowImportModule           Allow 'module(...)' as a synonym for 'require(...)'.
  * --declaration                 Generates corresponding .d.ts file
  * --mapRoot LOCATION            Specifies the location where debugger should locate map files instead of generated locations.
- * --module KIND                 Specify module code generation: "commonjs" or "amd"
+ * --module KIND                 Specify module code generation: "commonjs" or "amd" (grunt-ts default)
  * --noImplicitAny               Warn on expressions and declarations with an implied 'any' type.
  * --noResolve                   Skip resolution and preprocessing
- * --removeComments              Do not emit comments to output
- * --sourcemap                   Generates corresponding .map file
+ * --removeComments              Do not emit comments to output (grunt-ts default)
+ * --sourceMap                   Generates corresponding .map file (grunt-ts default)
  * --sourceRoot LOCATION         Specifies the location where debugger should locate TypeScript files instead of source locations.
- * --target VERSION              Specify ECMAScript target version: "ES3" (default), or "ES5"
+ * --target VERSION              Specify ECMAScript target version: "ES3" (tsc default), or "ES5" (grunt-ts default)
 
 Can also do js *file concatenation* using `--out`. Additionally supports an output directory for the generated
 javascript using `--outDir` flag. 
@@ -70,7 +70,7 @@ exist originally, it is created for you.
 ```
 
 ####Javscript generation Redirect
-If you specify `outDir` all output javascript are redirectied to this folder. 
+If you specify `outDir` all output javascript are redirected to this folder.
 This helps keep your source folder clean.
 
 ####AMD / RequireJS support 
@@ -136,7 +136,7 @@ PS: your individual file SourceMaps will continue to work. So now you can debug 
 
 
 ###Html 2 TypeScript support 
-Can reencode html files into typescript and makes them available as a variable. e.g.
+Can re-encode html files into typescript and makes them available as a variable. e.g.
 a file called `test.html` containing
 ```html
 <div> Some Content </div>
@@ -146,7 +146,7 @@ is compiled to a typescript file `test.html.ts` containing:
 module test { export var html =  '<div> Some content </div>' } 
 ``` 
 so that you can use use the variable `test.html` within your typescript to get the content of test.html 
-as a string. The motivatation is to remove http requests to load templates in various front end frameworks. 
+as a string. The motivation is to remove http requests to load templates in various front end frameworks.
 
 ####Html 2 TypeScript usage in AngularJS 
 This is great for putting variables in templateCache : http://docs.angularjs.org/api/ng.$templateCache 
@@ -195,38 +195,38 @@ Then add some configuration for the plugin like so:
 
     grunt.initConfig({
         ...
-        ts: {            
-            dev: {                                 // a particular target   
+        ts: {
+            dev: {                                 // a particular target
                 src: ["test/work/**/*.ts"],        // The source typescript files, http://gruntjs.com/configuring-tasks#files
                 html: ["test/work/**/*.tpl.html"], // The source html files, https://github.com/basarat/grunt-ts#html-2-typescript-support
                 reference: "./test/reference.ts",  // If specified, generate this file that you can use for your reference management
-                out: 'test/out.js',                // If specified, generate an out.js file which is the merged js file                     
+                out: 'test/out.js',                // If specified, generate an out.js file which is the merged js file
                 outDir: 'test/outputdirectory',    // If specified, the generate javascript files are placed here. Only works if out is not specified
-                watch: 'test',                     // If specified, watches this directory for changes, and re-runs the current target  
-                options: {                    // use to override the default options, http://gruntjs.com/configuring-tasks#options
-					target: 'es3',            // 'es3' (default) | 'es5'
-					module: 'commonjs',       // 'amd' (default) | 'commonjs'
-					sourcemap: true,          // true  (default) | false
-					declaration: false,       // true | false  (default)                
-					comments: false           // true | false (default)
-				},
+                watch: 'test',                     // If specified, watches this directory for changes, and re-runs the current target
+                options: {                         // use to override the default options, http://gruntjs.com/configuring-tasks#options
+                    target: 'es3',                 // 'es3' (default) | 'es5'
+                    module: 'commonjs',            // 'amd' (default) | 'commonjs'
+                    sourceMap: true,               // true (default) | false
+                    declaration: false,            // true | false (default)
+                    comments: false                // true | false (default)
+                },
             },
-            build: {                        // another target 
+            build: {                               // another target
                 src: ["test/work/**/*.ts"],
-                options: {                  // overide the main options for this target 
-                    sourcemap: false,
+                options: {                         // override the main options for this target
+                    sourceMap: false,
                 }
             },
         },
         ...
     });
 
-I also recommend adding a default taget you want to run in case you do not want to specify any arguments to grunt: 
+I also recommend adding a default target you want to run in case you do not want to specify any arguments to grunt: 
 ```
 grunt.registerTask("default", ["ts:dev"]);
 ```
     
-You can see/grab a sample grunt file here : https://github.com/basarat/grunt-ts/blob/master/sample/Gruntfile.js
+You can see/grab an up-to-date sample grunt file here: https://github.com/basarat/grunt-ts/blob/master/sample/Gruntfile.js
    
 ### Different configurations per target   
 Configuration options are per target. You can see how you can have one set of default options and then override
@@ -239,7 +239,16 @@ Again provided by grunt : http://gruntjs.com/configuring-tasks#files
 
 # Contributing
 
-How to build the project:
+## Building the project:
 
     tsc "./tasks/ts.ts" --sourcemap --module commonjs
-    
+
+## Running the tests:
+
+With npm and grunt-cli installed, run the following from the root of the repository,
+
+    grunt ts
+
+Some tests expect failures and will be labelled.
+
+We welcome new methods for writing automated tests that are a little less of a manual process.

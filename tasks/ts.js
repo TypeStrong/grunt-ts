@@ -1,5 +1,5 @@
 /// <reference path="../defs/node/node.d.ts"/>
-/// <reference path="../defs/grunt/grunt.d.ts"/>
+/// <reference path="../defs/grunt/gruntjs.d.ts"/>
 /// <reference path="../defs/underscore/underscore.d.ts"/>
 /// <reference path="../defs/underscore.string/underscore.string.d.ts"/>
 /**
@@ -522,7 +522,7 @@ function pluginFn(grunt) {
     /////////////////////////////////////////////////////////////////////
     // The grunt task
     ////////////////////////////////////////////////////////////////////
-    // Note: this funciton is called once for each target
+    // Note: this function is called once for each target
     // so task + target options are a bit blurred inside this function
     grunt.registerMultiTask('ts', 'Compile TypeScript files', function () {
         var currenttask = this;
@@ -555,7 +555,7 @@ function pluginFn(grunt) {
             if (options.removeComments === options.comments) {
                 console.warn('Either option will suffice (and removing the other will have no effect).'.magenta);
             } else {
-                console.warn('The --removeComments value of "' + options.removeComments + '" ' + 'supercedes the --comments value of ' + options.comments + '"');
+                console.warn(('The --removeComments value of "' + options.removeComments + '" ' + 'supercedes the --comments value of ' + options.comments + '"').magenta);
             }
         }
 
@@ -771,7 +771,6 @@ function pluginFn(grunt) {
         }
     });
 }
-;
 
 module.exports = pluginFn;
 
