@@ -1,5 +1,5 @@
 /// <reference path="../defs/node/node.d.ts"/>
-/// <reference path="../defs/grunt/grunt.d.ts"/>
+/// <reference path="../defs/grunt/gruntjs.d.ts"/>
 /// <reference path="../defs/underscore/underscore.d.ts"/>
 /// <reference path="../defs/underscore.string/underscore.string.d.ts"/>
 
@@ -602,11 +602,11 @@ function pluginFn(grunt: IGrunt) {
     // The grunt task 
     ////////////////////////////////////////////////////////////////////
 
-    // Note: this funciton is called once for each target 
+    // Note: this function is called once for each target
     // so task + target options are a bit blurred inside this function 
-    grunt.registerMultiTask('ts', 'Compile TypeScript files', function () {
+    grunt.registerMultiTask('ts', 'Compile TypeScript files', function() {
 
-        var currenttask: ITask = this;
+        var currenttask: grunt.task.IMultiTask<ITargetOptions> = this;
 
         // setup default options 
         var options = currenttask.options<ITaskOptions>({
@@ -820,7 +820,7 @@ function pluginFn(grunt: IGrunt) {
             if (!!watch) {
 
                 // make async 
-                var done = currenttask.async();
+                var done: grunt.task.AsyncResultCatcher = currenttask.async();
 
                 // A debounced version of compile                 
                 var debouncedCompile = _.debounce(filterFilesAndCompile, 150);
@@ -865,5 +865,5 @@ function pluginFn(grunt: IGrunt) {
             return success;
         }
     });
-};
+}
 export = pluginFn;
