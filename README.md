@@ -20,17 +20,18 @@ Following are some key features:
 
 ###Compiler support 
 Supports the following compiler flags in both original format and camelCase (preferred):
- * --allowBool                   Allow 'bool' as a synonym for 'boolean'.
- * --allowImportModule           Allow 'module(...)' as a synonym for 'require(...)'.
- * --declaration                 Generates corresponding .d.ts file
- * --mapRoot LOCATION            Specifies the location where debugger should locate map files instead of generated locations.
- * --module KIND                 Specify module code generation: "commonjs" or "amd" (grunt-ts default)
- * --noImplicitAny               Warn on expressions and declarations with an implied 'any' type.
- * --noResolve                   Skip resolution and preprocessing
- * --removeComments              Do not emit comments to output (grunt-ts default)
- * --sourceMap                   Generates corresponding .map file (grunt-ts default)
- * --sourceRoot LOCATION         Specifies the location where debugger should locate TypeScript files instead of source locations.
- * --target VERSION              Specify ECMAScript target version: "ES3" (tsc default), or "ES5" (grunt-ts default)
+
+    --allowBool                   Allow 'bool' as a synonym for 'boolean'.
+    --allowImportModule           Allow 'module(...)' as a synonym for 'require(...)'.
+    --declaration                 Generates corresponding .d.ts file
+    --mapRoot LOCATION            Specifies the location where debugger should locate map files instead of generated locations.
+    --module KIND                 Specify module code generation: "commonjs" or "amd" (grunt-ts default)
+    --noImplicitAny               Warn on expressions and declarations with an implied 'any' type.
+    --noResolve                   Skip resolution and preprocessing
+    --removeComments              Do not emit comments to output (grunt-ts default)
+    --sourceMap                   Generates corresponding .map file (grunt-ts default)
+    --sourceRoot LOCATION         Specifies the location where debugger should locate TypeScript files instead of source locations.
+    --target VERSION              Specify ECMAScript target version: "ES3" (tsc default), or "ES5" (grunt-ts default)
 
 Can also do js *file concatenation* using `--out`. Additionally supports an output directory for the generated
 javascript using `--outDir` flag. 
