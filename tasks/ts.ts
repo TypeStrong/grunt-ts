@@ -627,9 +627,9 @@ function pluginFn(grunt: IGrunt) {
         });
 
         // fix the properly cased options to their appropriate values
-        options.allowBool = options['allowbool'] || options.allowBool;
-        options.allowImportModule = options['allowimportmodule'] || options.allowImportModule;
-        options.sourceMap = options['sourcemap'] || options.sourceMap;
+        options.allowBool = 'allowbool' in options ? options['allowbool'] : options.allowBool;
+        options.allowImportModule = 'allowimportmodule' in options ? options['allowimportmodule'] : options.allowImportModule;
+        options.sourceMap = 'sourcemap' in options ? options['sourcemap'] : options.sourceMap;
 
         // Remove comments based on the removeComments flag first then based on the comments flag, otherwise true
         if (options.removeComments !== null && options.comments !== null) {
