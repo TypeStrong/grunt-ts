@@ -2,7 +2,7 @@
     "author": "basarat",
     "name": "grunt-ts",
     "description": "Compile and manage your TypeScript project",    
-    "version": "1.4.5",
+    "version": "1.4.6",
     "homepage": "https://github.com/basarat/grunt-ts",
     "repository": {
         "type": "git",
@@ -18,6 +18,16 @@
         }
     ],
     "main": "grunt.js",
+    "maintainers": [
+	{
+		"name": "basarat",
+		"email": "basaratali@gmail.com"
+	},
+	{
+		"name": "jeffmay",
+		"email": "viralidealogue@gmail.com"
+	},
+    ],
     "engines": {
         "node": ">= 0.8.0"
     },
