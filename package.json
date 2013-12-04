@@ -19,15 +19,15 @@
     ],
     "main": "grunt.js",
     "maintainers": [
-	{
-		"name": "basarat",
-		"email": "basaratali@gmail.com"
-	},
-	{
-		"name": "jeffmay",
-		"email": "viralidealogue@gmail.com"
-	},
-    ],
+		{
+			"name": "basarat",
+			"email": "basaratali@gmail.com"
+		},
+		{
+			"name": "jeffmay",
+			"email": "viralidealogue@gmail.com"
+		}
+	],
     "engines": {
         "node": ">= 0.8.0"
     },
