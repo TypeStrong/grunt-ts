@@ -121,6 +121,7 @@ The following combination of circumstances are why you would use it instead of C
 
 * You want to use RequireJS since you prefer to debug "js" files instead of "ts" files. 
 This is useful in some cases and the most common way is using AMD
+* You want the ability to individually compile only changed files (for a faster dev-compile-run cycle)
 * However, File order doesn't matter to you, even when you have inter file depenendency (e.g. AngularJS runtime Dependency injection)
 
 In such a case you can either create a `loader.js` manually or have grunt create it for you. 
