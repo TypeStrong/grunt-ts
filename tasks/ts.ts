@@ -632,7 +632,9 @@ function pluginFn(grunt: IGrunt) {
         options.sourceMap = 'sourcemap' in options ? options['sourcemap'] : options.sourceMap;
 
         // Remove comments based on the removeComments flag first then based on the comments flag, otherwise true
-        if (options.removeComments !== null && options.comments !== null) {
+        if (options.removeComments === null) {
+            options.removeComments = !options.comments;
+        } else if (options.comments !== null) {
             console.warn('WARNING: Option "comments" and "removeComments" should not be used together'.magenta);
             if (options.removeComments === options.comments) {
                 console.warn('Either option will suffice (and removing the other will have no effect).'.magenta);
@@ -642,8 +644,7 @@ function pluginFn(grunt: IGrunt) {
                     'supercedes the --comments value of ' + options.comments + '"').magenta)
             }
         }
-        // Remove comments based on the removeComments flag first then based on the comments flag, otherwise true
-        options.removeComments = options.removeComments === true || options.comments === false || true;
+        options.removeComments = !!options.removeComments;
 
         // Was the whole process successful
         var success = true;

@@ -550,7 +550,9 @@ function pluginFn(grunt) {
         options.allowImportModule = 'allowimportmodule' in options ? options['allowimportmodule'] : options.allowImportModule;
         options.sourceMap = 'sourcemap' in options ? options['sourcemap'] : options.sourceMap;
 
-        if (options.removeComments !== null && options.comments !== null) {
+        if (options.removeComments === null) {
+            options.removeComments = !options.comments;
+        } else if (options.comments !== null) {
             console.warn('WARNING: Option "comments" and "removeComments" should not be used together'.magenta);
             if (options.removeComments === options.comments) {
                 console.warn('Either option will suffice (and removing the other will have no effect).'.magenta);
@@ -558,9 +560,7 @@ function pluginFn(grunt) {
                 console.warn(('The --removeComments value of "' + options.removeComments + '" ' + 'supercedes the --comments value of ' + options.comments + '"').magenta);
             }
         }
-
-        // Remove comments based on the removeComments flag first then based on the comments flag, otherwise true
-        options.removeComments = options.removeComments === true || options.comments === false || true;
+        options.removeComments = !!options.removeComments;
 
         // Was the whole process successful
         var success = true;
