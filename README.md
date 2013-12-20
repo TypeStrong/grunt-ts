@@ -210,7 +210,7 @@ Then add some configuration for the plugin like so:
                     module: 'commonjs',            // 'amd' (default) | 'commonjs'
                     sourceMap: true,               // true (default) | false
                     declaration: false,            // true | false (default)
-                    comments: false                // true | false (default)
+                    removeComments: true           // true (default) | false
                 },
             },
             build: {                               // another target
