@@ -1,8 +1,8 @@
 ///<reference path="../reference.ts"/>
-class ClassB extends ClassA {
+class ClassU extends ClassT {
     constructor() {
         super(); 
-        console.log('class b'); 
+        console.log('class U');
     }
 }
 console.log('reading html:', test.tpl.html);
