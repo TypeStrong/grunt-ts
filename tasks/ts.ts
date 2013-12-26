@@ -64,9 +64,10 @@ interface ITaskOptions {
 /**
  * Returns the result of an array inserted into another, starting at the given index.
  */
-function insertArrayAt(array: string[], index: number, arrayToInsert: string[]): string[] {
+function insertArrayAt<T>(array: T[], index: number, arrayToInsert: T[]): T[] {
     var updated = array.slice(0);
-    Array.prototype.splice.apply(updated, [index, 0].concat(arrayToInsert));
+    var spliceAt: any[] = [index, 0];
+    Array.prototype.splice.apply(updated, spliceAt.concat(arrayToInsert));
     return updated;
 }
 // Useful string functions 
