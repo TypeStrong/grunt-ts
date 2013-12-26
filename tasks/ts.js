@@ -79,7 +79,7 @@ function pluginFn(grunt) {
         return resolveTypeScriptBinPath(currentPath, ++depth);
     }
     function getTsc(binPath) {
-        return '"' + binPath + '/' + 'tsc" ';
+        return '"' + binPath + '/' + 'tsc"';
     }
     var exec = shell.exec;
     var cwd = path.resolve(".");
@@ -87,10 +87,7 @@ function pluginFn(grunt) {
 
     // Blindly runs the tsc task using provided options
     function compileAllFiles(files, target, task) {
-        var filepath = files.join(' ');
-        var tscExecCommand = 'node ' + tsc;
-
-        var cmd = filepath;
+        var cmd = files.join(' ');
 
         // boolean options
         if (task.sourceMap)
@@ -125,9 +122,13 @@ function pluginFn(grunt) {
             cmd = cmd + ' --mapRoot ' + task.mapRoot;
         }
 
+        var tscExecCommand = 'node ' + tsc + ' ' + cmd;
+
         // To debug the tsc command
         if (task.verbose) {
-            console.log(cmd);
+            console.log(tscExecCommand.yellow);
+        } else {
+            grunt.log.verbose.writeln(cmd.yellow);
         }
 
         // Create a temp last command file
@@ -249,6 +250,7 @@ function pluginFn(grunt) {
     ////////////////////////////////////////////////////////////////////
     function getReferencesInOrder(referenceFile, referencePath) {
         var toreturn = {
+            all: [],
             before: [],
             generated: [],
             unordered: [],
@@ -320,6 +322,7 @@ function pluginFn(grunt) {
         toreturn.after = _.map(toreturn.after, function (relativepath) {
             return path.resolve(referencePath, relativepath);
         });
+        toreturn.all = Array.prototype.concat.call([], toreturn.before, toreturn.generated, toreturn.unordered, toreturn.after);
 
         return toreturn;
     }
@@ -327,10 +330,20 @@ function pluginFn(grunt) {
     // Finds the longest common section of a collection of strings.
     // Simply sorting and comparing first and last http://stackoverflow.com/a/1917041/390330
     function sharedStart(array) {
-        var A = array.slice(0).sort(), word1 = A[0], word2 = A[A.length - 1], i = 0;
-        while (word1.charAt(i) == word2.charAt(i))
-            ++i;
-        return word1.substring(0, i);
+        if (array.length == 0)
+            throw "Cannot find common root of empty array.";
+        var A = array.slice(0).sort(), firstWord = A[0], lastWord = A[A.length - 1];
+        if (firstWord === lastWord)
+            return firstWord;
+        else {
+            var i = -1;
+            do {
+                i += 1;
+                var firstWordChar = firstWord.charAt(i);
+                var lastWordChar = lastWord.charAt(i);
+            } while(firstWordChar == lastWordChar);
+            return firstWord.substring(0, i);
+        }
     }
 
     // Explanation inline
@@ -347,21 +360,49 @@ function pluginFn(grunt) {
     function updateAmdLoader(referenceFile, referencePath, loaderFile, loaderPath, outDir) {
         // Read the original file if it exists
         if (fs.existsSync(referenceFile)) {
+            grunt.log.verbose.writeln('Generating amdloader from reference file ' + referenceFile);
             var files = getReferencesInOrder(referenceFile, referencePath);
 
             // Filter.d.ts,
-            files.before = _.filter(files.before, function (file) {
-                return !endsWith(file, '.d.ts');
-            });
-            files.generated = _.filter(files.generated, function (file) {
-                return !endsWith(file, '.d.ts');
-            });
-            files.unordered = _.filter(files.unordered, function (file) {
-                return !endsWith(file, '.d.ts');
-            });
-            files.after = _.filter(files.after, function (file) {
-                return !endsWith(file, '.d.ts');
-            });
+            if (files.all.length > 0) {
+                grunt.log.verbose.writeln('Files: ' + files.all.map(function (f) {
+                    return f.cyan;
+                }).join(', '));
+            } else {
+                grunt.warn("No files in reference file: " + referenceFile);
+            }
+            if (files.before.length > 0) {
+                files.before = _.filter(files.before, function (file) {
+                    return !endsWith(file, '.d.ts');
+                });
+                grunt.log.verbose.writeln('Before: ' + files.before.map(function (f) {
+                    return f.cyan;
+                }).join(', '));
+            }
+            if (files.generated.length > 0) {
+                files.generated = _.filter(files.generated, function (file) {
+                    return !endsWith(file, '.d.ts');
+                });
+                grunt.log.verbose.writeln('Generated: ' + files.generated.map(function (f) {
+                    return f.cyan;
+                }).join(', '));
+            }
+            if (files.unordered.length > 0) {
+                files.unordered = _.filter(files.unordered, function (file) {
+                    return !endsWith(file, '.d.ts');
+                });
+                grunt.log.verbose.writeln('Unordered: ' + files.unordered.map(function (f) {
+                    return f.cyan;
+                }).join(', '));
+            }
+            if (files.after.length > 0) {
+                files.after = _.filter(files.after, function (file) {
+                    return !endsWith(file, '.d.ts');
+                });
+                grunt.log.verbose.writeln('After: ' + files.after.map(function (f) {
+                    return f.cyan;
+                }).join(', '));
+            }
 
             // If target has outDir we need to make adjust the path
             // c:/somefolder/ts/a , c:/somefolder/ts/inside/b  + c:/somefolder/build/js => c:/somefolder/build/js/a , c:/somefolder/build/js/inside/b
@@ -371,9 +412,11 @@ function pluginFn(grunt) {
             if (outDir) {
                 // Find common path
                 var commonPath = findCommonPath(files.before.concat(files.generated.concat(files.unordered.concat(files.after))));
+                grunt.log.verbose.writeln('Found common path: ' + commonPath);
 
                 // Make sure outDir is absolute:
                 outDir = path.resolve(outDir);
+                grunt.log.verbose.writeln('Using outDir: ' + outDir);
 
                 function makeRelativeToOutDir(files) {
                     files = _.map(files, function (file) {
@@ -393,6 +436,7 @@ function pluginFn(grunt) {
                     });
                     return files;
                 }
+                grunt.log.verbose.writeln("Making files relative to outDir...");
                 files.before = makeRelativeToOutDir(files.before);
                 files.generated = makeRelativeToOutDir(files.generated);
                 files.unordered = makeRelativeToOutDir(files.unordered);
@@ -415,7 +459,9 @@ function pluginFn(grunt) {
                 var binaryContent = binaryTemplate({ filenames: binaryFilesNames.join('","') });
                 var binFileExtension = '.bin.js';
                 var loaderFileWithoutExtension = path.dirname(loaderFile) + pathSeperator + path.basename(loaderFile, '.js');
-                fs.writeFileSync(loaderFileWithoutExtension + binFileExtension, binaryContent);
+                var binFilename = loaderFileWithoutExtension + binFileExtension;
+                fs.writeFileSync(binFilename, binaryContent);
+                grunt.log.verbose.writeln('Binary AMD loader written ' + binFilename.cyan);
 
                 //
                 // Notice that we build inside out in the below sections:
@@ -430,8 +476,10 @@ function pluginFn(grunt) {
 
                 // Next up add the unordered items:
                 // For these we will use just one require call
-                var unorderFileNames = files.unordered.join('",' + eol + '\t\t  "');
-                subitem = singleRequireTemplate({ filename: '"' + unorderFileNames + '"', subitem: subitem });
+                if (files.unordered.length > 0) {
+                    var unorderFileNames = files.unordered.join('",' + eol + '\t\t  "');
+                    subitem = singleRequireTemplate({ filename: '"' + unorderFileNames + '"', subitem: subitem });
+                }
 
                 // Next the generated files
                 // For these we will use just one require call
@@ -450,6 +498,7 @@ function pluginFn(grunt) {
 
                 // Finally write it out
                 fs.writeFileSync(loaderFile, output);
+                grunt.log.verbose.writeln('AMD loader written ' + loaderFile.cyan);
             }
         } else {
             grunt.log.writeln('Cannot generate amd loader unless a reference file is present'.red);
