@@ -1,5 +1,5 @@
 class ClassA {
     constructor() {
-        console.log('in a');
+        console.log('in A');
     }
 }

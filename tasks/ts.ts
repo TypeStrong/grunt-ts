@@ -64,13 +64,14 @@ interface ITaskOptions {
 /**
  * Returns the result of an array inserted into another, starting at the given index.
  */
-function insertArrayAt(array: string[], index: number, arrayToInsert: string[]): string[] {
+function insertArrayAt<T>(array: T[], index: number, arrayToInsert: T[]): T[] {
     var updated = array.slice(0);
-    Array.prototype.splice.apply(updated, [index, 0].concat(arrayToInsert));
+    var spliceAt: any[] = [index, 0];
+    Array.prototype.splice.apply(updated, spliceAt.concat(arrayToInsert));
     return updated;
 }
-// Useful string functions 
-// used to make sure string ends with a slash 
+// Useful string functions
+// used to make sure string ends with a slash
 function endsWith(str: string, suffix: string) {
     return str.indexOf(suffix, str.length - suffix.length) !== -1;
 };
@@ -91,11 +92,11 @@ function timeIt<R>(makeIt: () => R): {
     /**
      * The result of the computation
      */
-        it: R
+    it: R
     /**
      * Time in milliseconds.
      */
-        time: number
+    time: number
 } {
     var starttime = new Date().getTime();
     var it = makeIt();
@@ -106,7 +107,7 @@ function timeIt<R>(makeIt: () => R): {
     };
 }
 
-// Typescript imports 
+// Typescript imports
 import _ = require('underscore');
 import _str = require('underscore.string');
 import path = require('path');
@@ -122,7 +123,7 @@ enum referenceFileLoopState { before, unordered, after };
 function pluginFn(grunt: IGrunt) {
 
     /////////////////////////////////////////////////////////////////////
-    // tsc handling. 
+    // tsc handling.
     ////////////////////////////////////////////////////////////////////
 
     function resolveTypeScriptBinPath(currentPath, depth): string {
@@ -139,20 +140,17 @@ function pluginFn(grunt: IGrunt) {
         return resolveTypeScriptBinPath(currentPath, ++depth);
     }
     function getTsc(binPath: string): string {
-        return '"' + binPath + '/' + 'tsc" ';
+        return '"' + binPath + '/' + 'tsc"';
     }
     var exec = shell.exec;
     var cwd = path.resolve(".");
     var tsc = getTsc(resolveTypeScriptBinPath(cwd, 0));
 
-    // Blindly runs the tsc task using provided options 
+    // Blindly runs the tsc task using provided options
     function compileAllFiles(files: string[], target: ITargetOptions, task: ITaskOptions): ICompileResult {
 
-        var filepath: string = files.join(' ');
-        var tscExecCommand = 'node ' + tsc;
-
-        var cmd = filepath;
-        // boolean options 
+        var cmd: string = files.join(' ');
+        // boolean options
         if (task.sourceMap)
             cmd = cmd + ' --sourcemap';
         if (task.declaration)
@@ -168,7 +166,7 @@ function pluginFn(grunt: IGrunt) {
         cmd = cmd + ' --target ' + task.target.toUpperCase();
         cmd = cmd + ' --module ' + task.module.toLowerCase();
 
-        // Target options: 
+        // Target options:
         if (target.out) {
             cmd = cmd + ' --out ' + target.out;
         }
@@ -185,12 +183,17 @@ function pluginFn(grunt: IGrunt) {
             cmd = cmd + ' --mapRoot ' + task.mapRoot;
         }
 
+        var tscExecCommand = 'node ' + tsc + ' ' + cmd;
+
         // To debug the tsc command
         if (task.verbose) {
-            console.log(cmd);
+            console.log(tscExecCommand.yellow);
+        }
+        else {
+            grunt.log.verbose.writeln(cmd.yellow);
         }
 
-        // Create a temp last command file 
+        // Create a temp last command file
         var tempfilename = 'tscommand.tmp.txt';
         fs.writeFileSync(tempfilename, cmd);
         tscExecCommand = tscExecCommand + ' @' + tempfilename;
@@ -199,16 +202,16 @@ function pluginFn(grunt: IGrunt) {
         return result;
     }
 
-    /////////////////////////////////////////////////////////////////////    
+    /////////////////////////////////////////////////////////////////////
     // Reference file logic
     ////////////////////////////////////////////////////////////////////
 
-    // Converts "C:\boo" , "C:\boo\foo.ts" => "./foo.ts"; Works on unix as well. 
+    // Converts "C:\boo" , "C:\boo\foo.ts" => "./foo.ts"; Works on unix as well.
     function makeReferencePath(folderpath: string, filename: string) {
         return path.relative(folderpath, filename).split('\\').join('/');
     }
 
-    // Updates the reference file 
+    // Updates the reference file
     function updateReferenceFile(files: string[], generatedFiles: string[], referenceFile: string, referencePath: string): boolean {
         var referenceIntro = '/// <reference path="';
         var referenceEnd = '" />';
@@ -219,13 +222,13 @@ function pluginFn(grunt: IGrunt) {
 
         var lines = []; // All lines of the file
         var origFileLines = []; // The lines we do not modify and send out as is. Lines will we reach grunt-ts generated
-        var origFileReferences = []; // The list of files already there that we do not need to manage 
+        var origFileReferences = []; // The list of files already there that we do not need to manage
 
         // Location of our generated references
         // By default at start of file
         var signatureSectionPosition = 0;
 
-        // Read the original file if it exists 
+        // Read the original file if it exists
         if (fs.existsSync(referenceFile)) {
             lines = fs.readFileSync(referenceFile).toString().split('\n');
 
@@ -238,9 +241,9 @@ function pluginFn(grunt: IGrunt) {
 
                 var line = _str.trim(lines[i]);
 
-                // Skip logic for our generated section 
+                // Skip logic for our generated section
                 if (_str.include(line, ourSignatureStart)) {
-                    //Wait for the end signature: 
+                    //Wait for the end signature:
                     signatureSectionPosition = i;
                     inSignatureSection = true;
                     continue;
@@ -251,10 +254,10 @@ function pluginFn(grunt: IGrunt) {
                 }
                 if (inSignatureSection) continue;
 
-                // store the line     
+                // store the line
                 origFileLines.push(line);
 
-                // Fetch the existing reference's filename if any: 
+                // Fetch the existing reference's filename if any:
                 if (_str.include(line, referenceIntro)) {
                     var match = line.match(referenceMatch);
                     var filename = match[1];
@@ -263,23 +266,23 @@ function pluginFn(grunt: IGrunt) {
             }
         }
 
-        // Put in the generated files 
+        // Put in the generated files
         generatedFiles = _.map(generatedFiles, (file) => referenceIntro + makeReferencePath(referencePath, file) + referenceEnd + generatedSignature);
         var contents = insertArrayAt([ourSignatureStart], 1, generatedFiles);
 
-        // Put in the new / observed missing files:         
+        // Put in the new / observed missing files:
         files.forEach((filename: string) => {
-            // The file we are about to add 
+            // The file we are about to add
             var filepath = makeReferencePath(referencePath, filename);
 
-            // If there are orig references 
+            // If there are orig references
             if (origFileReferences.length) {
                 if (_.contains(origFileReferences, filepath)) {
                     return;
                 }
             }
 
-            // Finally add the filepath 
+            // Finally add the filepath
             contents.push(referenceIntro + filepath + referenceEnd);
         });
         contents.push(ourSignatureEnd);
@@ -304,36 +307,37 @@ function pluginFn(grunt: IGrunt) {
     }
 
 
-    /////////////////////////////////////////////////////////////////////    
-    // AMD Loader, creates a js file that loads a few files in order 
+    /////////////////////////////////////////////////////////////////////
+    // AMD Loader, creates a js file that loads a few files in order
     // and the rest un orderded, based on the reference.ts spec
     ////////////////////////////////////////////////////////////////////
 
-    function getReferencesInOrder(referenceFile: string, referencePath: string): { before: string[]; generated: string[]; unordered: string[]; after: string[]; } {
+    function getReferencesInOrder(referenceFile: string, referencePath: string): { all: string[]; before: string[]; generated: string[]; unordered: string[]; after: string[]; } {
         var toreturn = {
+            all: [],
             before: [],
             generated: [],
             unordered: [],
             after: []
         };
 
-        // When reading 
+        // When reading
         var referenceMatch = /\/\/\/ <reference path=\"(.*?)\"/;
 
-        // When writing 
+        // When writing
         var referenceIntro = '/// <reference path="';
         var referenceEnd = '" />';
 
-        // The section of unordered files 
+        // The section of unordered files
         var ourSignatureStart = '//grunt-start';
         var ourSignatureEnd = '//grunt-end';
 
-        // The generated files. These must go on top 
+        // The generated files. These must go on top
         var generatedSignature = "// generated";
 
         var lines = fs.readFileSync(referenceFile).toString().split('\n');
 
-        // Which of the three sections we are in 
+        // Which of the three sections we are in
         var loopState = referenceFileLoopState.before;
 
         for (var i = 0; i < lines.length; i++) {
@@ -341,7 +345,7 @@ function pluginFn(grunt: IGrunt) {
             var line = _str.trim(lines[i]);
 
             if (_str.include(line, ourSignatureStart)) {
-                //Wait for the end signature:                 
+                //Wait for the end signature:
                 loopState = referenceFileLoopState.unordered;
             }
             if (_str.include(line, ourSignatureEnd)) {
@@ -349,7 +353,7 @@ function pluginFn(grunt: IGrunt) {
             }
 
 
-            // Fetch the existing reference's filename if any: 
+            // Fetch the existing reference's filename if any:
             if (_str.include(line, referenceIntro)) {
                 var match = line.match(referenceMatch);
                 var filename = match[1];
@@ -372,28 +376,38 @@ function pluginFn(grunt: IGrunt) {
             }
         }
 
-        // Fix the references to be absolute: 
+        // Fix the references to be absolute:
         toreturn.before = _.map(toreturn.before, (relativepath) => { return path.resolve(referencePath, relativepath); });
         toreturn.generated = _.map(toreturn.generated, (relativepath) => { return path.resolve(referencePath, relativepath); });
         toreturn.unordered = _.map(toreturn.unordered, (relativepath) => { return path.resolve(referencePath, relativepath); });
         toreturn.after = _.map(toreturn.after, (relativepath) => { return path.resolve(referencePath, relativepath); });
+        toreturn.all = Array.prototype.concat.call([], toreturn.before, toreturn.generated, toreturn.unordered, toreturn.after);
 
         return toreturn;
     }
 
-    // Finds the longest common section of a collection of strings. 
+    // Finds the longest common section of a collection of strings.
     // Simply sorting and comparing first and last http://stackoverflow.com/a/1917041/390330
-    function sharedStart(array: string[]) {
+    function sharedStart(array: string[]): string {
+        if (array.length == 0) throw "Cannot find common root of empty array.";
         var A = array.slice(0).sort(),
-            word1 = A[0], word2 = A[A.length - 1],
-            i = 0;
-        while (word1.charAt(i) == word2.charAt(i))++i;
-        return word1.substring(0, i);
+            firstWord = A[0],
+            lastWord = A[A.length - 1];
+        if (firstWord === lastWord) return firstWord;
+        else {
+            var i = -1;
+            do {
+                i += 1;
+                var firstWordChar = firstWord.charAt(i);
+                var lastWordChar = lastWord.charAt(i);
+            } while (firstWordChar == lastWordChar);
+            return firstWord.substring(0, i);
+        }
     }
 
-    // Explanation inline 
+    // Explanation inline
     function findCommonPath(paths: string[]) {
-        // Now for "C:\u\starter" "C:\u\started" => "C:\u\starte" 
+        // Now for "C:\u\starter" "C:\u\started" => "C:\u\starte"
         var largetStartSegement = sharedStart(paths);
 
         // For "C:\u\starte" => C:\u\
@@ -401,49 +415,71 @@ function pluginFn(grunt: IGrunt) {
         return largetStartSegement.substr(0, ending);
     }
 
-    // It updates based on the order of reference files 
+    // It updates based on the order of reference files
     function updateAmdLoader(referenceFile: string, referencePath: string, loaderFile: string, loaderPath: string, outDir: string) {
 
-        // Read the original file if it exists 
+        // Read the original file if it exists
         if (fs.existsSync(referenceFile)) {
+            grunt.log.verbose.writeln('Generating amdloader from reference file ' + referenceFile);
             var files = getReferencesInOrder(referenceFile, referencePath);
 
-            // Filter.d.ts,             
-            files.before = _.filter(files.before, (file) => { return !endsWith(file, '.d.ts'); });
-            files.generated = _.filter(files.generated, (file) => { return !endsWith(file, '.d.ts'); });
-            files.unordered = _.filter(files.unordered, (file) => { return !endsWith(file, '.d.ts'); });
-            files.after = _.filter(files.after, (file) => { return !endsWith(file, '.d.ts'); });
+            // Filter.d.ts,
+            if (files.all.length > 0) {
+                grunt.log.verbose.writeln('Files: ' + files.all.map((f) => f.cyan).join(', '));
+            }
+            else {
+                grunt.warn("No files in reference file: " + referenceFile);
+            }
+            if (files.before.length > 0) {
+                files.before = _.filter(files.before, (file) => { return !endsWith(file, '.d.ts'); });
+                grunt.log.verbose.writeln('Before: ' + files.before.map((f) => f.cyan).join(', '));
+            }
+            if (files.generated.length > 0) {
+                files.generated = _.filter(files.generated, (file) => { return !endsWith(file, '.d.ts'); });
+                grunt.log.verbose.writeln('Generated: ' + files.generated.map((f) => f.cyan).join(', '));
+            }
+            if (files.unordered.length > 0) {
+                files.unordered = _.filter(files.unordered, (file) => { return !endsWith(file, '.d.ts'); });
+                grunt.log.verbose.writeln('Unordered: ' + files.unordered.map((f) => f.cyan).join(', '));
+            }
+            if (files.after.length > 0) {
+                files.after = _.filter(files.after, (file) => { return !endsWith(file, '.d.ts'); });
+                grunt.log.verbose.writeln('After: ' + files.after.map((f) => f.cyan).join(', '));
+            }
 
-            // If target has outDir we need to make adjust the path             
+            // If target has outDir we need to make adjust the path
             // c:/somefolder/ts/a , c:/somefolder/ts/inside/b  + c:/somefolder/build/js => c:/somefolder/build/js/a , c:/somefolder/build/js/inside/b
-            // Logic: 
-            //     find the common structure in the source files ,and remove it 
-            //          Finally: outDir path + remainder section 
+            // Logic:
+            //     find the common structure in the source files ,and remove it
+            //          Finally: outDir path + remainder section
             if (outDir) {
-                // Find common path 
+                // Find common path
                 var commonPath = findCommonPath(files.before.concat(files.generated.concat(files.unordered.concat(files.after))));
+                grunt.log.verbose.writeln('Found common path: ' + commonPath);
 
-                // Make sure outDir is absolute: 
+                // Make sure outDir is absolute:
                 outDir = path.resolve(outDir);
+                grunt.log.verbose.writeln('Using outDir: ' + outDir);
 
                 function makeRelativeToOutDir(files: string[]) {
                     files = _.map(files, (file) => {
-                        // Remove common path and replace with absolute outDir 
+                        // Remove common path and replace with absolute outDir
                         file = file.replace(commonPath, outDir);
 
-                        //remove ts extension '.ts': 
+                        //remove ts extension '.ts':
                         file = file.substr(0, file.length - 3);
 
-                        // Make relative to amd loader 
+                        // Make relative to amd loader
                         file = makeReferencePath(loaderPath, file);
 
-                        // Prepend "./" to prevent "basePath" requirejs setting from interferring: 
+                        // Prepend "./" to prevent "basePath" requirejs setting from interferring:
                         file = "./" + file;
 
                         return file;
                     });
                     return files;
                 }
+                grunt.log.verbose.writeln("Making files relative to outDir...");
                 files.before = makeRelativeToOutDir(files.before);
                 files.generated = makeRelativeToOutDir(files.generated);
                 files.unordered = makeRelativeToOutDir(files.unordered);
@@ -459,55 +495,60 @@ function pluginFn(grunt: IGrunt) {
                     + eol + '\t });');
 
 
-                // The final body of the function 
+                // The final body of the function
                 var body = '';
 
-                // initial sub item 
+                // initial sub item
                 var subitem = '';
 
 
-                // Write out a binary file: 
+                // Write out a binary file:
                 var binaryTemplate = _.template('define(["<%= filenames %>"],function () {});');
                 var binaryFilesNames = files.before.concat(files.generated.concat(files.unordered.concat(files.after)));
                 var binaryContent = binaryTemplate({ filenames: binaryFilesNames.join('","') });
                 var binFileExtension = '.bin.js';
                 var loaderFileWithoutExtension = path.dirname(loaderFile) + pathSeperator + path.basename(loaderFile, '.js');
-                fs.writeFileSync(loaderFileWithoutExtension + binFileExtension, binaryContent);
+                var binFilename = loaderFileWithoutExtension + binFileExtension;
+                fs.writeFileSync(binFilename, binaryContent);
+                grunt.log.verbose.writeln('Binary AMD loader written ' + binFilename.cyan);
 
-                // 
-                // Notice that we build inside out in the below sections:  
+                //
+                // Notice that we build inside out in the below sections:
                 //
 
-                // Generate fileTemplate from inside out                 
-                // Start with after 
-                // Build the subitem for ordered after items                 
-                files.after = files.after.reverse();     // Important to build inside out                        
+                // Generate fileTemplate from inside out
+                // Start with after
+                // Build the subitem for ordered after items
+                files.after = files.after.reverse();     // Important to build inside out
                 _.forEach(files.after, (file) => {
                     subitem = singleRequireTemplate({ filename: '"' + file + '"', subitem: subitem });
                 });
 
-                // Next up add the unordered items: 
+                // Next up add the unordered items:
                 // For these we will use just one require call
-                var unorderFileNames = files.unordered.join('",' + eol + '\t\t  "');
-                subitem = singleRequireTemplate({ filename: '"' + unorderFileNames + '"', subitem: subitem });
+                if (files.unordered.length > 0) {
+                    var unorderFileNames = files.unordered.join('",' + eol + '\t\t  "');
+                    subitem = singleRequireTemplate({ filename: '"' + unorderFileNames + '"', subitem: subitem });
+                }
 
-                // Next the generated files 
+                // Next the generated files
                 // For these we will use just one require call
                 var generatedFileNames = files.generated.join('",' + eol + '\t\t  "');
                 subitem = singleRequireTemplate({ filename: '"' + generatedFileNames + '"', subitem: subitem });
 
-                // Build the subitem for ordered before items                 
+                // Build the subitem for ordered before items
                 files.before = files.before.reverse();
                 _.forEach(files.before, (file) => {
                     subitem = singleRequireTemplate({ filename: '"' + file + '"', subitem: subitem });
                 });
 
-                // The last subitem is now the body 
+                // The last subitem is now the body
                 body = subitem;
                 var output = mainTemplate({ body: body });
 
-                // Finally write it out                 
+                // Finally write it out
                 fs.writeFileSync(loaderFile, output);
+                grunt.log.verbose.writeln('AMD loader written ' + loaderFile.cyan);
             }
         }
         else {
@@ -586,14 +627,14 @@ function pluginFn(grunt: IGrunt) {
         var fileNameVariableSection = fileVariableNames.join(',' + eol);
 
         var templateCachePutTemplate = _.template('$templateCache.put("<%= fileName %>", <%=fileVariableName%>);');
-        var templateCachePut = _.map(fileNames, (fileName) => templateCachePutTemplate({ 
-                fileName: fileName, 
-                fileVariableName: fileVarialbeName(fileName) 
-            })).join(eol);
+        var templateCachePut = _.map(fileNames, (fileName) => templateCachePutTemplate({
+            fileName: fileName,
+            fileVariableName: fileVarialbeName(fileName)
+        })).join(eol);
 
-        var fileContent = templateCacheTemplate({ 
-            relativePathSection: relativePathSection, 
-            fileNameVariableSection: fileNameVariableSection, 
+        var fileContent = templateCacheTemplate({
+            relativePathSection: relativePathSection,
+            fileNameVariableSection: fileNameVariableSection,
             templateCachePut: templateCachePut });
         fs.writeFileSync(dest, fileContent);
     }

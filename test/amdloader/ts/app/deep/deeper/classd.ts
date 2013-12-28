@@ -2,6 +2,6 @@
 class ClassD extends ClassC {
     constructor() {
         super(); 
-        console.log('class d'); 
+        console.log('class D');
     }
 }

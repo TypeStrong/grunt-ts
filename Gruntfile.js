@@ -73,13 +73,21 @@ module.exports = function (grunt) {
                 src: ['test/outdirtest/**/*.ts'],                                          
                 outDir: 'test/outdirtest/js',                
             },
+            amdloadersrc: {
+                src: ['test/amdloader/ts/app/**/*.ts'],
+                html: ['test/amdloader/ts/app/**/*.tpl.html'],
+                reference: 'test/amdloader/ts/app/reference.ts',
+                outDir: 'test/amdloader/js/app',
+                amdloader: 'test/amdloader/js/app/loader.js',
+              //  watch: 'test/amdloader/app'
+            },
             amdloadertest: {
-                src: ['test/amdloader/**/*.ts'],
-                html: ['test/amdloader/**/*.tpl.html'],                
-                reference: 'test/amdloader/ts/reference.ts',
-                outDir: 'test/amdloader/js',
-                amdloader: 'test/amdloader/js/loader.js',
-              //  watch: 'test/amdloader'
+                src: ['test/amdloader/ts/test/**/*.ts'],
+                html: ['test/amdloader/ts/test/**/*.tpl.html'],
+                reference: 'test/amdloader/ts/test/reference.ts',
+                outDir: 'test/amdloader/js/test',
+                amdloader: 'test/amdloader/js/test/loader.js',
+                //  watch: 'test/amdloader'
             },
             sourceroottest: {
                 src: ['test/sourceroot/src/**/*.ts'],
