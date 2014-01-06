@@ -48,11 +48,9 @@ var _ = require('underscore');
 var _str = require('underscore.string');
 var path = require('path');
 var fs = require('fs');
-var os = require('os');
 
 // plain vanilla imports
 var shell = require('shelljs');
-var eol = os.EOL;
 var pathSeperator = path.sep;
 
 var referenceFileLoopState;
@@ -81,6 +79,7 @@ function pluginFn(grunt) {
     function getTsc(binPath) {
         return '"' + binPath + '/' + 'tsc"';
     }
+    var eol = grunt.util.linefeed;
     var exec = shell.exec;
     var cwd = path.resolve(".");
     var tsc = getTsc(resolveTypeScriptBinPath(cwd, 0));
