@@ -112,10 +112,8 @@ import _ = require('underscore');
 import _str = require('underscore.string');
 import path = require('path');
 import fs = require('fs');
-import os = require('os');
 // plain vanilla imports
 var shell = require('shelljs');
-var eol = os.EOL;
 var pathSeperator = path.sep;
 
 enum referenceFileLoopState { before, unordered, after };
@@ -142,6 +140,7 @@ function pluginFn(grunt: IGrunt) {
     function getTsc(binPath: string): string {
         return '"' + binPath + '/' + 'tsc"';
     }
+    var eol = grunt.util.linefeed;
     var exec = shell.exec;
     var cwd = path.resolve(".");
     var tsc = getTsc(resolveTypeScriptBinPath(cwd, 0));
