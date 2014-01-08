@@ -3,6 +3,13 @@
 /// <reference path="../defs/underscore/underscore.d.ts"/>
 /// <reference path="../defs/underscore.string/underscore.string.d.ts"/>
 
+var ReferenceOrder;
+(function (ReferenceOrder) {
+    ReferenceOrder[ReferenceOrder["before"] = 0] = "before";
+    ReferenceOrder[ReferenceOrder["unordered"] = 1] = "unordered";
+    ReferenceOrder[ReferenceOrder["after"] = 2] = "after";
+})(ReferenceOrder || (ReferenceOrder = {}));
+
 
 /**
 * Returns the result of an array inserted into another, starting at the given index.
@@ -14,17 +21,13 @@ function insertArrayAt(array, index, arrayToInsert) {
     return updated;
 }
 
-// Useful string functions
-// used to make sure string ends with a slash
+/**
+* Compares the end of the string with the given suffix for literal equality.
+*
+* @returns {boolean} whether the string ends with the suffix literally.
+*/
 function endsWith(str, suffix) {
     return str.indexOf(suffix, str.length - suffix.length) !== -1;
-}
-;
-function endWithSlash(path) {
-    if (!endsWith(path, '/') && !endsWith(path, '\\')) {
-        return path + '/';
-    }
-    return path;
 }
 
 /**
@@ -52,14 +55,6 @@ var fs = require('fs');
 // plain vanilla imports
 var shell = require('shelljs');
 var pathSeperator = path.sep;
-
-var referenceFileLoopState;
-(function (referenceFileLoopState) {
-    referenceFileLoopState[referenceFileLoopState["before"] = 0] = "before";
-    referenceFileLoopState[referenceFileLoopState["unordered"] = 1] = "unordered";
-    referenceFileLoopState[referenceFileLoopState["after"] = 2] = "after";
-})(referenceFileLoopState || (referenceFileLoopState = {}));
-;
 
 function pluginFn(grunt) {
     /////////////////////////////////////////////////////////////////////
@@ -135,8 +130,7 @@ function pluginFn(grunt) {
         fs.writeFileSync(tempfilename, cmd);
         tscExecCommand = tscExecCommand + ' @' + tempfilename;
 
-        var result = exec(tscExecCommand);
-        return result;
+        return exec(tscExecCommand);
     }
 
     /////////////////////////////////////////////////////////////////////
@@ -154,7 +148,6 @@ function pluginFn(grunt) {
         var referenceMatch = /\/\/\/ <reference path=\"(.*?)\"/;
         var ourSignatureStart = '//grunt-start';
         var ourSignatureEnd = '//grunt-end';
-        var generatedSignature = "// generated";
 
         var lines = [];
         var origFileLines = [];
@@ -204,7 +197,7 @@ function pluginFn(grunt) {
 
         // Put in the generated files
         generatedFiles = _.map(generatedFiles, function (file) {
-            return referenceIntro + makeReferencePath(referencePath, file) + referenceEnd + generatedSignature;
+            return referenceIntro + makeReferencePath(referencePath, file) + referenceEnd;
         });
         var contents = insertArrayAt([ourSignatureStart], 1, generatedFiles);
 
@@ -247,7 +240,7 @@ function pluginFn(grunt) {
     // AMD Loader, creates a js file that loads a few files in order
     // and the rest un orderded, based on the reference.ts spec
     ////////////////////////////////////////////////////////////////////
-    function getReferencesInOrder(referenceFile, referencePath) {
+    function getReferencesInOrder(referenceFile, referencePath, generatedFiles) {
         var toreturn = {
             all: [],
             before: [],
@@ -255,6 +248,11 @@ function pluginFn(grunt) {
             unordered: [],
             after: []
         };
+
+        var sortedGeneratedFiles = _.sortBy(generatedFiles);
+        function isGeneratedFile(filename) {
+            return _.indexOf(sortedGeneratedFiles, filename, true) !== -1;
+        }
 
         // When reading
         var referenceMatch = /\/\/\/ <reference path=\"(.*?)\"/;
@@ -266,9 +264,6 @@ function pluginFn(grunt) {
         // The section of unordered files
         var ourSignatureStart = '//grunt-start';
         var ourSignatureEnd = '//grunt-end';
-
-        // The generated files. These must go on top
-        var generatedSignature = "// generated";
 
         var lines = fs.readFileSync(referenceFile).toString().split('\n');
 
@@ -295,7 +290,7 @@ function pluginFn(grunt) {
                         toreturn.before.push(filename);
                         break;
                     case 1 /* unordered */:
-                        if (endsWith(line, generatedSignature)) {
+                        if (isGeneratedFile(filename)) {
                             toreturn.generated.push(filename);
                         } else {
                             toreturn.unordered.push(filename);
@@ -309,17 +304,17 @@ function pluginFn(grunt) {
         }
 
         // Fix the references to be absolute:
-        toreturn.before = _.map(toreturn.before, function (relativepath) {
-            return path.resolve(referencePath, relativepath);
+        toreturn.before = _.map(toreturn.before, function (relativePath) {
+            return path.resolve(referencePath, relativePath);
         });
-        toreturn.generated = _.map(toreturn.generated, function (relativepath) {
-            return path.resolve(referencePath, relativepath);
+        toreturn.generated = _.map(toreturn.generated, function (relativePath) {
+            return path.resolve(referencePath, relativePath);
         });
-        toreturn.unordered = _.map(toreturn.unordered, function (relativepath) {
-            return path.resolve(referencePath, relativepath);
+        toreturn.unordered = _.map(toreturn.unordered, function (relativePath) {
+            return path.resolve(referencePath, relativePath);
         });
-        toreturn.after = _.map(toreturn.after, function (relativepath) {
-            return path.resolve(referencePath, relativepath);
+        toreturn.after = _.map(toreturn.after, function (relativePath) {
+            return path.resolve(referencePath, relativePath);
         });
         toreturn.all = Array.prototype.concat.call([], toreturn.before, toreturn.generated, toreturn.unordered, toreturn.after);
 
@@ -356,11 +351,10 @@ function pluginFn(grunt) {
     }
 
     // It updates based on the order of reference files
-    function updateAmdLoader(referenceFile, referencePath, loaderFile, loaderPath, outDir) {
+    function updateAmdLoader(referenceFile, files, loaderFile, loaderPath, outDir) {
         // Read the original file if it exists
         if (fs.existsSync(referenceFile)) {
             grunt.log.verbose.writeln('Generating amdloader from reference file ' + referenceFile);
-            var files = getReferencesInOrder(referenceFile, referencePath);
 
             // Filter.d.ts,
             if (files.all.length > 0) {
@@ -446,9 +440,6 @@ function pluginFn(grunt) {
                 // The order in the before and after files is important
                 var singleRequireTemplate = _.template('\t require([<%= filename %>],function (){' + eol + '<%= subitem %>' + eol + '\t });');
 
-                // The final body of the function
-                var body = '';
-
                 // initial sub item
                 var subitem = '';
 
@@ -492,8 +483,7 @@ function pluginFn(grunt) {
                 });
 
                 // The last subitem is now the body
-                body = subitem;
-                var output = mainTemplate({ body: body });
+                var output = mainTemplate({ body: subitem });
 
                 // Finally write it out
                 fs.writeFileSync(loaderFile, output);
@@ -783,7 +773,8 @@ function pluginFn(grunt) {
 
                         // Create the loader if specified & compiliation succeeded
                         if (success && !!amdloaderPath) {
-                            updateAmdLoader(referenceFile, referencePath, amdloaderFile, amdloaderPath, target.outDir);
+                            var referenceOrder = getReferencesInOrder(referenceFile, referencePath, generatedHtmlFiles);
+                            updateAmdLoader(referenceFile, referenceOrder, amdloaderFile, amdloaderPath, target.outDir);
                         }
                     } else {
                         grunt.log.writeln('No files to compile'.red);
