@@ -1,7 +1,7 @@
 /// <reference path="classt.ts" />
 
 //grunt-start
-/// <reference path="partials/test.tpl.html.ts" />
+/// <reference path="partials/templates.b.html.ts" />
 /// <reference path="deep/classu.ts" />
 /// <reference path="deep/classv.ts" />
 /// <reference path="extendedAppCode.ts" />

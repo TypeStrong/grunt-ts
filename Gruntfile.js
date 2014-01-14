@@ -33,13 +33,28 @@ module.exports = function (grunt) {
                 reference: 'test/abtest/reference.ts',
                 out: 'test/abtest/out.js',                
             },
+            amdloadersrc: {
+                src: ['test/amdloader/ts/app/**/*.ts'],
+                html: ['test/amdloader/ts/app/**/*.html'],
+                reference: 'test/amdloader/ts/app/reference.ts',
+                outDir: 'test/amdloader/js/app',
+                amdloader: 'test/amdloader/js/app/loader.js',
+                //  watch: 'test/amdloader/app'
+            },
+            amdloadertest: {
+                src: ['test/amdloader/ts/test/**/*.ts'],
+                html: ['test/amdloader/ts/test/**/*.html'],
+                reference: 'test/amdloader/ts/test/reference.ts',
+                outDir: 'test/amdloader/js/test',
+                amdloader: 'test/amdloader/js/test/loader.js',
+            },
             amdtest: {
                 src: ['test/amdtest/**/*.ts'],                
                 options: {
                     module: 'amd'
                 }
             },
-            bothcomments: {
+            warnbothcomments: {
                 src: ['test/abtest/**/*.ts'],
                 reference: 'test/abtest/reference.ts',
                 out: 'test/abtest/out.js',
@@ -72,22 +87,6 @@ module.exports = function (grunt) {
             outdirtest:{
                 src: ['test/outdirtest/**/*.ts'],                                          
                 outDir: 'test/outdirtest/js',                
-            },
-            amdloadersrc: {
-                src: ['test/amdloader/ts/app/**/*.ts'],
-                html: ['test/amdloader/ts/app/**/*.tpl.html'],
-                reference: 'test/amdloader/ts/app/reference.ts',
-                outDir: 'test/amdloader/js/app',
-                amdloader: 'test/amdloader/js/app/loader.js',
-              //  watch: 'test/amdloader/app'
-            },
-            amdloadertest: {
-                src: ['test/amdloader/ts/test/**/*.ts'],
-                html: ['test/amdloader/ts/test/**/*.tpl.html'],
-                reference: 'test/amdloader/ts/test/reference.ts',
-                outDir: 'test/amdloader/js/test',
-                amdloader: 'test/amdloader/js/test/loader.js',
-                //  watch: 'test/amdloader'
             },
             sourceroottest: {
                 src: ['test/sourceroot/src/**/*.ts'],
@@ -126,7 +125,7 @@ module.exports = function (grunt) {
     //grunt.loadNpmTasks("grunt-ts")
 
     grunt.loadNpmTasks("grunt-contrib-clean");    
-    
+
     grunt.registerTask("test", ["clean", "ts:htmltest"]);
     grunt.registerTask("test", ["clean", "ts:htmltest", "ts:definitelyTypedTest"]);
     grunt.registerTask("default", ["test"]);

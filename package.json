@@ -19,21 +19,21 @@
     ],
     "main": "grunt.js",
     "maintainers": [
-		{
-			"name": "basarat",
-			"email": "basaratali@gmail.com"
-		},
-		{
-			"name": "jeffmay",
-			"email": "viralidealogue@gmail.com"
-		}
-	],
+        {
+            "name": "basarat",
+            "email": "basaratali@gmail.com"
+        },
+        {
+            "name": "jeffmay",
+            "email": "viralidealogue@gmail.com"
+        }
+	  ],
     "engines": {
         "node": ">= 0.8.0"
     },
     "dependencies": {
         "typescript": "0.9.5",
-	    "chokidar": "0.6.2",
+	      "chokidar": "0.6.2",
         "shelljs": "0.1.4",		
         "underscore": "1.5.1",
         "underscore.string": "2.3.3"

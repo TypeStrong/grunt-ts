@@ -5,4 +5,4 @@ class ClassB extends ClassA {
         console.log('class B');
     }
 }
-console.log('reading html:', test.tpl.html);
+console.log('reading html:', templates.a.html);
