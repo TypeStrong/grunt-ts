@@ -619,7 +619,6 @@ function pluginFn(grunt: IGrunt) {
 
 
         var templateCacheTemplate = _.template('// You must have requirejs + text plugin loaded for this to work.'
-            + eol + 'var define;'
             + eol + 'define([<%=relativePathSection%>],function(<%=fileNameVariableSection%>){'
             + eol + 'angular.module("ng").run(["$templateCache",function($templateCache) {'
             + eol + '<%=templateCachePut%>'

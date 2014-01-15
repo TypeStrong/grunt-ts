@@ -553,7 +553,7 @@ function pluginFn(grunt) {
         };
         var fileVariableNames = _.map(fileNames, fileVarialbeName);
 
-        var templateCacheTemplate = _.template('// You must have requirejs + text plugin loaded for this to work.' + eol + 'var define;' + eol + 'define([<%=relativePathSection%>],function(<%=fileNameVariableSection%>){' + eol + 'angular.module("ng").run(["$templateCache",function($templateCache) {' + eol + '<%=templateCachePut%>' + eol + '}]);' + eol + '});');
+        var templateCacheTemplate = _.template('// You must have requirejs + text plugin loaded for this to work.' + eol + 'define([<%=relativePathSection%>],function(<%=fileNameVariableSection%>){' + eol + 'angular.module("ng").run(["$templateCache",function($templateCache) {' + eol + '<%=templateCachePut%>' + eol + '}]);' + eol + '});');
 
         var relativePathSection = '"' + relativePaths.join('",' + eol + '"') + '"';
         var fileNameVariableSection = fileVariableNames.join(',' + eol);
