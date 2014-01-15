@@ -125,8 +125,8 @@ function pluginFn(grunt) {
 
         // Create a temp last command file and use that to guide tsc.
         // Reason: passing all the files on the command line causes TSC to go in an infinite loop.
-        var tscExecCommand = 'node ' + tsc + ' @' + tempfilename;
         var tempfilename = 'tscommand.tmp.txt';
+        var tscExecCommand = 'node ' + tsc + ' @' + tempfilename;
         fs.writeFileSync(tempfilename, cmd);
 
         return exec(tscExecCommand);
