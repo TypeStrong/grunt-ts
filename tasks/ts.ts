@@ -192,20 +192,19 @@ function pluginFn(grunt: IGrunt) {
             cmd = cmd + ' --mapRoot ' + task.mapRoot;
         }
 
-        var tscExecCommand = 'node ' + tsc + ' ' + cmd;
-
         // To debug the tsc command
         if (task.verbose) {
-            console.log(tscExecCommand.yellow);
+            console.log(cmd.yellow);
         }
         else {
             grunt.log.verbose.writeln(cmd.yellow);
         }
 
-        // Create a temp last command file
+        // Create a temp last command file and use that to guide tsc. 
+        // Reason: passing all the files on the command line causes TSC to go in an infinite loop.
+        var tscExecCommand = 'node ' + tsc + ' @' + tempfilename;
         var tempfilename = 'tscommand.tmp.txt';
         fs.writeFileSync(tempfilename, cmd);
-        tscExecCommand = tscExecCommand + ' @' + tempfilename;
 
         return exec(tscExecCommand);
     }
