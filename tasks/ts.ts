@@ -119,6 +119,42 @@ function timeIt<R>(makeIt: () => R): {
     };
 }
 
+/**
+ * Get a random hex value
+ *
+ * @returns {string} hex string
+ */
+function getRandomHex(length: number = 16): string {
+    var name:string = '';
+    do {
+        name += Math.round(Math.random() * Math.pow(16, 8)).toString(16);
+    }
+    while (name.length < length);
+
+    return name.substr(0, length);
+}
+/**
+ * Get a unique temp file
+ *
+ * @returns {string} unique-ish path to file in given directory.
+ */
+function getTempFile(prefix?: string, dir: string = ''): string {
+    prefix = (prefix ? prefix + '-' : '');
+    var attempts = 100;
+    do {
+        var name:string = prefix + getRandomHex(8) + '.tmp.txt';
+        var dest:string = path.join(dir, name);
+
+        if (!fs.existsSync(dest)) {
+            return dest;
+        }
+        attempts--;
+    }
+    while (attempts > 0);
+
+    return null;
+}
+
 // Typescript imports
 import _ = require('underscore');
 import _str = require('underscore.string');
@@ -202,11 +238,20 @@ function pluginFn(grunt: IGrunt) {
 
         // Create a temp last command file and use that to guide tsc. 
         // Reason: passing all the files on the command line causes TSC to go in an infinite loop.
-        var tempfilename = 'tscommand.tmp.txt';
+        var tempfilename = getTempFile('tscommand');
+        if (!tempfilename) {
+            return null;
+        }
+
         var tscExecCommand = 'node ' + tsc + ' @' + tempfilename;
         fs.writeFileSync(tempfilename, cmd);
 
-        return exec(tscExecCommand);
+        var result = exec(tscExecCommand);
+
+        // Cleanup
+        fs.unlinkSync(tempfilename);
+
+        return result;
     }
 
     /////////////////////////////////////////////////////////////////////
@@ -771,8 +816,8 @@ function pluginFn(grunt: IGrunt) {
                 endtime = new Date().getTime();
 
                 // Evaluate the result
-                if (result.code != 0) {
-                    var msg = "Compilation failed"/*+result.output*/;
+                if (!result || result.code != 0) {
+                    var msg = "Compilation failed";
                     grunt.log.error(msg.red);
                     return false;
                 }
