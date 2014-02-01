@@ -46,6 +46,44 @@ function timeIt(makeIt) {
     };
 }
 
+/**
+* Get a random hex value
+*
+* @returns {string} hex string
+*/
+function getRandomHex(length) {
+    if (typeof length === "undefined") { length = 16; }
+    var name = '';
+    do {
+        name += Math.round(Math.random() * Math.pow(16, 8)).toString(16);
+    } while(name.length < length);
+
+    return name.substr(0, length);
+}
+
+/**
+* Get a unique temp file
+*
+* @returns {string} unique-ish path to file in given directory.
+* @throws when it cannot create a temp file in the specified directory
+*/
+function getTempFile(prefix, dir) {
+    if (typeof dir === "undefined") { dir = ''; }
+    prefix = (prefix ? prefix + '-' : '');
+    var attempts = 100;
+    do {
+        var name = prefix + getRandomHex(8) + '.tmp.txt';
+        var dest = path.join(dir, name);
+
+        if (!fs.existsSync(dest)) {
+            return dest;
+        }
+        attempts--;
+    } while(attempts > 0);
+
+    throw 'Cannot create temp file in ' + dir;
+}
+
 // Typescript imports
 var _ = require('underscore');
 var _str = require('underscore.string');
@@ -75,7 +113,6 @@ function pluginFn(grunt) {
         return '"' + binPath + '/' + 'tsc"';
     }
     var eol = grunt.util.linefeed;
-    var exec = shell.exec;
     var cwd = path.resolve(".");
     var tsc = getTsc(resolveTypeScriptBinPath(cwd, 0));
 
@@ -125,11 +162,20 @@ function pluginFn(grunt) {
 
         // Create a temp last command file and use that to guide tsc.
         // Reason: passing all the files on the command line causes TSC to go in an infinite loop.
-        var tempfilename = 'tscommand.tmp.txt';
+        var tempfilename = getTempFile('tscommand');
+        if (!tempfilename) {
+            return null;
+        }
+
         var tscExecCommand = 'node ' + tsc + ' @' + tempfilename;
         fs.writeFileSync(tempfilename, cmd);
 
-        return exec(tscExecCommand);
+        var result = shell.exec(tscExecCommand);
+
+        // Cleanup
+        fs.unlinkSync(tempfilename);
+
+        return result;
     }
 
     /////////////////////////////////////////////////////////////////////
@@ -697,7 +743,7 @@ function pluginFn(grunt) {
                 endtime = new Date().getTime();
 
                 // Evaluate the result
-                if (result.code != 0) {
+                if (!result || result.code != 0) {
                     var msg = "Compilation failed";
                     grunt.log.error(msg.red);
                     return false;
