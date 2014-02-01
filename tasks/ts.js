@@ -65,6 +65,7 @@ function getRandomHex(length) {
 * Get a unique temp file
 *
 * @returns {string} unique-ish path to file in given directory.
+* @throws when it cannot create a temp file in the specified directory
 */
 function getTempFile(prefix, dir) {
     if (typeof dir === "undefined") { dir = ''; }
@@ -80,7 +81,7 @@ function getTempFile(prefix, dir) {
         attempts--;
     } while(attempts > 0);
 
-    return null;
+    throw 'Cannot create temp file in ' + dir;
 }
 
 // Typescript imports
@@ -112,7 +113,6 @@ function pluginFn(grunt) {
         return '"' + binPath + '/' + 'tsc"';
     }
     var eol = grunt.util.linefeed;
-    var exec = shell.exec;
     var cwd = path.resolve(".");
     var tsc = getTsc(resolveTypeScriptBinPath(cwd, 0));
 
@@ -170,7 +170,7 @@ function pluginFn(grunt) {
         var tscExecCommand = 'node ' + tsc + ' @' + tempfilename;
         fs.writeFileSync(tempfilename, cmd);
 
-        var result = exec(tscExecCommand);
+        var result = shell.exec(tscExecCommand);
 
         // Cleanup
         fs.unlinkSync(tempfilename);

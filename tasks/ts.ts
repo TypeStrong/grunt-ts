@@ -137,13 +137,14 @@ function getRandomHex(length: number = 16): string {
  * Get a unique temp file
  *
  * @returns {string} unique-ish path to file in given directory.
+ * @throws when it cannot create a temp file in the specified directory
  */
 function getTempFile(prefix?: string, dir: string = ''): string {
     prefix = (prefix ? prefix + '-' : '');
     var attempts = 100;
     do {
-        var name:string = prefix + getRandomHex(8) + '.tmp.txt';
-        var dest:string = path.join(dir, name);
+        var name: string = prefix + getRandomHex(8) + '.tmp.txt';
+        var dest: string = path.join(dir, name);
 
         if (!fs.existsSync(dest)) {
             return dest;
@@ -152,7 +153,7 @@ function getTempFile(prefix?: string, dir: string = ''): string {
     }
     while (attempts > 0);
 
-    return null;
+    throw 'Cannot create temp file in ' + dir
 }
 
 // Typescript imports
@@ -161,7 +162,7 @@ import _str = require('underscore.string');
 import path = require('path');
 import fs = require('fs');
 // plain vanilla imports
-var shell = require('shelljs');
+var shell: any = require('shelljs');
 var pathSeperator = path.sep;
 
 function pluginFn(grunt: IGrunt) {
@@ -187,7 +188,6 @@ function pluginFn(grunt: IGrunt) {
         return '"' + binPath + '/' + 'tsc"';
     }
     var eol = grunt.util.linefeed;
-    var exec = shell.exec;
     var cwd = path.resolve(".");
     var tsc = getTsc(resolveTypeScriptBinPath(cwd, 0));
 
@@ -236,7 +236,7 @@ function pluginFn(grunt: IGrunt) {
             grunt.log.verbose.writeln(cmd.yellow);
         }
 
-        // Create a temp last command file and use that to guide tsc. 
+        // Create a temp last command file and use that to guide tsc.
         // Reason: passing all the files on the command line causes TSC to go in an infinite loop.
         var tempfilename = getTempFile('tscommand');
         if (!tempfilename) {
@@ -246,7 +246,7 @@ function pluginFn(grunt: IGrunt) {
         var tscExecCommand = 'node ' + tsc + ' @' + tempfilename;
         fs.writeFileSync(tempfilename, cmd);
 
-        var result = exec(tscExecCommand);
+        var result = shell.exec(tscExecCommand);
 
         // Cleanup
         fs.unlinkSync(tempfilename);
