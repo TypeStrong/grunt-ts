@@ -26,7 +26,7 @@ interface ITargetOptions {
         dest: string;
         baseUrl: string;
     }
-    shebang:string;
+    shebang:string; // if specified adds the shebang string to the specified js file
 }
 
 interface IReferences {
