@@ -1,7 +1,7 @@
 {
     "author": "basarat",
     "name": "grunt-ts",
-    "description": "Compile and manage your TypeScript project",    
+    "description": "Compile and manage your TypeScript project",
     "version": "1.6.4",
     "homepage": "https://github.com/basarat/grunt-ts",
     "repository": {
@@ -26,15 +26,22 @@
         {
             "name": "jeffmay",
             "email": "viralidealogue@gmail.com"
+        },
+        {
+            "name": "bartvds",
+            "email": "bartvanderschoor@gmail.com"
         }
-	  ],
+    ],
     "engines": {
         "node": ">= 0.8.0"
     },
+    "scripts": {
+        "test": "grunt test"
+    },
     "dependencies": {
         "typescript": "0.9.5",
-	      "chokidar": "0.6.2",
-        "shelljs": "0.1.4",		
+        "chokidar": "0.6.2",
+        "shelljs": "0.1.4",
         "underscore": "1.5.1",
         "underscore.string": "2.3.3"
     },
@@ -45,7 +52,11 @@
         "grunt": "~0.4.0",
         "grunt-contrib-clean": "~0.4.0",
         "grunt-contrib-watch": "~0.5.1",
-        "grunt-contrib-nodeunit": "~0.1.2"
+        "grunt-contrib-nodeunit": "~0.1.2",
+        "grunt-shell": "~0.6.4",
+        "grunt-tslint": "~0.4.0",
+        "tslint-path-formatter": "~0.1.1",
+        "source-map-support": "~0.2.5"
     },
     "optionalDependencies": {},
     "keywords": [
