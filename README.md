@@ -1,5 +1,7 @@
-grunt-ts
-================
+# grunt-ts
+
+[![Build Status](https://secure.travis-ci.org/basarat/grunt-ts.png?branch=master)](http://travis-ci.org/basarat/grunt-ts) [![NPM version](https://badge.fury.io/js/grunt-ts.png)](http://badge.fury.io/js/grunt-ts)
+
 Written from scratch TypeScript compiler task for GruntJS. 
 It differs from grunt-typescript which is another excellent [grunt plugin for typescript](https://npmjs.org/package/grunt-typescript).
 
@@ -15,10 +17,10 @@ Additional / longer / more basic video tutorial : http://youtu.be/Km0DpfX5ZxM
 
 *If you know Grunt. Here is a quickstart full featured [Gruntfile](https://github.com/basarat/grunt-ts/blob/master/sample/Gruntfile.js)*
 
-Following are some key features: 
-======================
+## Following are some key features: 
 
-###Compiler support 
+### Compiler support 
+
 Supports the following compiler flags in both original format and camelCase (preferred):
 
     --allowBool                   Allow 'bool' as a synonym for 'boolean'.
@@ -38,12 +40,12 @@ javascript using `--outDir` flag.
 For file ordering look at Javascript Generation below. 
 
 
-###Reference file generation 
+### Reference file generation 
 Can generate a reference.ts file for you which contains a reference to all your ts files.
 This means you never need to cross reference files manually. Just reference `reference.ts` :) 
 
 
-####Javascript generation and ordering
+#### Javascript generation and ordering
 Also if you specify both an out js file via `out` && a reference file via `reference` 
 it uses the generated reference file to *order the code in the generated javascript*. 
 
@@ -70,11 +72,11 @@ exist originally, it is created for you.
 /// <reference path="main.ts" />
 ```
 
-####Javscript generation Redirect
+#### Javscript generation Redirect
 If you specify `outDir` all output javascript are redirected to this folder.
 This helps keep your source folder clean.
 
-####AMD / RequireJS support 
+#### AMD / RequireJS support 
 If you specify both `outDir` and `amdloader` option a Javascript requireJS loader file is created using the information
 available from `reference.ts`. The file consists of three sections. 
 * The initial ordered section. 
@@ -116,7 +118,7 @@ define(function (require) {
 });
 ```
 
-#####Advantage of using amdloader option
+##### Advantage of using amdloader option
 The following combination of circumstances are why you would use it instead of Compiler supported AMD. 
 
 * You want to use RequireJS since you prefer to debug "js" files instead of "ts" files. 
@@ -137,7 +139,7 @@ worrying about file paths when they are not relevant.
 PS: your individual file SourceMaps will continue to work. So now you can debug individual "JS" or "TS" files :)
 
 
-###Html 2 TypeScript support 
+### Html 2 TypeScript support 
 Can re-encode html files into typescript and makes them available as a variable. e.g.
 a file called `test.html` containing
 ```html
@@ -150,21 +152,20 @@ module test { export var html =  '<div> Some content </div>' }
 so that you can use use the variable `test.html` within your typescript to get the content of test.html 
 as a string. The motivation is to remove http requests to load templates in various front end frameworks.
 
-####Html 2 TypeScript usage in AngularJS 
+#### Html 2 TypeScript usage in AngularJS 
 This is great for putting variables in templateCache : http://docs.angularjs.org/api/ng.$templateCache 
 or even using the html string directly by setting it to the `template` properties (directives/views) instead of `templateUrl`
 
-####Html 2 TypeScript usage in EmberJS
+#### Html 2 TypeScript usage in EmberJS
 You can specify this string to the template on a view : http://emberjs.com/api/classes/Ember.View.html 
 Specifically: http://stackoverflow.com/a/9867375/390330
 
-###Live file watching and building
+### Live file watching and building
 Can watch a directory for you and recompile your typescript files when any typescript file changes, gets added, gets removed. 
 This makes sure your project is always build ready :) 
 
 
-npm install
-======================
+## npm install
 
 The npm package is available here : https://npmjs.org/package/grunt-ts
 
