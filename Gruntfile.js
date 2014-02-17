@@ -144,7 +144,6 @@ module.exports = function (grunt) {
 
     grunt.loadNpmTasks("grunt-contrib-clean");
     grunt.loadNpmTasks("grunt-tslint");
-    grunt.loadNpmTasks("grunt-continue");
     grunt.loadNpmTasks("grunt-shell");
 
     grunt.registerTask("build", ["clean", "shell:build", "tslint:source"]);
