@@ -9,7 +9,25 @@ module.exports = function (grunt) {
                 "test/**/*.html.ts",
             ]
         },
-
+        shell: {
+            build: {
+                command: 'tsc "./tasks/ts.ts" --sourcemap --module commonjs',
+                options: {
+                    failOnError: true,
+                    stderr: true,
+                    stdout: true
+                }
+            }
+        },
+        tslint: {
+            source: {
+                options: {
+                    configuration: grunt.file.readJSON('tslint.json'),
+                    formatter: 'tslint-path-formatter'
+                },
+                src: ['tasks/**/*.ts']
+            }
+        },
         ts: {
             options: {
                 target: 'es3',            // 'es3' (default) | 'es5'
@@ -31,7 +49,7 @@ module.exports = function (grunt) {
             abtest: {
                 src: ['test/abtest/**/*.ts'],
                 reference: 'test/abtest/reference.ts',
-                out: 'test/abtest/out.js',                
+                out: 'test/abtest/out.js',
             },
             amdloadersrc: {
                 src: ['test/amdloader/ts/app/**/*.ts'],
@@ -49,7 +67,7 @@ module.exports = function (grunt) {
                 amdloader: 'test/amdloader/js/test/loader.js',
             },
             amdtest: {
-                src: ['test/amdtest/**/*.ts'],                
+                src: ['test/amdtest/**/*.ts'],
                 options: {
                     module: 'amd'
                 }
@@ -65,10 +83,10 @@ module.exports = function (grunt) {
                 },
             },
             htmltest: {
-                src: ['test/html/**/*.ts'],                            
-                html: ['test/html/**/*.tpl.html'],    
+                src: ['test/html/**/*.ts'],
+                html: ['test/html/**/*.tpl.html'],
                 reference: 'test/html/reference.ts',
-                out: 'test/html/out.js',                
+                out: 'test/html/out.js',
             },
             definitelyTypedTest: {
                 src: ['test/definitelytypedtest/**/*.ts'],
@@ -84,9 +102,9 @@ module.exports = function (grunt) {
                     compile: false,
                 }
             },
-            outdirtest:{
-                src: ['test/outdirtest/**/*.ts'],                                          
-                outDir: 'test/outdirtest/js',                
+            outdirtest: {
+                src: ['test/outdirtest/**/*.ts'],
+                outDir: 'test/outdirtest/js',
             },
             sourceroottest: {
                 src: ['test/sourceroot/src/**/*.ts'],
@@ -99,12 +117,12 @@ module.exports = function (grunt) {
                 },
             },
             templatecache: {
-                src: ['test/templatecache/**/*.ts'],         
-                reference: 'test/templatecache/ts/reference.ts',                
-                amdloader: 'test/templatecache/js/loader.js',                
+                src: ['test/templatecache/**/*.ts'],
+                reference: 'test/templatecache/ts/reference.ts',
+                amdloader: 'test/templatecache/js/loader.js',
                 outDir: 'test/templatecache/js',
                 templateCache: {
-                    baseUrl : 'test/templatecache/js/',
+                    baseUrl: 'test/templatecache/js/',
                     src: ['test/templatecache/js/**/*.html'],
                     dest: 'test/templatecache/js/templateCache.js',
                 },
@@ -116,7 +134,7 @@ module.exports = function (grunt) {
                     sourcemap: false,
                 }
             },
-        },
+        }
     });
 
     // Loading it for testing since I have in a local "tasks" folder 
@@ -124,10 +142,13 @@ module.exports = function (grunt) {
     // in your configuration you would load this like: 
     //grunt.loadNpmTasks("grunt-ts")
 
-    grunt.loadNpmTasks("grunt-contrib-clean");    
+    grunt.loadNpmTasks("grunt-contrib-clean");
+    grunt.loadNpmTasks("grunt-tslint");
+    grunt.loadNpmTasks("grunt-continue");
+    grunt.loadNpmTasks("grunt-shell");
 
-    grunt.registerTask("test", ["clean", "ts:htmltest"]);
-    grunt.registerTask("test", ["clean", "ts:htmltest", "ts:definitelyTypedTest"]);
+    grunt.registerTask("build", ["clean", "shell:build", "tslint:source"]);
+    grunt.registerTask("test", ["build", "ts:htmltest", "ts:definitelyTypedTest"]);
     grunt.registerTask("default", ["test"]);
 
 };
