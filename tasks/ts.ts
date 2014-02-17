@@ -26,6 +26,7 @@ interface ITargetOptions {
         dest: string;
         baseUrl: string;
     }
+	shebang:string; // if specified adds the shebang string to the specified js file
 }
 
 interface IReferences {
@@ -899,10 +900,42 @@ function pluginFn(grunt: IGrunt) {
                         grunt.log.writeln('No files to compile'.red);
                     }
                 }
-            }
+				// Checks if shebang options was specified
+				// If specified then adds the shebang string to the
+				// first line of the file and saves it to disk
+				addSheBang( files );
+			}
 
-            // Initial compilation:
-            filterFilesAndCompile();
+			// Initial compilation:
+			filterFilesAndCompile();
+
+			// Checks if shebang options was specified
+			// If specified then adds the shebang string to the
+			// first line of the file and saves it to disk
+			function addSheBang( files ) {
+				if( target.shebang && typeof target.shebang=="string" && files.indexOf(target.shebang) ) {
+
+					// determine final .ts location
+					var file:string = target.outDir ?
+						target.outDir+'/'+path.basename( files[ files.indexOf(target.shebang) ]).replace('.ts','.js'):
+						target.out ? target.out:
+							files[ files.indexOf(target.shebang) ].replace('.ts','.js');
+
+					// checks if compiled js exist
+					if( fs.existsSync( file ) ) {
+						var contents:string = fs.readFileSync( file, { encoding:"utf8" } );
+						// Adds shebang tag as first line and splits
+						// the original file into lines cleaning CRLF
+						var lines:string[] = [ "#!/usr/bin/env node" ].concat( contents.split( /\r\n|[\n\v\f\r\x85\u2028\u2029]/ ) );
+
+						// Write file with *nix file endings
+						fs.writeFileSync( file, lines.join( '\n' ), { encoding:"utf8" } );
+						grunt.log.writeln( ( "Success: Added shebang string to file: "+file ).green );
+						return;
+					}
+					grunt.log.writeln( ("Unable to add shebang to file "+target.shebang).red );
+				}
+			}
 
 
             // Watch a folder? 
