@@ -2,14 +2,12 @@
 /// <reference path="../defs/grunt/gruntjs.d.ts"/>
 /// <reference path="../defs/underscore/underscore.d.ts"/>
 /// <reference path="../defs/underscore.string/underscore.string.d.ts"/>
-
 var ReferenceOrder;
 (function (ReferenceOrder) {
     ReferenceOrder[ReferenceOrder["before"] = 0] = "before";
     ReferenceOrder[ReferenceOrder["unordered"] = 1] = "unordered";
     ReferenceOrder[ReferenceOrder["after"] = 2] = "after";
 })(ReferenceOrder || (ReferenceOrder = {}));
-
 
 /**
 * Returns the result of an array inserted into another, starting at the given index.
@@ -120,7 +118,6 @@ function pluginFn(grunt) {
     function compileAllFiles(files, target, task) {
         var cmd = files.join(' ');
 
-        // boolean options
         if (task.sourceMap)
             cmd = cmd + ' --sourcemap';
         if (task.declaration)
@@ -136,7 +133,6 @@ function pluginFn(grunt) {
         cmd = cmd + ' --target ' + task.target.toUpperCase();
         cmd = cmd + ' --module ' + task.module.toLowerCase();
 
-        // Target options:
         if (target.out) {
             cmd = cmd + ' --out ' + target.out;
         }
@@ -153,7 +149,6 @@ function pluginFn(grunt) {
             cmd = cmd + ' --mapRoot ' + task.mapRoot;
         }
 
-        // To debug the tsc command
         if (task.verbose) {
             console.log(cmd.yellow);
         } else {
@@ -202,7 +197,6 @@ function pluginFn(grunt) {
         // By default at start of file
         var signatureSectionPosition = 0;
 
-        // Read the original file if it exists
         if (fs.existsSync(referenceFile)) {
             lines = fs.readFileSync(referenceFile).toString().split('\n');
 
@@ -214,7 +208,6 @@ function pluginFn(grunt) {
             for (var i = 0; i < lines.length; i++) {
                 var line = _str.trim(lines[i]);
 
-                // Skip logic for our generated section
                 if (_str.include(line, ourSignatureStart)) {
                     //Wait for the end signature:
                     signatureSectionPosition = i;
@@ -231,7 +224,6 @@ function pluginFn(grunt) {
                 // store the line
                 origFileLines.push(line);
 
-                // Fetch the existing reference's filename if any:
                 if (_str.include(line, referenceIntro)) {
                     var match = line.match(referenceMatch);
                     var filename = match[1];
@@ -251,7 +243,6 @@ function pluginFn(grunt) {
             // The file we are about to add
             var filepath = makeReferencePath(referencePath, filename);
 
-            // If there are orig references
             if (origFileReferences.length) {
                 if (_.contains(origFileReferences, filepath)) {
                     return;
@@ -267,7 +258,6 @@ function pluginFn(grunt) {
         var updatedFileLines = insertArrayAt(origFileLines, signatureSectionPosition, contents);
         fs.writeFileSync(referenceFile, updatedFileLines.join(eol));
 
-        // Return whether the file was changed
         if (lines.length == updatedFileLines.length) {
             var updated = false;
             for (var i = 0; i < lines.length; i++) {
@@ -313,35 +303,34 @@ function pluginFn(grunt) {
         var lines = fs.readFileSync(referenceFile).toString().split('\n');
 
         // Which of the three sections we are in
-        var loopState = 0 /* before */;
+        var loopState = ReferenceOrder.before;
 
         for (var i = 0; i < lines.length; i++) {
             var line = _str.trim(lines[i]);
 
             if (_str.include(line, ourSignatureStart)) {
                 //Wait for the end signature:
-                loopState = 1 /* unordered */;
+                loopState = ReferenceOrder.unordered;
             }
             if (_str.include(line, ourSignatureEnd)) {
-                loopState = 2 /* after */;
+                loopState = ReferenceOrder.after;
             }
 
-            // Fetch the existing reference's filename if any:
             if (_str.include(line, referenceIntro)) {
                 var match = line.match(referenceMatch);
                 var filename = match[1];
                 switch (loopState) {
-                    case 0 /* before */:
+                    case ReferenceOrder.before:
                         toreturn.before.push(filename);
                         break;
-                    case 1 /* unordered */:
+                    case ReferenceOrder.unordered:
                         if (isGeneratedFile(filename)) {
                             toreturn.generated.push(filename);
                         } else {
                             toreturn.unordered.push(filename);
                         }
                         break;
-                    case 2 /* after */:
+                    case ReferenceOrder.after:
                         toreturn.after.push(filename);
                         break;
                 }
@@ -374,7 +363,7 @@ function pluginFn(grunt) {
         var A = array.slice(0).sort(), firstWord = A[0], lastWord = A[A.length - 1];
         if (firstWord === lastWord)
             return firstWord;
-        else {
+else {
             var i = -1;
             do {
                 i += 1;
@@ -397,11 +386,9 @@ function pluginFn(grunt) {
 
     // It updates based on the order of reference files
     function updateAmdLoader(referenceFile, files, loaderFile, loaderPath, outDir) {
-        // Read the original file if it exists
         if (fs.existsSync(referenceFile)) {
             grunt.log.verbose.writeln('Generating amdloader from reference file ' + referenceFile);
 
-            // Filter.d.ts,
             if (files.all.length > 0) {
                 grunt.log.verbose.writeln('Files: ' + files.all.map(function (f) {
                     return f.cyan;
@@ -442,11 +429,6 @@ function pluginFn(grunt) {
                 }).join(', '));
             }
 
-            // If target has outDir we need to make adjust the path
-            // c:/somefolder/ts/a , c:/somefolder/ts/inside/b  + c:/somefolder/build/js => c:/somefolder/build/js/a , c:/somefolder/build/js/inside/b
-            // Logic:
-            //     find the common structure in the source files ,and remove it
-            //          Finally: outDir path + remainder section
             if (outDir) {
                 // Find common path
                 var commonPath = findCommonPath(files.before.concat(files.generated.concat(files.unordered.concat(files.after))));
@@ -504,13 +486,11 @@ function pluginFn(grunt) {
                 // Generate fileTemplate from inside out
                 // Start with after
                 // Build the subitem for ordered after items
-                files.after = files.after.reverse(); // Important to build inside out
+                files.after = files.after.reverse();
                 _.forEach(files.after, function (file) {
                     subitem = singleRequireTemplate({ filename: '"' + file + '"', subitem: subitem });
                 });
 
-                // Next up add the unordered items:
-                // For these we will use just one require call
                 if (files.unordered.length > 0) {
                     var unorderFileNames = files.unordered.join('",' + eol + '\t\t  "');
                     subitem = singleRequireTemplate({ filename: '"' + unorderFileNames + '"', subitem: subitem });
@@ -615,7 +595,8 @@ function pluginFn(grunt) {
         var fileContent = templateCacheTemplate({
             relativePathSection: relativePathSection,
             fileNameVariableSection: fileNameVariableSection,
-            templateCachePut: templateCachePut });
+            templateCachePut: templateCachePut
+        });
         fs.writeFileSync(dest, fileContent);
     }
 
@@ -650,7 +631,6 @@ function pluginFn(grunt) {
         options.allowImportModule = 'allowimportmodule' in options ? options['allowimportmodule'] : options.allowImportModule;
         options.sourceMap = 'sourcemap' in options ? options['sourcemap'] : options.sourceMap;
 
-        // Remove comments based on the removeComments flag first then based on the comments flag, otherwise true
         if (options.removeComments === null) {
             options.removeComments = !options.comments;
         } else if (options.comments !== null) {
@@ -725,8 +705,6 @@ function pluginFn(grunt) {
                 // The files to compile
                 var filesToCompile = files;
 
-                // If reference and out are both specified.
-                // Then only compile the udpated reference file as that contains the correct order
                 if (!!referencePath && target.out) {
                     filesToCompile = [referenceFile];
                 }
@@ -742,7 +720,6 @@ function pluginFn(grunt) {
                 // End the timer
                 endtime = new Date().getTime();
 
-                // Evaluate the result
                 if (!result || result.code != 0) {
                     var msg = "Compilation failed";
                     grunt.log.error(msg.red);
@@ -770,8 +747,6 @@ function pluginFn(grunt) {
                     });
                 }
 
-                // The template cache files do not go into generated files.
-                // You are free to generate a `ts OR js` file, both should just work
                 if (currenttask.data.templateCache) {
                     if (!currenttask.data.templateCache.src || !currenttask.data.templateCache.dest || !currenttask.data.templateCache.baseUrl) {
                         grunt.log.writeln('templateCache : src, dest, baseUrl must be specified if templateCache option is used'.red);
@@ -801,8 +776,6 @@ function pluginFn(grunt) {
                         return (!isReferenceFile(filename) && !isOutFile(filename));
                     });
 
-                    // Generate the reference file
-                    // Create a reference file if specified
                     if (!!referencePath) {
                         var result = timeIt(function () {
                             return updateReferenceFile(files, generatedHtmlFiles, referenceFile, referencePath);
@@ -812,11 +785,9 @@ function pluginFn(grunt) {
                         }
                     }
 
-                    // compile, If there are any files to compile!
                     if (files.length > 0) {
                         success = runCompilation(files, target, options);
 
-                        // Create the loader if specified & compiliation succeeded
                         if (success && !!amdloaderPath) {
                             var referenceOrder = getReferencesInOrder(referenceFile, referencePath, generatedHtmlFiles);
                             updateAmdLoader(referenceFile, referenceOrder, amdloaderFile, amdloaderPath, target.outDir);
@@ -825,10 +796,39 @@ function pluginFn(grunt) {
                         grunt.log.writeln('No files to compile'.red);
                     }
                 }
+
+                // Checks if shebang options was specified
+                // If specified then adds the shebang string to the
+                // first line of the file and saves it to disk
+                addSheBang(files);
             }
 
             // Initial compilation:
             filterFilesAndCompile();
+
+            // Checks if shebang options was specified
+            // If specified then adds the shebang string to the
+            // first line of the file and saves it to disk
+            function addSheBang(files) {
+                if (target.shebang && typeof target.shebang == "string" && files.indexOf(target.shebang)) {
+                    // determine final .ts location
+                    var file = target.outDir ? target.outDir + '/' + path.basename(files[files.indexOf(target.shebang)]).replace('.ts', '.js') : target.out ? target.out : files[files.indexOf(target.shebang)].replace('.ts', '.js');
+
+                    if (fs.existsSync(file)) {
+                        var contents = fs.readFileSync(file, { encoding: "utf8" });
+
+                        // Adds shebang tag as first line and splits
+                        // the original file into lines cleaning CRLF
+                        var lines = ["#!/usr/bin/env node"].concat(contents.split(/\r\n|[\n\v\f\r\x85\u2028\u2029]/));
+
+                        // Write file with *nix file endings
+                        fs.writeFileSync(file, lines.join('\n'), { encoding: "utf8" });
+                        grunt.log.writeln(("Success: Added shebang string to file: " + file).green);
+                        return;
+                    }
+                    grunt.log.writeln(("Unable to add shebang to file " + target.shebang).red);
+                }
+            }
 
             // Watch a folder?
             watch = target.watch;
@@ -841,12 +841,9 @@ function pluginFn(grunt) {
 
                 // local event to handle file event
                 function handleFileEvent(filepath, displaystr) {
-                    // Only ts and html :
                     if (!endsWith(filepath.toLowerCase(), '.ts') && !endsWith(filepath.toLowerCase(), '.html'))
                         return;
 
-                    // Do not run if just ran, behaviour same as grunt-watch
-                    // These are the files our run modified
                     if ((new Date().getTime() - endtime) <= 100) {
                         //grunt.log.writeln((' ///'  + ' >>' + filepath).grey);
                         return;
@@ -885,5 +882,6 @@ function pluginFn(grunt) {
         }
     });
 }
+
 module.exports = pluginFn;
-//# sourceMappingURL=ts.js.map
+
