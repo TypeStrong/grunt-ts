@@ -796,27 +796,39 @@ else {
                         grunt.log.writeln('No files to compile'.red);
                     }
                 }
+
+                // Checks if shebang options was specified
+                // If specified then adds the shebang string to the
+                // first line of the file and saves it to disk
+                addSheBang(files);
             }
 
             // Initial compilation:
             filterFilesAndCompile();
 
             // Checks if shebang options was specified
-            // If specified then adds the shebang string
-            // to the first line of the file and saves it
-            // to disk
-            function addSheBang() {
-                if (target.shebang && typeof target.shebang == "string") {
-                    if (fs.existsSync(target.shebang)) {
-                        fs.writeFileSync(target.shebang, "#!/usr/bin/env node\n\n" + fs.readFileSync(target.shebang, { encoding: "utf8" }), { encoding: "utf8" });
-                        grunt.log.writeln(("Success: Added shebang string to file:" + target.shebang).green);
+            // If specified then adds the shebang string to the
+            // first line of the file and saves it to disk
+            function addSheBang(files) {
+                if (target.shebang && typeof target.shebang == "string" && files.indexOf(target.shebang)) {
+                    // determine final .ts location
+                    var file = target.outDir ? target.outDir + '/' + path.basename(files[files.indexOf(target.shebang)]).replace('.ts', '.js') : target.out ? target.out : files[files.indexOf(target.shebang)].replace('.ts', '.js');
+
+                    if (fs.existsSync(file)) {
+                        var contents = fs.readFileSync(file, { encoding: "utf8" });
+
+                        // Adds shebang tag as first line and splits
+                        // the original file into lines cleaning CRLF
+                        var lines = ["#!/usr/bin/env node"].concat(contents.split(/\r\n|[\n\v\f\r\x85\u2028\u2029]/));
+
+                        // Write file with *nix file endings
+                        fs.writeFileSync(file, lines.join('\n'), { encoding: "utf8" });
+                        grunt.log.writeln(("Success: Added shebang string to file: " + file).green);
                         return;
                     }
                     grunt.log.writeln(("Unable to add shebang to file " + target.shebang).red);
                 }
             }
-
-            addSheBang();
 
             // Watch a folder?
             watch = target.watch;
@@ -873,4 +885,3 @@ else {
 
 module.exports = pluginFn;
 
-//# sourceMappingURL=ts.js.map
