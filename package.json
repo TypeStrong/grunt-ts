@@ -1,7 +1,7 @@
 {
     "author": "basarat",
     "name": "grunt-ts",
-    "description": "Compile and manage your TypeScript project",    
+    "description": "Compile and manage your TypeScript project",
     "version": "1.6.4",
     "homepage": "https://github.com/basarat/grunt-ts",
     "repository": {
@@ -34,7 +34,7 @@
     "dependencies": {
         "typescript": "0.9.5",
 	      "chokidar": "0.6.2",
-        "shelljs": "0.1.4",		
+        "shelljs": "0.1.4",
         "underscore": "1.5.1",
         "underscore.string": "2.3.3"
     },
