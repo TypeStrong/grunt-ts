@@ -2,22 +2,12 @@ module.exports = function (grunt) {
     "use strict";
 
     grunt.initConfig({
-
+        pkg: grunt.file.readJSON('package.json'),
         clean: {
             test: [
                 "test/**/*.js",
                 "test/**/*.html.ts",
             ]
-        },
-        shell: {
-            build: {
-                command: 'tsc "./tasks/ts.ts" --sourcemap --module commonjs',
-                options: {
-                    failOnError: true,
-                    stderr: true,
-                    stdout: true
-                }
-            }
         },
         tslint: {
             source: {
@@ -26,6 +16,18 @@ module.exports = function (grunt) {
                     formatter: 'tslint-path-formatter'
                 },
                 src: ['tasks/**/*.ts']
+            }
+        },
+        "ts-internal": {
+            options: {
+                module: 'commonjs',
+                comments: true,
+                sourcemap: true,
+                verbose: true
+            },
+            build: {
+                out: 'tasks/ts.js',
+                src: ['tasks/ts.ts']
             }
         },
         ts: {
@@ -137,6 +139,21 @@ module.exports = function (grunt) {
         }
     });
 
+    grunt.registerTask("upgrade", function () {
+        var next = grunt.file.read('./tasks/ts.js');
+
+        var pattern = 'grunt.registerMultiTask(\'ts\',';
+        var internal = 'grunt.registerMultiTask(\'ts-internal\',';
+
+        if (next.indexOf(pattern) < 0) {
+            grunt.fail.warn('can\'t find task declaration-pattern: ' + pattern);
+            return;
+        }
+        next = next.replace(pattern, internal);
+        next = '// v' + grunt.config.get('pkg.version') + ' ' + new Date().toISOString() + '\r\n' + next;
+        grunt.file.write('./tasks/ts-internal.js', next)
+    });
+
     // Loading it for testing since I have in a local "tasks" folder 
     grunt.loadTasks("tasks");
     // in your configuration you would load this like: 
@@ -144,9 +161,8 @@ module.exports = function (grunt) {
 
     grunt.loadNpmTasks("grunt-contrib-clean");
     grunt.loadNpmTasks("grunt-tslint");
-    grunt.loadNpmTasks("grunt-shell");
 
-    grunt.registerTask("build", ["clean", "shell:build", "tslint:source"]);
+    grunt.registerTask("build", ["clean", "ts-internal:build", "tslint:source"]);
     grunt.registerTask("test", ["build", "ts:htmltest", "ts:definitelyTypedTest"]);
     grunt.registerTask("default", ["test"]);
 

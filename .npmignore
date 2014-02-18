@@ -18,3 +18,5 @@ npm-debug.log
 /Gruntfile.js
 /build.bat
 /*.tgz
+
+/tasks/ts-internal.js
