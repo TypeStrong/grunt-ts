@@ -1,7 +1,4 @@
-/// <reference path="../defs/node/node.d.ts"/>
-/// <reference path="../defs/grunt/gruntjs.d.ts"/>
-/// <reference path="../defs/underscore/underscore.d.ts"/>
-/// <reference path="../defs/underscore.string/underscore.string.d.ts"/>
+/// <reference path="../defs/tsd.d.ts"/>
 
 /*
  * grunt-ts

@@ -1,0 +1,21 @@
+{
+  "version": "v4",
+  "repo": "borisyankov/DefinitelyTyped",
+  "ref": "master",
+  "path": "defs",
+  "bundle": "defs/tsd.d.ts",
+  "installed": {
+    "node/node.d.ts": {
+      "commit": "2aff984fa86634866f70278406714d9fd7b9572d"
+    },
+    "underscore.string/underscore.string.d.ts": {
+      "commit": "2aff984fa86634866f70278406714d9fd7b9572d"
+    },
+    "underscore/underscore.d.ts": {
+      "commit": "2aff984fa86634866f70278406714d9fd7b9572d"
+    },
+    "gruntjs/gruntjs.d.ts": {
+      "commit": "2aff984fa86634866f70278406714d9fd7b9572d"
+    }
+  }
+}
