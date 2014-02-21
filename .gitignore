@@ -2,6 +2,7 @@ node_modules
 npm-debug.log
 test/tmp
 /.idea
+/*.tgz
 *.iml
 tasks/*.js
 test/out.d.ts
@@ -13,7 +14,7 @@ test/**/*.html.ts
 test/html/reference.ts
 
 test/definitelytypedtest/reference.ts
-tscommand.tmp.txt
+/tscommand*.tmp.txt
 
 !.gitignore
 !tasks/ts.js

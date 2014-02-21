@@ -19,4 +19,6 @@ npm-debug.log
 /build.bat
 /*.tgz
 
+/tscommand*.tmp.txt
+
 /tasks/ts-internal.js
