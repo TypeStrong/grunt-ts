@@ -8,6 +8,8 @@ module.exports = function (grunt) {
                 'test/**/*.js',
                 'test/**/*.js.map',
                 'test/**/*.html.ts',
+                '!test/test.js',
+                '!test/expected/**/*'
             ]
         },
         jshint: {
@@ -38,6 +40,9 @@ module.exports = function (grunt) {
                 src: ['tasks/ts.ts']
             }
         },
+        nodeunit:{
+            tests:['test/test.js']
+        },
         ts: {
             options: {                  // override the main options, See : http://gruntjs.com/configuring-tasks#options
                 target: 'es3',            // 'es3' (default) | 'es5'
@@ -48,7 +53,7 @@ module.exports = function (grunt) {
                 comments: false,          // leave comments in compiled js code (true | false (default))
                 verbose: true             // print the tsc command (true | false (default))
             },
-            dev: {                          // a particular target   
+            work: {                         // a particular target                  
                 src: ['test/work/**/*.ts'], // The source typescript files, See : http://gruntjs.com/configuring-tasks#files                
                 out: 'test/work/out.js',    // If specified, generate an out.js file which is the merged js file                     
                 options: {                  // override the main options, See : http://gruntjs.com/configuring-tasks#options
@@ -198,12 +203,14 @@ module.exports = function (grunt) {
     //grunt.loadNpmTasks('grunt-ts')
 
     grunt.loadNpmTasks('grunt-contrib-clean');
-    grunt.loadNpmTasks('grunt-contrib-jshint');
+    grunt.loadNpmTasks('grunt-contrib-jshint');    
     grunt.loadNpmTasks('grunt-tslint');
+    grunt.loadNpmTasks('grunt-contrib-nodeunit');
 
     grunt.registerTask('prep', ['clean', 'jshint:support']);
     grunt.registerTask('build', ['prep', 'ts-internal:build', 'tslint:source']);
-    grunt.registerTask('test', ['test_all']);
+    grunt.registerTask('test', ['test_all','nodeunit']);
+    grunt.registerTask('prepush', ['build','test']);
     grunt.registerTask('default', ['test']);
 
     grunt.registerTask('run', ['ts:amdloadersrc']);

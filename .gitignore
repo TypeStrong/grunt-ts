@@ -19,3 +19,5 @@ test/definitelytypedtest/reference.ts
 !.gitignore
 !tasks/ts.js
 !tasks/ts-internal.js
+!test/expected/**/*.js
+!test/expected/**/*.map

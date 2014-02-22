@@ -53,6 +53,7 @@
         "grunt-tslint": "~0.4.0",
         "grunt-contrib-clean": "~0.4.0",
         "grunt-contrib-jshint": "~0.8.0",
+        "grunt-contrib-nodeunit": "~0.2.2",
         "tslint-path-formatter": "~0.1.1",
         "source-map-support": "~0.2.5",
         "jshint-path-reporter": "~0.1.3"
