@@ -277,6 +277,4 @@ We welcome new methods for writing automated tests that are a little less of a m
 
 ## License
 
-Copyright (c) 2013 by [@basarat](https://github.com/basarat).
-
 Licensed under the MIT License. 
