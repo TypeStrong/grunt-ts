@@ -16,6 +16,9 @@
     },
     "gruntjs/gruntjs.d.ts": {
       "commit": "2aff984fa86634866f70278406714d9fd7b9572d"
+    },
+    "es6-promises/es6-promises.d.ts": {
+      "commit": "62594ee84438dc6fb742f66e9e1c6f9f7fd29ec7"
     }
   }
 }

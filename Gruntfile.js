@@ -1,25 +1,35 @@
 module.exports = function (grunt) {
-    "use strict";
+    'use strict';
 
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
         clean: {
             test: [
-                "test/**/*.js",
-                "test/**/*.html.ts",
+                'test/**/*.js',
+                'test/**/*.js.map',
+                'test/**/*.html.ts',
+                '!test/test.js',
+                '!test/expected/**/*'
             ]
         },
+        jshint: {
+            options: grunt.util._.extend(grunt.file.readJSON('.jshintrc'), {
+                reporter: './node_modules/jshint-path-reporter'
+            }),
+            support: ['Gruntfile.js']
+        },
         tslint: {
+            options: {
+                configuration: grunt.file.readJSON('tslint.json'),
+                formatter: 'tslint-path-formatter'
+            },
             source: {
-                options: {
-                    configuration: grunt.file.readJSON('tslint.json'),
-                    formatter: 'tslint-path-formatter'
-                },
                 src: ['tasks/**/*.ts']
             }
         },
-        "ts-internal": {
+        'ts-internal': {
             options: {
+                target: 'es5',
                 module: 'commonjs',
                 comments: true,
                 sourcemap: true,
@@ -30,8 +40,11 @@ module.exports = function (grunt) {
                 src: ['tasks/ts.ts']
             }
         },
+        nodeunit:{
+            tests:['test/test.js']
+        },
         ts: {
-            options: {
+            options: {                  // override the main options, See : http://gruntjs.com/configuring-tasks#options
                 target: 'es3',            // 'es3' (default) | 'es5'
                 module: 'commonjs',       // use amd for asynchonous loading or commonjs  'amd' (default) | 'commonjs'
                 sourcemap: true,          // generate a source map file for each result js file (true (default) | false)
@@ -40,20 +53,31 @@ module.exports = function (grunt) {
                 comments: false,          // leave comments in compiled js code (true | false (default))
                 verbose: true             // print the tsc command (true | false (default))
             },
-            dev: {                          // a particular target   
-                src: ["test/work/**/*.ts"], // The source typescript files, See : http://gruntjs.com/configuring-tasks#files                
+            work: {                         // a particular target                  
+                src: ['test/work/**/*.ts'], // The source typescript files, See : http://gruntjs.com/configuring-tasks#files                
                 out: 'test/work/out.js',    // If specified, generate an out.js file which is the merged js file                     
                 options: {                  // override the main options, See : http://gruntjs.com/configuring-tasks#options
                     sourcemap: true,
                     declaration: true
                 },
             },
+            simple: {
+                test: true,
+                options: {
+                    sourcemap: true,
+                    declaration: true
+                },
+                src: ['test/simple/ts/zoo.ts'],
+                outDir: 'test/simple/js/',
+            },
             abtest: {
+                test: true,
                 src: ['test/abtest/**/*.ts'],
                 reference: 'test/abtest/reference.ts',
                 out: 'test/abtest/out.js',
             },
             amdloadersrc: {
+                test: true,
                 src: ['test/amdloader/ts/app/**/*.ts'],
                 html: ['test/amdloader/ts/app/**/*.html'],
                 reference: 'test/amdloader/ts/app/reference.ts',
@@ -62,6 +86,7 @@ module.exports = function (grunt) {
                 //  watch: 'test/amdloader/app'
             },
             amdloadertest: {
+                test: true,
                 src: ['test/amdloader/ts/test/**/*.ts'],
                 html: ['test/amdloader/ts/test/**/*.html'],
                 reference: 'test/amdloader/ts/test/reference.ts',
@@ -69,12 +94,14 @@ module.exports = function (grunt) {
                 amdloader: 'test/amdloader/js/test/loader.js',
             },
             amdtest: {
+                test: true,
                 src: ['test/amdtest/**/*.ts'],
                 options: {
                     module: 'amd'
                 }
             },
             warnbothcomments: {
+                test: true,
                 src: ['test/abtest/**/*.ts'],
                 reference: 'test/abtest/reference.ts',
                 out: 'test/abtest/out.js',
@@ -85,18 +112,21 @@ module.exports = function (grunt) {
                 },
             },
             htmltest: {
+                test: true,
                 src: ['test/html/**/*.ts'],
                 html: ['test/html/**/*.tpl.html'],
                 reference: 'test/html/reference.ts',
                 out: 'test/html/out.js',
             },
             definitelyTypedTest: {
+                test: true,
                 src: ['test/definitelytypedtest/**/*.ts'],
                 html: ['test/definitelytypedtest/**/*.tpl.html'],
                 reference: 'test/definitelytypedtest/reference.ts',
                 out: 'test/definitelytypedtest/out.js',
             },
             nocompile: {
+                test: true,
                 src: ['test/nocompile/**/*.ts'],
                 reference: 'test/nocompile/reference.ts',
                 out: 'test/nocompile/out.js',
@@ -105,10 +135,12 @@ module.exports = function (grunt) {
                 }
             },
             outdirtest: {
+                test: true,
                 src: ['test/outdirtest/**/*.ts'],
                 outDir: 'test/outdirtest/js',
             },
             sourceroottest: {
+                test: true,
                 src: ['test/sourceroot/src/**/*.ts'],
                 html: ['test/sourceroot/src/**/*.html'],
                 reference: 'test/sourceroot/src/reference.ts',
@@ -119,6 +151,7 @@ module.exports = function (grunt) {
                 },
             },
             templatecache: {
+                test: true,
                 src: ['test/templatecache/**/*.ts'],
                 reference: 'test/templatecache/ts/reference.ts',
                 amdloader: 'test/templatecache/js/loader.js',
@@ -130,7 +163,7 @@ module.exports = function (grunt) {
                 },
             },
             fail: {                        // a designed to fail target
-                src: ["test/fail/**/*.ts"],
+                src: ['test/fail/**/*.ts'],
 //                watch: 'test',
                 options: {                  // overide the main options for this target 
                     sourcemap: false,
@@ -139,7 +172,9 @@ module.exports = function (grunt) {
         }
     });
 
-    grunt.registerTask("upgrade", function () {
+    // Helper to upgrade internal compiler task (fresh dogfood)
+    // Only do this when stable!
+    grunt.registerTask('upgrade', function () {
         var next = grunt.file.read('./tasks/ts.js');
 
         var pattern = 'grunt.registerMultiTask(\'ts\',';
@@ -151,19 +186,34 @@ module.exports = function (grunt) {
         }
         next = next.replace(pattern, internal);
         next = '// v' + grunt.config.get('pkg.version') + ' ' + new Date().toISOString() + '\r\n' + next;
-        grunt.file.write('./tasks/ts-internal.js', next)
+        grunt.file.write('./tasks/ts-internal.js', next);
     });
 
-    // Loading it for testing since I have in a local "tasks" folder 
-    grunt.loadTasks("tasks");
+    // Collect test tasks
+    grunt.registerTask('test_all', grunt.util._.reduce(grunt.config.get('ts'), function (memo, task, name) {
+        if (task.test) {
+            memo.push('ts:' + name);
+        }
+        return memo;
+    }, []));
+
+    // Loading it for testing since we have in a local 'tasks' folder 
+    grunt.loadTasks('tasks');
     // in your configuration you would load this like: 
-    //grunt.loadNpmTasks("grunt-ts")
+    //grunt.loadNpmTasks('grunt-ts')
 
-    grunt.loadNpmTasks("grunt-contrib-clean");
-    grunt.loadNpmTasks("grunt-tslint");
+    grunt.loadNpmTasks('grunt-contrib-clean');
+    grunt.loadNpmTasks('grunt-contrib-jshint');    
+    grunt.loadNpmTasks('grunt-tslint');
+    grunt.loadNpmTasks('grunt-contrib-nodeunit');
 
-    grunt.registerTask("build", ["clean", "ts-internal:build", "tslint:source"]);
-    grunt.registerTask("test", ["build", "ts:htmltest", "ts:definitelyTypedTest"]);
-    grunt.registerTask("default", ["test"]);
+    grunt.registerTask('prep', ['clean', 'jshint:support']);
+    grunt.registerTask('build', ['prep', 'ts-internal:build', 'tslint:source']);
+    grunt.registerTask('test', ['test_all','nodeunit']);
+    grunt.registerTask('prepush', ['build','test']);
+    grunt.registerTask('default', ['test']);
+
+    grunt.registerTask('run', ['ts:amdloadersrc']);
+    grunt.registerTask('dev', ['ts:simple']);
 
 };

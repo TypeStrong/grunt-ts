@@ -5,7 +5,7 @@
         "comment-format": [true,
             "check-space"
         ],
-        "curly": false,
+        "curly": true,
         "eofline": true,
         "forin": true,
         "indent": [true, 4],
@@ -32,7 +32,11 @@
         "no-string-literal": false,
         "no-trailing-whitespace": true,
         "no-unreachable": true,
+        "no-unused-variable": true,
+        "no-use-before-declare": true,
         "one-line": [true,
+            "_check-catch",
+            "_check-else",
             "check-open-brace",
             "check-whitespace"
         ],
