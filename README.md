@@ -206,30 +206,45 @@ module.exports = function (grunt) {
 }
 ```
 
-Then add some configuration for the plugin:
+Add some configuration for the plugin:
 
 ```javascript
 grunt.initConfig({
     ...
     ts: {
-        dev: {                                 // a particular target
-            src: ["test/work/**/*.ts"],        // The source TypeScript files, http://gruntjs.com/configuring-tasks#files
-            html: ["test/work/**/*.tpl.html"], // The source html files, https://github.com/basarat/grunt-ts#html-2-typescript-support
-            reference: "./test/reference.ts",  // If specified, generate this file that to can use for reference management
-            out: 'test/out.js',                // If specified, generate an out.js file which is the merged js file
-            outDir: 'test/outputdirectory',    // If specified, the generate JavaScript files are placed here. Only works if out is not specified
-            watch: 'test',                     // If specified, watches this directory for changes, and re-runs the current target
-            options: {                         // use to override the default options, http://gruntjs.com/configuring-tasks#options
-                target: 'es3',                 // 'es3' (default) | 'es5'
-                module: 'commonjs',            // 'amd' (default) | 'commonjs'
-                sourceMap: true,               // true (default) | false
-                declaration: false,            // true | false (default)
-                removeComments: true           // true (default) | false
+		// A specific target
+        build: {
+			// The source TypeScript files, http://gruntjs.com/configuring-tasks#files
+			src: ["test/work/**/*.ts"],
+			// The source html files, https://github.com/basarat/grunt-ts#html-2-typescript-support   
+            html: ["test/work/**/*.tpl.html"], 
+			// If specified, generate this file that to can use for reference management
+			reference: "./test/reference.ts",  
+			// If specified, generate an out.js file which is the merged js file
+            out: 'test/out.js',
+			// If specified, the generate JavaScript files are placed here. Only works if out is not specified
+            outDir: 'test/outputdirectory',
+			// If specified, watches this directory for changes, and re-runs the current target
+            watch: 'test',                     
+			// Use to override the default options, http://gruntjs.com/configuring-tasks#options
+            options: {     
+				// 'es3' (default) | 'es5'
+                target: 'es3',
+				// 'amd' (default) | 'commonjs'    
+                module: 'commonjs',
+				// true (default) | false
+                sourceMap: true,
+				// true | false (default)
+                declaration: false,
+				// true (default) | false
+                removeComments: true
             },
         },
-        build: {                               // another target
+		// Another target
+        dist: {                               
             src: ["test/work/**/*.ts"],
-            options: {                         // override the main options for this target
+			// Override the main options for this target
+            options: {
                 sourceMap: false,
             }
         },
@@ -241,7 +256,7 @@ grunt.initConfig({
 It is recommended to add a default target to run in case no arguments to grunt are specified: 
 
 ```js
-grunt.registerTask("default", ["ts:dev"]);
+grunt.registerTask("default", ["ts:build"]);
 ```
 
 For an example of an up-to-date configuration look at the [sample gruntfile](https://github.com/basarat/grunt-ts/blob/master/sample/Gruntfile.js) 

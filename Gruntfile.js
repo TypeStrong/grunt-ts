@@ -44,19 +44,31 @@ module.exports = function (grunt) {
             tests:['test/test.js']
         },
         ts: {
-            options: {                  // override the main options, See : http://gruntjs.com/configuring-tasks#options
-                target: 'es3',            // 'es3' (default) | 'es5'
-                module: 'commonjs',       // use amd for asynchonous loading or commonjs  'amd' (default) | 'commonjs'
-                sourcemap: true,          // generate a source map file for each result js file (true (default) | false)
-                declaration: false,       // generate a declaration .d.ts file for each resulting js file (true | false  (default))
-                nolib: false,             // ??? (true | false (default))
-                comments: false,          // leave comments in compiled js code (true | false (default))
-                verbose: true             // print the tsc command (true | false (default))
+            // Set the default options, see : http://gruntjs.com/configuring-tasks#options
+            options: {
+                // 'es3' (default) | 'es5'
+                target: 'es3',
+                // Use amd for asynchonous loading or commonjs  'amd' (default) | 'commonjs'
+                module: 'commonjs',
+                // Generate a source map file for each result js file (true (default) | false)
+                sourcemap: true,
+                // Generate a declaration .d.ts file for each resulting js file (true | false  (default))
+                declaration: false,
+                // ??? (true | false (default))
+                nolib: false,
+                // Leave comments in compiled js code (true | false (default))
+                comments: false,
+                // Print the tsc command (true | false (default))
+                verbose: true
             },
-            work: {                         // a particular target                  
-                src: ['test/work/**/*.ts'], // The source typescript files, See : http://gruntjs.com/configuring-tasks#files                
-                out: 'test/work/out.js',    // If specified, generate an out.js file which is the merged js file                     
-                options: {                  // override the main options, See : http://gruntjs.com/configuring-tasks#options
+            // A specific target
+            work: {
+                // The source typescript files, see : http://gruntjs.com/configuring-tasks#files
+                src: ['test/work/**/*.ts'],
+                // If specified, generate an out.js file which is the merged js file
+                out: 'test/work/out.js',
+                // Override the default options, see : http://gruntjs.com/configuring-tasks#options
+                options: {
                     sourcemap: true,
                     declaration: true
                 },
@@ -203,7 +215,7 @@ module.exports = function (grunt) {
     //grunt.loadNpmTasks('grunt-ts')
 
     grunt.loadNpmTasks('grunt-contrib-clean');
-    grunt.loadNpmTasks('grunt-contrib-jshint');    
+    grunt.loadNpmTasks('grunt-contrib-jshint');
     grunt.loadNpmTasks('grunt-tslint');
     grunt.loadNpmTasks('grunt-contrib-nodeunit');
 
