@@ -12,6 +12,7 @@ npm-debug.log
 /tasks/scratch.*
 
 /tslint.json
+/tsd.json
 
 /.travis.yml
 /.jshintrc

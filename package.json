@@ -2,19 +2,19 @@
     "author": "basarat",
     "name": "grunt-ts",
     "description": "Compile and manage your TypeScript project",
-    "version": "1.6.4",
-    "homepage": "https://github.com/basarat/grunt-ts",
+    "version": "1.7.0",
+    "homepage": "https://github.com/grunt-ts/grunt-ts",
     "repository": {
         "type": "git",
-        "url": "git@github.com:basarat/grunt-ts.git"
+        "url": "git@github.com:grunt-ts/grunt-ts.git"
     },
     "bugs": {
-        "url": "https://github.com/basarat/grunt-ts/issues"
+        "url": "https://github.com/grunt-ts/grunt-ts/issues"
     },
     "licenses": [
         {
             "type": "MIT",
-            "url": "https://github.com/basarat/grunt-ts/blob/master/LICENSE"
+            "url": "https://github.com/grunt-ts/grunt-ts/blob/master/LICENSE"
         }
     ],
     "main": "grunt.js",
