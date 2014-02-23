@@ -1,20 +1,43 @@
 {
-	"curly": true,
-	"eqeqeq": true,
-	"immed": true,
-	"latedef": true,
-	"newcap": true,
-	"noarg": true,
-	"sub": true,
-	"undef": true,
-	"unused": true,
-	"eqnull": true,
-	"smarttabs": true,
-	"node": true,
-	"browser": true,
-	"laxcomma": true,
-	"quotmark": true,
-	"indent": 4,
-	"globals": {
-	}
+    "bitwise": true,
+    "camelcase": false,
+    "curly": true,
+    "eqeqeq": true,
+    "es3": false,
+    "forin": true,
+    "freeze": true,
+    "immed": true,
+    "indent": 4,
+    "latedef": true,
+    "newcap": true,
+    "noarg": true,
+    "noempty": true,
+    "nonew": true,
+    "plusplus": false,
+    "quotmark": true,
+    "undef": true,
+    "unused": true,
+    "strict": false,
+    "trailing": true,
+
+    "maxlen": 120,
+
+    "smarttabs": true,
+
+    "browser": false,
+    "devel": false,
+    "node": true,
+    "worker": false,
+
+    "globals": {
+        "describe": true,
+        "it": true,
+        "beforeEach": true,
+        "afterEach": true,
+        "before": true,
+        "after": true,
+        "define": true,
+        "chai": true,
+        "assert": true
+    }
 }
