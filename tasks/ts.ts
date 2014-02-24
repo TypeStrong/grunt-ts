@@ -1019,7 +1019,14 @@ function pluginFn(grunt: IGrunt) {
         }).then((res: boolean[]) => {
             // Ignore res? (either logs or throws)
             if (!watch) {
-                done();
+                if (res.some((succes: boolean) => {
+                    return !succes;
+                })) {
+                    done(false);
+                }
+                else {
+                    done();
+                }
             }
         }, done);
     });

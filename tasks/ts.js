@@ -947,7 +947,13 @@ function pluginFn(grunt) {
         }).then(function (res) {
             // Ignore res? (either logs or throws)
             if (!watch) {
-                done();
+                if (res.some(function (succes) {
+                    return !succes;
+                })) {
+                    done(false);
+                } else {
+                    done();
+                }
             }
         }, done);
     });
