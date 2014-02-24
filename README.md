@@ -1,12 +1,12 @@
 # grunt-ts
 
-[![Build Status](https://secure.travis-ci.org/basarat/grunt-ts.png?branch=master)](http://travis-ci.org/basarat/grunt-ts) [![NPM version](https://badge.fury.io/js/grunt-ts.png)](http://badge.fury.io/js/grunt-ts)
+[![Build Status](https://secure.travis-ci.org/grunt-ts/grunt-ts.png?branch=master)](http://travis-ci.org/basarat/grunt-ts) [![NPM version](https://badge.fury.io/js/grunt-ts.png)](http://badge.fury.io/js/grunt-ts)
 
 Written from scratch TypeScript compiler task for GruntJS. It differs from grunt-typescript which is another excellent [grunt plugin for TypeScript](https://npmjs.org/package/grunt-typescript).
 
 Following are the reasons why grunt-ts was created:
 
-- Written in [TypeScript](https://github.com/basarat/grunt-ts/blob/master/tasks/ts.ts)
+- Written in [TypeScript](https://github.com/grunt-ts/grunt-ts/blob/master/tasks/ts.ts)
 - Enables a TypeScript development workflow in addition to simple file compilation. 
 - Super simple to update to the [latest version of the TypeScript](https://github.com/basarat/grunt-ts/commit/ffede564f2b20bc4dc207cb1a30dc57db7c44fe5)
 
