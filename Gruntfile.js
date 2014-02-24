@@ -177,7 +177,8 @@ module.exports = function (grunt) {
             fail: {
                 fail: true,                  // a designed to fail target
                 src: ['test/fail/**/*.ts'],
-//                watch: 'test',
+                // watch: 'test',
+                reference: 'test/fail/reference.ts',
                 options: {                  // overide the main options for this target 
                     sourcemap: false,
                 }

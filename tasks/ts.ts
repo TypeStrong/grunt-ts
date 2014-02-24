@@ -881,7 +881,7 @@ function pluginFn(grunt: IGrunt) {
                 // Compile the files
                 return compileAllFiles(filesToCompile, target, options).then((result: ICompileResult) => {
                     // End the timer
-                    lastCompile = endtime = new Date().getTime();
+                    endtime = new Date().getTime();
 
                     // Evaluate the result
                     if (!result || result.code) {
@@ -977,11 +977,9 @@ function pluginFn(grunt: IGrunt) {
             watch = target.watch;
             if (!!watch) {
 
-                // A debounced version of compile
-                var debouncedCompile = _.debounce(filterFilesAndCompile, 150);
-
                 // local event to handle file event
                 function handleFileEvent(filepath: string, displaystr: string) {
+
                     // Only ts and html :
                     if (!endsWith(filepath.toLowerCase(), '.ts') && !endsWith(filepath.toLowerCase(), '.html')) {
                         return;
@@ -990,12 +988,16 @@ function pluginFn(grunt: IGrunt) {
                     // Do not run if just ran, behaviour same as grunt-watch
                     // These are the files our run modified
                     if ((new Date().getTime() - lastCompile) <= 100) {
+                        // Uncomment for debugging which files were ignored
                         // grunt.log.writeln((' ///'  + ' >>' + filepath).grey);
                         return;
                     }
+                    // Reset the time for last compile call
+                    lastCompile = new Date().getTime();
+
                     // Log and run the debounced version.
                     grunt.log.writeln((displaystr + ' >>' + filepath).yellow);
-                    debouncedCompile();
+                    filterFilesAndCompile();
                 }
 
                 // get path
