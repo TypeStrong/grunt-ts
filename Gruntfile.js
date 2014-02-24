@@ -174,7 +174,8 @@ module.exports = function (grunt) {
                     dest: 'test/templatecache/js/templateCache.js',
                 },
             },
-            fail: {                        // a designed to fail target
+            fail: {
+                fail: true,                  // a designed to fail target
                 src: ['test/fail/**/*.ts'],
 //                watch: 'test',
                 options: {                  // overide the main options for this target 
@@ -209,6 +210,14 @@ module.exports = function (grunt) {
         return memo;
     }, []));
 
+    // Collect test tasks
+    grunt.registerTask('test_fail', grunt.util._.reduce(grunt.config.get('ts'), function (memo, task, name) {
+        if (task.fail) {
+            memo.push('ts:' + name);
+        }
+        return memo;
+    }, []));
+
     // Loading it for testing since we have in a local 'tasks' folder 
     grunt.loadTasks('tasks');
     // in your configuration you would load this like: 
@@ -217,11 +226,13 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-clean');
     grunt.loadNpmTasks('grunt-contrib-jshint');
     grunt.loadNpmTasks('grunt-tslint');
+    grunt.loadNpmTasks('grunt-continue');
     grunt.loadNpmTasks('grunt-contrib-nodeunit');
 
     grunt.registerTask('prep', ['clean', 'jshint:support']);
     grunt.registerTask('build', ['prep', 'ts-internal:build', 'tslint:source']);
-    grunt.registerTask('test', ['test_all','nodeunit']);
+    grunt.registerTask('fail', ['continueOn', 'test_fail', 'continueOff']);
+    grunt.registerTask('test', ['test_all', 'nodeunit', 'fail']);
     grunt.registerTask('prepush', ['build','test']);
     grunt.registerTask('default', ['test']);
 
