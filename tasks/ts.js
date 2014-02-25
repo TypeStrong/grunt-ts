@@ -678,7 +678,8 @@ function pluginFn(grunt) {
         var fileContent = templateCacheTemplate({
             relativePathSection: relativePathSection,
             fileNameVariableSection: fileNameVariableSection,
-            templateCachePut: templateCachePut });
+            templateCachePut: templateCachePut
+        });
         fs.writeFileSync(dest, fileContent);
     }
 
@@ -916,9 +917,6 @@ function pluginFn(grunt) {
                         return;
                     }
 
-                    // Reset the time for last compile call
-                    lastCompile = new Date().getTime();
-
                     // Log and run the debounced version.
                     grunt.log.writeln((displaystr + ' >>' + filepath).yellow);
                     filterFilesAndCompile();
@@ -937,10 +935,19 @@ function pluginFn(grunt) {
                 // A file has been added/changed/deleted has occurred
                 watcher.on('add', function (path) {
                     handleFileEvent(path, '+++ added   ');
+
+                    // Reset the time for last compile call
+                    lastCompile = new Date().getTime();
                 }).on('change', function (path) {
                     handleFileEvent(path, '### changed ');
+
+                    // Reset the time for last compile call
+                    lastCompile = new Date().getTime();
                 }).on('unlink', function (path) {
                     handleFileEvent(path, '--- removed ');
+
+                    // Reset the time for last compile call
+                    lastCompile = new Date().getTime();
                 }).on('error', function (error) {
                     console.error('Error happened in chokidar: ', error);
                 });

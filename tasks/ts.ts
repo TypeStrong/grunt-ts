@@ -196,12 +196,12 @@ function pluginFn(grunt: IGrunt) {
                 cmd: 'node',
                 args: args
             }, (error, result, code) => {
-                var ret: ICompileResult = {
-                    code: code,
-                    output: String(result)
-                };
-                resolve(ret);
-            });
+                    var ret: ICompileResult = {
+                        code: code,
+                        output: String(result)
+                    };
+                    resolve(ret);
+                });
         });
     }
 
@@ -210,7 +210,7 @@ function pluginFn(grunt: IGrunt) {
     ////////////////////////////////////////////////////////////////////
 
     function resolveTypeScriptBinPath(): string {
-        var ownRoot =  path.resolve(path.dirname((module).filename), '..');
+        var ownRoot = path.resolve(path.dirname((module).filename), '..');
         var userRoot = path.resolve(ownRoot, '..', '..');
         var binSub = path.join('node_modules', 'typescript', 'bin');
 
@@ -288,22 +288,22 @@ function pluginFn(grunt: IGrunt) {
         // Reason: passing all the files on the command line causes TSC to go in an infinite loop.
         var tempfilename = getTempFile('tscommand');
         if (!tempfilename) {
-            throw(new Error('cannot create temp file'));
+            throw (new Error('cannot create temp file'));
         }
 
         fs.writeFileSync(tempfilename, args.join(' '));
 
         // Execute command
-        return executeNode([tsc , '@' + tempfilename]).then((result: ICompileResult) => {
+        return executeNode([tsc, '@' + tempfilename]).then((result: ICompileResult) => {
             fs.unlinkSync(tempfilename);
 
             grunt.log.writeln(result.output);
 
             return Promise.cast(result);
         }, (err) => {
-            fs.unlinkSync(tempfilename);
-            throw err;
-        });
+                fs.unlinkSync(tempfilename);
+                throw err;
+            });
     }
 
     /////////////////////////////////////////////////////////////////////
@@ -746,7 +746,8 @@ function pluginFn(grunt: IGrunt) {
         var fileContent = templateCacheTemplate({
             relativePathSection: relativePathSection,
             fileNameVariableSection: fileNameVariableSection,
-            templateCachePut: templateCachePut });
+            templateCachePut: templateCachePut
+        });
         fs.writeFileSync(dest, fileContent);
     }
 
@@ -756,7 +757,7 @@ function pluginFn(grunt: IGrunt) {
 
     // Note: this function is called once for each target
     // so task + target options are a bit blurred inside this function
-    grunt.registerMultiTask('ts', 'Compile TypeScript files', function() {
+    grunt.registerMultiTask('ts', 'Compile TypeScript files', function () {
 
         var currenttask: grunt.task.IMultiTask<ITargetOptions> = this;
 
@@ -977,7 +978,7 @@ function pluginFn(grunt: IGrunt) {
             watch = target.watch;
             if (!!watch) {
 
-                
+
 
                 // local event to handle file event
                 function handleFileEvent(filepath: string, displaystr: string) {
@@ -994,8 +995,6 @@ function pluginFn(grunt: IGrunt) {
                         // grunt.log.writeln((' ///'  + ' >>' + filepath).grey);
                         return;
                     }
-                    // Reset the time for last compile call
-                    lastCompile = new Date().getTime();
 
                     // Log and run the debounced version.
                     grunt.log.writeln((displaystr + ' >>' + filepath).yellow);
@@ -1013,10 +1012,25 @@ function pluginFn(grunt: IGrunt) {
                 grunt.log.writeln(('Watching all TypeScript / Html files under : ' + watchpath).cyan);
 
                 // A file has been added/changed/deleted has occurred
-                watcher.on('add', function (path) { handleFileEvent(path, '+++ added   '); })
-                    .on('change', function (path) { handleFileEvent(path, '### changed '); })
-                    .on('unlink', function (path) { handleFileEvent(path, '--- removed '); })
-                    .on('error', function (error) { console.error('Error happened in chokidar: ', error); });
+                watcher
+                    .on('add', function (path) {
+                        handleFileEvent(path, '+++ added   ');
+                        // Reset the time for last compile call
+                        lastCompile = new Date().getTime();
+                    })
+                    .on('change', function (path) {
+                        handleFileEvent(path, '### changed ');
+                        // Reset the time for last compile call
+                        lastCompile = new Date().getTime();
+                    })
+                    .on('unlink', function (path) {
+                        handleFileEvent(path, '--- removed ');
+                        // Reset the time for last compile call
+                        lastCompile = new Date().getTime();
+                    })
+                    .on('error', function (error) {
+                        console.error('Error happened in chokidar: ', error);
+                    });
             }
 
             // Reset the time for last compile call
@@ -1026,18 +1040,18 @@ function pluginFn(grunt: IGrunt) {
             return filterFilesAndCompile();
 
         }).then((res: boolean[]) => {
-            // Ignore res? (either logs or throws)
-            if (!watch) {
-                if (res.some((succes: boolean) => {
-                    return !succes;
-                })) {
-                    done(false);
+                // Ignore res? (either logs or throws)
+                if (!watch) {
+                    if (res.some((succes: boolean) => {
+                        return !succes;
+                    })) {
+                        done(false);
+                    }
+                    else {
+                        done();
+                    }
                 }
-                else {
-                    done();
-                }
-            }
-        }, done);
+            }, done);
     });
 }
 export = pluginFn;
