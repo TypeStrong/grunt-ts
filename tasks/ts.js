@@ -776,8 +776,6 @@ function pluginFn(grunt) {
                 amdloaderPath = path.dirname(amdloaderFile);
             }
 
-            var lastCompile = 0;
-
             // Compiles all the files
             // Uses the blind tsc compile task
             // logs errors
@@ -897,6 +895,9 @@ function pluginFn(grunt) {
                 return Promise.resolve(true);
             }
 
+            // Time (in ms) when last compile took place
+            var lastCompile = 0;
+
             // Watch a folder?
             watch = target.watch;
             if (!!watch) {
@@ -944,6 +945,11 @@ function pluginFn(grunt) {
                     console.error('Error happened in chokidar: ', error);
                 });
             }
+
+            // Reset the time for last compile call
+            lastCompile = new Date().getTime();
+
+            // Run initial compile
             return filterFilesAndCompile();
         }).then(function (res) {
             // Ignore res? (either logs or throws)

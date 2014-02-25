@@ -852,8 +852,6 @@ function pluginFn(grunt: IGrunt) {
                 amdloaderPath = path.dirname(amdloaderFile);
             }
 
-            var lastCompile = 0;
-
             // Compiles all the files
             // Uses the blind tsc compile task
             // logs errors
@@ -972,10 +970,14 @@ function pluginFn(grunt: IGrunt) {
                 return Promise.resolve(true);
             }
 
+            // Time (in ms) when last compile took place
+            var lastCompile = 0;
 
             // Watch a folder?
             watch = target.watch;
             if (!!watch) {
+
+                
 
                 // local event to handle file event
                 function handleFileEvent(filepath: string, displaystr: string) {
@@ -1016,6 +1018,11 @@ function pluginFn(grunt: IGrunt) {
                     .on('unlink', function (path) { handleFileEvent(path, '--- removed '); })
                     .on('error', function (error) { console.error('Error happened in chokidar: ', error); });
             }
+
+            // Reset the time for last compile call
+            lastCompile = new Date().getTime();
+
+            // Run initial compile
             return filterFilesAndCompile();
 
         }).then((res: boolean[]) => {
