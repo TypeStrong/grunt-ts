@@ -1,6 +1,6 @@
 # grunt-ts
 
-[![Build Status](https://secure.travis-ci.org/grunt-ts/grunt-ts.png?branch=master)](http://travis-ci.org/basarat/grunt-ts) [![NPM version](https://badge.fury.io/js/grunt-ts.png)](http://badge.fury.io/js/grunt-ts)
+[![Build Status](https://secure.travis-ci.org/grunt-ts/grunt-ts.png?branch=master)](http://travis-ci.org/grunt-ts/grunt-ts) [![NPM version](https://badge.fury.io/js/grunt-ts.png)](http://badge.fury.io/js/grunt-ts)
 
 Written from scratch TypeScript compiler task for GruntJS. It differs from grunt-typescript which is another excellent [grunt plugin for TypeScript](https://npmjs.org/package/grunt-typescript).
 
@@ -8,13 +8,13 @@ Following are the reasons why grunt-ts was created:
 
 - Written in [TypeScript](https://github.com/grunt-ts/grunt-ts/blob/master/tasks/ts.ts)
 - Enables a TypeScript development workflow in addition to simple file compilation. 
-- Super simple to update to the [latest version of the TypeScript](https://github.com/basarat/grunt-ts/commit/ffede564f2b20bc4dc207cb1a30dc57db7c44fe5)
+- Super simple to update to the [latest version of the TypeScript](https://github.com/grunt-ts/grunt-ts/commit/ffede564f2b20bc4dc207cb1a30dc57db7c44fe5)
 
 Check how grunt-ts can help streamline front end development: [Sample usage with AngularJS](http://www.youtube.com/watch?v=0-6vT7xgE4Y&hd=1)
 
 Additional / longer / more basic video tutorial: http://youtu.be/Km0DpfX5ZxM
 
-For a quickstart see the full featured [Gruntfile](https://github.com/basarat/grunt-ts/blob/master/sample/Gruntfile.js).
+For a quickstart see the full featured [Gruntfile](https://github.com/grunt-ts/grunt-ts/blob/master/sample/Gruntfile.js).
 
 ## Following are some key features: 
 
@@ -216,7 +216,7 @@ grunt.initConfig({
         build: {
 			// The source TypeScript files, http://gruntjs.com/configuring-tasks#files
 			src: ["test/work/**/*.ts"],
-			// The source html files, https://github.com/basarat/grunt-ts#html-2-typescript-support   
+			// The source html files, https://github.com/grunt-ts/grunt-ts#html-2-typescript-support   
             html: ["test/work/**/*.tpl.html"], 
 			// If specified, generate this file that to can use for reference management
 			reference: "./test/reference.ts",  
@@ -259,7 +259,7 @@ It is recommended to add a default target to run in case no arguments to grunt a
 grunt.registerTask("default", ["ts:build"]);
 ```
 
-For an example of an up-to-date configuration look at the [sample gruntfile](https://github.com/basarat/grunt-ts/blob/master/sample/Gruntfile.js) 
+For an example of an up-to-date configuration look at the [sample gruntfile](https://github.com/grunt-ts/grunt-ts/blob/master/sample/Gruntfile.js) 
    
 ### Different configurations per target  
  
