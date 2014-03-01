@@ -8,7 +8,7 @@ Following are the reasons why grunt-ts was created:
 
 - Written in [TypeScript](https://github.com/grunt-ts/grunt-ts/blob/master/tasks/ts.ts)
 - Enables a TypeScript development workflow in addition to simple file compilation. 
-- Super simple to update to the [latest version of the TypeScript](https://github.com/grunt-ts/grunt-ts/commit/ffede564f2b20bc4dc207cb1a30dc57db7c44fe5)
+- Supports overriding the bundled compiler with an alternate version.
 
 Check how grunt-ts can help streamline front end development: [Sample usage with AngularJS](http://www.youtube.com/watch?v=0-6vT7xgE4Y&hd=1)
 
@@ -16,7 +16,7 @@ Additional / longer / more basic video tutorial: http://youtu.be/Km0DpfX5ZxM
 
 For a quickstart see the full featured [Gruntfile](https://github.com/grunt-ts/grunt-ts/blob/master/sample/Gruntfile.js).
 
-## Following are some key features: 
+## Key features
 
 ### Compiler support 
 
@@ -169,30 +169,38 @@ Grunt-ts can watch a directory and recompile TypeScript files when any TypeScrip
 
 Grunt-ts is published as [npm package](https://npmjs.org/package/grunt-ts):
 
-````bash
-$ npm install grunt-ts --save-dev
-````
-
-For new projects and user new to node, make sure to have installed nodejs, then install grunt-cli:
+For new projects make sure to have installed nodejs, then install grunt-cli:
 
 ````bash
 $ npm install -g grunt-cli
 ````
 
-Next install `grunt` and `grunt-ts` by creating a `package.json` file containing the following: 
+Install the and save to `package.json` devDependencies:
+
+````bash
+$ npm install grunt-ts --save-dev
+````
+
+### Alternate compiler version
+
+Support for both legacy or cutting-edge projects can be enabled using the compiler override:
+
+At runtime the plugin will look for an alternate compiler in the same `node_modules` folder. To use a different version of the TypeScript compiler install the required `typescript` version as a *peer* of `grunt-ts`. If no override was found the bundled compiler is used.  
+
+The `package.json` would look something like this for a legacy project:
 
 ```javascript
 {
   "devDependencies": {
-    "grunt" : "0.4.1",
-    "grunt-ts" : "latest"
+    "grunt" : "~0.4.1",
+    "grunt-ts" : "~1.7.2",
+    "typescript" : "0.9.1-1",
   }
 }
 ```
-Then run `npm install` from the same directory. This will download both grunt and grunt-ts. 
+Note: make sure to pin the exact TypeScript version (do not use `~` or `>`).
 
-
-## Configuration Documentation
+## Configuration
 
 Create a `Gruntfile.js`. Modify it to load grunt-ts by adding the following lines:
 
