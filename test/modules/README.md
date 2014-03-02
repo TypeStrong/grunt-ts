@@ -5,6 +5,8 @@ This is a living document till we've finalized everything:
 This is a proposal to target both requirejs / nodejs with codegen to reduce the need to have explicit file paths when not required. So you can simply add a new TypeScript file and start writing code without unnecessary ceremony required by the javascript module system.
 
 # Implementation
+
+A few ideas: 
 ## Idea A
 Have a target option called `modules` that takes `"moduleDirectory" : "gruntFileGlobs"` generates an index.ts at each moduleDirectory which contains every file from the file glob as 
 ```
@@ -15,8 +17,7 @@ export var file = filename_file;
 This is good for when you want lazy loading and only need a few modules to be explicit. 
 
 ## Idea B
-Alternative implementation idea: 
-`index: true` will create an index.ts in *each* folder. You can ignore these from your repo.
+`index: ['directorya','directoryb']` will create an index.ts in *each* folder inside `directorya`,`directoryb`... . You can ignore these from your repo.
 
 This is great for when you don't care about lazy loading within your code.
 
