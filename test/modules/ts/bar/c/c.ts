@@ -1,15 +1,15 @@
 
-import main = require('../index');
+import foo = require('../../foo/index');
 
 // USE CLASSES FROM A/B:
 
 // With `export =` and naming file same as main export variable: 
-var a1 = new main.A1();
-var a2 = new main.A2();
+var a1 = new foo.A1();
+var a2 = new foo.A2();
 
 // Conventional javascript file naming and exporting class with `export class ClassName`
-var B1 = main.b1.B1;
-var B2 = main.b2.B2;
+var B1 = foo.b1.B1;
+var B2 = foo.b2.B2;
 var b1 = new B1();
 var b2 = new B2();
 
