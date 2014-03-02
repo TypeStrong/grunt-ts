@@ -5,11 +5,20 @@ This is a living document till we've finalized everything:
 This is a proposal to target both requirejs / nodejs with codegen to reduce the need to have explicit file paths when not required. So you can simply add a new TypeScript file and start writing code without unnecessary ceremony required by the javascript module system.
 
 # Implementation
+## Idea A
 Have a target option called `modules` that takes `"moduleDirectory" : "gruntFileGlobs"` generates an index.ts at each moduleDirectory which contains every file from the file glob as 
 ```
 import filename_file = require('./path/to/filename');
 export var file = filename_file;
 ```
+
+This is good for when you want lazy loading and only need a few modules to be explicit. 
+
+## Idea B
+Alternative implementation idea: 
+`index: true` will create an index.ts in *each* folder. You can ignore these from your repo.
+
+This is great for when you don't care about lazy loading within your code.
 
 # Sample
 The file structure: 
@@ -32,19 +41,7 @@ And we want to use `a1,a2,b1,b2` (foo module) from `c.ts`.
 # Limitations
 * Inside a module  (e.g. `foo`) dependencies need to be explict e.g. a2 must explicitly require a1 if it needs it. 
 
-* The module cannot contain the file consuming the module. e.g. notice it does not contain `c`: 
-```
-//grunt-start
-import A1_file = require('./a/A1');
-export var A1 = A1_file;
-import A2_file = require('./a/A2');
-export var A2 = A2_file;
-import b1_file = require('./b/b1');
-export var b1 = b1_file;
-import b2_file = require('./b/b2');
-export var b2 = b2_file;
-//grunt-end
-```
+* *No* file should import an index file above it in the tree (since this index file already has a require pointing to this subfile)
 
 * There is still some unnecessary dots e.g. note `foo.` but this is tolerable. 
 
