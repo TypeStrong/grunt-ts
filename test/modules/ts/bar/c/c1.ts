@@ -1,5 +1,5 @@
 
-import foo = require('../../foo/index');
+import foo = require('../../index/foo');
 
 // USE CLASSES FROM A/B:
 
