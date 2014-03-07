@@ -5,7 +5,23 @@ This is a living document till we've finalized everything:
 This is a proposal to target both requirejs / nodejs with codegen to reduce the need to have explicit file paths when not required. So you can simply add a new TypeScript file and start writing code without unnecessary ceremony required by the javascript module system.
 
 # Implementation
-`index: 'directorya'` will create an `index/` directory inside directorya and a file.ts inside `index/` for each subfile of directorya. If a file is called `index.ts` then it is exported as `foldername.ts`. If two files at any level of the directory are called the same then an error is thrown.
+`index: ['directorya'`] will create an `index/` directory inside directorya and a `file.ts` inside `index/` for each subfile of directorya and a `foldername.ts` for each subfolder. If a file is called `index.ts` then it is exported as `foldername.ts`. If two files at any level of the directory are called the same (excluding `index.ts`) then an error is thrown.
+
+An generated `foldername.ts` (other than `index.ts`) consists of the following for each subfile of folder: 
+
+```
+import filename1_file = require('./path/to/filename1');
+export var filename1 = filename1_file;
+import filename2_file = require('./path/to/filename2');
+export var filename2 = filename2_file;
+```
+
+A `filename.ts` consists of the following for a given file: 
+
+```
+import filename = require('./path/to/filename');
+export = filename;
+```
 
 # Sample
 The file structure: 
@@ -50,10 +66,6 @@ var b2 = new B2();
 
 ## Idea A
 Have a target option called `modules` that takes `"moduleDirectory" : "gruntFileGlobs"` generates an index.ts at each moduleDirectory which contains every file from the file glob as 
-```
-import filename_file = require('./path/to/filename');
-export var file = filename_file;
-```
 
 This is good for when you want lazy loading and only need a few modules to be explicit. 
 
