@@ -7,7 +7,7 @@ This is a proposal to target both requirejs / nodejs with codegen to reduce the 
 # Implementation
 `index: ['directorya'`] will create an `index/` directory inside directorya and a `file.ts` inside `index/` for each subfile of directorya and a `foldername.ts` for each subfolder. If a file is called `index.ts` then it is exported as `foldername.ts`. If two files at any level of the directory are called the same (excluding `index.ts`) then an error is thrown.
 
-An generated `foldername.ts` (other than `index.ts`) consists of the following for each subfile of folder: 
+A generated `foldername.ts` (other than `index.ts`) consists of the following for each subfile of folder: 
 
 ```
 import filename1_file = require('./path/to/filename1');
