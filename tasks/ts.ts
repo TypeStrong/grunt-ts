@@ -11,6 +11,10 @@ import _str = require('underscore.string');
 import path = require('path');
 import fs = require('fs');
 
+// Modules of grunt-ts
+import utils = require('./modules/utils');
+import indexModule = require('./modules/index');
+
 // plain vanilla imports
 var pathSeperator = path.sep;
 var Promise: typeof Promise = require('es6-promise').Promise;
@@ -28,8 +32,9 @@ interface ITargetOptions {
     html: string[];  // if specified this is used to generate typescript files with a single variable which contains the content of the html
     watch: string; // if specified watches all files in this directory for changes. 
     amdloader: string;  // if specified creates a js file to load all the generated typescript files in order using requirejs + order
-    templateCache: { // if specified search thought all the html file at this location
-        src: string[];
+    index: string[]; // used to create an index folder to make external module access easier
+    templateCache: {
+        src: string[]; // if search through all the html files at this location
         dest: string;
         baseUrl: string;
     }
@@ -189,7 +194,9 @@ function asyncSeries<U, W>(arr: U[], iter: (item: U) => Promise<W>): Promise<W[]
 
 function pluginFn(grunt: IGrunt) {
 
+    ///////////////////////////
     // Helper
+    ///////////////////////////
     function executeNode(args: string[]): Promise<ICompileResult> {
         return new Promise((resolve, reject) => {
             grunt.util.spawn({
@@ -308,12 +315,7 @@ function pluginFn(grunt: IGrunt) {
 
     /////////////////////////////////////////////////////////////////////
     // Reference file logic
-    ////////////////////////////////////////////////////////////////////
-
-    // Converts "C:\boo" , "C:\boo\foo.ts" => "./foo.ts"; Works on unix as well.
-    function makeReferencePath(folderpath: string, filename: string) {
-        return path.relative(folderpath, filename).split('\\').join('/');
-    }
+    ////////////////////////////////////////////////////////////////////    
 
     // Updates the reference file
     function updateReferenceFile(files: string[], generatedFiles: string[], referenceFile: string, referencePath: string): boolean {
@@ -373,13 +375,13 @@ function pluginFn(grunt: IGrunt) {
         }
 
         // Put in the generated files
-        generatedFiles = _.map(generatedFiles, (file) => referenceIntro + makeReferencePath(referencePath, file) + referenceEnd);
+        generatedFiles = _.map(generatedFiles, (file) => referenceIntro + utils.makeRelativePath(referencePath, file) + referenceEnd);
         var contents = insertArrayAt([ourSignatureStart], 1, generatedFiles);
 
         // Put in the new / observed missing files:
         files.forEach((filename: string) => {
             // The file we are about to add
-            var filepath = makeReferencePath(referencePath, filename);
+            var filepath = utils.makeRelativePath(referencePath, filename);
 
             // If there are orig references
             if (origFileReferences.length) {
@@ -584,7 +586,7 @@ function pluginFn(grunt: IGrunt) {
                         file = file.substr(0, file.length - 3);
 
                         // Make relative to amd loader
-                        file = makeReferencePath(loaderPath, file);
+                        file = utils.makeRelativePath(loaderPath, file);
 
                         // Prepend "./" to prevent "basePath" requirejs setting from interferring:
                         file = './' + file;
@@ -721,7 +723,7 @@ function pluginFn(grunt: IGrunt) {
         }
 
         // Resolve the relative path from basePath to each src file
-        var relativePaths: string[] = _.map(src, (anHtmlFile) => 'text!' + makeReferencePath(basePath, anHtmlFile));
+        var relativePaths: string[] = _.map(src, (anHtmlFile) => 'text!' + utils.makeRelativePath(basePath, anHtmlFile));
         var fileNames: string[] = _.map(src, (anHtmlFile) => path.basename(anHtmlFile));
         var fileVarialbeName = (anHtmlFile) => anHtmlFile.split('.').join('_').split('-').join('_');
         var fileVariableNames: string[] = _.map(fileNames, fileVarialbeName);
@@ -923,10 +925,19 @@ function pluginFn(grunt: IGrunt) {
                     }
                 }
 
-                if (!!options.compile) {
-                    // Reexpand the original file glob:
-                    var files = grunt.file.expand(currenttask.data.src);
+                // Reexpand the original file glob:
+                var files = grunt.file.expand(currenttask.data.src);
 
+                // Create the index if specified                 
+                var index = target.index;
+                if (!!index) {
+                    if (!_.isArray(index)) {
+                        grunt.warn('Index option needs to be an array of directories');
+                    }
+                    indexModule.indexDirectories(_.map(index, (folder) => path.resolve(folder)));
+                }
+
+                if (!!options.compile) {
                     // ignore directories
                     files = files.filter(function (file) {
                         var stats = fs.lstatSync(file);

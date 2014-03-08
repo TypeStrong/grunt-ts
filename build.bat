@@ -1,2 +1,4 @@
 tsc "./tasks/ts.ts" --sourcemap --module commonjs
-grunt ts:templatecache
+tsc "./test/test.ts" --module commonjs
+REM grunt ts:index
+grunt nodeunit

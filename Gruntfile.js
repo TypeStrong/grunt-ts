@@ -40,8 +40,8 @@ module.exports = function (grunt) {
                 src: ['tasks/ts.ts']
             }
         },
-        nodeunit:{
-            tests:['test/test.js']
+        nodeunit: {
+            tests: ['test/test.js']
         },
         ts: {
             // Set the default options, see : http://gruntjs.com/configuring-tasks#options
@@ -174,6 +174,12 @@ module.exports = function (grunt) {
                     dest: 'test/templatecache/js/templateCache.js',
                 },
             },
+            index: {
+                test: true,
+                src: 'test/index/ts/**/*.ts',
+                outDir: 'test/index/js',
+                index: ['test/index/ts']
+            },
             fail: {
                 fail: true,                  // a designed to fail target
                 src: ['test/fail/**/*.ts'],
@@ -234,7 +240,7 @@ module.exports = function (grunt) {
     grunt.registerTask('build', ['prep', 'ts-internal:build', 'tslint:source']);
     grunt.registerTask('fail', ['continueOn', 'test_fail', 'continueOff']);
     grunt.registerTask('test', ['test_all', 'nodeunit', 'fail']);
-    grunt.registerTask('prepush', ['build','test']);
+    grunt.registerTask('prepush', ['build', 'test']);
     grunt.registerTask('default', ['test']);
 
     grunt.registerTask('run', ['ts:amdloadersrc']);
