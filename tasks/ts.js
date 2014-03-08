@@ -9,6 +9,9 @@ var _str = require('underscore.string');
 var path = require('path');
 var fs = require('fs');
 
+// Modules of grunt-ts
+var indexModule = require('./modules/index');
+
 // plain vanilla imports
 var pathSeperator = path.sep;
 var Promise = require('es6-promise').Promise;
@@ -119,7 +122,14 @@ function asyncSeries(arr, iter) {
 }
 
 function pluginFn(grunt) {
+    ////////////////////////
+    // Setup modules of grunt-ts
+    ////////////////////////
+    indexModule.grunt = grunt;
+
+    ///////////////////////////
     // Helper
+    ///////////////////////////
     function executeNode(args) {
         return new Promise(function (resolve, reject) {
             grunt.util.spawn({
@@ -777,6 +787,13 @@ function pluginFn(grunt) {
                 amdloaderPath = path.dirname(amdloaderFile);
             }
 
+            // Create an index?
+            var index = target.index;
+            var indexFolder;
+            if (!!index) {
+                indexFolder = path.resolve(index);
+            }
+
             // Compiles all the files
             // Uses the blind tsc compile task
             // logs errors
@@ -848,10 +865,15 @@ function pluginFn(grunt) {
                     }
                 }
 
-                if (!!options.compile) {
-                    // Reexpand the original file glob:
-                    var files = grunt.file.expand(currenttask.data.src);
+                // Reexpand the original file glob:
+                var files = grunt.file.expand(currenttask.data.src);
 
+                // Create the index if specified
+                if (!!indexFolder) {
+                    indexModule.indexDirectory(indexFolder);
+                }
+
+                if (!!options.compile) {
                     // ignore directories
                     files = files.filter(function (file) {
                         var stats = fs.lstatSync(file);

@@ -11,6 +11,9 @@ import _str = require('underscore.string');
 import path = require('path');
 import fs = require('fs');
 
+// Modules of grunt-ts
+import indexModule = require('./modules/index');
+
 // plain vanilla imports
 var pathSeperator = path.sep;
 var Promise: typeof Promise = require('es6-promise').Promise;
@@ -28,8 +31,9 @@ interface ITargetOptions {
     html: string[];  // if specified this is used to generate typescript files with a single variable which contains the content of the html
     watch: string; // if specified watches all files in this directory for changes. 
     amdloader: string;  // if specified creates a js file to load all the generated typescript files in order using requirejs + order
-    templateCache: { // if specified search thought all the html file at this location
-        src: string[];
+    index: string[]; // used to create an index folder to make external module access easier
+    templateCache: {
+        src: string[]; // if search through all the html files at this location
         dest: string;
         baseUrl: string;
     }
@@ -189,7 +193,14 @@ function asyncSeries<U, W>(arr: U[], iter: (item: U) => Promise<W>): Promise<W[]
 
 function pluginFn(grunt: IGrunt) {
 
+    ////////////////////////
+    // Setup modules of grunt-ts 
+    ////////////////////////
+    indexModule.grunt = grunt;
+
+    ///////////////////////////
     // Helper
+    ///////////////////////////
     function executeNode(args: string[]): Promise<ICompileResult> {
         return new Promise((resolve, reject) => {
             grunt.util.spawn({
@@ -853,6 +864,13 @@ function pluginFn(grunt: IGrunt) {
                 amdloaderPath = path.dirname(amdloaderFile);
             }
 
+            // Create an index? 
+            var index = target.index;
+            var indexFolder;
+            if (!!index) {
+                indexFolder = path.resolve(index);
+            }
+
             // Compiles all the files
             // Uses the blind tsc compile task
             // logs errors
@@ -923,10 +941,15 @@ function pluginFn(grunt: IGrunt) {
                     }
                 }
 
-                if (!!options.compile) {
-                    // Reexpand the original file glob:
-                    var files = grunt.file.expand(currenttask.data.src);
+                // Reexpand the original file glob:
+                var files = grunt.file.expand(currenttask.data.src);
 
+                // Create the index if specified 
+                if (!!indexFolder) {
+                    indexModule.indexDirectory(indexFolder);
+                }
+
+                if (!!options.compile) {
                     // ignore directories
                     files = files.filter(function (file) {
                         var stats = fs.lstatSync(file);

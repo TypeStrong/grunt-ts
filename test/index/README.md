@@ -5,7 +5,7 @@ This is a living document till we've finalized everything:
 This is a proposal to target both requirejs / nodejs with codegen to reduce the need to have explicit file paths when not required. So you can simply add a new TypeScript file and start writing code without unnecessary ceremony required by the javascript module system.
 
 # Implementation
-`index: ['directorya'`] will create an `index/` directory inside directorya and a `file.ts` inside `index/` for each subfile of directorya and a `foldername.ts` for each subfolder. If a file is called `index.ts` then it is exported as `foldername.ts`. If two files at any level of the directory are called the same (excluding `index.ts`) then an error is thrown.
+`index: 'directorya'` will create an `index/` directory inside directorya and a `file.ts` inside `index/` for each subfile of directorya and a `foldername.ts` for each subfolder. If a file is called `index.ts` then it is exported as `foldername.ts`. If two files at any level of the directory are called the same (excluding `index.ts`) then an error is thrown.
 
 A generated `foldername.ts` (other than `index.ts`) consists of the following for each subfile of folder: 
 
