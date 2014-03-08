@@ -1,7 +1,6 @@
 /// <reference path="../../defs/tsd.d.ts"/>
 
 import _ = require('underscore');
-import _str = require('underscore.string');
 import path = require('path');
 import fs = require('fs');
 import os = require('os');
@@ -42,7 +41,7 @@ function indexDirectory(destFolder: string) {
     var dirs = utils.getDirs(destFolder, (dir) => {
         var normDir = path.normalize(dir);
         // Exclude index and the root folder itself
-        return normDir == path.normalize(indexDirectory) || normDir == path.normalize(destFolder);
+        return normDir === path.normalize(indexDirectory) || normDir === path.normalize(destFolder);
     });
 
     _.forEach(dirs, (dir) => {
@@ -70,7 +69,7 @@ function indexDirectory(destFolder: string) {
 
         var filename = path.basename(completePathToFile, '.ts');
 
-        if (filename == 'index') { // Export it as directory.ts
+        if (filename === 'index') { // Export it as directory.ts
 
             // Note: since the logic for creating modules for folders is before this
             // we will automatically override the folder.ts with an import of the correct index.ts    
@@ -84,10 +83,10 @@ function indexDirectory(destFolder: string) {
         fs.writeFileSync(destinationFile, fileContent);
 
         // Debug logs
-        //grunt.log.writeln(fileContent.green);
-        //grunt.log.writeln(destinationFile);
-        //grunt.log.writeln(filename, pathToFile);
-        //grunt.log.writeln(completePathToFile + ''.green);
+        // grunt.log.writeln(fileContent.green);
+        // grunt.log.writeln(destinationFile);
+        // grunt.log.writeln(filename, pathToFile);
+        // grunt.log.writeln(completePathToFile + ''.green);
     });
 }
 
