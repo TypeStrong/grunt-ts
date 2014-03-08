@@ -33,6 +33,39 @@ export var filename2 = filename2_file;
 # Usage
 This allows you to import stuff within your application from the index folder. And then you are free to reorganize your code over time and not update all the referenced places. Additionally `foldername.ts` files make it easy to import entire folders without manual effort.
 
+Consider the example folder [source](https://github.com/grunt-ts/grunt-ts/tree/master/test/index/ts): 
+```
+foo
+  a
+  |--A1.ts
+  |--A2.ts
+  b
+  |--b1.ts
+  |--b2.ts
+bar
+  c
+  |--c.ts
+index
+  | This will be dynamically created  
+```  
+And we want to use a1,a2,b1,b2 (foo module) from c.ts,  It becomes as simple as: 
+
+``` TypeScript
+import foo = require('../../index/foo');
+
+// USE CLASSES FROM A/B:
+
+// With `export =` and naming file same as main export variable: 
+var a1 = new foo.A1();
+var a2 = new foo.A2();
+
+// Conventional javascript file naming and exporting class with `export class ClassName`
+var B1 = foo.b1.B1;
+var B2 = foo.b2.B2;
+var b1 = new B1();
+var b2 = new B2();
+```
+
 # Limitations
 
 * *No* file should import a `foldername.ts` above it in the tree to prevent a cyclic dependency (since `foldername.ts` already has a require statement pointing to this subfile)
