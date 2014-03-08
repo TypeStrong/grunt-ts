@@ -80,5 +80,11 @@ function indexDirectory(destFolder) {
         //grunt.log.writeln(completePathToFile + ''.green);
     });
 }
-exports.indexDirectory = indexDirectory;
+
+function indexDirectories(destFolders) {
+    _.forEach(destFolders, function (folder) {
+        return indexDirectory(folder);
+    });
+}
+exports.indexDirectories = indexDirectories;
 //# sourceMappingURL=index.js.map

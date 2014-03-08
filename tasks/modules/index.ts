@@ -10,6 +10,7 @@ import utils = require('./utils');
 
 var eol = os.EOL;
 var grunt = utils.grunt;
+
 /////////////////////////////////////////////////////////////////////
 // index : used to make external modules access easier
 ////////////////////////////////////////////////////////////////////
@@ -22,8 +23,7 @@ var indexPartialFileExportTemplate: (data?: { filename: string; pathToFile: stri
     _.template('import <%=filename%>_file = require(\'<%= pathToFile %>\');'
         + eol + 'export var <%=filename%> = <%=filename%>_file;');
 
-
-export function indexDirectory(destFolder: string) {
+function indexDirectory(destFolder: string) {
     var indexDirectory = path.join(destFolder, 'index');
 
     // We index all files except those in the index directory
@@ -89,4 +89,8 @@ export function indexDirectory(destFolder: string) {
         //grunt.log.writeln(filename, pathToFile);
         //grunt.log.writeln(completePathToFile + ''.green);
     });
+}
+
+export function indexDirectories(destFolders: string[]) {
+    _.forEach(destFolders, (folder) => indexDirectory(folder));
 }

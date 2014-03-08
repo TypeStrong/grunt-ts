@@ -2,12 +2,28 @@ This is a living document till we've finalized everything:
 
 # Background 
 
-This is a proposal to target both requirejs / nodejs with codegen to reduce the need to have explicit file paths when not required. So you can simply add a new TypeScript file and start writing code without unnecessary ceremony required by the javascript module system.
+Target both requirejs / nodejs with codegen to reduce the need to have explicit file paths when not required. So you can simply add a new TypeScript file and start writing code without unnecessary ceremony required by the javascript module system. This is similar to the `reference.ts` concept except it is for *external modules*
 
 # Implementation
-`index: 'directorya'` will create an `index/` directory inside directorya and a `file.ts` inside `index/` for each subfile of directorya and a `foldername.ts` for each subfolder. If a file is called `index.ts` (in some folder `fooFoldername`) then it is exported as `fooFoldername.ts`. If two files at any level of the directory are called the same (excluding `index.ts`) then an error is thrown.
 
-A generated `foldername.ts` (other than `index.ts`) consists of the following for each subfile of folder: 
+`index: ['directorya',...]` will create a `directorya/index/` directory if not already there. 
+
+Inside `/index` it will create the following files (contents of these files are explained later):
+
+* `filename.ts` for each subfile (excluding files called `index.ts`) of directorya.
+* `foldername.ts` for each subfolder of directorya.
+* If any `index.ts` files are found at any folder these will replace the corresponding `foldername.ts`. 
+
+If two files (or folders) at any level of the directory are called the same (excluding `index.ts`) then an error is thrown.
+
+A generated `filename.ts` (or `foldername.ts` created for existing `index.ts`) consists of the following for a given file: 
+
+```
+import filename = require('./path/to/filename');
+export = filename;
+```
+
+A generated `foldername.ts` (other than `index.ts`) consists of the following for each subfile of the folder: 
 
 ```
 import filename1_file = require('./path/to/filename1');
@@ -16,63 +32,31 @@ import filename2_file = require('./path/to/filename2');
 export var filename2 = filename2_file;
 ```
 
-A `filename.ts` or (`foldername.ts` created for existing `index.ts`) consists of the following for a given file: 
+What this allows you to do is import stuff within your application from the index folder. And then you are free to reorganize your code over time and not update all the referenced places. Additionally `foldername.ts` files make it easy to import entire modules without lots of manual effort.
 
-```
-import filename = require('./path/to/filename');
-export = filename;
-```
+# Limitations
+
+* *No* file should import a `foldername.ts` above it in the tree to prevent a cyclic dependency (since `foldername.ts` already has a require statement pointing to this subfile)
 
 # Sample
-The file structure: 
+See the index example from the main testing Gruntfile.js
+
+The file structure is: 
 
 ```
 foo
   a
-  |--a1.ts
-  |--a2.ts
+  |--A1.ts
+  |--A2.ts
   b
   |--b1.ts
   |--b2.ts
 bar
   c
   |--c.ts
+index
+  | This will be dynamically created  
 ```
 
-And we want to use `a1,a2,b1,b2` (foo module) from `c.ts`.
+And we want to use `a1,a2,b1,b2` (foo module) from `c.ts`
 
-# Limitations
-* Inside a module  (e.g. `foo`) dependencies need to be explict e.g. a2 must explicitly require a1 if it needs it. 
-
-* *No* file should import an index file above it in the tree (since this index file already has a require pointing to this subfile)
-
-* There is still some unnecessary dots e.g. note `foo.` but this is tolerable. 
-
-```
-// With `export =` and naming file same as main export variable: 
-var a1 = new foo.A1();
-var a2 = new foo.A2();
-
-// Conventional javascript file naming and exporting class with `export class ClassName`
-var B1 = foo.b1.B1;
-var B2 = foo.b2.B2;
-var b1 = new B1();
-var b2 = new B2();
-```
-
-* Two files in a module cannot share the same filename. It is a bad practice to do this anyways.
-
-# Rejected Ideas
-
-## Idea A
-Have a target option called `modules` that takes `"moduleDirectory" : "gruntFileGlobs"` generates an index.ts at each moduleDirectory which contains every file from the file glob as 
-
-This is good for when you want lazy loading and only need a few modules to be explicit. 
-
-## Idea B
-`index: ['directorya','directoryb']` will create an index.ts in *each* folder inside `directorya`,`directoryb`... . You can ignore these from your repo. 
-
-This is great for when you don't care about lazy loading within your code.
-
-## Idea C 
-`index: 'directorya'` will create an `index/` directory inside directorya and a folder.ts inside `index/` for each subfolder of directorya

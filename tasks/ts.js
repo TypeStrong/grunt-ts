@@ -778,13 +778,6 @@ function pluginFn(grunt) {
                 amdloaderPath = path.dirname(amdloaderFile);
             }
 
-            // Create an index?
-            var index = target.index;
-            var indexFolder;
-            if (!!index) {
-                indexFolder = path.resolve(index);
-            }
-
             // Compiles all the files
             // Uses the blind tsc compile task
             // logs errors
@@ -860,8 +853,11 @@ function pluginFn(grunt) {
                 var files = grunt.file.expand(currenttask.data.src);
 
                 // Create the index if specified
-                if (!!indexFolder) {
-                    indexModule.indexDirectory(indexFolder);
+                var index = target.index;
+                if (!!index && _.isArray(index)) {
+                    indexModule.indexDirectories(_.map(index, function (folder) {
+                        return path.resolve(index);
+                    }));
                 }
 
                 if (!!options.compile) {
