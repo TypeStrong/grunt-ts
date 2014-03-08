@@ -14,6 +14,18 @@ exports.makeRelativePath = makeRelativePath;
 // From https://github.com/centi/node-dirutils/blob/master/index.js
 // Slightly modified. See BAS
 /**
+* Get all files from a directory and all its subdirectories.
+* @param {String} dirPath A path to a directory
+* @param {RegExp|Function} exclude Defines which files should be excluded. Can be a RegExp (whole filepath is tested) or a Function which will get the filepath as an argument and should return true (exclude file) or false (do not exclude).
+* @returns {Array} An array of files
+*/
+function getFiles(dirPath, exclude) {
+    return _getAll(dirPath, exclude, true);
+}
+exports.getFiles = getFiles;
+;
+
+/**
 * Get all directories from a directory and all its subdirectories.
 * @param {String} dirPath A path to a directory
 * @param {RegExp|Function} exclude Defines which directories should be excluded. Can be a RegExp (whole dirpath is tested) or a Function which will get the dirpath as an argument and should return true (exclude dir) or false (do not exclude).
@@ -105,4 +117,3 @@ function _checkExcludeArgument(exclude) {
 
     return exclude;
 }
-//# sourceMappingURL=utils.js.map

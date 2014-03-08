@@ -1,8 +1,10 @@
 /// <reference path="../defs/tsd.d.ts" />
-var grunt = require('grunt');
 
-var utils = require('../tasks/modules/utils');
-var _ = require('underscore');
+var grunt: IGrunt = require('grunt');
+import fs = require('fs');
+import path = require('path');
+import utils = require('../tasks/modules/utils');
+import _ = require('underscore');
 
 function testFile(test, path) {
     var actual = grunt.file.read('test/' + path);
@@ -10,20 +12,20 @@ function testFile(test, path) {
     test.equal(expected, actual, 'tested path: ' + path);
 }
 
-function testExpectedFile(test, path) {
-    var actual = grunt.file.read(path.replace('\\expected', '').replace('/expected', ''));
+function testExpectedFile(test, path:string) {
+    var actual = grunt.file.read(path.replace('\\expected','').replace('/expected',''));
     var expected = grunt.file.read(path);
     test.equal(expected, actual, 'tested path: ' + path);
 }
 
 function testDirectory(test, folder) {
     var files = utils.getFiles(('test/expected/' + folder));
-    _.forEach(files, function (expected) {
+    _.forEach(files, (expected: string) => {        
         testExpectedFile(test, expected);
     });
 }
 
-exports.typescript = {
+export var typescript = {
     simple: function (test) {
         testFile(test, 'simple/js/zoo.js');
         testFile(test, 'simple/js/zoo.d.ts');
@@ -38,4 +40,4 @@ exports.typescript = {
         testDirectory(test, 'index');
         test.done();
     }
-};
+}
