@@ -30,11 +30,11 @@ import filename2_file = require('./path/to/filename2');
 export var filename2 = filename2_file;
 ```
 
-The files at the root level of `directorya` etc are excluded to prevent unintentional cyclic references.  
-
 # Usage
 This allows you to import stuff within your application from the index folder. And then you are free to reorganize your code over time and not update all the referenced places. Additionally `foldername.ts` files make it easy to import entire folders without manual effort.
 
 # Limitations
 
 * *No* file should import a `foldername.ts` above it in the tree to prevent a cyclic dependency (since `foldername.ts` already has a require statement pointing to this subfile)
+
+* The files which are immediate children of `directorya` are excluded to prevent unintentional cyclic references. These file should contain code to kick off the application.  
