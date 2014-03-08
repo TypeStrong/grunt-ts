@@ -66,6 +66,23 @@ var b1 = new B1();
 var b2 = new B2();
 ```
 
+Or you can import at a more granular level (for lazy loads): 
+```
+import a = require('../../index/a');
+import b1 = require('../../index/b1');
+import b2 = require('../../index/b2');
+
+// USE CLASSES FROM A/B:
+
+// With `export =` and naming file same as main export variable: 
+var a1 = new a.A1();
+var a2 = new a.A2();
+
+// Conventional javascript file naming and exporting class with `export class ClassName`
+var b1Instance = new b1.B1();
+var b2Instance = new b2.B2();
+```
+
 # Limitations
 
 * *No* file should import a `foldername.ts` above it in the tree to prevent a cyclic dependency (since `foldername.ts` already has a require statement pointing to this subfile)
