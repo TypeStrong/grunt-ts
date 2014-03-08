@@ -930,8 +930,11 @@ function pluginFn(grunt: IGrunt) {
 
                 // Create the index if specified                 
                 var index = target.index;
-                if (!!index && _.isArray(index)) {
-                    indexModule.indexDirectories(_.map(index, (folder) => path.resolve(index)));
+                if (!!index) {
+                    if (!_.isArray(index)) {
+                        grunt.warn('Index option needs to be an array of directories');
+                    }
+                    indexModule.indexDirectories(_.map(index, (folder) => path.resolve(folder)));
                 }
 
                 if (!!options.compile) {

@@ -178,7 +178,7 @@ module.exports = function (grunt) {
                 test: true,
                 src: 'test/index/ts/**/*.ts',
                 outDir: 'test/index/js',
-                index: 'test/index/ts'
+                index: ['test/index/ts']
             },
             fail: {
                 fail: true,                  // a designed to fail target

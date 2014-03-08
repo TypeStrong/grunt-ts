@@ -1,5 +1,3 @@
-This is a living document till we've finalized everything:
-
 # Background 
 
 Target both requirejs / nodejs with codegen to reduce the need to have explicit file paths when not required. So you can simply add a new TypeScript file and start writing code without unnecessary ceremony required by the javascript module system. This is similar to the `reference.ts` concept except it is for *external modules*
@@ -10,7 +8,7 @@ Target both requirejs / nodejs with codegen to reduce the need to have explicit 
 
 Inside `/index` it will create the following files (contents of these files are explained later):
 
-* `filename.ts` for each subfile (excluding files called `index.ts`) of directorya.
+* `filename.ts` for each subfile of directorya, excluding files called `index.ts` and immediate children of `directorya`.
 * `foldername.ts` for each subfolder of directorya.
 * If any `index.ts` files are found at any folder these will replace the corresponding `foldername.ts`. 
 
@@ -32,31 +30,11 @@ import filename2_file = require('./path/to/filename2');
 export var filename2 = filename2_file;
 ```
 
-What this allows you to do is import stuff within your application from the index folder. And then you are free to reorganize your code over time and not update all the referenced places. Additionally `foldername.ts` files make it easy to import entire modules without lots of manual effort.
+The files at the root level of `directorya` etc are excluded to prevent unintentional cyclic references.  
+
+# Usage
+This allows you to import stuff within your application from the index folder. And then you are free to reorganize your code over time and not update all the referenced places. Additionally `foldername.ts` files make it easy to import entire folders without manual effort.
 
 # Limitations
 
 * *No* file should import a `foldername.ts` above it in the tree to prevent a cyclic dependency (since `foldername.ts` already has a require statement pointing to this subfile)
-
-# Sample
-See the index example from the main testing Gruntfile.js
-
-The file structure is: 
-
-```
-foo
-  a
-  |--A1.ts
-  |--A2.ts
-  b
-  |--b1.ts
-  |--b2.ts
-bar
-  c
-  |--c.ts
-index
-  | This will be dynamically created  
-```
-
-And we want to use `a1,a2,b1,b2` (foo module) from `c.ts`
-

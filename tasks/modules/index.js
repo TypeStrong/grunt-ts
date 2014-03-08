@@ -23,12 +23,12 @@ function indexDirectory(destFolder) {
     // We index all files except those in the index directory
     var tsFilesGlob = [
         path.join(destFolder, '**', '*.ts'),
-        path.join('!' + indexDirectory, '*.ts')
+        path.join('!' + indexDirectory, '*.ts'),
+        path.join('!' + destFolder, '*.ts')
     ];
 
     // create an index directory if not already there:
     if (!fs.existsSync(indexDirectory)) {
-        // Create this directory
         fs.mkdir(indexDirectory);
     }
 
