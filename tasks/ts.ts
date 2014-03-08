@@ -12,6 +12,7 @@ import path = require('path');
 import fs = require('fs');
 
 // Modules of grunt-ts
+import utils = require('./modules/utils');
 import indexModule = require('./modules/index');
 
 // plain vanilla imports
@@ -193,11 +194,6 @@ function asyncSeries<U, W>(arr: U[], iter: (item: U) => Promise<W>): Promise<W[]
 
 function pluginFn(grunt: IGrunt) {
 
-    ////////////////////////
-    // Setup modules of grunt-ts 
-    ////////////////////////
-    indexModule.grunt = grunt;
-
     ///////////////////////////
     // Helper
     ///////////////////////////
@@ -319,12 +315,7 @@ function pluginFn(grunt: IGrunt) {
 
     /////////////////////////////////////////////////////////////////////
     // Reference file logic
-    ////////////////////////////////////////////////////////////////////
-
-    // Converts "C:\boo" , "C:\boo\foo.ts" => "./foo.ts"; Works on unix as well.
-    function makeReferencePath(folderpath: string, filename: string) {
-        return path.relative(folderpath, filename).split('\\').join('/');
-    }
+    ////////////////////////////////////////////////////////////////////    
 
     // Updates the reference file
     function updateReferenceFile(files: string[], generatedFiles: string[], referenceFile: string, referencePath: string): boolean {
@@ -384,13 +375,13 @@ function pluginFn(grunt: IGrunt) {
         }
 
         // Put in the generated files
-        generatedFiles = _.map(generatedFiles, (file) => referenceIntro + makeReferencePath(referencePath, file) + referenceEnd);
+        generatedFiles = _.map(generatedFiles, (file) => referenceIntro + utils.makeRelativePath(referencePath, file) + referenceEnd);
         var contents = insertArrayAt([ourSignatureStart], 1, generatedFiles);
 
         // Put in the new / observed missing files:
         files.forEach((filename: string) => {
             // The file we are about to add
-            var filepath = makeReferencePath(referencePath, filename);
+            var filepath = utils.makeRelativePath(referencePath, filename);
 
             // If there are orig references
             if (origFileReferences.length) {
@@ -595,7 +586,7 @@ function pluginFn(grunt: IGrunt) {
                         file = file.substr(0, file.length - 3);
 
                         // Make relative to amd loader
-                        file = makeReferencePath(loaderPath, file);
+                        file = utils.makeRelativePath(loaderPath, file);
 
                         // Prepend "./" to prevent "basePath" requirejs setting from interferring:
                         file = './' + file;
@@ -732,7 +723,7 @@ function pluginFn(grunt: IGrunt) {
         }
 
         // Resolve the relative path from basePath to each src file
-        var relativePaths: string[] = _.map(src, (anHtmlFile) => 'text!' + makeReferencePath(basePath, anHtmlFile));
+        var relativePaths: string[] = _.map(src, (anHtmlFile) => 'text!' + utils.makeRelativePath(basePath, anHtmlFile));
         var fileNames: string[] = _.map(src, (anHtmlFile) => path.basename(anHtmlFile));
         var fileVarialbeName = (anHtmlFile) => anHtmlFile.split('.').join('_').split('-').join('_');
         var fileVariableNames: string[] = _.map(fileNames, fileVarialbeName);
