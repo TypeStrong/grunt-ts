@@ -57,12 +57,13 @@ function getRandomHex(length) {
 * @returns {string} unique-ish path to file in given directory.
 * @throws when it cannot create a temp file in the specified directory
 */
-function getTempFile(prefix, dir) {
+function getTempFile(prefix, dir, extension) {
     if (typeof dir === "undefined") { dir = ''; }
+    if (typeof extension === "undefined") { extension = '.tmp.txt'; }
     prefix = (prefix ? prefix + '-' : '');
     var attempts = 100;
     do {
-        var name = prefix + getRandomHex(8) + '.tmp.txt';
+        var name = prefix + getRandomHex(8) + extension;
         var dest = path.join(dir, name);
 
         if (!fs.existsSync(dest)) {
@@ -381,6 +382,8 @@ function pluginFn(grunt) {
                 // Reexpand the original file glob:
                 var files = grunt.file.expand(currenttask.data.src);
                 var fastCompiling = false;
+                var baseDirFile = 'ignoreBaseDirFile.ts';
+                var baseDirFilePath;
 
                 // If fast compile and a file changed
                 if (target.fast && changedFile) {
@@ -392,10 +395,21 @@ function pluginFn(grunt) {
                             return path.resolve(file);
                         });
                         var intersect = _.intersection(completeFiles, [path.resolve(changedFile)]);
+
                         if (intersect) {
                             files = intersect;
                         }
                     }
+                }
+
+                // If baseDir is specified create a temp tsc file to make sure that `--outDir` works fine
+                // see https://github.com/grunt-ts/grunt-ts/issues/77
+                if (target.outDir && target.baseDir) {
+                    baseDirFilePath = path.join(target.baseDir, baseDirFile);
+                    if (!fs.existsSync(baseDirFilePath)) {
+                        fs.writeFileSync(baseDirFilePath, '// Ignore this file. See https://github.com/grunt-ts/grunt-ts/issues/77');
+                    }
+                    files.push(baseDirFilePath);
                 }
 
                 // Create the index if specified

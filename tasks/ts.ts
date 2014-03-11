@@ -31,6 +31,7 @@ interface ITargetOptions {
     reference: string; // path to a reference.ts e.g. './approot/'
     out: string; // if sepecified e.g. 'single.js' all output js files are merged into single.js using tsc --out command     
     outDir: string; // if sepecified e.g. '/build/js' all output js files are put in this location
+    baseDir: string; // If specified. outDir files are made relative to this. 
     html: string[];  // if specified this is used to generate typescript files with a single variable which contains the content of the html
     watch: string; // if specified watches all files in this directory for changes. 
     amdloader: string;  // if specified creates a js file to load all the generated typescript files in order using requirejs + order
@@ -121,11 +122,11 @@ function getRandomHex(length: number = 16): string {
  * @returns {string} unique-ish path to file in given directory.
  * @throws when it cannot create a temp file in the specified directory
  */
-function getTempFile(prefix?: string, dir: string = ''): string {
+function getTempFile(prefix?: string, dir: string = '', extension = '.tmp.txt'): string {
     prefix = (prefix ? prefix + '-' : '');
     var attempts = 100;
     do {
-        var name: string = prefix + getRandomHex(8) + '.tmp.txt';
+        var name: string = prefix + getRandomHex(8) + extension;
         var dest: string = path.join(dir, name);
 
         if (!fs.existsSync(dest)) {
@@ -456,6 +457,8 @@ function pluginFn(grunt: IGrunt) {
                 // Reexpand the original file glob:
                 var files = grunt.file.expand(currenttask.data.src);
                 var fastCompiling = false;
+                var baseDirFile: string = 'ignoreBaseDirFile.ts';
+                var baseDirFilePath: string;
 
                 // If fast compile and a file changed 
                 if (target.fast && changedFile) {
@@ -466,10 +469,21 @@ function pluginFn(grunt: IGrunt) {
                         fastCompiling = true;
                         var completeFiles = _.map(files, (file) => path.resolve(file));
                         var intersect = _.intersection(completeFiles, [path.resolve(changedFile)]);
+
                         if (intersect) {
                             files = intersect;
                         }
                     }
+                }
+
+                // If baseDir is specified create a temp tsc file to make sure that `--outDir` works fine
+                // see https://github.com/grunt-ts/grunt-ts/issues/77
+                if (target.outDir && target.baseDir) {
+                    baseDirFilePath = path.join(target.baseDir, baseDirFile);
+                    if (!fs.existsSync(baseDirFilePath)) {
+                        fs.writeFileSync(baseDirFilePath, '// Ignore this file. See https://github.com/grunt-ts/grunt-ts/issues/77');
+                    }
+                    files.push(baseDirFilePath);
                 }
 
                 // Create the index if specified                 
@@ -511,6 +525,7 @@ function pluginFn(grunt: IGrunt) {
                     // Compile, if there are any files to compile!
                     if (files.length > 0) {
                         return runCompilation(files, target, options).then((success: boolean) => {
+
                             // Create the loader if specified & compiliation succeeded
                             if (!fastCompiling && success && !!amdloaderPath) {
                                 var referenceOrder: amdLoaderModule.IReferences
@@ -518,7 +533,7 @@ function pluginFn(grunt: IGrunt) {
                                 amdLoaderModule.updateAmdLoader(referenceFile, referenceOrder, amdloaderFile, amdloaderPath, target.outDir);
                             }
                             return success;
-                        });
+                        })
                     }
                     else {
                         grunt.log.writeln('No files to compile'.red);

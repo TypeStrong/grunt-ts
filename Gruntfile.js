@@ -185,6 +185,7 @@ module.exports = function (grunt) {
                 fast: true,
                 src: ['test/fail/**/*.ts'],
                 outDir: 'test/fail/js',
+                baseDir: 'test/fail/ts',
                 // watch: 'test',
                 options: {                  // overide the main options for this target 
                     sourcemap: false,
