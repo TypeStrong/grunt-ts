@@ -40,6 +40,10 @@ export var typescript = {
         testDirectory(test, 'amdloader');
         test.done();
     },
+    templateCache: function (test) {
+        testDirectory(test, 'templateCache');
+        test.done();
+    },
     index: function (test) {
         testDirectory(test, 'index');
         test.done();
