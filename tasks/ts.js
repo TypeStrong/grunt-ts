@@ -404,7 +404,7 @@ function pluginFn(grunt) {
 
                 // If baseDir is specified create a temp tsc file to make sure that `--outDir` works fine
                 // see https://github.com/grunt-ts/grunt-ts/issues/77
-                if (target.outDir && target.baseDir) {
+                if (target.outDir && target.baseDir && files.length > 0) {
                     baseDirFilePath = path.join(target.baseDir, baseDirFile);
                     if (!fs.existsSync(baseDirFilePath)) {
                         fs.writeFileSync(baseDirFilePath, '// Ignore this file. See https://github.com/grunt-ts/grunt-ts/issues/77');
