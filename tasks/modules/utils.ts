@@ -11,6 +11,27 @@ export function makeRelativePath(folderpath: string, filename: string) {
     return path.relative(folderpath, filename).split('\\').join('/');
 }
 
+
+/**
+ * Returns the result of an array inserted into another, starting at the given index.
+ */
+export function insertArrayAt<T>(array: T[], index: number, arrayToInsert: T[]): T[] {
+    var updated = array.slice(0);
+    var spliceAt: any[] = [index, 0];
+    Array.prototype.splice.apply(updated, spliceAt.concat(arrayToInsert));
+    return updated;
+}
+
+/**
+ * Compares the end of the string with the given suffix for literal equality.
+ *
+ * @returns {boolean} whether the string ends with the suffix literally.
+ */
+export function endsWith(str: string, suffix: string): boolean {
+    return str.indexOf(suffix, str.length - suffix.length) !== -1;
+}
+
+
 // From https://github.com/centi/node-dirutils/blob/master/index.js
 // Slightly modified. See BAS
 
