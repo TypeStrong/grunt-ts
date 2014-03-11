@@ -34,8 +34,13 @@ exports.typescript = {
         testFile(test, 'abtest/out.js');
         test.done();
     },
+    amdloader: function (test) {
+        testDirectory(test, 'amdloader');
+        test.done();
+    },
     index: function (test) {
         testDirectory(test, 'index');
         test.done();
     }
 };
+//# sourceMappingURL=test.js.map

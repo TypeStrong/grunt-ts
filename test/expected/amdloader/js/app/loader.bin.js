@@ -1,0 +1,1 @@
+define(["./classa","./partials/templates.a.html","./deep/classb","./deep/classc","./deep/deeper/classd","./app"],function () {});

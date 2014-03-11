@@ -12,15 +12,15 @@ function testFile(test, path) {
     test.equal(expected, actual, 'tested path: ' + path);
 }
 
-function testExpectedFile(test, path:string) {
-    var actual = grunt.file.read(path.replace('\\expected','').replace('/expected',''));
+function testExpectedFile(test, path: string) {
+    var actual = grunt.file.read(path.replace('\\expected', '').replace('/expected', ''));
     var expected = grunt.file.read(path);
     test.equal(expected, actual, 'tested path: ' + path);
 }
 
 function testDirectory(test, folder) {
     var files = utils.getFiles(('test/expected/' + folder));
-    _.forEach(files, (expected: string) => {        
+    _.forEach(files, (expected: string) => {
         testExpectedFile(test, expected);
     });
 }
@@ -34,6 +34,10 @@ export var typescript = {
     abtest: function (test) {
         testFile(test, 'abtest/reference.ts');
         testFile(test, 'abtest/out.js');
+        test.done();
+    },
+    amdloader: function (test) {
+        testDirectory(test, 'amdloader');
         test.done();
     },
     index: function (test) {
