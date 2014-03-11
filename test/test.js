@@ -42,6 +42,10 @@ exports.typescript = {
         testDirectory(test, 'templateCache');
         test.done();
     },
+    html2ts: function (test) {
+        testDirectory(test, 'html');
+        test.done();
+    },
     index: function (test) {
         testDirectory(test, 'index');
         test.done();
