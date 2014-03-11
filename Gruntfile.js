@@ -182,9 +182,10 @@ module.exports = function (grunt) {
             },
             fail: {
                 fail: true,                  // a designed to fail target
+                fast: true,
                 src: ['test/fail/**/*.ts'],
+                outDir: 'test/fail/js',
                 // watch: 'test',
-                reference: 'test/fail/reference.ts',
                 options: {                  // overide the main options for this target 
                     sourcemap: false,
                 }

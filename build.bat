@@ -1,4 +1,5 @@
 tsc "./tasks/ts.ts" --sourcemap --module commonjs
-tsc "./test/test.ts" --sourcemap --module commonjs
+REM tsc "./test/test.ts" --sourcemap --module commonjs
 REM grunt ts:index
-grunt nodeunit
+REM grunt nodeunit
+REM grunt ts:fail

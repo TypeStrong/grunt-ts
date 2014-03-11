@@ -39,7 +39,8 @@ interface ITargetOptions {
         src: string[]; // if search through all the html files at this location
         dest: string;
         baseUrl: string;
-    }
+    };
+    fast: boolean; // If specified it compiles the immediately watched file only.
 }
 
 /**
@@ -427,7 +428,7 @@ function pluginFn(grunt: IGrunt) {
             // Find out which files to compile
             // Then calls the compile function on those files
             // Also this funciton is debounced
-            function filterFilesAndCompile(): Promise<boolean> {
+            function filterFilesAndCompile(changedFile?: string): Promise<boolean> {
 
                 // Html files:
                 // Note:
@@ -454,6 +455,22 @@ function pluginFn(grunt: IGrunt) {
 
                 // Reexpand the original file glob:
                 var files = grunt.file.expand(currenttask.data.src);
+                var fastCompiling = false;
+
+                // If fast compile and a file changed 
+                if (target.fast && changedFile) {
+                    if (target.out) {
+                        grunt.log.write('Fast compile will not work when --out is specified. Ignoring.'.red);
+                    }
+                    else {
+                        fastCompiling = true;
+                        var completeFiles = _.map(files, (file) => path.resolve(file));
+                        var intersect = _.intersection(completeFiles, [path.resolve(changedFile)]);
+                        if (intersect) {
+                            files = intersect;
+                        }
+                    }
+                }
 
                 // Create the index if specified                 
                 var index = target.index;
@@ -465,6 +482,7 @@ function pluginFn(grunt: IGrunt) {
                 }
 
                 if (!!options.compile) {
+
                     // ignore directories
                     files = files.filter(function (file) {
                         var stats = fs.lstatSync(file);
@@ -481,7 +499,7 @@ function pluginFn(grunt: IGrunt) {
 
                     // Generate the reference file
                     // Create a reference file if specified
-                    if (!!referencePath) {
+                    if (!fastCompiling && !!referencePath) {
                         var result = timeIt(() => {
                             return referenceModule.updateReferenceFile(files, generatedHtmlFiles, referenceFile, referencePath);
                         });
@@ -494,7 +512,7 @@ function pluginFn(grunt: IGrunt) {
                     if (files.length > 0) {
                         return runCompilation(files, target, options).then((success: boolean) => {
                             // Create the loader if specified & compiliation succeeded
-                            if (success && !!amdloaderPath) {
+                            if (!fastCompiling && success && !!amdloaderPath) {
                                 var referenceOrder: amdLoaderModule.IReferences
                                     = amdLoaderModule.getReferencesInOrder(referenceFile, referencePath, generatedHtmlFiles);
                                 amdLoaderModule.updateAmdLoader(referenceFile, referenceOrder, amdloaderFile, amdloaderPath, target.outDir);
@@ -520,7 +538,7 @@ function pluginFn(grunt: IGrunt) {
 
 
                 // local event to handle file event
-                function handleFileEvent(filepath: string, displaystr: string) {
+                function handleFileEvent(filepath: string, displaystr: string, addedOrChanged: boolean = false) {
 
                     // Only ts and html :
                     if (!utils.endsWith(filepath.toLowerCase(), '.ts') && !utils.endsWith(filepath.toLowerCase(), '.html')) {
@@ -537,7 +555,13 @@ function pluginFn(grunt: IGrunt) {
 
                     // Log and run the debounced version.
                     grunt.log.writeln((displaystr + ' >>' + filepath).yellow);
-                    filterFilesAndCompile();
+
+                    if (addedOrChanged) {
+                        filterFilesAndCompile(filepath);
+                    }
+                    else {
+                        filterFilesAndCompile();
+                    }
                 }
 
                 // get path
@@ -553,12 +577,12 @@ function pluginFn(grunt: IGrunt) {
                 // A file has been added/changed/deleted has occurred
                 watcher
                     .on('add', function (path) {
-                        handleFileEvent(path, '+++ added   ');
+                        handleFileEvent(path, '+++ added   ', true);
                         // Reset the time for last compile call
                         lastCompile = new Date().getTime();
                     })
                     .on('change', function (path) {
-                        handleFileEvent(path, '### changed ');
+                        handleFileEvent(path, '### changed ', true);
                         // Reset the time for last compile call
                         lastCompile = new Date().getTime();
                     })
