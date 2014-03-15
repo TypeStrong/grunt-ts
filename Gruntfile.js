@@ -36,8 +36,11 @@ module.exports = function (grunt) {
                 verbose: true
             },
             build: {
-                out: 'tasks/ts.js',
-                src: ['tasks/ts.ts']
+                src: ['tasks/ts.ts'],
+                out: 'tasks/ts.js'
+            },
+            test: {
+                src: ['test/test.ts']
             }
         },
         nodeunit: {
@@ -239,7 +242,7 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-nodeunit');
 
     grunt.registerTask('prep', ['clean', 'jshint:support']);
-    grunt.registerTask('build', ['prep', 'ts-internal:build', 'tslint:source']);
+    grunt.registerTask('build', ['prep', 'ts-internal', 'tslint:source']);
     grunt.registerTask('fail', ['continueOn', 'test_fail', 'continueOff']);
     grunt.registerTask('test', ['test_all', 'nodeunit', 'fail']);
     grunt.registerTask('prepush', ['build', 'test']);
