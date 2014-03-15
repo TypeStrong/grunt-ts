@@ -32,8 +32,51 @@ function endsWith(str, suffix) {
 }
 exports.endsWith = endsWith;
 
+/**
+* Get a random hex value
+*
+* @returns {string} hex string
+*/
+function getRandomHex(length) {
+    if (typeof length === "undefined") { length = 16; }
+    var name = '';
+    do {
+        name += Math.round(Math.random() * Math.pow(16, 8)).toString(16);
+    } while(name.length < length);
+
+    return name.substr(0, length);
+}
+exports.getRandomHex = getRandomHex;
+
+/**
+* Get a unique temp file
+*
+* @returns {string} unique-ish path to file in given directory.
+* @throws when it cannot create a temp file in the specified directory
+*/
+function getTempFile(prefix, dir, extension) {
+    if (typeof dir === "undefined") { dir = ''; }
+    if (typeof extension === "undefined") { extension = '.tmp.txt'; }
+    prefix = (prefix ? prefix + '-' : '');
+    var attempts = 100;
+    do {
+        var name = prefix + exports.getRandomHex(8) + extension;
+        var dest = path.join(dir, name);
+
+        if (!fs.existsSync(dest)) {
+            return dest;
+        }
+        attempts--;
+    } while(attempts > 0);
+
+    throw 'Cannot create temp file in ' + dir;
+}
+exports.getTempFile = getTempFile;
+
+/////////////////////////////////////////////////////////////////////////
 // From https://github.com/centi/node-dirutils/blob/master/index.js
 // Slightly modified. See BAS
+////////////////////////////////////////////////////////////////////////
 /**
 * Get all files from a directory and all its subdirectories.
 * @param {String} dirPath A path to a directory

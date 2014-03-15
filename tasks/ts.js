@@ -1,4 +1,5 @@
 /// <reference path="../defs/tsd.d.ts"/>
+/// <reference path="./modules/interfaces.d.ts"/>
 /*
 * grunt-ts
 * Licensed under the MIT license.
@@ -10,6 +11,7 @@ var fs = require('fs');
 
 // Modules of grunt-ts
 var utils = require('./modules/utils');
+var compileModule = require('./modules/compile');
 var indexModule = require('./modules/index');
 var referenceModule = require('./modules/reference');
 var amdLoaderModule = require('./modules/amdLoader');
@@ -18,7 +20,6 @@ var templateCacheModule = require('./modules/templateCache');
 
 // plain vanilla imports
 var Promise = require('es6-promise').Promise;
-
 
 /**
 * Time a function and print the result.
@@ -34,45 +35,6 @@ function timeIt(makeIt) {
         it: it,
         time: endtime - starttime
     };
-}
-
-/**
-* Get a random hex value
-*
-* @returns {string} hex string
-*/
-function getRandomHex(length) {
-    if (typeof length === "undefined") { length = 16; }
-    var name = '';
-    do {
-        name += Math.round(Math.random() * Math.pow(16, 8)).toString(16);
-    } while(name.length < length);
-
-    return name.substr(0, length);
-}
-
-/**
-* Get a unique temp file
-*
-* @returns {string} unique-ish path to file in given directory.
-* @throws when it cannot create a temp file in the specified directory
-*/
-function getTempFile(prefix, dir, extension) {
-    if (typeof dir === "undefined") { dir = ''; }
-    if (typeof extension === "undefined") { extension = '.tmp.txt'; }
-    prefix = (prefix ? prefix + '-' : '');
-    var attempts = 100;
-    do {
-        var name = prefix + getRandomHex(8) + extension;
-        var dest = path.join(dir, name);
-
-        if (!fs.existsSync(dest)) {
-            return dest;
-        }
-        attempts--;
-    } while(attempts > 0);
-
-    throw 'Cannot create temp file in ' + dir;
 }
 
 /**
@@ -100,120 +62,6 @@ function asyncSeries(arr, iter) {
 }
 
 function pluginFn(grunt) {
-    ///////////////////////////
-    // Helper
-    ///////////////////////////
-    function executeNode(args) {
-        return new Promise(function (resolve, reject) {
-            grunt.util.spawn({
-                cmd: 'node',
-                args: args
-            }, function (error, result, code) {
-                var ret = {
-                    code: code,
-                    output: String(result)
-                };
-                resolve(ret);
-            });
-        });
-    }
-
-    /////////////////////////////////////////////////////////////////////
-    // tsc handling.
-    ////////////////////////////////////////////////////////////////////
-    function resolveTypeScriptBinPath() {
-        var ownRoot = path.resolve(path.dirname((module).filename), '..');
-        var userRoot = path.resolve(ownRoot, '..', '..');
-        var binSub = path.join('node_modules', 'typescript', 'bin');
-
-        if (fs.existsSync(path.join(userRoot, binSub))) {
-            // Using project override
-            return path.join(userRoot, binSub);
-        }
-        return path.join(ownRoot, binSub);
-    }
-
-    function getTsc(binPath) {
-        var pkg = JSON.parse(fs.readFileSync(path.resolve(binPath, '..', 'package.json')).toString());
-        grunt.log.writeln('Using tsc v' + pkg.version);
-
-        return path.join(binPath, 'tsc');
-    }
-
-    // Blindly runs the tsc task using provided options
-    function compileAllFiles(files, target, task) {
-        var args = files.slice(0);
-
-        // boolean options
-        if (task.sourceMap) {
-            args.push('--sourcemap');
-        }
-        if (task.declaration) {
-            args.push('--declaration');
-        }
-        if (task.removeComments) {
-            args.push('--removeComments');
-        }
-        if (task.noImplicitAny) {
-            args.push('--noImplicitAny');
-        }
-        if (task.noResolve) {
-            args.push('--noResolve');
-        }
-
-        // string options
-        args.push('--target', task.target.toUpperCase());
-        args.push('--module', task.module.toLowerCase());
-
-        // Target options:
-        if (target.out) {
-            args.push('--out', target.out);
-        }
-        if (target.outDir) {
-            if (target.out) {
-                console.warn('WARNING: Option "out" and "outDir" should not be used together'.magenta);
-            }
-            args.push('--outDir', target.outDir);
-        }
-        if (task.sourceRoot) {
-            args.push('--sourceRoot', task.sourceRoot);
-        }
-        if (task.mapRoot) {
-            args.push('--mapRoot', task.mapRoot);
-        }
-
-        // Locate a compiler
-        var tsc = getTsc(resolveTypeScriptBinPath());
-
-        // To debug the tsc command
-        if (task.verbose) {
-            console.log(args.join(' ').yellow);
-        } else {
-            grunt.log.verbose.writeln(args.join(' ').yellow);
-        }
-
-        // Create a temp last command file and use that to guide tsc.
-        // Reason: passing all the files on the command line causes TSC to go in an infinite loop.
-        var tempfilename = getTempFile('tscommand');
-        if (!tempfilename) {
-            throw (new Error('cannot create temp file'));
-        }
-
-        fs.writeFileSync(tempfilename, args.join(' '));
-
-        // Execute command
-        return executeNode([tsc, '@' + tempfilename]).then(function (result) {
-            fs.unlinkSync(tempfilename);
-
-            grunt.log.writeln(result.output);
-
-            return Promise.cast(result);
-        }, function (err) {
-            fs.unlinkSync(tempfilename);
-            throw err;
-        });
-    }
-
     /////////////////////////////////////////////////////////////////////
     // The grunt task
     ////////////////////////////////////////////////////////////////////
@@ -242,7 +90,8 @@ function pluginFn(grunt) {
             sourceMap: true,
             sourceRoot: '',
             target: 'es5',
-            verbose: false
+            verbose: false,
+            fast: false
         });
 
         // fix the properly cased options to their appropriate values
@@ -324,17 +173,12 @@ function pluginFn(grunt) {
                     filesToCompile = [referenceFile];
                 }
 
-                // Quote the files to compile
-                filesToCompile = _.map(filesToCompile, function (item) {
-                    return '"' + item + '"';
-                });
-
                 // Time the compiler process
                 var starttime = new Date().getTime();
                 var endtime;
 
                 // Compile the files
-                return compileAllFiles(filesToCompile, target, options).then(function (result) {
+                return compileModule.compileAllFiles(filesToCompile, target, options).then(function (result) {
                     // End the timer
                     endtime = new Date().getTime();
 
@@ -344,20 +188,32 @@ function pluginFn(grunt) {
                         return false;
                     } else {
                         var time = (endtime - starttime) / 1000;
-                        grunt.log.writeln(('Success: ' + time.toFixed(2) + 's for ' + files.length + ' typescript files').green);
+                        grunt.log.writeln(('Success: ' + time.toFixed(2) + 's for ' + result.fileCount + ' typescript files').green);
                         return true;
                     }
                 });
             }
 
-            // Find out which files to compile
-            // Then calls the compile function on those files
-            // Also this funciton is debounced
-            function filterFilesAndCompile(changedFile) {
-                // Html files:
+            // Find out which files to compile, codegen etc.
+            // Then calls the appropriate functions + compile function on those files
+            function filterFilesAndCompile() {
+                // Reexpand the original file glob
+                var files = grunt.file.expand(currenttask.data.src);
+
+                // ignore directories
+                files = files.filter(function (file) {
+                    var stats = fs.lstatSync(file);
+                    return !stats.isDirectory();
+                });
+
+                // Clear the files of output.d.ts and reference.ts
+                files = _.filter(files, function (filename) {
+                    return (!isReferenceFile(filename) && !isOutFile(filename));
+                });
+
+                ///// Html files:
                 // Note:
-                //    compile html files before reference file creation. Which is done in runCompilation
-                //    compile html files before globbing the file system again
+                //    compile html files must be before reference file creation
                 var generatedHtmlFiles = [];
                 if (currenttask.data.html) {
                     var htmlFiles = grunt.file.expand(currenttask.data.html);
@@ -366,8 +222,9 @@ function pluginFn(grunt) {
                     });
                 }
 
-                // The template cache files do not go into generated files.
-                // You are free to generate a `ts OR js` file, both should just work
+                ///// Template cache
+                // Note: The template cache files do not go into generated files.
+                // Note: You are free to generate a `ts OR js` file for template cache, both should just work
                 if (currenttask.data.templateCache) {
                     if (!currenttask.data.templateCache.src || !currenttask.data.templateCache.dest || !currenttask.data.templateCache.baseUrl) {
                         grunt.log.writeln('templateCache : src, dest, baseUrl must be specified if templateCache option is used'.red);
@@ -379,93 +236,50 @@ function pluginFn(grunt) {
                     }
                 }
 
-                // Reexpand the original file glob:
-                var files = grunt.file.expand(currenttask.data.src);
-                var fastCompiling = false;
-                var baseDirFile = 'ignoreBaseDirFile.ts';
-                var baseDirFilePath;
-
-                // If fast compile and a file changed
-                if (target.fast && changedFile) {
-                    if (target.out) {
-                        grunt.log.write('Fast compile will not work when --out is specified. Ignoring.'.red);
-                    } else {
-                        fastCompiling = true;
-                        var completeFiles = _.map(files, function (file) {
-                            return path.resolve(file);
-                        });
-                        var intersect = _.intersection(completeFiles, [path.resolve(changedFile)]);
-
-                        if (intersect) {
-                            files = intersect;
-                        }
-                    }
-                }
-
-                // If baseDir is specified create a temp tsc file to make sure that `--outDir` works fine
-                // see https://github.com/grunt-ts/grunt-ts/issues/77
-                if (target.outDir && target.baseDir && files.length > 0) {
-                    baseDirFilePath = path.join(target.baseDir, baseDirFile);
-                    if (!fs.existsSync(baseDirFilePath)) {
-                        fs.writeFileSync(baseDirFilePath, '// Ignore this file. See https://github.com/grunt-ts/grunt-ts/issues/77');
-                    }
-                    files.push(baseDirFilePath);
-                }
-
+                ///// External Module Index
                 // Create the index if specified
-                var index = target.index;
-                if (!!index) {
-                    if (!_.isArray(index)) {
+                if (target.index) {
+                    if (!_.isArray(target.index)) {
                         grunt.warn('Index option needs to be an array of directories');
                     }
-                    indexModule.indexDirectories(_.map(index, function (folder) {
+                    indexModule.indexDirectories(_.map(target.index, function (folder) {
                         return path.resolve(folder);
                     }));
                 }
 
-                if (!!options.compile) {
-                    // ignore directories
-                    files = files.filter(function (file) {
-                        var stats = fs.lstatSync(file);
-                        return !stats.isDirectory();
+                ///// Reference File
+                // Generate the reference file
+                // Create a reference file if specified
+                if (!!referencePath) {
+                    var result = timeIt(function () {
+                        return referenceModule.updateReferenceFile(files, generatedHtmlFiles, referenceFile, referencePath);
                     });
-
-                    // remove the generated files from files:
-                    files = _.difference(files, generatedHtmlFiles);
-
-                    // Clear the files of output.d.ts and reference.ts
-                    files = _.filter(files, function (filename) {
-                        return (!isReferenceFile(filename) && !isOutFile(filename));
-                    });
-
-                    // Generate the reference file
-                    // Create a reference file if specified
-                    if (!fastCompiling && !!referencePath) {
-                        var result = timeIt(function () {
-                            return referenceModule.updateReferenceFile(files, generatedHtmlFiles, referenceFile, referencePath);
-                        });
-                        if (result.it === true) {
-                            grunt.log.writeln(('Updated reference file (' + result.time + 'ms).').green);
-                        }
+                    if (result.it === true) {
+                        grunt.log.writeln(('Updated reference file (' + result.time + 'ms).').green);
                     }
+                }
 
+                ///// AMD loader
+                // Create the amdLoader if specified
+                if (!!amdloaderPath) {
+                    var referenceOrder = amdLoaderModule.getReferencesInOrder(referenceFile, referencePath, generatedHtmlFiles);
+                    amdLoaderModule.updateAmdLoader(referenceFile, referenceOrder, amdloaderFile, amdloaderPath, target.outDir);
+                }
+
+                // Return promise to compliation
+                if (options.compile) {
                     // Compile, if there are any files to compile!
                     if (files.length > 0) {
                         return runCompilation(files, target, options).then(function (success) {
-                            // Create the loader if specified & compiliation succeeded
-                            if (!fastCompiling && success && !!amdloaderPath) {
-                                var referenceOrder = amdLoaderModule.getReferencesInOrder(referenceFile, referencePath, generatedHtmlFiles);
-                                amdLoaderModule.updateAmdLoader(referenceFile, referenceOrder, amdloaderFile, amdloaderPath, target.outDir);
-                            }
                             return success;
                         });
                     } else {
                         grunt.log.writeln('No files to compile'.red);
+                        return Promise.resolve(true);
                     }
+                } else {
+                    return Promise.resolve(true);
                 }
-
-                // Nothing to do
-                return Promise.resolve(true);
             }
 
             // Time (in ms) when last compile took place
@@ -493,11 +307,7 @@ function pluginFn(grunt) {
                     // Log and run the debounced version.
                     grunt.log.writeln((displaystr + ' >>' + filepath).yellow);
 
-                    if (addedOrChanged) {
-                        filterFilesAndCompile(filepath);
-                    } else {
-                        filterFilesAndCompile();
-                    }
+                    filterFilesAndCompile();
                 }
 
                 // get path

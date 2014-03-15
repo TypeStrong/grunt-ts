@@ -1,4 +1,5 @@
 /// <reference path="../defs/tsd.d.ts"/>
+/// <reference path="./modules/interfaces.d.ts"/>
 
 /*
  * grunt-ts
@@ -12,6 +13,7 @@ import fs = require('fs');
 
 // Modules of grunt-ts
 import utils = require('./modules/utils');
+import compileModule = require('./modules/compile');
 import indexModule = require('./modules/index');
 import referenceModule = require('./modules/reference');
 import amdLoaderModule = require('./modules/amdLoader');
@@ -20,62 +22,6 @@ import templateCacheModule = require('./modules/templateCache');
 
 // plain vanilla imports
 var Promise: typeof Promise = require('es6-promise').Promise;
-
-interface ICompileResult {
-    code: number;
-    output: string;
-}
-
-interface ITargetOptions {
-    src: string[]; // input files  // Note : this is a getter and returns a new "live globbed" array 
-    reference: string; // path to a reference.ts e.g. './approot/'
-    out: string; // if sepecified e.g. 'single.js' all output js files are merged into single.js using tsc --out command     
-    outDir: string; // if sepecified e.g. '/build/js' all output js files are put in this location
-    baseDir: string; // If specified. outDir files are made relative to this. 
-    html: string[];  // if specified this is used to generate typescript files with a single variable which contains the content of the html
-    watch: string; // if specified watches all files in this directory for changes. 
-    amdloader: string;  // if specified creates a js file to load all the generated typescript files in order using requirejs + order
-    index: string[]; // used to create an index folder to make external module access easier
-    templateCache: {
-        src: string[]; // if search through all the html files at this location
-        dest: string;
-        baseUrl: string;
-    };
-    fast: boolean; // If specified it compiles the immediately watched file only.
-}
-
-/**
- * Version 0.9.5.0
- *
- * Bare Options Supported:
- * --allowbool                   Allow 'bool' as a synonym for 'boolean'.
- * --allowimportmodule           Allow 'module(...)' as a synonym for 'require(...)'.
- * --declaration                 Generates corresponding .d.ts file
- * --mapRoot LOCATION            Specifies the location where debugger should locate map files instead of generated locations.
- * --module KIND                 Specify module code generation: "commonjs" or "amd"
- * --noImplicitAny               Warn on expressions and declarations with an implied 'any' type.
- * --noResolve                   Skip resolution and preprocessing
- * --removeComments              Do not emit comments to output
- * --sourcemap                   Generates corresponding .map file
- * --sourceRoot LOCATION         Specifies the location where debugger should locate TypeScript files instead of source locations.
- * --target VERSION              Specify ECMAScript target version: "ES3" (default), or "ES5"
- */
-interface ITaskOptions {
-    allowBool: boolean;
-    allowImportModule: boolean;
-    compile: boolean;
-    declaration: boolean;
-    mapRoot: string;
-    module: string; // amd, commonjs
-    noImplicitAny: boolean;
-    noResolve: boolean;
-    comments: boolean; // false to remove comments
-    removeComments: boolean; // true to remove comments
-    sourceMap: boolean;
-    sourceRoot: string;
-    target: string; // es3 , es5
-    verbose: boolean;
-}
 
 /**
  * Time a function and print the result.
@@ -103,43 +49,6 @@ function timeIt<R>(makeIt: () => R): {
 }
 
 /**
- * Get a random hex value
- *
- * @returns {string} hex string
- */
-function getRandomHex(length: number = 16): string {
-    var name: string = '';
-    do {
-        name += Math.round(Math.random() * Math.pow(16, 8)).toString(16);
-    }
-    while (name.length < length);
-
-    return name.substr(0, length);
-}
-/**
- * Get a unique temp file
- *
- * @returns {string} unique-ish path to file in given directory.
- * @throws when it cannot create a temp file in the specified directory
- */
-function getTempFile(prefix?: string, dir: string = '', extension = '.tmp.txt'): string {
-    prefix = (prefix ? prefix + '-' : '');
-    var attempts = 100;
-    do {
-        var name: string = prefix + getRandomHex(8) + extension;
-        var dest: string = path.join(dir, name);
-
-        if (!fs.existsSync(dest)) {
-            return dest;
-        }
-        attempts--;
-    }
-    while (attempts > 0);
-
-    throw 'Cannot create temp file in ' + dir;
-}
-
-/**
  * Run a map operation async in series (simplified)
  */
 function asyncSeries<U, W>(arr: U[], iter: (item: U) => Promise<W>): Promise<W[]> {
@@ -164,123 +73,6 @@ function asyncSeries<U, W>(arr: U[], iter: (item: U) => Promise<W>): Promise<W[]
 }
 
 function pluginFn(grunt: IGrunt) {
-
-    ///////////////////////////
-    // Helper
-    ///////////////////////////
-    function executeNode(args: string[]): Promise<ICompileResult> {
-        return new Promise((resolve, reject) => {
-            grunt.util.spawn({
-                cmd: 'node',
-                args: args
-            }, (error, result, code) => {
-                    var ret: ICompileResult = {
-                        code: code,
-                        output: String(result)
-                    };
-                    resolve(ret);
-                });
-        });
-    }
-
-    /////////////////////////////////////////////////////////////////////
-    // tsc handling.
-    ////////////////////////////////////////////////////////////////////
-
-    function resolveTypeScriptBinPath(): string {
-        var ownRoot = path.resolve(path.dirname((module).filename), '..');
-        var userRoot = path.resolve(ownRoot, '..', '..');
-        var binSub = path.join('node_modules', 'typescript', 'bin');
-
-        if (fs.existsSync(path.join(userRoot, binSub))) {
-            // Using project override
-            return path.join(userRoot, binSub);
-        }
-        return path.join(ownRoot, binSub);
-    }
-
-    function getTsc(binPath: string): string {
-        var pkg = JSON.parse(fs.readFileSync(path.resolve(binPath, '..', 'package.json')).toString());
-        grunt.log.writeln('Using tsc v' + pkg.version);
-
-        return path.join(binPath, 'tsc');
-    }
-
-    // Blindly runs the tsc task using provided options
-    function compileAllFiles(files: string[], target: ITargetOptions, task: ITaskOptions): Promise<ICompileResult> {
-
-        var args: string[] = files.slice(0);
-
-        // boolean options
-        if (task.sourceMap) {
-            args.push('--sourcemap');
-        }
-        if (task.declaration) {
-            args.push('--declaration');
-        }
-        if (task.removeComments) {
-            args.push('--removeComments');
-        }
-        if (task.noImplicitAny) {
-            args.push('--noImplicitAny');
-        }
-        if (task.noResolve) {
-            args.push('--noResolve');
-        }
-
-        // string options
-        args.push('--target', task.target.toUpperCase());
-        args.push('--module', task.module.toLowerCase());
-
-        // Target options:
-        if (target.out) {
-            args.push('--out', target.out);
-        }
-        if (target.outDir) {
-            if (target.out) {
-                console.warn('WARNING: Option "out" and "outDir" should not be used together'.magenta);
-            }
-            args.push('--outDir', target.outDir);
-        }
-        if (task.sourceRoot) {
-            args.push('--sourceRoot', task.sourceRoot);
-        }
-        if (task.mapRoot) {
-            args.push('--mapRoot', task.mapRoot);
-        }
-
-        // Locate a compiler
-        var tsc = getTsc(resolveTypeScriptBinPath());
-
-        // To debug the tsc command
-        if (task.verbose) {
-            console.log(args.join(' ').yellow);
-        }
-        else {
-            grunt.log.verbose.writeln(args.join(' ').yellow);
-        }
-
-        // Create a temp last command file and use that to guide tsc.
-        // Reason: passing all the files on the command line causes TSC to go in an infinite loop.
-        var tempfilename = getTempFile('tscommand');
-        if (!tempfilename) {
-            throw (new Error('cannot create temp file'));
-        }
-
-        fs.writeFileSync(tempfilename, args.join(' '));
-
-        // Execute command
-        return executeNode([tsc, '@' + tempfilename]).then((result: ICompileResult) => {
-            fs.unlinkSync(tempfilename);
-
-            grunt.log.writeln(result.output);
-
-            return Promise.cast(result);
-        }, (err) => {
-                fs.unlinkSync(tempfilename);
-                throw err;
-            });
-    }
 
     /////////////////////////////////////////////////////////////////////
     // The grunt task
@@ -313,6 +105,7 @@ function pluginFn(grunt: IGrunt) {
             sourceRoot: '',
             target: 'es5', // es3 , es5
             verbose: false,
+            fast: false
         });
 
         // fix the properly cased options to their appropriate values
@@ -387,7 +180,6 @@ function pluginFn(grunt: IGrunt) {
             // Compiles all the files
             // Uses the blind tsc compile task
             // logs errors
-
             function runCompilation(files: string[], target: ITargetOptions, options: ITaskOptions): Promise<boolean> {
                 // Don't run it yet
                 grunt.log.writeln('Compiling...'.yellow);
@@ -401,15 +193,12 @@ function pluginFn(grunt: IGrunt) {
                     filesToCompile = [referenceFile];
                 }
 
-                // Quote the files to compile
-                filesToCompile = _.map(filesToCompile, (item) => '"' + item + '"');
-
                 // Time the compiler process
                 var starttime = new Date().getTime();
                 var endtime;
 
                 // Compile the files
-                return compileAllFiles(filesToCompile, target, options).then((result: ICompileResult) => {
+                return compileModule.compileAllFiles(filesToCompile, target, options).then((result: compileModule.ICompileResult) => {
                     // End the timer
                     endtime = new Date().getTime();
 
@@ -420,28 +209,42 @@ function pluginFn(grunt: IGrunt) {
                     }
                     else {
                         var time = (endtime - starttime) / 1000;
-                        grunt.log.writeln(('Success: ' + time.toFixed(2) + 's for ' + files.length + ' typescript files').green);
+                        grunt.log.writeln(('Success: ' + time.toFixed(2) + 's for ' + result.fileCount + ' typescript files').green);
                         return true;
                     }
                 });
             }
 
-            // Find out which files to compile
-            // Then calls the compile function on those files
-            // Also this funciton is debounced
-            function filterFilesAndCompile(changedFile?: string): Promise<boolean> {
+            // Find out which files to compile, codegen etc. 
+            // Then calls the appropriate functions + compile function on those files
+            function filterFilesAndCompile(): Promise<boolean> {
 
-                // Html files:
+                // Reexpand the original file glob
+                var files = grunt.file.expand(currenttask.data.src);
+
+                // ignore directories
+                files = files.filter(function (file) {
+                    var stats = fs.lstatSync(file);
+                    return !stats.isDirectory();
+                });
+
+                // Clear the files of output.d.ts and reference.ts
+                files = _.filter(files, (filename) => {
+                    return (!isReferenceFile(filename) && !isOutFile(filename));
+                });
+
+                ///// Html files:
                 // Note:
-                //    compile html files before reference file creation. Which is done in runCompilation
-                //    compile html files before globbing the file system again
+                //    compile html files must be before reference file creation                
                 var generatedHtmlFiles = [];
                 if (currenttask.data.html) {
                     var htmlFiles = grunt.file.expand(currenttask.data.html);
                     generatedHtmlFiles = _.map(htmlFiles, (filename) => html2tsModule.compileHTML(filename));
                 }
-                // The template cache files do not go into generated files.
-                // You are free to generate a `ts OR js` file, both should just work
+
+                ///// Template cache
+                // Note: The template cache files do not go into generated files.
+                // Note: You are free to generate a `ts OR js` file for template cache, both should just work
                 if (currenttask.data.templateCache) {
                     if (!currenttask.data.templateCache.src || !currenttask.data.templateCache.dest || !currenttask.data.templateCache.baseUrl) {
                         grunt.log.writeln('templateCache : src, dest, baseUrl must be specified if templateCache option is used'.red);
@@ -454,93 +257,51 @@ function pluginFn(grunt: IGrunt) {
                     }
                 }
 
-                // Reexpand the original file glob:
-                var files = grunt.file.expand(currenttask.data.src);
-                var fastCompiling = false;
-                var baseDirFile: string = 'ignoreBaseDirFile.ts';
-                var baseDirFilePath: string;
-
-                // If fast compile and a file changed 
-                if (target.fast && changedFile) {
-                    if (target.out) {
-                        grunt.log.write('Fast compile will not work when --out is specified. Ignoring.'.red);
-                    }
-                    else {
-                        fastCompiling = true;
-                        var completeFiles = _.map(files, (file) => path.resolve(file));
-                        var intersect = _.intersection(completeFiles, [path.resolve(changedFile)]);
-
-                        if (intersect) {
-                            files = intersect;
-                        }
-                    }
-                }
-
-                // If baseDir is specified create a temp tsc file to make sure that `--outDir` works fine
-                // see https://github.com/grunt-ts/grunt-ts/issues/77
-                if (target.outDir && target.baseDir && files.length > 0) {
-                    baseDirFilePath = path.join(target.baseDir, baseDirFile);
-                    if (!fs.existsSync(baseDirFilePath)) {
-                        fs.writeFileSync(baseDirFilePath, '// Ignore this file. See https://github.com/grunt-ts/grunt-ts/issues/77');
-                    }
-                    files.push(baseDirFilePath);
-                }
-
+                ///// External Module Index
                 // Create the index if specified                 
-                var index = target.index;
-                if (!!index) {
-                    if (!_.isArray(index)) {
+                if (target.index) {
+                    if (!_.isArray(target.index)) {
                         grunt.warn('Index option needs to be an array of directories');
                     }
-                    indexModule.indexDirectories(_.map(index, (folder) => path.resolve(folder)));
+                    indexModule.indexDirectories(_.map(target.index, (folder) => path.resolve(folder)));
                 }
 
-                if (!!options.compile) {
-
-                    // ignore directories
-                    files = files.filter(function (file) {
-                        var stats = fs.lstatSync(file);
-                        return !stats.isDirectory();
+                ///// Reference File
+                // Generate the reference file
+                // Create a reference file if specified
+                if (!!referencePath) {
+                    var result = timeIt(() => {
+                        return referenceModule.updateReferenceFile(files, generatedHtmlFiles, referenceFile, referencePath);
                     });
-
-                    // remove the generated files from files:
-                    files = _.difference(files, generatedHtmlFiles);
-
-                    // Clear the files of output.d.ts and reference.ts
-                    files = _.filter(files, (filename) => {
-                        return (!isReferenceFile(filename) && !isOutFile(filename));
-                    });
-
-                    // Generate the reference file
-                    // Create a reference file if specified
-                    if (!fastCompiling && !!referencePath) {
-                        var result = timeIt(() => {
-                            return referenceModule.updateReferenceFile(files, generatedHtmlFiles, referenceFile, referencePath);
-                        });
-                        if (result.it === true) {
-                            grunt.log.writeln(('Updated reference file (' + result.time + 'ms).').green);
-                        }
+                    if (result.it === true) {
+                        grunt.log.writeln(('Updated reference file (' + result.time + 'ms).').green);
                     }
+                }
 
+                ///// AMD loader
+                // Create the amdLoader if specified 
+                if (!!amdloaderPath) {
+                    var referenceOrder: amdLoaderModule.IReferences
+                        = amdLoaderModule.getReferencesInOrder(referenceFile, referencePath, generatedHtmlFiles);
+                    amdLoaderModule.updateAmdLoader(referenceFile, referenceOrder, amdloaderFile, amdloaderPath, target.outDir);
+                }
+
+                // Return promise to compliation
+                if (options.compile) {
                     // Compile, if there are any files to compile!
                     if (files.length > 0) {
                         return runCompilation(files, target, options).then((success: boolean) => {
-
-                            // Create the loader if specified & compiliation succeeded
-                            if (!fastCompiling && success && !!amdloaderPath) {
-                                var referenceOrder: amdLoaderModule.IReferences
-                                    = amdLoaderModule.getReferencesInOrder(referenceFile, referencePath, generatedHtmlFiles);
-                                amdLoaderModule.updateAmdLoader(referenceFile, referenceOrder, amdloaderFile, amdloaderPath, target.outDir);
-                            }
                             return success;
                         });
                     }
-                    else {
+                    else { // Nothing to do
                         grunt.log.writeln('No files to compile'.red);
+                        return Promise.resolve(true);
                     }
                 }
-                // Nothing to do
-                return Promise.resolve(true);
+                else { // Nothing to do                    
+                    return Promise.resolve(true);
+                }
             }
 
             // Time (in ms) when last compile took place
@@ -549,8 +310,6 @@ function pluginFn(grunt: IGrunt) {
             // Watch a folder?
             watch = target.watch;
             if (!!watch) {
-
-
 
                 // local event to handle file event
                 function handleFileEvent(filepath: string, displaystr: string, addedOrChanged: boolean = false) {
@@ -571,12 +330,7 @@ function pluginFn(grunt: IGrunt) {
                     // Log and run the debounced version.
                     grunt.log.writeln((displaystr + ' >>' + filepath).yellow);
 
-                    if (addedOrChanged) {
-                        filterFilesAndCompile(filepath);
-                    }
-                    else {
-                        filterFilesAndCompile();
-                    }
+                    filterFilesAndCompile();
                 }
 
                 // get path

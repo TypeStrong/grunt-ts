@@ -8,7 +8,7 @@ import os = require('os');
 import utils = require('./utils');
 
 var eol = os.EOL;
-
+var grunt: IGrunt = require('grunt');
 
 /////////////////////////////////////////////////////////////////////
 // Reference file logic
@@ -21,6 +21,9 @@ export function updateReferenceFile(files: string[], generatedFiles: string[], r
     var referenceMatch = /\/\/\/ <reference path=\"(.*?)\"/;
     var ourSignatureStart = '//grunt-start';
     var ourSignatureEnd = '//grunt-end';
+
+    // remove the generated files from files:
+    files = _.difference(files, generatedFiles);
 
     var lines = []; // All lines of the file
     var origFileLines = []; // The lines we do not modify and send out as is. Lines will we reach grunt-ts generated
@@ -94,7 +97,7 @@ export function updateReferenceFile(files: string[], generatedFiles: string[], r
 
     // Modify the orig contents to put in our contents
     var updatedFileLines = utils.insertArrayAt(origFileLines, signatureSectionPosition, contents);
-    fs.writeFileSync(referenceFile, updatedFileLines.join(eol));
+    grunt.file.write(referenceFile, updatedFileLines.join(eol));
 
     // Return whether the file was changed
     if (lines.length === updatedFileLines.length) {

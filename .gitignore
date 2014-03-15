@@ -21,3 +21,4 @@ test/definitelytypedtest/reference.ts
 !tasks/ts-internal.js
 !test/expected/**/*.js
 !test/expected/**/*.map
+.tscache/
