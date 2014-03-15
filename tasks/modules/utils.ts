@@ -11,7 +11,6 @@ export function makeRelativePath(folderpath: string, filename: string) {
     return path.relative(folderpath, filename).split('\\').join('/');
 }
 
-
 /**
  * Returns the result of an array inserted into another, starting at the given index.
  */
@@ -31,9 +30,48 @@ export function endsWith(str: string, suffix: string): boolean {
     return str.indexOf(suffix, str.length - suffix.length) !== -1;
 }
 
+/**
+ * Get a random hex value
+ *
+ * @returns {string} hex string
+ */
+export function getRandomHex(length: number = 16): string {
+    var name: string = '';
+    do {
+        name += Math.round(Math.random() * Math.pow(16, 8)).toString(16);
+    }
+    while (name.length < length);
 
+    return name.substr(0, length);
+}
+
+/**
+ * Get a unique temp file
+ *
+ * @returns {string} unique-ish path to file in given directory.
+ * @throws when it cannot create a temp file in the specified directory
+ */
+export function getTempFile(prefix?: string, dir: string = '', extension = '.tmp.txt'): string {
+    prefix = (prefix ? prefix + '-' : '');
+    var attempts = 100;
+    do {
+        var name: string = prefix + getRandomHex(8) + extension;
+        var dest: string = path.join(dir, name);
+
+        if (!fs.existsSync(dest)) {
+            return dest;
+        }
+        attempts--;
+    }
+    while (attempts > 0);
+
+    throw 'Cannot create temp file in ' + dir;
+}
+
+/////////////////////////////////////////////////////////////////////////
 // From https://github.com/centi/node-dirutils/blob/master/index.js
 // Slightly modified. See BAS
+////////////////////////////////////////////////////////////////////////
 
 /**
  * Get all files from a directory and all its subdirectories.

@@ -1,4 +1,5 @@
 /// <reference path="../defs/tsd.d.ts"/>
+/// <reference path="./modules/interfaces.d.ts"/>
 /*
 * grunt-ts
 * Licensed under the MIT license.
@@ -10,6 +11,7 @@ var fs = require('fs');
 
 // Modules of grunt-ts
 var utils = require('./modules/utils');
+var compileModule = require('./modules/compile');
 var indexModule = require('./modules/index');
 var referenceModule = require('./modules/reference');
 var amdLoaderModule = require('./modules/amdLoader');
@@ -18,7 +20,6 @@ var templateCacheModule = require('./modules/templateCache');
 
 // plain vanilla imports
 var Promise = require('es6-promise').Promise;
-
 
 /**
 * Time a function and print the result.
@@ -34,45 +35,6 @@ function timeIt(makeIt) {
         it: it,
         time: endtime - starttime
     };
-}
-
-/**
-* Get a random hex value
-*
-* @returns {string} hex string
-*/
-function getRandomHex(length) {
-    if (typeof length === "undefined") { length = 16; }
-    var name = '';
-    do {
-        name += Math.round(Math.random() * Math.pow(16, 8)).toString(16);
-    } while(name.length < length);
-
-    return name.substr(0, length);
-}
-
-/**
-* Get a unique temp file
-*
-* @returns {string} unique-ish path to file in given directory.
-* @throws when it cannot create a temp file in the specified directory
-*/
-function getTempFile(prefix, dir, extension) {
-    if (typeof dir === "undefined") { dir = ''; }
-    if (typeof extension === "undefined") { extension = '.tmp.txt'; }
-    prefix = (prefix ? prefix + '-' : '');
-    var attempts = 100;
-    do {
-        var name = prefix + getRandomHex(8) + extension;
-        var dest = path.join(dir, name);
-
-        if (!fs.existsSync(dest)) {
-            return dest;
-        }
-        attempts--;
-    } while(attempts > 0);
-
-    throw 'Cannot create temp file in ' + dir;
 }
 
 /**
@@ -100,120 +62,6 @@ function asyncSeries(arr, iter) {
 }
 
 function pluginFn(grunt) {
-    ///////////////////////////
-    // Helper
-    ///////////////////////////
-    function executeNode(args) {
-        return new Promise(function (resolve, reject) {
-            grunt.util.spawn({
-                cmd: 'node',
-                args: args
-            }, function (error, result, code) {
-                var ret = {
-                    code: code,
-                    output: String(result)
-                };
-                resolve(ret);
-            });
-        });
-    }
-
-    /////////////////////////////////////////////////////////////////////
-    // tsc handling.
-    ////////////////////////////////////////////////////////////////////
-    function resolveTypeScriptBinPath() {
-        var ownRoot = path.resolve(path.dirname((module).filename), '..');
-        var userRoot = path.resolve(ownRoot, '..', '..');
-        var binSub = path.join('node_modules', 'typescript', 'bin');
-
-        if (fs.existsSync(path.join(userRoot, binSub))) {
-            // Using project override
-            return path.join(userRoot, binSub);
-        }
-        return path.join(ownRoot, binSub);
-    }
-
-    function getTsc(binPath) {
-        var pkg = JSON.parse(fs.readFileSync(path.resolve(binPath, '..', 'package.json')).toString());
-        grunt.log.writeln('Using tsc v' + pkg.version);
-
-        return path.join(binPath, 'tsc');
-    }
-
-    // Blindly runs the tsc task using provided options
-    function compileAllFiles(files, target, task) {
-        var args = files.slice(0);
-
-        // boolean options
-        if (task.sourceMap) {
-            args.push('--sourcemap');
-        }
-        if (task.declaration) {
-            args.push('--declaration');
-        }
-        if (task.removeComments) {
-            args.push('--removeComments');
-        }
-        if (task.noImplicitAny) {
-            args.push('--noImplicitAny');
-        }
-        if (task.noResolve) {
-            args.push('--noResolve');
-        }
-
-        // string options
-        args.push('--target', task.target.toUpperCase());
-        args.push('--module', task.module.toLowerCase());
-
-        // Target options:
-        if (target.out) {
-            args.push('--out', target.out);
-        }
-        if (target.outDir) {
-            if (target.out) {
-                console.warn('WARNING: Option "out" and "outDir" should not be used together'.magenta);
-            }
-            args.push('--outDir', target.outDir);
-        }
-        if (task.sourceRoot) {
-            args.push('--sourceRoot', task.sourceRoot);
-        }
-        if (task.mapRoot) {
-            args.push('--mapRoot', task.mapRoot);
-        }
-
-        // Locate a compiler
-        var tsc = getTsc(resolveTypeScriptBinPath());
-
-        // To debug the tsc command
-        if (task.verbose) {
-            console.log(args.join(' ').yellow);
-        } else {
-            grunt.log.verbose.writeln(args.join(' ').yellow);
-        }
-
-        // Create a temp last command file and use that to guide tsc.
-        // Reason: passing all the files on the command line causes TSC to go in an infinite loop.
-        var tempfilename = getTempFile('tscommand');
-        if (!tempfilename) {
-            throw (new Error('cannot create temp file'));
-        }
-
-        fs.writeFileSync(tempfilename, args.join(' '));
-
-        // Execute command
-        return executeNode([tsc, '@' + tempfilename]).then(function (result) {
-            fs.unlinkSync(tempfilename);
-
-            grunt.log.writeln(result.output);
-
-            return Promise.cast(result);
-        }, function (err) {
-            fs.unlinkSync(tempfilename);
-            throw err;
-        });
-    }
-
     /////////////////////////////////////////////////////////////////////
     // The grunt task
     ////////////////////////////////////////////////////////////////////
@@ -334,7 +182,7 @@ function pluginFn(grunt) {
                 var endtime;
 
                 // Compile the files
-                return compileAllFiles(filesToCompile, target, options).then(function (result) {
+                return compileModule.compileAllFiles(filesToCompile, target, options).then(function (result) {
                     // End the timer
                     endtime = new Date().getTime();
 
@@ -439,18 +287,6 @@ function pluginFn(grunt) {
                         //    filesToCompile = intersect;
                         // }
                     }
-                }
-
-                // If baseDir is specified create a temp tsc file to make sure that `--outDir` works fine
-                // see https://github.com/grunt-ts/grunt-ts/issues/77
-                var baseDirFile = 'ignoreBaseDirFile.ts';
-                var baseDirFilePath;
-                if (target.outDir && target.baseDir && files.length > 0) {
-                    baseDirFilePath = path.join(target.baseDir, baseDirFile);
-                    if (!fs.existsSync(baseDirFilePath)) {
-                        fs.writeFileSync(baseDirFilePath, '// Ignore this file. See https://github.com/grunt-ts/grunt-ts/issues/77');
-                    }
-                    filesToCompile.push(baseDirFilePath);
                 }
 
                 // Return promise to compliation
