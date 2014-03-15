@@ -19,6 +19,9 @@ function updateReferenceFile(files, generatedFiles, referenceFile, referencePath
     var ourSignatureStart = '//grunt-start';
     var ourSignatureEnd = '//grunt-end';
 
+    // remove the generated files from files:
+    files = _.difference(files, generatedFiles);
+
     var lines = [];
     var origFileLines = [];
     var origFileReferences = [];

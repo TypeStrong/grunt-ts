@@ -350,14 +350,26 @@ function pluginFn(grunt) {
                 });
             }
 
-            // Find out which files to compile
-            // Then calls the compile function on those files
-            // Also this funciton is debounced
-            function filterFilesAndCompile(changedFile) {
-                // Html files:
+            // Find out which files to compile, codegen etc.
+            // Then calls the appropriate functions + compile function on those files
+            function filterFilesAndCompile() {
+                // Reexpand the original file glob
+                var files = grunt.file.expand(currenttask.data.src);
+
+                // ignore directories
+                files = files.filter(function (file) {
+                    var stats = fs.lstatSync(file);
+                    return !stats.isDirectory();
+                });
+
+                // Clear the files of output.d.ts and reference.ts
+                files = _.filter(files, function (filename) {
+                    return (!isReferenceFile(filename) && !isOutFile(filename));
+                });
+
+                ///// Html files:
                 // Note:
-                //    compile html files before reference file creation. Which is done in runCompilation
-                //    compile html files before globbing the file system again
+                //    compile html files must be before reference file creation
                 var generatedHtmlFiles = [];
                 if (currenttask.data.html) {
                     var htmlFiles = grunt.file.expand(currenttask.data.html);
@@ -366,8 +378,9 @@ function pluginFn(grunt) {
                     });
                 }
 
-                // The template cache files do not go into generated files.
-                // You are free to generate a `ts OR js` file, both should just work
+                ///// Template cache
+                // Note: The template cache files do not go into generated files.
+                // Note: You are free to generate a `ts OR js` file for template cache, both should just work
                 if (currenttask.data.templateCache) {
                     if (!currenttask.data.templateCache.src || !currenttask.data.templateCache.dest || !currenttask.data.templateCache.baseUrl) {
                         grunt.log.writeln('templateCache : src, dest, baseUrl must be specified if templateCache option is used'.red);
@@ -379,93 +392,81 @@ function pluginFn(grunt) {
                     }
                 }
 
-                // Reexpand the original file glob:
-                var files = grunt.file.expand(currenttask.data.src);
-                var fastCompiling = false;
-                var baseDirFile = 'ignoreBaseDirFile.ts';
-                var baseDirFilePath;
+                ///// External Module Index
+                // Create the index if specified
+                if (target.index) {
+                    if (!_.isArray(target.index)) {
+                        grunt.warn('Index option needs to be an array of directories');
+                    }
+                    indexModule.indexDirectories(_.map(target.index, function (folder) {
+                        return path.resolve(folder);
+                    }));
+                }
 
-                // If fast compile and a file changed
-                if (target.fast && changedFile) {
+                ///// Reference File
+                // Generate the reference file
+                // Create a reference file if specified
+                if (!!referencePath) {
+                    var result = timeIt(function () {
+                        return referenceModule.updateReferenceFile(files, generatedHtmlFiles, referenceFile, referencePath);
+                    });
+                    if (result.it === true) {
+                        grunt.log.writeln(('Updated reference file (' + result.time + 'ms).').green);
+                    }
+                }
+
+                ///// AMD loader
+                // Create the amdLoader if specified
+                if (!!amdloaderPath) {
+                    var referenceOrder = amdLoaderModule.getReferencesInOrder(referenceFile, referencePath, generatedHtmlFiles);
+                    amdLoaderModule.updateAmdLoader(referenceFile, referenceOrder, amdloaderFile, amdloaderPath, target.outDir);
+                }
+
+                // TODO: find out which files were changed since last compile
+                // Only if fast compile is specifed
+                // By default we assume all files are changed
+                var filesToCompile = files;
+                var fastCompiling = false;
+                if (target.fast) {
                     if (target.out) {
-                        grunt.log.write('Fast compile will not work when --out is specified. Ignoring.'.red);
+                        grunt.log.write('Fast compile will not work when --out is specified. Ignoring fast compilation'.red);
                     } else {
                         fastCompiling = true;
-                        var completeFiles = _.map(files, function (file) {
-                            return path.resolve(file);
-                        });
-                        var intersect = _.intersection(completeFiles, [path.resolve(changedFile)]);
-
-                        if (intersect) {
-                            files = intersect;
-                        }
+                        // TODO: determine from cache of all files
+                        // var changedFilesWithCompletePaths = files; // TODO: determine from cache
+                        // var intersect = _.intersection(filesWithCompletePaths, changedFilesWithCompletePaths);
+                        // if (intersect) {
+                        //    filesToCompile = intersect;
+                        // }
                     }
                 }
 
                 // If baseDir is specified create a temp tsc file to make sure that `--outDir` works fine
                 // see https://github.com/grunt-ts/grunt-ts/issues/77
+                var baseDirFile = 'ignoreBaseDirFile.ts';
+                var baseDirFilePath;
                 if (target.outDir && target.baseDir && files.length > 0) {
                     baseDirFilePath = path.join(target.baseDir, baseDirFile);
                     if (!fs.existsSync(baseDirFilePath)) {
                         fs.writeFileSync(baseDirFilePath, '// Ignore this file. See https://github.com/grunt-ts/grunt-ts/issues/77');
                     }
-                    files.push(baseDirFilePath);
+                    filesToCompile.push(baseDirFilePath);
                 }
 
-                // Create the index if specified
-                var index = target.index;
-                if (!!index) {
-                    if (!_.isArray(index)) {
-                        grunt.warn('Index option needs to be an array of directories');
-                    }
-                    indexModule.indexDirectories(_.map(index, function (folder) {
-                        return path.resolve(folder);
-                    }));
-                }
-
-                if (!!options.compile) {
-                    // ignore directories
-                    files = files.filter(function (file) {
-                        var stats = fs.lstatSync(file);
-                        return !stats.isDirectory();
-                    });
-
-                    // remove the generated files from files:
-                    files = _.difference(files, generatedHtmlFiles);
-
-                    // Clear the files of output.d.ts and reference.ts
-                    files = _.filter(files, function (filename) {
-                        return (!isReferenceFile(filename) && !isOutFile(filename));
-                    });
-
-                    // Generate the reference file
-                    // Create a reference file if specified
-                    if (!fastCompiling && !!referencePath) {
-                        var result = timeIt(function () {
-                            return referenceModule.updateReferenceFile(files, generatedHtmlFiles, referenceFile, referencePath);
-                        });
-                        if (result.it === true) {
-                            grunt.log.writeln(('Updated reference file (' + result.time + 'ms).').green);
-                        }
-                    }
-
+                // Return promise to compliation
+                if (options.compile) {
                     // Compile, if there are any files to compile!
                     if (files.length > 0) {
-                        return runCompilation(files, target, options).then(function (success) {
-                            // Create the loader if specified & compiliation succeeded
-                            if (!fastCompiling && success && !!amdloaderPath) {
-                                var referenceOrder = amdLoaderModule.getReferencesInOrder(referenceFile, referencePath, generatedHtmlFiles);
-                                amdLoaderModule.updateAmdLoader(referenceFile, referenceOrder, amdloaderFile, amdloaderPath, target.outDir);
-                            }
+                        return runCompilation(filesToCompile, target, options).then(function (success) {
                             return success;
                         });
                     } else {
                         grunt.log.writeln('No files to compile'.red);
+                        return Promise.resolve(true);
                     }
+                } else {
+                    return Promise.resolve(true);
                 }
-
-                // Nothing to do
-                return Promise.resolve(true);
             }
 
             // Time (in ms) when last compile took place
@@ -493,11 +494,7 @@ function pluginFn(grunt) {
                     // Log and run the debounced version.
                     grunt.log.writeln((displaystr + ' >>' + filepath).yellow);
 
-                    if (addedOrChanged) {
-                        filterFilesAndCompile(filepath);
-                    } else {
-                        filterFilesAndCompile();
-                    }
+                    filterFilesAndCompile();
                 }
 
                 // get path
