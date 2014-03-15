@@ -234,7 +234,7 @@ export function updateAmdLoader(referenceFile: string, files: IReferences, loade
             var binFileExtension = '.bin.js';
             var loaderFileWithoutExtension = path.dirname(loaderFile) + pathSeperator + path.basename(loaderFile, '.js');
             var binFilename = loaderFileWithoutExtension + binFileExtension;
-            fs.writeFileSync(binFilename, binaryContent);
+            grunt.file.write(binFilename, binaryContent);
             grunt.log.verbose.writeln('Binary AMD loader written ' + binFilename.cyan);
 
             //
@@ -271,7 +271,7 @@ export function updateAmdLoader(referenceFile: string, files: IReferences, loade
             var output = mainTemplate({ body: subitem });
 
             // Finally write it out
-            fs.writeFileSync(loaderFile, output);
+            grunt.file.write(loaderFile, output);
             grunt.log.verbose.writeln('AMD loader written ' + loaderFile.cyan);
         }
     }
