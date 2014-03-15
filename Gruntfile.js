@@ -184,14 +184,14 @@ module.exports = function (grunt) {
                 index: ['test/index/ts']
             },
             fail: {
-                fail: true,                  // a designed to fail target
-                fast: true,
+                fail: true,                  // a designed to fail target                
                 src: ['test/fail/**/*.ts'],
                 outDir: 'test/fail/js',
                 baseDir: 'test/fail/ts',
                 // watch: 'test',
                 options: {                  // overide the main options for this target 
                     sourcemap: false,
+                    fast: true,
                 }
             },
         }

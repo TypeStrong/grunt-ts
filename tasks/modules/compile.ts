@@ -5,6 +5,7 @@ import path = require('path');
 import fs = require('fs');
 import _ = require('underscore');
 import utils = require('./utils');
+import cache = require('./cacheUtils');
 
 
 var Promise: typeof Promise = require('es6-promise').Promise;
@@ -13,6 +14,7 @@ export var grunt: IGrunt = require('grunt');
 export interface ICompileResult {
     code: number;
     output: string;
+    fileCount?: number;
 }
 
 ///////////////////////////
@@ -34,7 +36,7 @@ function executeNode(args: string[]): Promise<ICompileResult> {
 }
 
 /////////////////////////////////////////////////////////////////////
-// tsc handling.
+// tsc handling
 ////////////////////////////////////////////////////////////////////
 
 function resolveTypeScriptBinPath(): string {
@@ -58,8 +60,21 @@ function getTsc(binPath: string): string {
 
 export function compileAllFiles(targetFiles: string[], target: ITargetOptions, task: ITaskOptions): Promise<ICompileResult> {
 
-    // Make a local copy to mutate freely
+    // Make a local copy so we can modify files without having external side effects
     var files = _.map(targetFiles, (file) => file);
+
+    if (task.fast) {
+        if (target.out) {
+            grunt.log.write('Fast compile will not work when --out is specified. Ignoring fast compilation'.red);
+        }
+        else {
+            var newFiles = getChangedFiles(files);
+            if (newFiles.length !== 0) { files = newFiles; }
+            else {
+                grunt.log.writeln('Compiling all files as no changed files were detected'.green);
+            }
+        }
+    }
 
     // If baseDir is specified create a temp tsc file to make sure that `--outDir` works fine
     // see https://github.com/grunt-ts/grunt-ts/issues/77
@@ -72,6 +87,9 @@ export function compileAllFiles(targetFiles: string[], target: ITargetOptions, t
         }
         files.push(baseDirFilePath);
     }
+
+    // Quote the files to compile. Needed for command line parsing by tsc
+    files = _.map(files, (item) => '"' + path.resolve(item) + '"');
 
     var args: string[] = files.slice(0);
 
@@ -135,6 +153,13 @@ export function compileAllFiles(targetFiles: string[], target: ITargetOptions, t
 
     // Execute command
     return executeNode([tsc, '@' + tempfilename]).then((result: ICompileResult) => {
+
+        if (task.fast) {
+            resetChangedFiles();
+        }
+
+        result.fileCount = files.length;
+
         fs.unlinkSync(tempfilename);
 
         grunt.log.writeln(result.output);
@@ -144,4 +169,27 @@ export function compileAllFiles(targetFiles: string[], target: ITargetOptions, t
             fs.unlinkSync(tempfilename);
             throw err;
         });
+}
+
+
+/////////////////////////////////////////////////////////////////
+// Fast Compilation 
+/////////////////////////////////////////////////////////////////
+
+function getChangedFiles(files) {
+
+    var targetName = grunt.task.current.target;
+
+    files = cache.getNewFilesForTarget(files, targetName);
+
+    _.forEach(files, (file) => {
+        grunt.log.writeln(('### Fast Compile >>' + file).cyan);
+    });
+
+    return files;
+}
+
+function resetChangedFiles() {
+    var targetName = grunt.task.current.target;
+    cache.compileSuccessfull(targetName);
 }

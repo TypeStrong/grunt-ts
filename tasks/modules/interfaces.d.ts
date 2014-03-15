@@ -14,7 +14,6 @@ interface ITargetOptions {
         dest: string;
         baseUrl: string;
     };
-    fast: boolean; // If specified it compiles the immediately watched file only.
 }
 
 /**
@@ -36,7 +35,6 @@ interface ITargetOptions {
 interface ITaskOptions {
     allowBool: boolean;
     allowImportModule: boolean;
-    compile: boolean;
     declaration: boolean;
     mapRoot: string;
     module: string; // amd, commonjs
@@ -47,5 +45,8 @@ interface ITaskOptions {
     sourceMap: boolean;
     sourceRoot: string;
     target: string; // es3 , es5
+
     verbose: boolean;
+    compile: boolean;
+    fast: boolean; // true compiles the changed files only
 }

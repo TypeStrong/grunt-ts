@@ -90,7 +90,8 @@ function pluginFn(grunt) {
             sourceMap: true,
             sourceRoot: '',
             target: 'es5',
-            verbose: false
+            verbose: false,
+            fast: false
         });
 
         // fix the properly cased options to their appropriate values
@@ -172,11 +173,6 @@ function pluginFn(grunt) {
                     filesToCompile = [referenceFile];
                 }
 
-                // Quote the files to compile
-                filesToCompile = _.map(filesToCompile, function (item) {
-                    return '"' + item + '"';
-                });
-
                 // Time the compiler process
                 var starttime = new Date().getTime();
                 var endtime;
@@ -192,7 +188,7 @@ function pluginFn(grunt) {
                         return false;
                     } else {
                         var time = (endtime - starttime) / 1000;
-                        grunt.log.writeln(('Success: ' + time.toFixed(2) + 's for ' + files.length + ' typescript files').green);
+                        grunt.log.writeln(('Success: ' + time.toFixed(2) + 's for ' + result.fileCount + ' typescript files').green);
                         return true;
                     }
                 });
@@ -270,30 +266,11 @@ function pluginFn(grunt) {
                     amdLoaderModule.updateAmdLoader(referenceFile, referenceOrder, amdloaderFile, amdloaderPath, target.outDir);
                 }
 
-                // TODO: find out which files were changed since last compile
-                // Only if fast compile is specifed
-                // By default we assume all files are changed
-                var filesToCompile = files;
-                var fastCompiling = false;
-                if (target.fast) {
-                    if (target.out) {
-                        grunt.log.write('Fast compile will not work when --out is specified. Ignoring fast compilation'.red);
-                    } else {
-                        fastCompiling = true;
-                        // TODO: determine from cache of all files
-                        // var changedFilesWithCompletePaths = files; // TODO: determine from cache
-                        // var intersect = _.intersection(filesWithCompletePaths, changedFilesWithCompletePaths);
-                        // if (intersect) {
-                        //    filesToCompile = intersect;
-                        // }
-                    }
-                }
-
                 // Return promise to compliation
                 if (options.compile) {
                     // Compile, if there are any files to compile!
                     if (files.length > 0) {
-                        return runCompilation(filesToCompile, target, options).then(function (success) {
+                        return runCompilation(files, target, options).then(function (success) {
                             return success;
                         });
                     } else {

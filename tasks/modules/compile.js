@@ -4,6 +4,7 @@ var path = require('path');
 var fs = require('fs');
 var _ = require('underscore');
 var utils = require('./utils');
+var cache = require('./cacheUtils');
 
 var Promise = require('es6-promise').Promise;
 exports.grunt = require('grunt');
@@ -27,7 +28,7 @@ function executeNode(args) {
 }
 
 /////////////////////////////////////////////////////////////////////
-// tsc handling.
+// tsc handling
 ////////////////////////////////////////////////////////////////////
 function resolveTypeScriptBinPath() {
     var ownRoot = path.resolve(path.dirname((module).filename), '../..');
@@ -49,10 +50,23 @@ function getTsc(binPath) {
 }
 
 function compileAllFiles(targetFiles, target, task) {
-    // Make a local copy to mutate freely
+    // Make a local copy so we can modify files without having external side effects
     var files = _.map(targetFiles, function (file) {
         return file;
     });
+
+    if (task.fast) {
+        if (target.out) {
+            exports.grunt.log.write('Fast compile will not work when --out is specified. Ignoring fast compilation'.red);
+        } else {
+            var newFiles = getChangedFiles(files);
+            if (newFiles.length !== 0) {
+                files = newFiles;
+            } else {
+                exports.grunt.log.writeln('Compiling all files as no changed files were detected'.green);
+            }
+        }
+    }
 
     // If baseDir is specified create a temp tsc file to make sure that `--outDir` works fine
     // see https://github.com/grunt-ts/grunt-ts/issues/77
@@ -65,6 +79,11 @@ function compileAllFiles(targetFiles, target, task) {
         }
         files.push(baseDirFilePath);
     }
+
+    // Quote the files to compile. Needed for command line parsing by tsc
+    files = _.map(files, function (item) {
+        return '"' + path.resolve(item) + '"';
+    });
 
     var args = files.slice(0);
 
@@ -127,6 +146,12 @@ function compileAllFiles(targetFiles, target, task) {
 
     // Execute command
     return executeNode([tsc, '@' + tempfilename]).then(function (result) {
+        if (task.fast) {
+            resetChangedFiles();
+        }
+
+        result.fileCount = files.length;
+
         fs.unlinkSync(tempfilename);
 
         exports.grunt.log.writeln(result.output);
@@ -138,4 +163,24 @@ function compileAllFiles(targetFiles, target, task) {
     });
 }
 exports.compileAllFiles = compileAllFiles;
+
+/////////////////////////////////////////////////////////////////
+// Fast Compilation
+/////////////////////////////////////////////////////////////////
+function getChangedFiles(files) {
+    var targetName = exports.grunt.task.current.target;
+
+    files = cache.getNewFilesForTarget(files, targetName);
+
+    _.forEach(files, function (file) {
+        exports.grunt.log.writeln(('### Fast Compile >>' + file).cyan);
+    });
+
+    return files;
+}
+
+function resetChangedFiles() {
+    var targetName = exports.grunt.task.current.target;
+    cache.compileSuccessfull(targetName);
+}
 //# sourceMappingURL=compile.js.map
