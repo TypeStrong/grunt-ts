@@ -7,7 +7,6 @@ import _ = require('underscore');
 import utils = require('./utils');
 import cache = require('./cacheUtils');
 
-
 var Promise: typeof Promise = require('es6-promise').Promise;
 export var grunt: IGrunt = require('grunt');
 
@@ -63,15 +62,25 @@ export function compileAllFiles(targetFiles: string[], target: ITargetOptions, t
     // Make a local copy so we can modify files without having external side effects
     var files = _.map(targetFiles, (file) => file);
 
+    var newFiles: string[];
     if (task.fast) {
         if (target.out) {
             grunt.log.write('Fast compile will not work when --out is specified. Ignoring fast compilation'.red);
+            newFiles = files;
         }
         else {
-            var newFiles = getChangedFiles(files);
+            newFiles = getChangedFiles(files);
             if (newFiles.length !== 0) { files = newFiles; }
             else {
-                grunt.log.writeln('Compiling all files as no changed files were detected'.green);
+                grunt.log.writeln('No file changes were detected. Skipping Compile'.green);
+                return new Promise((resolve) => {
+                    var ret: ICompileResult = {
+                        code: 0,
+                        fileCount:0,
+                        output: 'No files compiled as no change detected'
+                    };
+                    resolve(ret);
+                });
             }
         }
     }
@@ -155,7 +164,7 @@ export function compileAllFiles(targetFiles: string[], target: ITargetOptions, t
     return executeNode([tsc, '@' + tempfilename]).then((result: ICompileResult) => {
 
         if (task.fast) {
-            resetChangedFiles();
+            resetChangedFiles(newFiles);
         }
 
         result.fileCount = files.length;
@@ -189,7 +198,7 @@ function getChangedFiles(files) {
     return files;
 }
 
-function resetChangedFiles() {
+function resetChangedFiles(files) {
     var targetName = grunt.task.current.target;
-    cache.compileSuccessfull(targetName);
+    cache.compileSuccessfull(files, targetName);
 }
