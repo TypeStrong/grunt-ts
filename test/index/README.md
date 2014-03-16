@@ -1,10 +1,12 @@
 # WARNING: Deprecated
 
 ## Reasons for dropping support: 
-* It expects the user to do further config inside the gruntfile task. This is more work. 
+* It expects the user to do further config inside the gruntfile task. This work we can avoid. 
 * It adds a directory `index` containing a bunch of files. Many of these will never even be used. 
 * It is unintutive from a simple import of a directory what are all the files you are actually loading (which might be more than you think). 
 * It is still difficult to manage. You would need to commit an `index` directory into source control. And all your files will need to point to this. I personally would not even want to type `require('../../../../index/someotherfile.ts');`
+
+For new plan see : https://github.com/grunt-ts/grunt-ts/issues/85
 
 # Background 
 
