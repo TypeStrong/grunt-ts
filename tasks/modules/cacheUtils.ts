@@ -5,6 +5,7 @@
 import fs = require('fs');
 import _ = require('underscore');
 import path = require('path');
+import crypto = require('crypto');
 var grunt: IGrunt = require('grunt');
 
 //////////////////////
@@ -15,9 +16,15 @@ var grunt: IGrunt = require('grunt');
 //        - Finally we can update the timestamp file with new time
 /////////////////////
 
+var cacheDir = '.tscache';
+
+
+//////////////////////////////
+// File stamp based filtering
+//////////////////////////////
 
 function getStampPath(targetName: string): string {
-    return path.join('.tscache', targetName, 'timestamp');
+    return path.join(cacheDir, targetName, 'timestamp');
 }
 
 function getLastSuccessfullCompile(targetName: string): Date {
@@ -42,18 +49,97 @@ export function anyNewerThan(paths: string[], time: Date) {
     return getFilesNewerThan(paths, time).length > 0;
 }
 
+export function filterPathsByTime(paths: string[], targetName): string[] {
+    var time = getLastSuccessfullCompile(targetName);
+    return getFilesNewerThan(paths, time);
+};
+
+//////////////////////////////
+// File hash based filtering
+//////////////////////////////
+
+/**
+ * Get path to cached file hash for a target.
+ * @return {string} Path to hash.
+ */
+function getHashPath(filePath, targetName) {
+    var hashedName = crypto.createHash('md5').update(filePath).digest('hex');
+    return path.join(cacheDir, targetName, 'hashes', hashedName);
+};
+
+/**
+ * Get an existing hash for a file (if it exists). 
+ */
+function getExistingHash(filePath, targetName) {
+    var hashPath = getHashPath(filePath, targetName);
+    var exists = fs.existsSync(hashPath);
+    if (!exists) {
+        return null;
+    }
+    return fs.readFileSync(hashPath).toString();
+};
+
+/**
+ * Generate a hash (md5sum) of a file contents.
+ * @param {string} filePath Path to file.
+ */
+function generateFileHash(filePath: string) {
+    var md5sum = crypto.createHash('md5');
+    var data = fs.readFileSync(filePath);
+    md5sum.update(data);
+    return md5sum.digest('hex');
+};
+
+/**
+ * Filter files based on hashed contents.
+ * @param {Array.<string>} paths List of paths to files.
+ * @param {string} cacheDir Cache directory.
+ * @param {string} taskName Task name.
+ * @param {string} targetName Target name.
+ * @param {function(Error, Array.<string>)} callback Callback called with any
+ *     error and a filtered list of files that only includes files with hashes
+ *     that are different than the cached hashes for the same files.
+ */
+function filterPathsByHash(filePaths: string[], targetName) {
+
+    var filtered = _.filter(filePaths, (filePath) => {
+        var previous = getExistingHash(filePath, targetName);
+        var current = generateFileHash(filePath);
+        return previous !== current;
+    });
+
+    return filtered;
+};
+
+function updateHashes(filePaths: string[], targetName) {
+    _.forEach(filePaths, (filePath) => {
+        var hashPath = getHashPath(filePath, targetName);
+        var hash = generateFileHash(filePath);
+        grunt.file.write(hashPath, hash);
+    });
+}
+
+//////////////////////////////
+// External functions
+//////////////////////////////
+
+
 /**
  * Filter a list of files by target
  */
 export function getNewFilesForTarget(paths: string[], targetName): string[] {
+    var step1 = filterPathsByTime(paths, targetName);
+    var step2 = filterPathsByHash(step1, targetName);
 
-    var time = getLastSuccessfullCompile(targetName);
-    return getFilesNewerThan(paths, time);
+    return step2;
 };
 
 /**
  * Update the timestamp for a target to denote last successful compile
  */
-export function compileSuccessfull(targetName) {
+export function compileSuccessfull(paths: string[], targetName) {
+    // update timestamp
     grunt.file.write(getStampPath(targetName), '');
+    // update filehash
+    updateHashes(paths, targetName);
 }

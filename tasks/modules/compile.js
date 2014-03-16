@@ -55,15 +55,25 @@ function compileAllFiles(targetFiles, target, task) {
         return file;
     });
 
+    var newFiles;
     if (task.fast) {
         if (target.out) {
             exports.grunt.log.write('Fast compile will not work when --out is specified. Ignoring fast compilation'.red);
+            newFiles = files;
         } else {
-            var newFiles = getChangedFiles(files);
+            newFiles = getChangedFiles(files);
             if (newFiles.length !== 0) {
                 files = newFiles;
             } else {
-                exports.grunt.log.writeln('Compiling all files as no changed files were detected'.green);
+                exports.grunt.log.writeln('No file changes were detected. Skipping Compile'.green);
+                return new Promise(function (resolve) {
+                    var ret = {
+                        code: 0,
+                        fileCount: 0,
+                        output: 'No files compiled as no change detected'
+                    };
+                    resolve(ret);
+                });
             }
         }
     }
@@ -147,7 +157,7 @@ function compileAllFiles(targetFiles, target, task) {
     // Execute command
     return executeNode([tsc, '@' + tempfilename]).then(function (result) {
         if (task.fast) {
-            resetChangedFiles();
+            resetChangedFiles(newFiles);
         }
 
         result.fileCount = files.length;
@@ -179,8 +189,8 @@ function getChangedFiles(files) {
     return files;
 }
 
-function resetChangedFiles() {
+function resetChangedFiles(files) {
     var targetName = exports.grunt.task.current.target;
-    cache.compileSuccessfull(targetName);
+    cache.compileSuccessfull(files, targetName);
 }
 //# sourceMappingURL=compile.js.map
