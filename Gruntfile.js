@@ -8,6 +8,7 @@ module.exports = function (grunt) {
                 'test/**/*.js',
                 'test/**/*.js.map',
                 'test/**/*.html.ts',
+                '.tscache/**/*',
                 '!test/test.js',
                 '!test/expected/**/*'
             ]
