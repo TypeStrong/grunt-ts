@@ -1,3 +1,4 @@
+REM rmdir .tscache /S /Q
 REM grunt update
 tsc "./tasks/ts.ts" --sourcemap --module commonjs
 REM tsc "./test/test.ts" --sourcemap --module commonjs

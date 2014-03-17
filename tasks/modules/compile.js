@@ -5,6 +5,7 @@ var fs = require('fs');
 var _ = require('underscore');
 var utils = require('./utils');
 var cache = require('./cacheUtils');
+var transformers = require('./transformers');
 
 var Promise = require('es6-promise').Promise;
 exports.grunt = require('grunt');
@@ -55,11 +56,10 @@ function compileAllFiles(targetFiles, target, task) {
         return file;
     });
 
-    var newFiles;
+    var newFiles = files;
     if (task.fast) {
         if (target.out) {
             exports.grunt.log.write('Fast compile will not work when --out is specified. Ignoring fast compilation'.red);
-            newFiles = files;
         } else {
             newFiles = getChangedFiles(files);
             if (newFiles.length !== 0) {
@@ -77,6 +77,9 @@ function compileAllFiles(targetFiles, target, task) {
             }
         }
     }
+
+    // Transform files as needed. Currently all of this logic in is one module
+    transformers.transformFiles(newFiles, targetFiles, target, task);
 
     // If baseDir is specified create a temp tsc file to make sure that `--outDir` works fine
     // see https://github.com/grunt-ts/grunt-ts/issues/77
