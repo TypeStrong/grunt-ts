@@ -184,6 +184,14 @@ module.exports = function (grunt) {
                 outDir: 'test/index/js',
                 index: ['test/index/ts']
             },
+            transform: {
+                test: true,
+                src: ['test/transform/ts/**/*.ts'],
+                outDir: 'test/transform/js',
+                options: {
+                    fast: true
+                }
+            },
             fail: {
                 fail: true,                  // a designed to fail target                
                 src: ['test/fail/**/*.ts'],

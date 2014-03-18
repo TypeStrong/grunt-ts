@@ -3,12 +3,9 @@
 import _ = require('underscore');
 import _str = require('underscore.string');
 import fs = require('fs');
-import os = require('os');
+import grunt = require('grunt');
 
 import utils = require('./utils');
-
-var eol = os.EOL;
-var grunt: IGrunt = require('grunt');
 
 /////////////////////////////////////////////////////////////////////
 // Reference file logic
@@ -97,7 +94,7 @@ export function updateReferenceFile(files: string[], generatedFiles: string[], r
 
     // Modify the orig contents to put in our contents
     var updatedFileLines = utils.insertArrayAt(origFileLines, signatureSectionPosition, contents);
-    grunt.file.write(referenceFile, updatedFileLines.join(eol));
+    grunt.file.write(referenceFile, updatedFileLines.join('\n'));
 
     // Return whether the file was changed
     if (lines.length === updatedFileLines.length) {

@@ -51,5 +51,9 @@ export var typescript = {
     index: function (test) {
         testDirectory(test, 'index');
         test.done();
+    },
+    transform: function (test) {
+        testDirectory(test, 'transform');
+        test.done();
     }
 }

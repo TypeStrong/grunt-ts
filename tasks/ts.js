@@ -167,12 +167,6 @@ function pluginFn(grunt) {
                 // The files to compile
                 var filesToCompile = files;
 
-                // If reference and out are both specified.
-                // Then only compile the udpated reference file as that contains the correct order
-                if (!!referencePath && target.out) {
-                    filesToCompile = [referenceFile];
-                }
-
                 // Time the compiler process
                 var starttime = new Date().getTime();
                 var endtime;
