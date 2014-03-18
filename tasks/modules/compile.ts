@@ -66,7 +66,7 @@ export function compileAllFiles(targetFiles: string[], target: ITargetOptions, t
     var newFiles: string[] = files;
     if (task.fast) {
         if (target.out) {
-            grunt.log.write('Fast compile will not work when --out is specified. Ignoring fast compilation'.red);            
+            grunt.log.write('Fast compile will not work when --out is specified. Ignoring fast compilation'.red);
         }
         else {
             newFiles = getChangedFiles(files);
@@ -95,9 +95,16 @@ export function compileAllFiles(targetFiles: string[], target: ITargetOptions, t
     if (target.outDir && target.baseDir && files.length > 0) {
         baseDirFilePath = path.join(target.baseDir, baseDirFile);
         if (!fs.existsSync(baseDirFilePath)) {
-            fs.writeFileSync(baseDirFilePath, '// Ignore this file. See https://github.com/grunt-ts/grunt-ts/issues/77');
+            grunt.file.write(baseDirFilePath, '// Ignore this file. See https://github.com/grunt-ts/grunt-ts/issues/77');
         }
         files.push(baseDirFilePath);
+    }
+    
+    // If reference and out are both specified.
+    // Then only compile the updated reference file as that contains the correct order
+    if (target.reference && target.out) {
+        var referenceFile = path.resolve(target.reference);
+        files = [referenceFile];
     }
 
     // Quote the files to compile. Needed for command line parsing by tsc

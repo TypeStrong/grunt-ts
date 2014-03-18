@@ -8,8 +8,6 @@ var _ = require('underscore');
 var os = require('os');
 var utils = require('./utils');
 
-var eol = os.EOL;
-
 // Based on name
 // if a filename matches we return a filepath
 // If a foldername matches we return a folderpath
@@ -18,7 +16,7 @@ function getImports(currentFilePath, name, targetFiles, targetDirs) {
 
     // Test if any filename matches
     var targetFile = _.find(targetFiles, function (targetFile) {
-        return path.basename(targetFile) == name || path.basename(targetFile, '.d.ts') == name || path.basename(targetFile, '.ts') == name;
+        return path.basename(targetFile) === name || path.basename(targetFile, '.d.ts') === name || path.basename(targetFile, '.ts') === name;
     });
     if (targetFile) {
         files.push(targetFile);
@@ -28,14 +26,13 @@ function getImports(currentFilePath, name, targetFiles, targetDirs) {
     // i.e. have a 'foldername':folderpath map passed in
     // Test if dirname matches
     var targetDir = _.find(targetDirs, function (targetDir) {
-        return path.basename(targetDir) == name;
+        return path.basename(targetDir) === name;
     });
     if (targetDir) {
         // If targetDir has an index file, we use that
         if (fs.existsSync(path.join(targetDir, 'index.ts'))) {
             files.push(path.join(targetDir, 'index.ts'));
         } else {
-            grunt.log.writeln(targetDir.red);
             var filesInDir = utils.getFiles(targetDir, function (filename) {
                 return path.extname(filename) && (!_str.endsWith(filename, '.ts') || _str.endsWith(filename, '.d.ts')) && !fs.lstatSync(filename).isDirectory();
             });
@@ -54,7 +51,7 @@ function getTargetFolders(targetFiles) {
     var folders = [];
     _.forEach(targetFiles, function (targetFile) {
         var dir = path.dirname(targetFile);
-        while (dir != '.') {
+        while (dir !== '.') {
             // grunt.log.writeln(dir);
             folders.push(dir);
             dir = path.dirname(dir);
@@ -75,7 +72,7 @@ function transformFiles(changedFiles, targetFiles, target, task) {
     ///ts:import=foldername
     // Becomes
     ///ts:import=filename
-    //import filename = require('../relative/path/to/filename'); ///ts:import:generated
+    // import filename = require('../relative/path/to/filename'); ///ts:import:generated
     var tsSignature = '///ts:';
 
     var importMatch = /\/\/\/ts:import=(.*)/;
@@ -97,7 +94,6 @@ function transformFiles(changedFiles, targetFiles, target, task) {
         var fileToProcessDirectory = path.dirname(fileToProcess);
 
         var outputLines = [];
-        var inSignatureSection = false;
 
         for (var i = 0; i < lines.length; i++) {
             var line = lines[i];
@@ -129,7 +125,7 @@ function transformFiles(changedFiles, targetFiles, target, task) {
                             var filename = path.basename(completePathToFile, '.ts');
 
                             // If filename is index, we replace it with dirname:
-                            if (filename.toLowerCase() == 'index') {
+                            if (filename.toLowerCase() === 'index') {
                                 filename = path.basename(path.dirname(completePathToFile));
                             }
                             var pathToFile = utils.makeRelativePath(fileToProcessDirectory, completePathToFile.replace('.ts', ''));

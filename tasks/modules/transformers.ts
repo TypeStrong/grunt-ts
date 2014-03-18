@@ -9,8 +9,6 @@ import _ = require('underscore');
 import os = require('os');
 import utils = require('./utils');
 
-var eol = os.EOL;
-
 // Based on name
 // if a filename matches we return a filepath
 // If a foldername matches we return a folderpath
@@ -19,9 +17,9 @@ function getImports(currentFilePath: string, name: string, targetFiles: string[]
 
     // Test if any filename matches 
     var targetFile = _.find(targetFiles, (targetFile) => {
-        return path.basename(targetFile) == name
-            || path.basename(targetFile, '.d.ts') == name
-            || path.basename(targetFile, '.ts') == name;
+        return path.basename(targetFile) === name
+            || path.basename(targetFile, '.d.ts') === name
+            || path.basename(targetFile, '.ts') === name;
 
     });
     if (targetFile) {
@@ -33,7 +31,7 @@ function getImports(currentFilePath: string, name: string, targetFiles: string[]
 
     // Test if dirname matches
     var targetDir = _.find(targetDirs, (targetDir) => {
-        return path.basename(targetDir) == name;
+        return path.basename(targetDir) === name;
     });
     if (targetDir) {
         // If targetDir has an index file, we use that
@@ -62,10 +60,10 @@ function getTargetFolders(targetFiles: string[]) {
     var folders = [];
     _.forEach(targetFiles, (targetFile) => {
         var dir = path.dirname(targetFile);
-        while (dir != '.') {
+        while (dir !== '.') {
             // grunt.log.writeln(dir);
             folders.push(dir);
-            dir = path.dirname(dir)
+            dir = path.dirname(dir);
         }
     });
 
@@ -92,13 +90,13 @@ export function transformFiles(
     // Becomes
 
     ///ts:import=filename    
-    //import filename = require('../relative/path/to/filename'); ///ts:import:generated
+    // import filename = require('../relative/path/to/filename'); ///ts:import:generated
 
 
     var tsSignature = '///ts:';
 
     var importMatch = /\/\/\/ts:import=(.*)/;
-    var importSignatureIntro = '///ts:import'
+    var importSignatureIntro = '///ts:import';
     var importSignatureGenerated = ' ' + importSignatureIntro + ':generated';
     var importError = '/// No glob matched name: ';
 
@@ -119,7 +117,6 @@ export function transformFiles(
         var fileToProcessDirectory = path.dirname(fileToProcess);
 
         var outputLines = [];
-        var inSignatureSection = false;
 
         for (var i = 0; i < lines.length; i++) {
 
@@ -153,7 +150,7 @@ export function transformFiles(
                         _.forEach(imports, (completePathToFile) => {
                             var filename = path.basename(completePathToFile, '.ts');
                             // If filename is index, we replace it with dirname: 
-                            if (filename.toLowerCase() == 'index') {
+                            if (filename.toLowerCase() === 'index') {
                                 filename = path.basename(path.dirname(completePathToFile));
                             }
                             var pathToFile = utils.makeRelativePath(fileToProcessDirectory, completePathToFile.replace('.ts', ''));

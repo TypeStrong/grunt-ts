@@ -3,11 +3,9 @@
 import _ = require('underscore');
 import _str = require('underscore.string');
 import fs = require('fs');
-import os = require('os');
+import grunt = require('grunt');
 
 import utils = require('./utils');
-
-import grunt = require('grunt');
 
 /////////////////////////////////////////////////////////////////////
 // Reference file logic

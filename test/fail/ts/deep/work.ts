@@ -1,5 +1,11 @@
-﻿///ts:import=filename
-import filename = require('../relative/path/to/filename'); ///ts:import:generated
+﻿///ts:import=filename
+/// No glob matched name: filename ///ts:import:generated
+
+
+
+
+
+
 
 module Simple1 {
     export function main() {

@@ -2,10 +2,9 @@
 var _ = require('underscore');
 var _str = require('underscore.string');
 var fs = require('fs');
+var grunt = require('grunt');
 
 var utils = require('./utils');
-
-var grunt = require('grunt');
 
 /////////////////////////////////////////////////////////////////////
 // Reference file logic
