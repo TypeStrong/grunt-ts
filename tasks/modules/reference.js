@@ -17,9 +17,6 @@ function updateReferenceFile(files, generatedFiles, referenceFile, referencePath
     var ourSignatureStart = '//grunt-start';
     var ourSignatureEnd = '//grunt-end';
 
-    // remove the generated files from files:
-    files = _.difference(files, generatedFiles);
-
     var lines = [];
     var origFileLines = [];
     var origFileReferences = [];
@@ -29,6 +26,47 @@ function updateReferenceFile(files, generatedFiles, referenceFile, referencePath
     var signatureSectionPosition = 0;
     var i;
 
+    // Put in the generated files
+    generatedFiles = _.map(generatedFiles, function (file) {
+        return referenceIntro + utils.makeRelativePath(referencePath, file) + referenceEnd;
+    });
+    var contents = utils.insertArrayAt([ourSignatureStart], 1, generatedFiles);
+
+    // Iterate through files for constant file referencing/build order.
+    // In TFS, local files are readonly in so TFS can handle them, when working in TEAMS it is not possible to include a dynamic, automatically created file in TFS as it is read only.
+    // grunt will fail becuase of a file access error. Also, note that file ordering is a team wide resource and so it should be stored in a regenerated file.
+    // The solution is using external files, the idea is the same as //grunt-start - //grunt-end but using files as prefix/suffix.
+    // The implementation co-exists with the original solution, the files are added inside the dynamic file area to make everyone happy.
+    // No settings needed,  create 2 file with the same name as your master reference file and add ".prefix" / ".suffix" to thier name.
+    // e.g: for master.ts create 2 files: master.prefix.ts & master.suffix.ts (You can also add one of them...)
+    /* PRFIX FILE */
+    if (fs.existsSync(i = referenceFile.replace(/\.ts$/, '.prefix.ts'))) {
+        // Add it as reference.
+        contents.push(referenceIntro + utils.makeRelativePath(referencePath, i) + referenceEnd);
+
+        // get list of its childs to register existing nested references.
+        origFileReferences = _.union(origFileReferences, fs.readFileSync(i).toString().split('\n').filter(function (f) {
+            return _str.include(f, referenceIntro);
+        }).map(function (f) {
+            return f.match(referenceMatch)[1];
+        }), [utils.makeRelativePath(referencePath, i)]);
+    }
+
+    /* SUFFIX FILE */
+    var suffixRef;
+    if (fs.existsSync(i = referenceFile.replace(/\.ts$/, '.suffix.ts'))) {
+        // Save the reference, we will add it before closing. (should be right before //grunt-end)
+        suffixRef = referenceIntro + utils.makeRelativePath(referencePath, i) + referenceEnd;
+
+        // get list of its childs to register existing nested references.
+        origFileReferences = _.union(origFileReferences, fs.readFileSync(i).toString().split('\n').filter(function (f) {
+            return _str.include(f, referenceIntro);
+        }).map(function (f) {
+            return f.match(referenceMatch)[1];
+        }), [utils.makeRelativePath(referencePath, i)]);
+    }
+
+    /* END OF FILE PREFIX/SUFFIX addon */
     // Read the original file if it exists
     if (fs.existsSync(referenceFile)) {
         lines = fs.readFileSync(referenceFile).toString().split('\n');
@@ -68,12 +106,6 @@ function updateReferenceFile(files, generatedFiles, referenceFile, referencePath
         }
     }
 
-    // Put in the generated files
-    generatedFiles = _.map(generatedFiles, function (file) {
-        return referenceIntro + utils.makeRelativePath(referencePath, file) + referenceEnd;
-    });
-    var contents = utils.insertArrayAt([ourSignatureStart], 1, generatedFiles);
-
     // Put in the new / observed missing files:
     files.forEach(function (filename) {
         // The file we are about to add
@@ -89,6 +121,10 @@ function updateReferenceFile(files, generatedFiles, referenceFile, referencePath
         // Finally add the filepath
         contents.push(referenceIntro + filepath + referenceEnd);
     });
+
+    if (suffixRef)
+        contents.push(suffixRef);
+
     contents.push(ourSignatureEnd);
 
     // Modify the orig contents to put in our contents
