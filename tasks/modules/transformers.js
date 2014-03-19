@@ -74,13 +74,13 @@ function transformFiles(changedFiles, targetFiles, target, task) {
     ///ts:import=filename
     // import filename = require('../relative/path/to/filename'); ///ts:import:generated
     var tsSignature = '///ts:';
+    var tsSignatureMatch = '///ts:{0}=(.*)';
 
-    var importMatch = /\/\/\/ts:import=(.*)/;
-    var importSignatureIntro = '///ts:import';
+    var importMatch = new RegExp(utils.format(tsSignatureMatch, 'import'));
+    var importSignatureIntro = tsSignature + 'import';
     var importSignatureGenerated = ' ' + importSignatureIntro + ':generated';
     var importError = '/// No glob matched name: ';
-
-    var completeFileExportTemplate = _.template('import <%=filename%> = require(\'<%= pathToFile %>\');' + importSignatureGenerated);
+    var importemplate = _.template('import <%=filename%> = require(\'<%= pathToFile %>\');' + importSignatureGenerated);
 
     _.forEach(changedFiles, function (fileToProcess) {
         var contents = fs.readFileSync(fileToProcess).toString();
@@ -98,6 +98,7 @@ function transformFiles(changedFiles, targetFiles, target, task) {
         for (var i = 0; i < lines.length; i++) {
             var line = lines[i];
 
+            //// Debugging
             // grunt.log.writeln('line'.green);
             // grunt.log.writeln(line);
             // Skip generated lines as these will get regenerated
@@ -129,7 +130,7 @@ function transformFiles(changedFiles, targetFiles, target, task) {
                                 filename = path.basename(path.dirname(completePathToFile));
                             }
                             var pathToFile = utils.makeRelativePath(fileToProcessDirectory, completePathToFile.replace('.ts', ''));
-                            outputLines.push(completeFileExportTemplate({ filename: filename, pathToFile: pathToFile }));
+                            outputLines.push(importemplate({ filename: filename, pathToFile: pathToFile }));
                         });
                     } else {
                         outputLines.push(importError + name + importSignatureGenerated);

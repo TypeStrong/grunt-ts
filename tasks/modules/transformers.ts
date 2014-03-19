@@ -94,15 +94,14 @@ export function transformFiles(
 
 
     var tsSignature = '///ts:';
+    var tsSignatureMatch = '///ts:{0}=(.*)';
 
-    var importMatch = /\/\/\/ts:import=(.*)/;
-    var importSignatureIntro = '///ts:import';
+    var importMatch = new RegExp(utils.format(tsSignatureMatch, 'import'));
+    var importSignatureIntro = tsSignature + 'import';
     var importSignatureGenerated = ' ' + importSignatureIntro + ':generated';
     var importError = '/// No glob matched name: ';
-
-    var completeFileExportTemplate: (data?: { filename: string; pathToFile: string }) => string =
+    var importemplate: (data?: { filename: string; pathToFile: string }) => string =
         _.template('import <%=filename%> = require(\'<%= pathToFile %>\');' + importSignatureGenerated);
-
 
     _.forEach(changedFiles, (fileToProcess) => {
         var contents = fs.readFileSync(fileToProcess).toString();
@@ -122,6 +121,7 @@ export function transformFiles(
 
             var line = lines[i];
 
+            //// Debugging 
             // grunt.log.writeln('line'.green);
             // grunt.log.writeln(line);
 
@@ -154,7 +154,7 @@ export function transformFiles(
                                 filename = path.basename(path.dirname(completePathToFile));
                             }
                             var pathToFile = utils.makeRelativePath(fileToProcessDirectory, completePathToFile.replace('.ts', ''));
-                            outputLines.push(completeFileExportTemplate({ filename: filename, pathToFile: pathToFile }));
+                            outputLines.push(importemplate({ filename: filename, pathToFile: pathToFile }));
                         });
                     }
                     else {

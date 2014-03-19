@@ -30,6 +30,15 @@ export function endsWith(str: string, suffix: string): boolean {
     return str.indexOf(suffix, str.length - suffix.length) !== -1;
 }
 
+/** function for formatting strings 
+ * ('{0} says {1}','la','ba' ) => 'la says ba'
+ */
+export function format(str: string, ...args: any[]) {
+    return str.replace(/{(\d+)}/g, function (m, i?) {
+        return args[i] !== undefined ? args[i] : m;
+    });
+}
+
 /**
  * Get a random hex value
  *
