@@ -43,21 +43,32 @@ export function updateReferenceFile(files: string[], generatedFiles: string[], r
     // No settings needed,  create 2 file with the same name as your master reference file and add ".prefix" / ".suffix" to thier name.
     // e.g: for master.ts create 2 files: master.prefix.ts & master.suffix.ts (You can also add one of them...)
     /* PRFIX FILE */
-    if (fs.existsSync(i = referenceFile.replace(/\.ts$/, '.prefix.ts'))) {
-        // Add it as reference.
-        contents.push(referenceIntro + utils.makeRelativePath(referencePath, i) + referenceEnd);
+    if (fs.existsSync(i = referenceFile.replace(/\.ts$/, '.prefix.ts'))) {    
         // get list of its childs to register existing nested references.
-        origFileReferences = _.union(origFileReferences, fs.readFileSync(i).toString().split('\n').filter((f) => _str.include(f, referenceIntro)).map((f) => f.match(referenceMatch)[1]), [utils.makeRelativePath(referencePath, i)]);
+        fs.readFileSync(i).toString().split('\n').filter((f) => _str.include(f, referenceIntro)).map((f) => f.match(referenceMatch)[1]).forEach(function (f) {
+            contents.push(referenceIntro + f + referenceEnd); // file should be already relative
+            origFileReferences.push(f);      
+        });
+        // mark this file so we wont include it
+        origFileReferences.push(utils.makeRelativePath(referencePath, i));        
     }
+    origFileReferences = _.unique(origFileReferences);
+
     /* SUFFIX FILE */
-    var suffixRef;    
-    if (fs.existsSync(i = referenceFile.replace(/\.ts$/, '.suffix.ts'))) {
-        // Save the reference, we will add it before closing. (should be right before //grunt-end)
-        suffixRef = referenceIntro + utils.makeRelativePath(referencePath, i) + referenceEnd;
+    var suffixRef: any[];
+    if (fs.existsSync(i = referenceFile.replace(/\.ts$/, '.suffix.ts'))) {        
+        suffixRef = [];
+
         // get list of its childs to register existing nested references.
-        origFileReferences = _.union(origFileReferences, fs.readFileSync(i).toString().split('\n').filter((f) => _str.include(f, referenceIntro)).map((f) => f.match(referenceMatch)[1]), [utils.makeRelativePath(referencePath, i)]);
+        fs.readFileSync(i).toString().split('\n').filter((f) => _str.include(f, referenceIntro)).map((f) => f.match(referenceMatch)[1]).forEach(function (f) {
+            suffixRef.push(referenceIntro + f + referenceEnd); // file should be already relative
+            origFileReferences.push(f);
+        });
+
+        // mark this file so we wont include it
+        origFileReferences.push(utils.makeRelativePath(referencePath, i));
     }
-    /* END OF FILE PREFIX/SUFFIX addon */
+    
 
     // Read the original file if it exists
     if (fs.existsSync(referenceFile)) {
@@ -115,7 +126,7 @@ export function updateReferenceFile(files: string[], generatedFiles: string[], r
     });
 
     if (suffixRef)
-        contents.push(suffixRef);
+        contents = _.union( contents , suffixRef );
 
     contents.push(ourSignatureEnd);
 
