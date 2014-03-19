@@ -19,6 +19,9 @@ export function updateReferenceFile(files: string[], generatedFiles: string[], r
     var ourSignatureStart = '//grunt-start';
     var ourSignatureEnd = '//grunt-end';
 
+     // remove the generated files from files:
+    files = _.difference(files, generatedFiles);
+
     var lines = []; // All lines of the file
     var origFileLines = []; // The lines we do not modify and send out as is. Lines will we reach grunt-ts generated
     var origFileReferences = []; // The list of files already there that we do not need to manage
