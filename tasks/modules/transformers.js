@@ -55,6 +55,7 @@ function getImports(currentFilePath, name, targetFiles, targetDirs, getIndexIfDi
 
                 return path.extname(filename) && (!_str.endsWith(filename, '.ts') || _str.endsWith(filename, '.d.ts')) && !fs.lstatSync(filename).isDirectory();
             });
+            filesInDir.sort(); // Sort needed to increase reliability of codegen between runs
             files = files.concat(filesInDir);
         }
     }

@@ -90,7 +90,7 @@ export function getTempFile(prefix?: string, dir: string = '', extension = '.tmp
      as an argument and should return true (exclude file) or false (do not exclude).
  * @returns {Array} An array of files
  */
-export function getFiles(dirPath, exclude?: (filename: string) => boolean) {
+export function getFiles(dirPath, exclude?: (filename: string) => boolean): string[] {
     return _getAll(dirPath, exclude, true);
 };
 

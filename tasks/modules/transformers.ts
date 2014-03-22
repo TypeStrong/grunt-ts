@@ -57,6 +57,7 @@ function getImports(currentFilePath: string, name: string, targetFiles: string[]
                     && (!_str.endsWith(filename, '.ts') || _str.endsWith(filename, '.d.ts'))
                     && !fs.lstatSync(filename).isDirectory(); // for people that name directories with dots
             });
+            filesInDir.sort(); // Sort needed to increase reliability of codegen between runs
             files = files.concat(filesInDir);
         }
     }
