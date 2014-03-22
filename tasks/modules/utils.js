@@ -32,6 +32,20 @@ function endsWith(str, suffix) {
 }
 exports.endsWith = endsWith;
 
+/** function for formatting strings
+* ('{0} says {1}','la','ba' ) => 'la says ba'
+*/
+function format(str) {
+    var args = [];
+    for (var _i = 0; _i < (arguments.length - 1); _i++) {
+        args[_i] = arguments[_i + 1];
+    }
+    return str.replace(/{(\d+)}/g, function (m, i) {
+        return args[i] !== undefined ? args[i] : m;
+    });
+}
+exports.format = format;
+
 /**
 * Get a random hex value
 *

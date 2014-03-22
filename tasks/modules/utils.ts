@@ -30,6 +30,15 @@ export function endsWith(str: string, suffix: string): boolean {
     return str.indexOf(suffix, str.length - suffix.length) !== -1;
 }
 
+/** function for formatting strings 
+ * ('{0} says {1}','la','ba' ) => 'la says ba'
+ */
+export function format(str: string, ...args: any[]) {
+    return str.replace(/{(\d+)}/g, function (m, i?) {
+        return args[i] !== undefined ? args[i] : m;
+    });
+}
+
 /**
  * Get a random hex value
  *
@@ -81,7 +90,7 @@ export function getTempFile(prefix?: string, dir: string = '', extension = '.tmp
      as an argument and should return true (exclude file) or false (do not exclude).
  * @returns {Array} An array of files
  */
-export function getFiles(dirPath, exclude?: (filename: string) => boolean) {
+export function getFiles(dirPath, exclude?: (filename: string) => boolean): string[] {
     return _getAll(dirPath, exclude, true);
 };
 
