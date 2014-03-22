@@ -9,6 +9,11 @@ import _ = require('underscore');
 import os = require('os');
 import utils = require('./utils');
 
+// Setup when transformers are triggered
+var currentTargetFiles: string[];
+var currentTargetDirs: string[];
+
+
 // Based on name
 // if a filename matches we return a filepath
 // If a foldername matches we return a folderpath
@@ -34,15 +39,19 @@ function getImports(currentFilePath: string, name: string, targetFiles: string[]
         return path.basename(targetDir) === name;
     });
     if (targetDir) {
-        // If targetDir has an index file, we use that
-        if (getIndexIfDir && fs.existsSync(path.join(targetDir, 'index.ts'))) {
+        var possibleIndexFilePath = path.join(targetDir, 'index.ts');
+        // If targetDir has an index file AND this is not that file then 
+        // use index.ts instead of all the files in the directory
+        if (getIndexIfDir
+            && fs.existsSync(possibleIndexFilePath)
+            && path.relative(currentFilePath, possibleIndexFilePath) !== '') {
             files.push(path.join(targetDir, 'index.ts'));
         }
         // Otherwise we lookup all the files that are in the folder
         else {
             var filesInDir = utils.getFiles(targetDir, (filename) => {
                 // exclude current file
-                if (path.relative(currentFilePath, filename) == '.') return true;
+                if (path.relative(currentFilePath, filename) === '') { return true; }
 
                 return path.extname(filename) // must have extension : do not exclude directories                
                     && (!_str.endsWith(filename, '.ts') || _str.endsWith(filename, '.d.ts'))
@@ -77,8 +86,6 @@ class BaseTransformer {
 
     static tsSignature = '///ts:';
     static tsSignatureMatch = '///ts:{0}=(.*)';
-    static targetFiles: string[];
-    static targetDirs: string[];
 
     intro: string;
     match: RegExp;
@@ -115,9 +122,9 @@ class ImportTransformer extends BaseTransformer {
 
     transform(sourceFile: string, config: string, outputLines: string[]) {
         name = config;
-        var fileToProcessDirectory = path.dirname(sourceFile);
+        var sourceFileDirectory = path.dirname(sourceFile);
 
-        var imports = getImports(sourceFile, name, BaseTransformer.targetFiles, BaseTransformer.targetDirs);
+        var imports = getImports(sourceFile, name, currentTargetFiles, currentTargetDirs);
 
         if (imports.length) {
             _.forEach(imports, (completePathToFile) => {
@@ -126,7 +133,7 @@ class ImportTransformer extends BaseTransformer {
                 if (filename.toLowerCase() === 'index') {
                     filename = path.basename(path.dirname(completePathToFile));
                 }
-                var pathToFile = utils.makeRelativePath(fileToProcessDirectory, completePathToFile.replace('.ts', ''));
+                var pathToFile = './' + utils.makeRelativePath(sourceFileDirectory, completePathToFile.replace('.ts', ''));
                 outputLines.push(this.template({ filename: filename, pathToFile: pathToFile }));
             });
         }
@@ -153,9 +160,9 @@ class ExportTransformer extends BaseTransformer {
     // One difference : we do not short circuit to `index.ts` if found
     transform(sourceFile: string, config: string, outputLines: string[]) {
         name = config;
-        var fileToProcessDirectory = path.dirname(sourceFile);
+        var sourceFileDirectory = path.dirname(sourceFile);
 
-        var imports = getImports(sourceFile, name, BaseTransformer.targetFiles, BaseTransformer.targetDirs, false);
+        var imports = getImports(sourceFile, name, currentTargetFiles, currentTargetDirs, false);
 
         if (imports.length) {
             _.forEach(imports, (completePathToFile) => {
@@ -164,7 +171,7 @@ class ExportTransformer extends BaseTransformer {
                 if (filename.toLowerCase() === 'index') {
                     filename = path.basename(path.dirname(completePathToFile));
                 }
-                var pathToFile = utils.makeRelativePath(fileToProcessDirectory, completePathToFile.replace('.ts', ''));
+                var pathToFile = './' + utils.makeRelativePath(sourceFileDirectory, completePathToFile.replace('.ts', ''));
                 outputLines.push(this.template({ filename: filename, pathToFile: pathToFile }));
             });
         }
@@ -186,8 +193,8 @@ export function transformFiles(
     target: ITargetOptions,
     task: ITaskOptions) {
 
-    BaseTransformer.targetDirs = getTargetFolders(targetFiles);
-    BaseTransformer.targetFiles = targetFiles;
+    currentTargetDirs = getTargetFolders(targetFiles);
+    currentTargetFiles = targetFiles;
 
     ///////////////////////////////////// transformation
 

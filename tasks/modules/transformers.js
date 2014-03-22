@@ -14,6 +14,10 @@ var _ = require('underscore');
 var os = require('os');
 var utils = require('./utils');
 
+// Setup when transformers are triggered
+var currentTargetFiles;
+var currentTargetDirs;
+
 // Based on name
 // if a filename matches we return a filepath
 // If a foldername matches we return a folderpath
@@ -36,14 +40,18 @@ function getImports(currentFilePath, name, targetFiles, targetDirs, getIndexIfDi
         return path.basename(targetDir) === name;
     });
     if (targetDir) {
-        // If targetDir has an index file, we use that
-        if (getIndexIfDir && fs.existsSync(path.join(targetDir, 'index.ts'))) {
+        var possibleIndexFilePath = path.join(targetDir, 'index.ts');
+
+        // If targetDir has an index file AND this is not that file then
+        // use index.ts instead of all the files in the directory
+        if (getIndexIfDir && fs.existsSync(possibleIndexFilePath) && path.relative(currentFilePath, possibleIndexFilePath) !== '') {
             files.push(path.join(targetDir, 'index.ts'));
         } else {
             var filesInDir = utils.getFiles(targetDir, function (filename) {
                 // exclude current file
-                if (path.relative(currentFilePath, filename) == '.')
+                if (path.relative(currentFilePath, filename) === '') {
                     return true;
+                }
 
                 return path.extname(filename) && (!_str.endsWith(filename, '.ts') || _str.endsWith(filename, '.d.ts')) && !fs.lstatSync(filename).isDirectory();
             });
@@ -105,9 +113,9 @@ var ImportTransformer = (function (_super) {
     ImportTransformer.prototype.transform = function (sourceFile, config, outputLines) {
         var _this = this;
         name = config;
-        var fileToProcessDirectory = path.dirname(sourceFile);
+        var sourceFileDirectory = path.dirname(sourceFile);
 
-        var imports = getImports(sourceFile, name, BaseTransformer.targetFiles, BaseTransformer.targetDirs);
+        var imports = getImports(sourceFile, name, currentTargetFiles, currentTargetDirs);
 
         if (imports.length) {
             _.forEach(imports, function (completePathToFile) {
@@ -117,7 +125,7 @@ var ImportTransformer = (function (_super) {
                 if (filename.toLowerCase() === 'index') {
                     filename = path.basename(path.dirname(completePathToFile));
                 }
-                var pathToFile = utils.makeRelativePath(fileToProcessDirectory, completePathToFile.replace('.ts', ''));
+                var pathToFile = './' + utils.makeRelativePath(sourceFileDirectory, completePathToFile.replace('.ts', ''));
                 outputLines.push(_this.template({ filename: filename, pathToFile: pathToFile }));
             });
         } else {
@@ -139,9 +147,9 @@ var ExportTransformer = (function (_super) {
     ExportTransformer.prototype.transform = function (sourceFile, config, outputLines) {
         var _this = this;
         name = config;
-        var fileToProcessDirectory = path.dirname(sourceFile);
+        var sourceFileDirectory = path.dirname(sourceFile);
 
-        var imports = getImports(sourceFile, name, BaseTransformer.targetFiles, BaseTransformer.targetDirs, false);
+        var imports = getImports(sourceFile, name, currentTargetFiles, currentTargetDirs, false);
 
         if (imports.length) {
             _.forEach(imports, function (completePathToFile) {
@@ -151,7 +159,7 @@ var ExportTransformer = (function (_super) {
                 if (filename.toLowerCase() === 'index') {
                     filename = path.basename(path.dirname(completePathToFile));
                 }
-                var pathToFile = utils.makeRelativePath(fileToProcessDirectory, completePathToFile.replace('.ts', ''));
+                var pathToFile = './' + utils.makeRelativePath(sourceFileDirectory, completePathToFile.replace('.ts', ''));
                 outputLines.push(_this.template({ filename: filename, pathToFile: pathToFile }));
             });
         } else {
@@ -165,8 +173,8 @@ var ExportTransformer = (function (_super) {
 // I think it is the best option available at the moment.
 // I am open for suggestions
 function transformFiles(changedFiles, targetFiles, target, task) {
-    BaseTransformer.targetDirs = getTargetFolders(targetFiles);
-    BaseTransformer.targetFiles = targetFiles;
+    currentTargetDirs = getTargetFolders(targetFiles);
+    currentTargetFiles = targetFiles;
 
     ///////////////////////////////////// transformation
     // Sample import transformation
