@@ -66,7 +66,7 @@ export function compileAllFiles(targetFiles: string[], target: ITargetOptions, t
     var newFiles: string[] = files;
     if (task.fast) {
         if (target.out) {
-            grunt.log.write('Fast compile will not work when --out is specified. Ignoring fast compilation'.red);
+            grunt.log.writeln('Fast compile will not work when --out is specified. Ignoring fast compilation'.cyan);
         }
         else {
             newFiles = getChangedFiles(files);

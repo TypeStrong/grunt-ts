@@ -74,7 +74,7 @@ module.exports = function (grunt) {
                 // Override the default options, see : http://gruntjs.com/configuring-tasks#options
                 options: {
                     sourcemap: true,
-                    declaration: true
+                    declaration: true,
                 },
             },
             simple: {
@@ -187,10 +187,7 @@ module.exports = function (grunt) {
             transform: {
                 test: true,
                 src: ['test/transform/ts/**/*.ts'],
-                outDir: 'test/transform/js',
-                options: {
-                    fast: true
-                }
+                outDir: 'test/transform/js'
             },
             fail: {
                 fail: true,                  // a designed to fail target                
@@ -199,8 +196,7 @@ module.exports = function (grunt) {
                 baseDir: 'test/fail/ts',
                 // watch: 'test',
                 options: {                  // overide the main options for this target 
-                    sourcemap: false,
-                    fast: true,
+                    sourcemap: false
                 }
             },
         }
@@ -211,15 +207,18 @@ module.exports = function (grunt) {
     grunt.registerTask('upgrade', function () {
         var next = grunt.file.read('./tasks/ts.js');
 
+        // change `ts` to `ts-internal`
         var pattern = 'grunt.registerMultiTask(\'ts\',';
         var internal = 'grunt.registerMultiTask(\'ts-internal\',';
-
         if (next.indexOf(pattern) < 0) {
             grunt.fail.warn('can\'t find task declaration-pattern: ' + pattern);
             return;
         }
         next = next.replace(pattern, internal);
+
+        // Also add header to show which version was used
         next = '// v' + grunt.config.get('pkg.version') + ' ' + new Date().toISOString() + '\r\n' + next;
+
         grunt.file.write('./tasks/ts-internal.js', next);
     });
 

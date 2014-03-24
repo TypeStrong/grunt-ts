@@ -105,7 +105,7 @@ function pluginFn(grunt: IGrunt) {
             sourceRoot: '',
             target: 'es5', // es3 , es5
             verbose: false,
-            fast: false
+            fast: true
         });
 
         // fix the properly cased options to their appropriate values

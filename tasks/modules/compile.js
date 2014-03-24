@@ -59,7 +59,7 @@ function compileAllFiles(targetFiles, target, task) {
     var newFiles = files;
     if (task.fast) {
         if (target.out) {
-            exports.grunt.log.write('Fast compile will not work when --out is specified. Ignoring fast compilation'.red);
+            exports.grunt.log.writeln('Fast compile will not work when --out is specified. Ignoring fast compilation'.cyan);
         } else {
             newFiles = getChangedFiles(files);
             if (newFiles.length !== 0) {
