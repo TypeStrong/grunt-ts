@@ -240,8 +240,10 @@ function transformFiles(changedFiles, targetFiles, target, task) {
             // Lines not generated or not directives
             outputLines.push(line);
         }
-
-        grunt.file.write(fileToProcess, outputLines.join(os.EOL));
+        var transformedContent = outputLines.join(os.EOL);
+        if (transformedContent !== contents) {
+            grunt.file.write(fileToProcess, transformedContent);
+        }
     });
 }
 exports.transformFiles = transformFiles;
