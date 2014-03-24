@@ -5,6 +5,7 @@ var fs = require('fs');
 var grunt = require('grunt');
 
 var utils = require('./utils');
+var os = require('os');
 
 /////////////////////////////////////////////////////////////////////
 // Reference file logic
@@ -30,8 +31,10 @@ function updateReferenceFile(files, generatedFiles, referenceFile, referencePath
     var i;
 
     // Read the original file if it exists
+    var referenceContents = '';
     if (fs.existsSync(referenceFile)) {
-        lines = fs.readFileSync(referenceFile).toString().split('\n');
+        referenceContents = fs.readFileSync(referenceFile).toString();
+        lines = referenceContents.split(/\r\n|\r|\n/);
 
         var inSignatureSection = false;
 
@@ -91,21 +94,16 @@ function updateReferenceFile(files, generatedFiles, referenceFile, referencePath
     });
     contents.push(ourSignatureEnd);
 
-    // Modify the orig contents to put in our contents
     var updatedFileLines = utils.insertArrayAt(origFileLines, signatureSectionPosition, contents);
-    grunt.file.write(referenceFile, updatedFileLines.join('\n'));
+    var updatedFileContents = updatedFileLines.join(os.EOL);
 
-    // Return whether the file was changed
-    if (lines.length === updatedFileLines.length) {
-        var updated = false;
-        for (i = 0; i < lines.length; i++) {
-            if (lines[i] !== updatedFileLines[i]) {
-                updated = true;
-            }
-        }
-        return updated;
-    } else {
+    // Modify the orig contents to put in our contents only if changed
+    // Also Return whether the file was changed
+    if (updatedFileContents !== referenceContents) {
+        grunt.file.write(referenceFile, updatedFileContents);
         return true;
+    } else {
+        return false;
     }
 }
 exports.updateReferenceFile = updateReferenceFile;

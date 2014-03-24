@@ -33,7 +33,7 @@ export function updateReferenceFile(files: string[], generatedFiles: string[], r
     var i;
 
     // Read the original file if it exists
-    var referenceContents = ''
+    var referenceContents = '';
     if (fs.existsSync(referenceFile)) {
         referenceContents = fs.readFileSync(referenceFile).toString();
         lines = referenceContents.split(/\r\n|\r|\n/);
