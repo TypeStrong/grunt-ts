@@ -14,4 +14,4 @@ Added support for generating angularJS template cache
 * Make `///  ts:import` etc. work same as `///ts:import` i.e. whitespace independent. 
 * Add `///ts:reference` transform. 
 * Show error when `/// ts:???` is detected but no transform exists for `???`
-* Automatically clear the `.tscache` on loading `grunt-ts` task. https://github.com/grunt-ts/grunt-ts/issues/81
+* if fast compiling and `baseDir` isn't specified, figure one out based on the target src glob.
