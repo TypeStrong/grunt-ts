@@ -10,9 +10,11 @@
 import _ = require('underscore');
 import path = require('path');
 import fs = require('fs');
+import gruntGlobal = require('grunt');
 
 // Modules of grunt-ts
 import utils = require('./modules/utils');
+import cacheUtils = require('./modules/cacheUtils');
 import compileModule = require('./modules/compile');
 import indexModule = require('./modules/index');
 import referenceModule = require('./modules/reference');
@@ -22,6 +24,8 @@ import templateCacheModule = require('./modules/templateCache');
 
 // plain vanilla imports
 var Promise: typeof Promise = require('es6-promise').Promise;
+var rimraf = require('rimraf');
+
 
 /**
  * Time a function and print the result.
@@ -70,6 +74,16 @@ function asyncSeries<U, W>(arr: U[], iter: (item: U) => Promise<W>): Promise<W[]
         };
         next();
     });
+}
+
+// As soon as this module is loaded we clear the tscache
+// This ensures that we compile all the typescript whenever we are restarted
+try {
+    rimraf.sync(cacheUtils.cacheDir);
+    gruntGlobal.log.writeln('Cleared fast compile cache'.cyan);
+}
+catch (ex) {
+    gruntGlobal.log.writeln('No existing fast compile cache'.cyan);
 }
 
 function pluginFn(grunt: IGrunt) {

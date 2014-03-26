@@ -16,7 +16,7 @@ var grunt: IGrunt = require('grunt');
 //        - Finally we can update the timestamp file with new time
 /////////////////////
 
-var cacheDir = '.tscache';
+export var cacheDir = '.tscache';
 
 
 //////////////////////////////

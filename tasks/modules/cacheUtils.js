@@ -13,13 +13,13 @@ var grunt = require('grunt');
 //              new files for this target
 //        - Finally we can update the timestamp file with new time
 /////////////////////
-var cacheDir = '.tscache';
+exports.cacheDir = '.tscache';
 
 //////////////////////////////
 // File stamp based filtering
 //////////////////////////////
 function getStampPath(targetName) {
-    return path.join(cacheDir, targetName, 'timestamp');
+    return path.join(exports.cacheDir, targetName, 'timestamp');
 }
 
 function getLastSuccessfullCompile(targetName) {
@@ -61,7 +61,7 @@ exports.filterPathsByTime = filterPathsByTime;
 */
 function getHashPath(filePath, targetName) {
     var hashedName = crypto.createHash('md5').update(filePath).digest('hex');
-    return path.join(cacheDir, targetName, 'hashes', hashedName);
+    return path.join(exports.cacheDir, targetName, 'hashes', hashedName);
 }
 ;
 

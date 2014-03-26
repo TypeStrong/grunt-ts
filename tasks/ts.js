@@ -8,9 +8,11 @@
 var _ = require('underscore');
 var path = require('path');
 var fs = require('fs');
+var gruntGlobal = require('grunt');
 
 // Modules of grunt-ts
 var utils = require('./modules/utils');
+var cacheUtils = require('./modules/cacheUtils');
 var compileModule = require('./modules/compile');
 var indexModule = require('./modules/index');
 var referenceModule = require('./modules/reference');
@@ -20,6 +22,7 @@ var templateCacheModule = require('./modules/templateCache');
 
 // plain vanilla imports
 var Promise = require('es6-promise').Promise;
+var rimraf = require('rimraf');
 
 /**
 * Time a function and print the result.
@@ -59,6 +62,13 @@ function asyncSeries(arr, iter) {
         };
         next();
     });
+}
+
+try  {
+    rimraf.sync(cacheUtils.cacheDir);
+    gruntGlobal.log.writeln('Cleared fast compile cache'.cyan);
+} catch (ex) {
+    gruntGlobal.log.writeln('No existing fast compile cache'.cyan);
 }
 
 function pluginFn(grunt) {

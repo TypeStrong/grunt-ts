@@ -187,6 +187,7 @@ module.exports = function (grunt) {
             transform: {
                 test: true,
                 src: ['test/transform/ts/**/*.ts'],
+                // watch: './test',
                 outDir: 'test/transform/js'
             },
             fail: {
