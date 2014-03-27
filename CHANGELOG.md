@@ -18,4 +18,5 @@ Added support for generating angularJS template cache
 * Make `///  ts:import` etc. work same as `///ts:import` i.e. whitespace independent. 
 * Add `///ts:reference` transform. 
 * Show error when `/// ts:???` is detected but no transform exists for `???`
+* Update to TypeScript `0.9.7` as the default
 
