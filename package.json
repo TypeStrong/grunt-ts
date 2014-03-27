@@ -40,7 +40,7 @@
     },
     "dependencies": {
         "typescript": "0.9.5",
-        "chokidar": "0.8.1",
+        "chokidar": "0.8.2",
         "underscore": "1.5.1",
         "underscore.string": "2.3.3",
         "es6-promise": "~0.1.1",
