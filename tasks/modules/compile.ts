@@ -70,7 +70,15 @@ export function compileAllFiles(targetFiles: string[], target: ITargetOptions, t
         }
         else {
             newFiles = getChangedFiles(files);
-            if (newFiles.length !== 0) { files = newFiles; }
+
+            if (newFiles.length !== 0) {
+                files = newFiles;
+                
+                // If outDir is specified but no baseDir is specified we need to determine one
+                if (target.outDir && !target.baseDir) {
+                    target.baseDir = utils.findCommonPath(files, '/');
+                }
+            }
             else {
                 grunt.log.writeln('No file changes were detected. Skipping Compile'.green);
                 return new Promise((resolve) => {

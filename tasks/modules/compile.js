@@ -62,8 +62,14 @@ function compileAllFiles(targetFiles, target, task) {
             exports.grunt.log.writeln('Fast compile will not work when --out is specified. Ignoring fast compilation'.cyan);
         } else {
             newFiles = getChangedFiles(files);
+
             if (newFiles.length !== 0) {
                 files = newFiles;
+
+                // If outDir is specified but no baseDir is specified we need to determine one
+                if (target.outDir && !target.baseDir) {
+                    target.baseDir = utils.findCommonPath(files, '/');
+                }
             } else {
                 exports.grunt.log.writeln('No file changes were detected. Skipping Compile'.green);
                 return new Promise(function (resolve) {

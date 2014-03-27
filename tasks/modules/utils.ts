@@ -11,6 +11,43 @@ export function makeRelativePath(folderpath: string, filename: string) {
     return path.relative(folderpath, filename).split('\\').join('/');
 }
 
+
+// Finds the longest common section of a collection of strings.
+// Simply sorting and comparing first and last http://stackoverflow.com/a/1917041/390330
+function sharedStart(array: string[]): string {
+    if (array.length === 0) {
+        throw 'Cannot find common root of empty array.';
+    }
+    var A = array.slice(0).sort(),
+        firstWord = A[0],
+        lastWord = A[A.length - 1];
+
+    if (firstWord === lastWord) {
+        return firstWord;
+    }
+    else {
+        var i = -1;
+        do {
+            i += 1;
+            var firstWordChar = firstWord.charAt(i);
+            var lastWordChar = lastWord.charAt(i);
+        } while (firstWordChar === lastWordChar);
+
+        return firstWord.substring(0, i);
+    }
+}
+
+// Finds the common system path between paths
+// Explanation of how is inline
+export function findCommonPath(paths: string[], pathSeperator: string) {
+    // Now for "C:\u\starter" "C:\u\started" => "C:\u\starte"
+    var largetStartSegement = sharedStart(paths);
+
+    // For "C:\u\starte" => C:\u\
+    var ending = largetStartSegement.lastIndexOf(pathSeperator);
+    return largetStartSegement.substr(0, ending);
+}
+
 /**
  * Returns the result of an array inserted into another, starting at the given index.
  */

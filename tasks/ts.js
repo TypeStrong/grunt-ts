@@ -158,6 +158,15 @@ function pluginFn(grunt) {
                 return path.resolve(filename) === outFile_d_ts;
             }
 
+            // see https://github.com/grunt-ts/grunt-ts/issues/77
+            function isBaseDirFile(filename, targetFiles) {
+                var baseDirFile = 'ignoreBaseDirFile.ts';
+                if (!target.baseDir) {
+                    target.baseDir = utils.findCommonPath(targetFiles, '/');
+                }
+                return path.resolve(filename) === path.resolve(path.join(target.baseDir, baseDirFile));
+            }
+
             // Create an amd loader?
             var amdloader = target.amdloader;
             var amdloaderFile;
@@ -210,18 +219,18 @@ function pluginFn(grunt) {
                     return !stats.isDirectory();
                 });
 
-                // Clear the files of output.d.ts and reference.ts
+                // Clear the files of output.d.ts and reference.ts and baseDirFile
                 files = _.filter(files, function (filename) {
-                    return (!isReferenceFile(filename) && !isOutFile(filename));
+                    return (!isReferenceFile(filename) && !isOutFile(filename) && !isBaseDirFile(filename, files));
                 });
 
                 ///// Html files:
                 // Note:
                 //    compile html files must be before reference file creation
-                var generatedHtmlFiles = [];
+                var generatedFiles = [];
                 if (currenttask.data.html) {
                     var htmlFiles = grunt.file.expand(currenttask.data.html);
-                    generatedHtmlFiles = _.map(htmlFiles, function (filename) {
+                    generatedFiles = _.map(htmlFiles, function (filename) {
                         return html2tsModule.compileHTML(filename);
                     });
                 }
@@ -256,7 +265,7 @@ function pluginFn(grunt) {
                 // Create a reference file if specified
                 if (!!referencePath) {
                     var result = timeIt(function () {
-                        return referenceModule.updateReferenceFile(files, generatedHtmlFiles, referenceFile, referencePath);
+                        return referenceModule.updateReferenceFile(files, generatedFiles, referenceFile, referencePath);
                     });
                     if (result.it === true) {
                         grunt.log.writeln(('Updated reference file (' + result.time + 'ms).').green);
@@ -266,7 +275,7 @@ function pluginFn(grunt) {
                 ///// AMD loader
                 // Create the amdLoader if specified
                 if (!!amdloaderPath) {
-                    var referenceOrder = amdLoaderModule.getReferencesInOrder(referenceFile, referencePath, generatedHtmlFiles);
+                    var referenceOrder = amdLoaderModule.getReferencesInOrder(referenceFile, referencePath, generatedFiles);
                     amdLoaderModule.updateAmdLoader(referenceFile, referenceOrder, amdloaderFile, amdloaderPath, target.outDir);
                 }
 

@@ -108,41 +108,6 @@ export function getReferencesInOrder(referenceFile: string, referencePath: strin
     return toreturn;
 }
 
-// Finds the longest common section of a collection of strings.
-// Simply sorting and comparing first and last http://stackoverflow.com/a/1917041/390330
-function sharedStart(array: string[]): string {
-    if (array.length === 0) {
-        throw 'Cannot find common root of empty array.';
-    }
-    var A = array.slice(0).sort(),
-        firstWord = A[0],
-        lastWord = A[A.length - 1];
-
-    if (firstWord === lastWord) {
-        return firstWord;
-    }
-    else {
-        var i = -1;
-        do {
-            i += 1;
-            var firstWordChar = firstWord.charAt(i);
-            var lastWordChar = lastWord.charAt(i);
-        } while (firstWordChar === lastWordChar);
-
-        return firstWord.substring(0, i);
-    }
-}
-
-// Explanation inline
-function findCommonPath(paths: string[]) {
-    // Now for "C:\u\starter" "C:\u\started" => "C:\u\starte"
-    var largetStartSegement = sharedStart(paths);
-
-    // For "C:\u\starte" => C:\u\
-    var ending = largetStartSegement.lastIndexOf(pathSeperator);
-    return largetStartSegement.substr(0, ending);
-}
-
 // It updates based on the order of reference files
 export function updateAmdLoader(referenceFile: string, files: IReferences, loaderFile: string, loaderPath: string, outDir: string) {
 
@@ -181,7 +146,7 @@ export function updateAmdLoader(referenceFile: string, files: IReferences, loade
         //          Finally: outDir path + remainder section
         if (outDir) {
             // Find common path
-            var commonPath = findCommonPath(files.before.concat(files.generated.concat(files.unordered.concat(files.after))));
+            var commonPath = utils.findCommonPath(files.before.concat(files.generated.concat(files.unordered.concat(files.after))), pathSeperator);
             grunt.log.verbose.writeln('Found common path: ' + commonPath);
 
             // Make sure outDir is absolute:
