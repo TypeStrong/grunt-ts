@@ -193,7 +193,7 @@ The `package.json` would look something like this for a legacy project:
 {
   "devDependencies": {
     "grunt" : "~0.4.1",
-    "grunt-ts" : "~1.7.3",
+    "grunt-ts" : "~1.9.2",
     "typescript" : "0.9.7"
   }
 }
