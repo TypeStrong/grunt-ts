@@ -50,7 +50,6 @@ function filterPathsByTime(paths, targetName) {
     return getFilesNewerThan(paths, time);
 }
 exports.filterPathsByTime = filterPathsByTime;
-;
 
 //////////////////////////////
 // File hash based filtering
@@ -60,10 +59,9 @@ exports.filterPathsByTime = filterPathsByTime;
 * @return {string} Path to hash.
 */
 function getHashPath(filePath, targetName) {
-    var hashedName = crypto.createHash('md5').update(filePath).digest('hex');
+    var hashedName = path.basename(filePath) + '-' + crypto.createHash('md5').update(filePath).digest('hex');
     return path.join(exports.cacheDir, targetName, 'hashes', hashedName);
 }
-;
 
 /**
 * Get an existing hash for a file (if it exists).
@@ -76,7 +74,6 @@ function getExistingHash(filePath, targetName) {
     }
     return fs.readFileSync(hashPath).toString();
 }
-;
 
 /**
 * Generate a hash (md5sum) of a file contents.
@@ -88,7 +85,6 @@ function generateFileHash(filePath) {
     md5sum.update(data);
     return md5sum.digest('hex');
 }
-;
 
 /**
 * Filter files based on hashed contents.
@@ -109,7 +105,6 @@ function filterPathsByHash(filePaths, targetName) {
 
     return filtered;
 }
-;
 
 function updateHashes(filePaths, targetName) {
     _.forEach(filePaths, function (filePath) {
@@ -132,7 +127,6 @@ function getNewFilesForTarget(paths, targetName) {
     return step2;
 }
 exports.getNewFilesForTarget = getNewFilesForTarget;
-;
 
 /**
 * Update the timestamp for a target to denote last successful compile

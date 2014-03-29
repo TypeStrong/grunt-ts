@@ -52,7 +52,7 @@ export function anyNewerThan(paths: string[], time: Date) {
 export function filterPathsByTime(paths: string[], targetName): string[] {
     var time = getLastSuccessfullCompile(targetName);
     return getFilesNewerThan(paths, time);
-};
+}
 
 //////////////////////////////
 // File hash based filtering
@@ -63,9 +63,9 @@ export function filterPathsByTime(paths: string[], targetName): string[] {
  * @return {string} Path to hash.
  */
 function getHashPath(filePath, targetName) {
-    var hashedName = crypto.createHash('md5').update(filePath).digest('hex');
+    var hashedName = path.basename(filePath) + '-' + crypto.createHash('md5').update(filePath).digest('hex');
     return path.join(cacheDir, targetName, 'hashes', hashedName);
-};
+}
 
 /**
  * Get an existing hash for a file (if it exists). 
@@ -77,7 +77,7 @@ function getExistingHash(filePath, targetName) {
         return null;
     }
     return fs.readFileSync(hashPath).toString();
-};
+}
 
 /**
  * Generate a hash (md5sum) of a file contents.
@@ -88,7 +88,7 @@ function generateFileHash(filePath: string) {
     var data = fs.readFileSync(filePath);
     md5sum.update(data);
     return md5sum.digest('hex');
-};
+}
 
 /**
  * Filter files based on hashed contents.
@@ -109,7 +109,7 @@ function filterPathsByHash(filePaths: string[], targetName) {
     });
 
     return filtered;
-};
+}
 
 function updateHashes(filePaths: string[], targetName) {
     _.forEach(filePaths, (filePath) => {
@@ -132,7 +132,7 @@ export function getNewFilesForTarget(paths: string[], targetName): string[] {
     var step2 = filterPathsByHash(step1, targetName);
 
     return step2;
-};
+}
 
 /**
  * Update the timestamp for a target to denote last successful compile
