@@ -24,8 +24,6 @@ import templateCacheModule = require('./modules/templateCache');
 
 // plain vanilla imports
 var Promise: typeof Promise = require('es6-promise').Promise;
-var rimraf = require('rimraf');
-
 
 /**
  * Time a function and print the result.
@@ -76,16 +74,6 @@ function asyncSeries<U, W>(arr: U[], iter: (item: U) => Promise<W>): Promise<W[]
     });
 }
 
-// As soon as this module is loaded we clear the tscache
-// This ensures that we compile all the typescript whenever we are restarted
-try {
-    rimraf.sync(cacheUtils.cacheDir);
-    gruntGlobal.log.writeln('Cleared fast compile cache'.cyan);
-}
-catch (ex) {
-    gruntGlobal.log.writeln('No existing fast compile cache'.cyan);
-}
-
 function pluginFn(grunt: IGrunt) {
 
     /////////////////////////////////////////////////////////////////////
@@ -119,13 +107,19 @@ function pluginFn(grunt: IGrunt) {
             sourceRoot: '',
             target: 'es5', // es3 , es5
             verbose: false,
-            fast: true
+            fast: 'watch'
         });
 
         // fix the properly cased options to their appropriate values
         options.allowBool = 'allowbool' in options ? options['allowbool'] : options.allowBool;
         options.allowImportModule = 'allowimportmodule' in options ? options['allowimportmodule'] : options.allowImportModule;
         options.sourceMap = 'sourcemap' in options ? options['sourcemap'] : options.sourceMap;
+
+        // Warn the user of invalid values
+        if (options.fast !== 'watch' && options.fast !== 'always' && options.fast !== 'never') {
+            console.warn(('"fast" needs to be one of : "watch" (default) | "always" | "never" but you provided: ' + options.fast).magenta);
+            options.fast = 'watch';
+        }
 
         // Remove comments based on the removeComments flag first then based on the comments flag, otherwise true
         if (options.removeComments === null) {

@@ -5,6 +5,7 @@ var _ = require('underscore');
 var path = require('path');
 var crypto = require('crypto');
 var grunt = require('grunt');
+var rimraf = require('rimraf');
 
 //////////////////////
 //  Basic algo:
@@ -139,4 +140,17 @@ function compileSuccessfull(paths, targetName) {
     updateHashes(paths, targetName);
 }
 exports.compileSuccessfull = compileSuccessfull;
+
+function clearCache(targetName) {
+    var cacheDirForTarget = path.join(exports.cacheDir, targetName);
+    try  {
+        if (fs.existsSync(cacheDirForTarget)) {
+            rimraf.sync(cacheDirForTarget);
+            grunt.log.writeln(('Cleared fast compile cache for target: ' + targetName + ' (use task option fast:"always" if you didn\'t want this)').cyan);
+        }
+    } catch (ex) {
+        grunt.log.writeln(('Failed to clear compile cache for target: ' + targetName).red);
+    }
+}
+exports.clearCache = clearCache;
 //# sourceMappingURL=cacheUtils.js.map

@@ -48,5 +48,5 @@ interface ITaskOptions {
 
     verbose: boolean;
     compile: boolean;
-    fast: boolean; // true compiles the changed files only
+    fast: string; // never | always | watch (default)
 }

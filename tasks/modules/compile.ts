@@ -64,7 +64,15 @@ export function compileAllFiles(targetFiles: string[], target: ITargetOptions, t
     var files = _.map(targetFiles, (file) => file);
 
     var newFiles: string[] = files;
-    if (task.fast) {
+    // if we only do fast compile if target is watched
+    if (task.fast === 'watch') {
+        // if this is the first time its running after this file was loaded
+        if (cacheClearedOnce[grunt.task.current.target] === undefined) {
+            // Then clear the cache for this target 
+            clearCache();
+        }
+    }
+    if (task.fast !== 'never') {
         if (target.out) {
             grunt.log.writeln('Fast compile will not work when --out is specified. Ignoring fast compilation'.cyan);
         }
@@ -73,7 +81,7 @@ export function compileAllFiles(targetFiles: string[], target: ITargetOptions, t
 
             if (newFiles.length !== 0) {
                 files = newFiles;
-                
+
                 // If outDir is specified but no baseDir is specified we need to determine one
                 if (target.outDir && !target.baseDir) {
                     target.baseDir = utils.findCommonPath(files, '/');
@@ -107,7 +115,7 @@ export function compileAllFiles(targetFiles: string[], target: ITargetOptions, t
         }
         files.push(baseDirFilePath);
     }
-    
+
     // If reference and out are both specified.
     // Then only compile the updated reference file as that contains the correct order
     if (target.reference && target.out) {
@@ -181,7 +189,7 @@ export function compileAllFiles(targetFiles: string[], target: ITargetOptions, t
     // Execute command
     return executeNode([tsc, '@' + tempfilename]).then((result: ICompileResult) => {
 
-        if (task.fast) {
+        if (task.fast !== 'never') {
             resetChangedFiles(newFiles);
         }
 
@@ -203,6 +211,9 @@ export function compileAllFiles(targetFiles: string[], target: ITargetOptions, t
 // Fast Compilation 
 /////////////////////////////////////////////////////////////////
 
+// Map to store if the cache was cleared after the gruntfile was parsed
+var cacheClearedOnce: { [targetName: string]: boolean } = {};
+
 function getChangedFiles(files) {
 
     var targetName = grunt.task.current.target;
@@ -219,4 +230,10 @@ function getChangedFiles(files) {
 function resetChangedFiles(files) {
     var targetName = grunt.task.current.target;
     cache.compileSuccessfull(files, targetName);
+}
+
+function clearCache() {
+    var targetName = grunt.task.current.target;
+    cache.clearCache(targetName);
+    cacheClearedOnce[targetName] = true;
 }
