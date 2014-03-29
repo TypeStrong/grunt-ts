@@ -11,7 +11,6 @@ var fs = require('fs');
 
 // Modules of grunt-ts
 var utils = require('./modules/utils');
-
 var compileModule = require('./modules/compile');
 var indexModule = require('./modules/index');
 var referenceModule = require('./modules/reference');

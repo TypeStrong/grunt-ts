@@ -20,7 +20,7 @@
 ## v1.10.0
 * **Breaking Change**: updated `fast` task option to have three levels: https://github.com/grunt-ts/grunt-ts/issues/96#issuecomment-38987023 `watch` (default) | `always` | `never`. If you never specified it than you don't need to do anything as the new default `'watch'` is same as old default `true`
 * use grunt-ts to smoothe grunt-ts development workflow
-* Update LKG (used for dev)
+* Update LKG is automatic at the moment because of https://github.com/grunt-ts/grunt-ts/issues/97
 
 ## Not yet associated with a release
 * change `'./path/to/file'` to be `'path/to/file'` when doing transforms for `///ts:import` and `///ts:export`. Functionally equivalent, but the second form looks better (verify that it works for requirejs as well, I know it works for nodejs)

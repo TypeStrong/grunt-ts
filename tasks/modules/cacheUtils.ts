@@ -150,7 +150,7 @@ export function clearCache(targetName) {
     try {
         if (fs.existsSync(cacheDirForTarget)) {
             rimraf.sync(cacheDirForTarget);
-            grunt.log.writeln(('Cleared fast compile cache for target: ' + targetName + ' (use task option fast:"always" if you didn\'t want this)').cyan);
+            grunt.log.writeln(('Cleared fast compile cache for target: ' + targetName).cyan);
         }
     }
     catch (ex) {

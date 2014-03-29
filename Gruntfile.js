@@ -34,11 +34,11 @@ module.exports = function (grunt) {
                 module: 'commonjs',
                 comments: true,
                 sourcemap: true,
-                verbose: true
+                verbose: true,
+                fast: 'always'
             },
             build: {
-                src: ['tasks/ts.ts'],
-                out: 'tasks/ts.js'
+                src: ['tasks/**/*.ts']
             },
             test: {
                 src: ['test/test.ts']
@@ -49,11 +49,8 @@ module.exports = function (grunt) {
         },
         watch: {
             dev: {
-                files: ['**/*.ts'],
-                tasks: ['dev'],
-                options: {
-                    interrupt: true
-                }
+                files: ['**/*.ts', '!**/*.d.ts'],
+                tasks: ['run'],
             }
         },
         ts: {
@@ -229,8 +226,9 @@ module.exports = function (grunt) {
         }
         next = next.replace(pattern, internal);
 
-        // Also add header to show which version was used
-        next = '// v' + grunt.config.get('pkg.version') + ' ' + new Date().toISOString() + '\r\n' + next;
+        // Note: Commented out since we update automatically https://github.com/grunt-ts/grunt-ts/issues/97
+        // // Also add header to show which version was used
+        // next = '// v' + grunt.config.get('pkg.version') + ' ' + new Date().toISOString() + '\r\n' + next;
 
         grunt.file.write('./tasks/ts-internal.js', next);
     });
@@ -264,7 +262,8 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-watch');
 
     // Build
-    grunt.registerTask('prep', ['clean', 'jshint:support']);
+    // Note: made upgrade a part of prep. See https://github.com/grunt-ts/grunt-ts/issues/97
+    grunt.registerTask('prep', ['upgrade', 'clean', 'jshint:support']);
     grunt.registerTask('build', ['prep', 'ts-internal', 'tslint:source']);
 
     // Test
@@ -276,12 +275,65 @@ module.exports = function (grunt) {
     grunt.registerTask('default', ['release']);
 
     //////////////////////////////////////////////
-    // Dev
-    // And run `grunt dev`
-    // Modify run if you are working on something fancy (e.g. you need to clean the cache each time)
+    // Dev   
+    //
+    // `grunt dev` if using grunt watch
+    // Or 
+    // `grunt run` if using webstorm / manual run
+    // 
+    // Modify tasksToTest based on what you are working on 
+
+    var tasksToTest = ['ts:transform', 'ts:simple'];
 
     grunt.registerTask('dev', ['run', 'watch']);
-    grunt.registerTask('run', ['ts-internal:build', 'ts:transform']);
+
+    grunt.registerTask('run', function () {
+
+        // Clear the console and move to 0 0 
+        // http://stackoverflow.com/a/14976765/390330
+        console.log('\u001b[2J\u001b[0;0H');
+        console.log('>>>>>>>>>>> Cleared console >>>>>>>>>>> \n\n'.grey);
+
+        var done = this.async();
+
+        // Using a simple chain of ts:internal followed by ts:yourtest would not have run the updated grunt-ts
+        // We are spawn to ensure that `ts:` is reloaded after compile
+        function runTask(taskName, callback) {
+            grunt.util.spawn({
+                cmd: 'grunt',
+                args: [taskName]
+            }, function (err, output) {
+                if (err) {
+                    console.log(output.stderr || output.stdout);
+                    done(err);
+                }
+                else {
+                    console.log(output.stdout);
+                    console.log('\n'); // looks better
+                    callback();
+                }
+            });
+        }
+
+        // Add build task
+        tasksToTest.unshift('ts-internal:build');
+
+        // Now execute
+        var currentIndex = 0;
+        function getNextTaskFunction() {
+            currentIndex++;
+            if (currentIndex === tasksToTest.length) {
+                return done;
+            }
+            else {
+                return function () {
+                    runTask(tasksToTest[currentIndex], getNextTaskFunction());
+                };
+            }
+        }
+        runTask(tasksToTest[0], getNextTaskFunction());
+
+    });
 
     //////////////////////////////////////////////
 

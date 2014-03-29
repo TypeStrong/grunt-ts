@@ -10,11 +10,9 @@
 import _ = require('underscore');
 import path = require('path');
 import fs = require('fs');
-import gruntGlobal = require('grunt');
 
 // Modules of grunt-ts
 import utils = require('./modules/utils');
-import cacheUtils = require('./modules/cacheUtils');
 import compileModule = require('./modules/compile');
 import indexModule = require('./modules/index');
 import referenceModule = require('./modules/reference');
@@ -200,7 +198,7 @@ function pluginFn(grunt: IGrunt) {
             function runCompilation(files: string[], target: ITargetOptions, options: ITaskOptions): Promise<boolean> {
                 // Don't run it yet
                 grunt.log.writeln('Compiling...'.yellow);
-
+                
                 // The files to compile
                 var filesToCompile = files;
 

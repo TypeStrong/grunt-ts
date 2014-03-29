@@ -199,16 +199,6 @@ export function transformFiles(
 
     ///////////////////////////////////// transformation
 
-    // Sample import transformation
-    ///ts:import=filename
-    ///ts:import=foldername
-
-    // Becomes
-
-    ///ts:import=filename    
-    // import filename = require('../relative/path/to/filename'); ///ts:import:generated
-
-
     var transformers: BaseTransformer[] = [
         new ImportTransformer(),
         new ExportTransformer()

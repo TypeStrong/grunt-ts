@@ -35,6 +35,37 @@ function executeNode(args: string[]): Promise<ICompileResult> {
     });
 }
 
+/////////////////////////////////////////////////////////////////
+// Fast Compilation 
+/////////////////////////////////////////////////////////////////
+
+// Map to store if the cache was cleared after the gruntfile was parsed
+var cacheClearedOnce: { [targetName: string]: boolean } = {};
+
+function getChangedFiles(files) {
+
+    var targetName = grunt.task.current.target;
+
+    files = cache.getNewFilesForTarget(files, targetName);
+
+    _.forEach(files, (file) => {
+        grunt.log.writeln(('### Fast Compile >>' + file).cyan);
+    });
+
+    return files;
+}
+
+function resetChangedFiles(files) {
+    var targetName = grunt.task.current.target;
+    cache.compileSuccessfull(files, targetName);
+}
+
+function clearCache() {
+    var targetName = grunt.task.current.target;
+    cache.clearCache(targetName);
+    cacheClearedOnce[targetName] = true;
+}
+
 /////////////////////////////////////////////////////////////////////
 // tsc handling
 ////////////////////////////////////////////////////////////////////
@@ -64,10 +95,11 @@ export function compileAllFiles(targetFiles: string[], target: ITargetOptions, t
     var files = _.map(targetFiles, (file) => file);
 
     var newFiles: string[] = files;
-    // if we only do fast compile if target is watched
-    if (task.fast === 'watch') {
+    if (task.fast === 'watch') { // if we only do fast compile if target is watched
+
         // if this is the first time its running after this file was loaded
         if (cacheClearedOnce[grunt.task.current.target] === undefined) {
+
             // Then clear the cache for this target 
             clearCache();
         }
@@ -189,7 +221,7 @@ export function compileAllFiles(targetFiles: string[], target: ITargetOptions, t
     // Execute command
     return executeNode([tsc, '@' + tempfilename]).then((result: ICompileResult) => {
 
-        if (task.fast !== 'never') {
+        if (task.fast !== 'never' && result.code === 0) {
             resetChangedFiles(newFiles);
         }
 
@@ -204,36 +236,4 @@ export function compileAllFiles(targetFiles: string[], target: ITargetOptions, t
             fs.unlinkSync(tempfilename);
             throw err;
         });
-}
-
-
-/////////////////////////////////////////////////////////////////
-// Fast Compilation 
-/////////////////////////////////////////////////////////////////
-
-// Map to store if the cache was cleared after the gruntfile was parsed
-var cacheClearedOnce: { [targetName: string]: boolean } = {};
-
-function getChangedFiles(files) {
-
-    var targetName = grunt.task.current.target;
-
-    files = cache.getNewFilesForTarget(files, targetName);
-
-    _.forEach(files, (file) => {
-        grunt.log.writeln(('### Fast Compile >>' + file).cyan);
-    });
-
-    return files;
-}
-
-function resetChangedFiles(files) {
-    var targetName = grunt.task.current.target;
-    cache.compileSuccessfull(files, targetName);
-}
-
-function clearCache() {
-    var targetName = grunt.task.current.target;
-    cache.clearCache(targetName);
-    cacheClearedOnce[targetName] = true;
 }

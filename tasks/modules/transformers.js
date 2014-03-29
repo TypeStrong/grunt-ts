@@ -178,12 +178,6 @@ function transformFiles(changedFiles, targetFiles, target, task) {
     currentTargetFiles = targetFiles;
 
     ///////////////////////////////////// transformation
-    // Sample import transformation
-    ///ts:import=filename
-    ///ts:import=foldername
-    // Becomes
-    ///ts:import=filename
-    // import filename = require('../relative/path/to/filename'); ///ts:import:generated
     var transformers = [
         new ImportTransformer(),
         new ExportTransformer()

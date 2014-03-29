@@ -28,6 +28,35 @@ function executeNode(args) {
     });
 }
 
+/////////////////////////////////////////////////////////////////
+// Fast Compilation
+/////////////////////////////////////////////////////////////////
+// Map to store if the cache was cleared after the gruntfile was parsed
+var cacheClearedOnce = {};
+
+function getChangedFiles(files) {
+    var targetName = exports.grunt.task.current.target;
+
+    files = cache.getNewFilesForTarget(files, targetName);
+
+    _.forEach(files, function (file) {
+        exports.grunt.log.writeln(('### Fast Compile >>' + file).cyan);
+    });
+
+    return files;
+}
+
+function resetChangedFiles(files) {
+    var targetName = exports.grunt.task.current.target;
+    cache.compileSuccessfull(files, targetName);
+}
+
+function clearCache() {
+    var targetName = exports.grunt.task.current.target;
+    cache.clearCache(targetName);
+    cacheClearedOnce[targetName] = true;
+}
+
 /////////////////////////////////////////////////////////////////////
 // tsc handling
 ////////////////////////////////////////////////////////////////////
@@ -57,8 +86,6 @@ function compileAllFiles(targetFiles, target, task) {
     });
 
     var newFiles = files;
-
-    // if we only do fast compile if target is watched
     if (task.fast === 'watch') {
         // if this is the first time its running after this file was loaded
         if (cacheClearedOnce[exports.grunt.task.current.target] === undefined) {
@@ -181,7 +208,7 @@ function compileAllFiles(targetFiles, target, task) {
 
     // Execute command
     return executeNode([tsc, '@' + tempfilename]).then(function (result) {
-        if (task.fast !== 'never') {
+        if (task.fast !== 'never' && result.code === 0) {
             resetChangedFiles(newFiles);
         }
 
@@ -198,33 +225,4 @@ function compileAllFiles(targetFiles, target, task) {
     });
 }
 exports.compileAllFiles = compileAllFiles;
-
-/////////////////////////////////////////////////////////////////
-// Fast Compilation
-/////////////////////////////////////////////////////////////////
-// Map to store if the cache was cleared after the gruntfile was parsed
-var cacheClearedOnce = {};
-
-function getChangedFiles(files) {
-    var targetName = exports.grunt.task.current.target;
-
-    files = cache.getNewFilesForTarget(files, targetName);
-
-    _.forEach(files, function (file) {
-        exports.grunt.log.writeln(('### Fast Compile >>' + file).cyan);
-    });
-
-    return files;
-}
-
-function resetChangedFiles(files) {
-    var targetName = exports.grunt.task.current.target;
-    cache.compileSuccessfull(files, targetName);
-}
-
-function clearCache() {
-    var targetName = exports.grunt.task.current.target;
-    cache.clearCache(targetName);
-    cacheClearedOnce[targetName] = true;
-}
 //# sourceMappingURL=compile.js.map

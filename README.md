@@ -284,26 +284,38 @@ With npm and grunt-cli installed, run the following from the root of the reposit
 ```bash
 $ npm install
 ```
-
 ### Building the project:
+
+To build all 
 
 ```bash
 $ grunt build
 ```
-### Running the tests builds:
+### Running the tests:
+
+To test all
 
 ```bash
 $ grunt test
 ```
 
-### Releasing
+### Before PR
 
 ```bash
 $ grunt release
 ```
 
-It runs `build` followed by `test`. This is also the default task. 
+It runs `build` followed by `test`. This is also the default task. You should run this before sending a PR.
 
+### Development 
+
+You will probably be working and testing a particular feature. Modify `tasksToTest` in our `Gruntfile.js` and run:  
+
+```bash
+$ grunt dev 
+```
+
+It will watch your changes (to `grunt-ts` task as well as examples) and run your tasksToTest after updating the task (if any changes detected). 
 
 ## License
 

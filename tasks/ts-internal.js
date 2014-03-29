@@ -1,4 +1,3 @@
-// v1.8.0 2014-03-15T13:52:00.674Z
 /// <reference path="../defs/tsd.d.ts"/>
 /// <reference path="./modules/interfaces.d.ts"/>
 /*
@@ -92,13 +91,19 @@ function pluginFn(grunt) {
             sourceRoot: '',
             target: 'es5',
             verbose: false,
-            fast: false
+            fast: 'watch'
         });
 
         // fix the properly cased options to their appropriate values
         options.allowBool = 'allowbool' in options ? options['allowbool'] : options.allowBool;
         options.allowImportModule = 'allowimportmodule' in options ? options['allowimportmodule'] : options.allowImportModule;
         options.sourceMap = 'sourcemap' in options ? options['sourcemap'] : options.sourceMap;
+
+        // Warn the user of invalid values
+        if (options.fast !== 'watch' && options.fast !== 'always' && options.fast !== 'never') {
+            console.warn(('"fast" needs to be one of : "watch" (default) | "always" | "never" but you provided: ' + options.fast).magenta);
+            options.fast = 'watch';
+        }
 
         // Remove comments based on the removeComments flag first then based on the comments flag, otherwise true
         if (options.removeComments === null) {
@@ -149,6 +154,15 @@ function pluginFn(grunt) {
                 return path.resolve(filename) === outFile_d_ts;
             }
 
+            // see https://github.com/grunt-ts/grunt-ts/issues/77
+            function isBaseDirFile(filename, targetFiles) {
+                var baseDirFile = '.baseDir.ts';
+                if (!target.baseDir) {
+                    target.baseDir = utils.findCommonPath(targetFiles, '/');
+                }
+                return path.resolve(filename) === path.resolve(path.join(target.baseDir, baseDirFile));
+            }
+
             // Create an amd loader?
             var amdloader = target.amdloader;
             var amdloaderFile;
@@ -167,12 +181,6 @@ function pluginFn(grunt) {
 
                 // The files to compile
                 var filesToCompile = files;
-
-                // If reference and out are both specified.
-                // Then only compile the udpated reference file as that contains the correct order
-                if (!!referencePath && target.out) {
-                    filesToCompile = [referenceFile];
-                }
 
                 // Time the compiler process
                 var starttime = new Date().getTime();
@@ -207,18 +215,18 @@ function pluginFn(grunt) {
                     return !stats.isDirectory();
                 });
 
-                // Clear the files of output.d.ts and reference.ts
+                // Clear the files of output.d.ts and reference.ts and baseDirFile
                 files = _.filter(files, function (filename) {
-                    return (!isReferenceFile(filename) && !isOutFile(filename));
+                    return (!isReferenceFile(filename) && !isOutFile(filename) && !isBaseDirFile(filename, files));
                 });
 
                 ///// Html files:
                 // Note:
                 //    compile html files must be before reference file creation
-                var generatedHtmlFiles = [];
+                var generatedFiles = [];
                 if (currenttask.data.html) {
                     var htmlFiles = grunt.file.expand(currenttask.data.html);
-                    generatedHtmlFiles = _.map(htmlFiles, function (filename) {
+                    generatedFiles = _.map(htmlFiles, function (filename) {
                         return html2tsModule.compileHTML(filename);
                     });
                 }
@@ -253,7 +261,7 @@ function pluginFn(grunt) {
                 // Create a reference file if specified
                 if (!!referencePath) {
                     var result = timeIt(function () {
-                        return referenceModule.updateReferenceFile(files, generatedHtmlFiles, referenceFile, referencePath);
+                        return referenceModule.updateReferenceFile(files, generatedFiles, referenceFile, referencePath);
                     });
                     if (result.it === true) {
                         grunt.log.writeln(('Updated reference file (' + result.time + 'ms).').green);
@@ -263,7 +271,7 @@ function pluginFn(grunt) {
                 ///// AMD loader
                 // Create the amdLoader if specified
                 if (!!amdloaderPath) {
-                    var referenceOrder = amdLoaderModule.getReferencesInOrder(referenceFile, referencePath, generatedHtmlFiles);
+                    var referenceOrder = amdLoaderModule.getReferencesInOrder(referenceFile, referencePath, generatedFiles);
                     amdLoaderModule.updateAmdLoader(referenceFile, referenceOrder, amdloaderFile, amdloaderPath, target.outDir);
                 }
 
