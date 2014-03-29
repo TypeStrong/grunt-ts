@@ -30,4 +30,4 @@ Added support for generating angularJS template cache
 * Add documentation for fast compile 
 	* will only work with some `watch` All tasks like `grunt-contrib-watch` are supported
 	* will not work with `--out`
-
+* Fast compile needs to be more granular (https://github.com/grunt-ts/grunt-ts/issues/96#issuecomment-38987023) 
