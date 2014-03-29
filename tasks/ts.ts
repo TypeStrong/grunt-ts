@@ -184,7 +184,7 @@ function pluginFn(grunt: IGrunt) {
 
             // see https://github.com/grunt-ts/grunt-ts/issues/77
             function isBaseDirFile(filename: string, targetFiles: string[]) {
-                var baseDirFile: string = 'ignoreBaseDirFile.ts';
+                var baseDirFile: string = '.baseDir.ts';
                 if (!target.baseDir) {
                     target.baseDir = utils.findCommonPath(targetFiles, '/');
                 }

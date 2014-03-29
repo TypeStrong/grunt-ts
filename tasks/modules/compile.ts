@@ -98,7 +98,7 @@ export function compileAllFiles(targetFiles: string[], target: ITargetOptions, t
 
     // If baseDir is specified create a temp tsc file to make sure that `--outDir` works fine
     // see https://github.com/grunt-ts/grunt-ts/issues/77
-    var baseDirFile: string = 'ignoreBaseDirFile.ts';
+    var baseDirFile: string = '.baseDir.ts';
     var baseDirFilePath: string;
     if (target.outDir && target.baseDir && files.length > 0) {
         baseDirFilePath = path.join(target.baseDir, baseDirFile);

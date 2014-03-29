@@ -14,6 +14,7 @@ Added support for generating angularJS template cache
 
 # v1.9.3
 * Update cache hashed filename to be more intuitive : https://github.com/grunt-ts/grunt-ts/issues/96#issuecomment-38985020
+* Change `baseDir` temporary file to be less intrusive : https://github.com/grunt-ts/grunt-ts/issues/77#issuecomment-38983764
 
 # Planned
 * change `'./path/to/file'` to be `'path/to/file'` when doing transforms for `///ts:import` and `///ts:export`. Functionally equivalent, but the second form looks better (verify that it works for requirejs as well, I know it works for nodejs)
@@ -22,7 +23,6 @@ Added support for generating angularJS template cache
 * Add `///ts:reference` transform. 
 * Show error when `/// ts:???` is detected but no transform exists for `???`
 * Update to TypeScript `0.9.7` as the default
-* Change `baseDir` temporary file to be less intrusive : https://github.com/grunt-ts/grunt-ts/issues/77#issuecomment-38983764
 * Add documentation for fast compile 
 	* will only work with some `watch` All tasks like `grunt-contrib-watch` are supported
 	* will not work with `--out`
