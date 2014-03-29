@@ -20,6 +20,10 @@ Added support for generating angularJS template cache
 
 # Planned
 
+## v1.9.4
+* use grunt-ts to smoothe grunt-ts development workflow
+
+
 ## Not yet associated with a release
 * change `'./path/to/file'` to be `'path/to/file'` when doing transforms for `///ts:import` and `///ts:export`. Functionally equivalent, but the second form looks better (verify that it works for requirejs as well, I know it works for nodejs)
 * Add documentation for transforms 

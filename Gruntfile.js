@@ -47,6 +47,15 @@ module.exports = function (grunt) {
         nodeunit: {
             tests: ['test/test.js']
         },
+        watch: {
+            dev: {
+                files: ['**/*.ts'],
+                tasks: ['dev'],
+                options: {
+                    interrupt: true
+                }
+            }
+        },
         ts: {
             // Set the default options, see : http://gruntjs.com/configuring-tasks#options
             options: {
@@ -249,15 +258,28 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-tslint');
     grunt.loadNpmTasks('grunt-continue');
     grunt.loadNpmTasks('grunt-contrib-nodeunit');
+    grunt.loadNpmTasks('grunt-contrib-watch');
 
+    // Build
     grunt.registerTask('prep', ['clean', 'jshint:support']);
     grunt.registerTask('build', ['prep', 'ts-internal', 'tslint:source']);
+
+    // Test
     grunt.registerTask('fail', ['continueOn', 'test_fail', 'continueOff']);
     grunt.registerTask('test', ['test_all', 'nodeunit', 'fail']);
-    grunt.registerTask('prepush', ['build', 'test']);
-    grunt.registerTask('default', ['test']);
 
-    grunt.registerTask('run', ['ts:amdloadersrc']);
-    grunt.registerTask('dev', ['ts:simple']);
+    // Release
+    grunt.registerTask('release', ['build', 'test']);
+    grunt.registerTask('default', ['release']);
+
+    //////////////////////////////////////////////
+    // Dev
+    // And run `grunt dev`
+    // Modify run if you are working on something fancy (e.g. you need to clean the cache each time)
+
+    grunt.registerTask('dev', ['run', 'watch']);
+    grunt.registerTask('run', ['ts-internal:build', 'ts:transform']);
+
+    //////////////////////////////////////////////
 
 };

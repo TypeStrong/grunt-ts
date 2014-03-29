@@ -296,7 +296,14 @@ $ grunt build
 $ grunt test
 ```
 
-We welcome new methods for writing automated tests that are a little less of a manual process.
+### Releasing
+
+```bash
+$ grunt release
+```
+
+It runs `build` followed by `test`. This is also the default task. 
+
 
 ## License
 
