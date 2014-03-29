@@ -14,12 +14,11 @@ Added support for generating angularJS template cache
 * Fix: if fast compiling and user specified an `outDir` but `baseDir` isn't specified, figure one out based on the target src glob. (https://github.com/grunt-ts/grunt-ts/issues/77#issuecomment-37714430)
 * Chore: updated chokidar https://github.com/grunt-ts/grunt-ts/pull/94
 
-
-# Planned
-
 ## v1.9.3
 * Update cache hashed filename to be more intuitive : https://github.com/grunt-ts/grunt-ts/issues/96#issuecomment-38985020
 * Change `baseDir` temporary file to be less intrusive : https://github.com/grunt-ts/grunt-ts/issues/77#issuecomment-38983764
+
+# Planned
 
 ## Not yet associated with a release
 * change `'./path/to/file'` to be `'path/to/file'` when doing transforms for `///ts:import` and `///ts:export`. Functionally equivalent, but the second form looks better (verify that it works for requirejs as well, I know it works for nodejs)
