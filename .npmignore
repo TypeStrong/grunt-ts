@@ -10,6 +10,8 @@ npm-debug.log
 /defs
 /sample
 /tasks/scratch.*
+/tasks-internal
+/.tscache
 
 /tslint.json
 /tsd.json
@@ -21,5 +23,3 @@ npm-debug.log
 /*.tgz
 
 /tscommand*.tmp.txt
-
-/tasks/ts-internal.js
