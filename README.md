@@ -2,7 +2,7 @@
 
 [![Build Status](https://secure.travis-ci.org/grunt-ts/grunt-ts.png?branch=master)](http://travis-ci.org/grunt-ts/grunt-ts) [![NPM version](https://badge.fury.io/js/grunt-ts.png)](http://badge.fury.io/js/grunt-ts)
 
-Written from scratch TypeScript compiler task for GruntJS. It differs from grunt-typescript which is another excellent [grunt plugin for TypeScript](https://npmjs.org/package/grunt-typescript).
+Written from scratch TypeScript compiler task for GruntJS. 
 
 Following are the reasons why grunt-ts was created:
 
