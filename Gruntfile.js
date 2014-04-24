@@ -214,23 +214,39 @@ module.exports = function (grunt) {
 
     // Helper to upgrade internal compiler task (fresh dogfood)
     // Only do this when stable!
+    var lkgPath = './tasks-internal';
     grunt.registerTask('upgrade', function () {
-        var next = grunt.file.read('./tasks/ts.js');
+        var done = this.async();
+        var ncp = require('ncp').ncp;
+        var rimraf = require('rimraf');
 
-        // change `ts` to `ts-internal`
-        var pattern = 'grunt.registerMultiTask(\'ts\',';
-        var internal = 'grunt.registerMultiTask(\'ts-internal\',';
-        if (next.indexOf(pattern) < 0) {
-            grunt.fail.warn('can\'t find task declaration-pattern: ' + pattern);
-            return;
-        }
-        next = next.replace(pattern, internal);
+        rimraf(lkgPath, function (err) {
+            if (!err) {
+                ncp('./tasks', lkgPath, function (err) {
+                    if (!err) {
+                        var next = grunt.file.read('./tasks/ts.js');
+                        grunt.file.delete(lkgPath+'/ts.js');
 
-        // Note: Commented out since we update automatically https://github.com/grunt-ts/grunt-ts/issues/97
-        // // Also add header to show which version was used
-        // next = '// v' + grunt.config.get('pkg.version') + ' ' + new Date().toISOString() + '\r\n' + next;
+                        // change `ts` to `ts-internal`
+                        var pattern = 'grunt.registerMultiTask(\'ts\',';
+                        var internal = 'grunt.registerMultiTask(\'ts-internal\',';
+                        if (next.indexOf(pattern) < 0) {
+                            grunt.fail.warn('can\'t find task declaration-pattern: ' + pattern);
+                            done(false);
+                            return;
+                        }
+                        next = next.replace(pattern, internal);
 
-        grunt.file.write('./tasks/ts-internal.js', next);
+                        // Also add header to show which version was used
+                        next = '// v' + grunt.config.get('pkg.version') + ' ' + new Date().toISOString() + '\r\n' + next;
+
+                        grunt.file.write(lkgPath + '/ts-internal.js', next);
+                    }
+                    else done(false);
+                });
+            }
+            else done(false);
+        });
     });
 
     // Collect test tasks
@@ -254,6 +270,7 @@ module.exports = function (grunt) {
     // in your configuration you would load this like: 
     //grunt.loadNpmTasks('grunt-ts')
 
+    grunt.loadTasks(lkgPath); // dogfood
     grunt.loadNpmTasks('grunt-contrib-clean');
     grunt.loadNpmTasks('grunt-contrib-jshint');
     grunt.loadNpmTasks('grunt-tslint');
@@ -262,8 +279,7 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-watch');
 
     // Build
-    // Note: made upgrade a part of prep. See https://github.com/grunt-ts/grunt-ts/issues/97
-    grunt.registerTask('prep', ['upgrade', 'clean', 'jshint:support']);
+    grunt.registerTask('prep', ['clean', 'jshint:support']);
     grunt.registerTask('build', ['prep', 'ts-internal', 'tslint:source']);
 
     // Test
