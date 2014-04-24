@@ -238,7 +238,7 @@ function pluginFn(grunt: IGrunt) {
                 });
 
                 // Clear the files of output.d.ts and reference.ts and baseDirFile
-                files = _.filter(files, (filename) => {
+                files = _.filter(files, (filename: string) => {
                     return (!isReferenceFile(filename) && !isOutFile(filename) && !isBaseDirFile(filename, files));
                 });
 
