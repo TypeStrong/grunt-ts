@@ -225,7 +225,7 @@ module.exports = function (grunt) {
                 ncp('./tasks', lkgPath, function (err) {
                     if (!err) {
                         var next = grunt.file.read('./tasks/ts.js');
-                        grunt.file.delete(lkgPath+'/ts.js');
+                        grunt.file.delete(lkgPath + '/ts.js');
 
                         // change `ts` to `ts-internal`
                         var pattern = 'grunt.registerMultiTask(\'ts\',';
@@ -238,14 +238,19 @@ module.exports = function (grunt) {
                         next = next.replace(pattern, internal);
 
                         // Also add header to show which version was used
-                        next = '// v' + grunt.config.get('pkg.version') + ' ' + new Date().toISOString() + '\r\n' + next;
+                        next = '// v' + grunt.config.get('pkg.version') +
+                            ' ' + new Date().toISOString() + '\r\n' + next;
 
                         grunt.file.write(lkgPath + '/ts-internal.js', next);
                     }
-                    else done(false);
+                    else {
+                        done(false);
+                    }
                 });
             }
-            else done(false);
+            else {
+                done(false);
+            }
         });
     });
 
