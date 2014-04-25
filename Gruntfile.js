@@ -184,12 +184,6 @@ module.exports = function (grunt) {
                     dest: 'test/templatecache/js/templateCache.js',
                 },
             },
-            index: {
-                test: true,
-                src: 'test/index/ts/**/*.ts',
-                outDir: 'test/index/js',
-                index: ['test/index/ts']
-            },
             transform: {
                 test: true,
                 src: ['test/transform/ts/**/*.ts'],

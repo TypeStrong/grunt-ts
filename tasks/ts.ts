@@ -14,7 +14,6 @@ import fs = require('fs');
 // Modules of grunt-ts
 import utils = require('./modules/utils');
 import compileModule = require('./modules/compile');
-import indexModule = require('./modules/index');
 import referenceModule = require('./modules/reference');
 import amdLoaderModule = require('./modules/amdLoader');
 import html2tsModule = require('./modules/html2ts');
@@ -264,15 +263,6 @@ function pluginFn(grunt: IGrunt) {
                         var templateCacheBasePath = path.resolve(target.templateCache.baseUrl);
                         templateCacheModule.generateTemplateCache(templateCacheSrc, templateCacheDest, templateCacheBasePath);
                     }
-                }
-
-                ///// External Module Index
-                // Create the index if specified                 
-                if (target.index) {
-                    if (!_.isArray(target.index)) {
-                        grunt.warn('Index option needs to be an array of directories');
-                    }
-                    indexModule.indexDirectories(_.map(target.index, (folder) => path.resolve(folder)));
                 }
 
                 ///// Reference File
