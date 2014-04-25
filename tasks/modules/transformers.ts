@@ -225,12 +225,12 @@ export function transformFiles(
             // grunt.log.writeln(line);
 
             // Skip generated lines as these will get regenerated
-            if (_.some(transformers, (transformer) => transformer.isGenerated(line))) {
+            if (_.some(transformers, (transformer: BaseTransformer) => transformer.isGenerated(line))) {
                 continue;
             }
 
             // Directive line
-            if (_.some(transformers, (transformer) => {
+            if (_.some(transformers, (transformer: BaseTransformer) => {
                 if (transformer.isSignature(line)) {
                     // The code gen directive line automatically qualifies
                     outputLines.push(line);

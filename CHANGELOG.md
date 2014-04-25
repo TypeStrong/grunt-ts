@@ -22,9 +22,10 @@
 
 # Planned
 
-## v1.10.1
+## v1.11.0
 * Fix LKG https://github.com/grunt-ts/grunt-ts/issues/97 i.e. `grunt upgrade`
 * Cleanup `.npmignore`
+* **Breaking Change**: Update the bundled TSC to v1.0.0
 
 ## Not yet associated with a release
 * change `'./path/to/file'` to be `'path/to/file'` when doing transforms for `///ts:import` and `///ts:export`. Functionally equivalent, but the second form looks better (verify that it works for requirejs as well, I know it works for nodejs)
