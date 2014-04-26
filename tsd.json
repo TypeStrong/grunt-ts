@@ -6,19 +6,19 @@
   "bundle": "defs/tsd.d.ts",
   "installed": {
     "node/node.d.ts": {
-      "commit": "2aff984fa86634866f70278406714d9fd7b9572d"
+      "commit": "1c1c12eaea0040c2c4493319c286f7d8e8968827"
     },
     "underscore.string/underscore.string.d.ts": {
-      "commit": "2aff984fa86634866f70278406714d9fd7b9572d"
+      "commit": "1c1c12eaea0040c2c4493319c286f7d8e8968827"
     },
     "underscore/underscore.d.ts": {
-      "commit": "2aff984fa86634866f70278406714d9fd7b9572d"
+      "commit": "1c1c12eaea0040c2c4493319c286f7d8e8968827"
     },
     "gruntjs/gruntjs.d.ts": {
-      "commit": "2aff984fa86634866f70278406714d9fd7b9572d"
+      "commit": "1c1c12eaea0040c2c4493319c286f7d8e8968827"
     },
     "es6-promises/es6-promises.d.ts": {
-      "commit": "62594ee84438dc6fb742f66e9e1c6f9f7fd29ec7"
+      "commit": "1c1c12eaea0040c2c4493319c286f7d8e8968827"
     }
   }
 }

@@ -8,7 +8,6 @@ interface ITargetOptions {
     html: string[];  // if specified this is used to generate typescript files with a single variable which contains the content of the html
     watch: string; // if specified watches all files in this directory for changes. 
     amdloader: string;  // if specified creates a js file to load all the generated typescript files in order using requirejs + order
-    index: string[]; // used to create an index folder to make external module access easier
     templateCache: {
         src: string[]; // if search through all the html files at this location
         dest: string;

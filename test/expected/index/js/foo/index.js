@@ -1,9 +1,0 @@
-var A1_file = require('./a/A1');
-exports.A1 = A1_file;
-var A2_file = require('./a/A2');
-exports.A2 = A2_file;
-var b1_file = require('./b/b1');
-exports.b1 = b1_file;
-var b2_file = require('./b/b2');
-exports.b2 = b2_file;
-//# sourceMappingURL=index.js.map

@@ -117,14 +117,14 @@ declare module minimatch {
 declare module grunt {
 
     module config {
-
+       
         /**
          * {@link http://gruntjs.com/sample-gruntfile}
          */
-        interface IProjectConfig {
+        interface IProjectConfig{
             [plugin: string]: any
             pkg: any; // unfortunate. It is actually a string
-        }
+        }                
 
         /**
          * {@link http://gruntjs.com/api/grunt.config}
@@ -429,7 +429,7 @@ declare module grunt {
             recurse(
                 rootdir: string,
                 callback: (abspath: string, rootdir: string, subdir: string, filename: string) => void
-                ): void
+            ): void
 
             /**
              * Return a unique array of all file or directory paths that match the given globbing pattern(s).
@@ -549,7 +549,7 @@ declare module grunt {
          *
          * {@link http://gruntjs.com/configuring-tasks#files}
          */
-        interface IFilesArray extends Array<IFilesConfig> { }
+        interface IFilesArray extends Array<IFilesConfig> {}
 
         /**
          * {@link http://gruntjs.com/configuring-tasks#files}
@@ -983,7 +983,7 @@ declare module grunt {
         /**
          * @see ITaskOptions
          */
-        interface ITaskCompactOptions extends grunt.task.ITaskOptions, grunt.file.IFilesConfig { }
+        interface ITaskCompactOptions extends grunt.task.ITaskOptions, grunt.file.IFilesConfig {}
     }
 
     module template {
@@ -1294,8 +1294,8 @@ interface IGrunt extends grunt.IConfigComponents, grunt.fail.FailModule, grunt.I
     version: string
 }
 
-
 // NodeJS Support
 declare module 'grunt' {
-    export = IGrunt;
+    var grunt: IGrunt;
+    export = grunt;
 }
