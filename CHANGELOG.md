@@ -20,13 +20,13 @@
 * use grunt-ts to smoothe grunt-ts development workflow
 * Update LKG is automatic at the moment because of https://github.com/grunt-ts/grunt-ts/issues/97
 
-# Planned
-
 ## v1.11.0
 * Fix LKG https://github.com/grunt-ts/grunt-ts/issues/97 i.e. `grunt upgrade`
 * Cleanup `.npmignore`
 * **Breaking Change**: Update the bundled TSC to v1.0.0
-* **Breaking Change**: Remove `index` option (https://github.com/grunt-ts/grunt-ts/issues/68). This has been superceeded by transformers. Plus index is unreliable for when we have a file that doesn't `export` anything. 
+* **Breaking Change**: Remove `index` option (https://github.com/grunt-ts/grunt-ts/issues/68). This has been replaced by transformers. Plus the blindly created index is unreliable for when we have any file that doesn't `export` anything. 
+
+# Planned
 
 ## Not yet associated with a release
 * change `'./path/to/file'` to be `'path/to/file'` when doing transforms for `///ts:import` and `///ts:export`. Functionally equivalent, but the second form looks better (verify that it works for requirejs as well, I know it works for nodejs)
@@ -34,8 +34,7 @@
 * Make `///  ts:import` etc. work same as `///ts:import` i.e. whitespace independent. 
 * Add `///ts:reference` transform. 
 * Show error when `/// ts:???` is detected but no transform exists for `???`
-* Update to TypeScript `0.9.7` as the default
 * Add documentation for fast compile 
 	* All tasks like `grunt-contrib-watch` are supported
 	* will not work with `--out`
-* Fast compile needs to be more granular (https://github.com/grunt-ts/grunt-ts/issues/96#issuecomment-38987023) 
+	* the granularity https://github.com/grunt-ts/grunt-ts/issues/96#issuecomment-38987023 
