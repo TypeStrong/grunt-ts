@@ -26,6 +26,9 @@
 * **Breaking Change**: Update the bundled TSC to v1.0.0
 * **Breaking Change**: Remove `index` option (https://github.com/grunt-ts/grunt-ts/issues/68). This has been replaced by transformers. Plus the blindly created index is unreliable for when we have any file that doesn't `export` anything. 
 
+## v1.11.1
+* Do not update templateCache if previous file is same as the new calculated one
+
 # Planned
 
 ## Not yet associated with a release
