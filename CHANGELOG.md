@@ -29,13 +29,15 @@
 ## v1.11.1
 * Do not update templateCache if previous file is same as the new calculated one
 
+## v1.11.2
+* Add `///ts:ref` transform for reference tags
+* change `'./../path/to/file'` to be `'../path/to/file'` when doing transforms
+
 # Planned
 
 ## Not yet associated with a release
-* change `'./path/to/file'` to be `'path/to/file'` when doing transforms for `///ts:import` and `///ts:export`. Functionally equivalent, but the second form looks better (verify that it works for requirejs as well, I know it works for nodejs)
 * Add documentation for transforms 
 * Make `///  ts:import` etc. work same as `///ts:import` i.e. whitespace independent. 
-* Add `///ts:reference` transform. 
 * Show error when `/// ts:???` is detected but no transform exists for `???`
 * Add documentation for fast compile 
 	* All tasks like `grunt-contrib-watch` are supported

@@ -1,5 +1,5 @@
 ///ts:import=foo
-import foo = require('./../../foo/index'); ///ts:import:generated
+import foo = require('../../foo/index'); ///ts:import:generated
 
 // USE CLASSES FROM A/B:
 

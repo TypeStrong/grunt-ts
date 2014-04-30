@@ -1,4 +1,4 @@
-var foo = require('./../../foo/index');
+var foo = require('../../foo/index');
 
 var a1 = new foo.A1();
 var a2 = new foo.A2();

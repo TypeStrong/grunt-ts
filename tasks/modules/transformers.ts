@@ -134,7 +134,7 @@ class ImportTransformer extends BaseTransformer {
                 if (filename.toLowerCase() === 'index') {
                     filename = path.basename(path.dirname(completePathToFile));
                 }
-                var pathToFile = './' + utils.makeRelativePath(sourceFileDirectory, completePathToFile.replace('.ts', ''));
+                var pathToFile = utils.makeRelativePath(sourceFileDirectory, completePathToFile.replace('.ts', ''), true);
                 outputLines.push(this.template({ filename: filename, pathToFile: pathToFile }));
             });
         }
@@ -172,7 +172,44 @@ class ExportTransformer extends BaseTransformer {
                 if (filename.toLowerCase() === 'index') {
                     filename = path.basename(path.dirname(completePathToFile));
                 }
-                var pathToFile = './' + utils.makeRelativePath(sourceFileDirectory, completePathToFile.replace('.ts', ''));
+                var pathToFile = utils.makeRelativePath(sourceFileDirectory, completePathToFile.replace('.ts', ''), true);
+                outputLines.push(this.template({ filename: filename, pathToFile: pathToFile }));
+            });
+        }
+        else {
+            outputLines.push(this.importError + name + this.signatureGenerated);
+        }
+
+    }
+}
+
+class ReferenceTransformer extends BaseTransformer {
+
+    constructor() {
+        super('ref');
+    }
+
+    importError = '/// No glob matched name: ';
+
+    template: (data?: { filename: string; pathToFile: string }) => string =
+    _.template('/// <reference path="<%= pathToFile %>"/>' + this.signatureGenerated);
+
+    // This code is same as export transformer
+    // also we preserve .ts file extension
+    transform(sourceFile: string, config: string, outputLines: string[]) {
+        name = config;
+        var sourceFileDirectory = path.dirname(sourceFile);
+
+        var imports = getImports(sourceFile, name, currentTargetFiles, currentTargetDirs, false);
+
+        if (imports.length) {
+            _.forEach(imports, (completePathToFile) => {
+                var filename = path.basename(completePathToFile, '.ts');
+                // If filename is index, we replace it with dirname: 
+                if (filename.toLowerCase() === 'index') {
+                    filename = path.basename(path.dirname(completePathToFile));
+                }
+                var pathToFile = utils.makeRelativePath(sourceFileDirectory, completePathToFile, true);
                 outputLines.push(this.template({ filename: filename, pathToFile: pathToFile }));
             });
         }
@@ -201,7 +238,8 @@ export function transformFiles(
 
     var transformers: BaseTransformer[] = [
         new ImportTransformer(),
-        new ExportTransformer()
+        new ExportTransformer(),
+        new ReferenceTransformer()
     ];
 
     _.forEach(changedFiles, (fileToProcess) => {
