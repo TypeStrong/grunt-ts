@@ -15,6 +15,9 @@ module.exports = function (grunt) {
                 sourceRoot: '',                // where to locate TypeScript files. [(default) '' == source ts location]
                 mapRoot: '',                   // where to locate .map.js files. [(default) '' == generated js location.]
                 declaration: false,            // generate a declaration .d.ts file for every output js file. [true | false (default)]
+                htmlModuleTemplate: 'My.Module.<%= filename %>',    // Template for module name for generated ts from html files [(default) '<%= filename %>']
+                htmlVarTemplate: '<%= ext %>'                       // Template for variable name used in generated ts from html files [(default) '<%= ext %>]
+                                                                    // Both html templates accept the ext and filename parameters.
             },
             // a particular target
             dev: {

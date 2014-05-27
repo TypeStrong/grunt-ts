@@ -95,9 +95,12 @@ function pluginFn(grunt) {
             htmlVarTemplate: '<%= ext %>'
         });
 
-        var rawOptions = grunt.config.getRaw(currenttask.name + '.' + currenttask.target + '.options');
-        options.htmlModuleTemplate = rawOptions.htmlModuleTemplate;
-        options.htmlVarTemplate = rawOptions.htmlVarTemplate;
+        // get unprocessed templates from configuration
+        var rawTaskOptions = (grunt.config.getRaw(currenttask.name + '.options') || {});
+        var rawTargetOptions = (grunt.config.getRaw(currenttask.name + '.' + currenttask.target + '.options') || {});
+
+        options.htmlModuleTemplate = rawTargetOptions.htmlModuleTemplate || rawTaskOptions.htmlModuleTemplate;
+        options.htmlVarTemplate = rawTargetOptions.htmlVarTemplate || rawTaskOptions.htmlVarTemplate;
 
         // fix the properly cased options to their appropriate values
         options.allowBool = 'allowbool' in options ? options['allowbool'] : options.allowBool;
