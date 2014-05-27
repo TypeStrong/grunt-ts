@@ -104,7 +104,9 @@ function pluginFn(grunt: IGrunt) {
             sourceRoot: '',
             target: 'es5', // es3 , es5
             verbose: false,
-            fast: 'watch'
+            fast: 'watch',
+            htmlModuleTemplate: '<%= filename %>',
+            htmlVarTemplate: '<%= ext %>'
         });
 
         // fix the properly cased options to their appropriate values
@@ -247,7 +249,7 @@ function pluginFn(grunt: IGrunt) {
                 var generatedFiles = [];
                 if (currenttask.data.html) {
                     var htmlFiles = grunt.file.expand(currenttask.data.html);
-                    generatedFiles = _.map(htmlFiles, (filename) => html2tsModule.compileHTML(filename));
+                    generatedFiles = _.map(htmlFiles, (filename) => html2tsModule.compileHTML(filename, options));
                 }
 
                 ///// Template cache

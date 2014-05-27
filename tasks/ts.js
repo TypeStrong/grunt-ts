@@ -90,7 +90,9 @@ function pluginFn(grunt) {
             sourceRoot: '',
             target: 'es5',
             verbose: false,
-            fast: 'watch'
+            fast: 'watch',
+            htmlModuleTemplate: '<%= filename %>',
+            htmlVarTemplate: '<%= ext %>'
         });
 
         // fix the properly cased options to their appropriate values
@@ -226,7 +228,7 @@ function pluginFn(grunt) {
                 if (currenttask.data.html) {
                     var htmlFiles = grunt.file.expand(currenttask.data.html);
                     generatedFiles = _.map(htmlFiles, function (filename) {
-                        return html2tsModule.compileHTML(filename);
+                        return html2tsModule.compileHTML(filename, options);
                     });
                 }
 
