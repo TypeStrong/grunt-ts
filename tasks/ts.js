@@ -95,6 +95,10 @@ function pluginFn(grunt) {
             htmlVarTemplate: '<%= ext %>'
         });
 
+        var rawOptions = grunt.config.getRaw(currenttask.name + '.' + currenttask.target + '.options');
+        options.htmlModuleTemplate = rawOptions.htmlModuleTemplate;
+        options.htmlVarTemplate = rawOptions.htmlVarTemplate;
+
         // fix the properly cased options to their appropriate values
         options.allowBool = 'allowbool' in options ? options['allowbool'] : options.allowBool;
         options.allowImportModule = 'allowimportmodule' in options ? options['allowimportmodule'] : options.allowImportModule;
@@ -105,6 +109,21 @@ function pluginFn(grunt) {
             console.warn(('"fast" needs to be one of : "watch" (default) | "always" | "never" but you provided: ' + options.fast).magenta);
             options.fast = 'watch';
         }
+
+        if (options.htmlModuleTemplate === '') {
+            console.warn(('htmlModuleTemplate must be provided, reverting to default template: "<%= filename %>"').magenta);
+            options.htmlModuleTemplate = '<%= filename %>';
+        }
+
+        if (options.htmlVarTemplate === '') {
+            console.warn(('htmlVarTemplate must be provided, reverting to default template: "<%= ext %>"').magenta);
+            options.htmlVarTemplate = '<%= ext %>';
+        }
+
+        var html2tsOptions = {
+            moduleFunction: _.template(options.htmlModuleTemplate),
+            varFunction: _.template(options.htmlVarTemplate)
+        };
 
         // Remove comments based on the removeComments flag first then based on the comments flag, otherwise true
         if (options.removeComments === null) {
@@ -228,7 +247,7 @@ function pluginFn(grunt) {
                 if (currenttask.data.html) {
                     var htmlFiles = grunt.file.expand(currenttask.data.html);
                     generatedFiles = _.map(htmlFiles, function (filename) {
-                        return html2tsModule.compileHTML(filename, options);
+                        return html2tsModule.compileHTML(filename, html2tsOptions);
                     });
                 }
 

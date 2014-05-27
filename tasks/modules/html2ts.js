@@ -35,8 +35,8 @@ function compileHTML(filename, options) {
     var ext = path.extname(filename).replace('.', '');
     var extFreename = path.basename(filename, '.' + ext);
 
-    var moduleName = _.template(options.htmlModuleTemplate)({ ext: ext, filename: extFreename });
-    var varName = _.template(options.htmlVarTemplate)({ ext: ext, filename: extFreename });
+    var moduleName = options.moduleFunction({ ext: ext, filename: extFreename });
+    var varName = options.varFunction({ ext: ext, filename: extFreename });
 
     var fileContent = htmlTemplate({ modulename: moduleName, varname: varName, content: htmlContent });
 
