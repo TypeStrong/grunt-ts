@@ -113,20 +113,15 @@ function pluginFn(grunt) {
             options.fast = 'watch';
         }
 
-        if (options.htmlModuleTemplate === '') {
+        if (!options.htmlModuleTemplate) {
             console.warn(('htmlModuleTemplate must be provided, reverting to default template: "<%= filename %>"').magenta);
             options.htmlModuleTemplate = '<%= filename %>';
         }
 
-        if (options.htmlVarTemplate === '') {
+        if (!options.htmlVarTemplate) {
             console.warn(('htmlVarTemplate must be provided, reverting to default template: "<%= ext %>"').magenta);
             options.htmlVarTemplate = '<%= ext %>';
         }
-
-        var html2tsOptions = {
-            moduleFunction: _.template(options.htmlModuleTemplate),
-            varFunction: _.template(options.htmlVarTemplate)
-        };
 
         // Remove comments based on the removeComments flag first then based on the comments flag, otherwise true
         if (options.removeComments === null) {
@@ -248,6 +243,11 @@ function pluginFn(grunt) {
                 //    compile html files must be before reference file creation
                 var generatedFiles = [];
                 if (currenttask.data.html) {
+                    var html2tsOptions = {
+                        moduleFunction: _.template(options.htmlModuleTemplate),
+                        varFunction: _.template(options.htmlVarTemplate)
+                    };
+
                     var htmlFiles = grunt.file.expand(currenttask.data.html);
                     generatedFiles = _.map(htmlFiles, function (filename) {
                         return html2tsModule.compileHTML(filename, html2tsOptions);
