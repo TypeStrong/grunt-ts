@@ -104,7 +104,8 @@ function pluginFn(grunt: IGrunt) {
             sourceRoot: '',
             target: 'es5', // es3 , es5
             verbose: false,
-            fast: 'watch'
+            fast: 'watch',
+            failOnTypeErrors: true
         });
 
         // fix the properly cased options to their appropriate values
@@ -210,16 +211,62 @@ function pluginFn(grunt: IGrunt) {
                     // End the timer
                     endtime = new Date().getTime();
 
-                    // Evaluate the result
-                    if (!result || result.code) {
-                        grunt.log.error('Compilation failed'.red);
+                    grunt.log.writeln('');
+
+                    // Analyze the results of our tsc execution,
+                    //   then tell the user our analysis results
+                    //   and mark the build as fail or success
+                    if (!result) {
+                        grunt.log.error('Error: No result from tsc.'.red);
                         return false;
                     }
-                    else {
-                        var time = (endtime - starttime) / 1000;
-                        grunt.log.writeln(('Success: ' + time.toFixed(2) + 's for ' + result.fileCount + ' typescript files').green);
-                        return true;
+
+                    var isError = (result.code === 1);
+
+                    // If the compilation errors contain only type errors, JS files are still
+                    //   generated. If tsc finds type errors, it will return an error code, even
+                    //   if JS files are generated. We should check this for this,
+                    //   only type errors, and call this a successful compilation.
+                    // Assumptions:
+                    //   Level 1 errors = syntax errors - prevent JS emit.
+                    //   Level 2 errors = semantic errors - *not* prevents JS emit.
+                    //   Level 5 errors = compiler flag misuse - prevents JS emit.
+                    var hasPreventEmitErrors = _.foldl(result.output.split('\n'), function(memo, errorMsg: string) {
+                        var hasLevel1Errors = errorMsg.search(/error TS1\d+:/g) >= 0;
+                        // var hasLevel2PlusErrors = errorMsg.search(/error TS[2-4,6-9]\d+:/g) >= 0;
+                        var hasLevel5Errors = errorMsg.search(/error TS5\d+:/) >= 0;
+                        return memo || (hasLevel1Errors || hasLevel5Errors);
+                    }, false) || false;
+
+                    // Because we can't think of a better way to determine it,
+                    //   assume that emitted JS in spite of error codes implies type-only errors.
+                    var isOnlyTypeErrors = !hasPreventEmitErrors;
+
+                    // Explain our interpretation of the tsc errors before we mark build results.
+                    if (isError) {
+                        if (isOnlyTypeErrors) {
+                            grunt.log.writeln('Type errors only.');
+                        }
                     }
+
+                    // !!! To do: To really be confident that the build was actually successful,
+                    //   we have to check timestamps of the generated files in the destination.
+                    var isSuccessfulBuild = (!isError ||
+                        (isError && isOnlyTypeErrors && !options.failOnTypeErrors)
+                    );
+
+                    if (isSuccessfulBuild) {
+                        // Report successful build.
+                        var time = (endtime - starttime) / 1000;
+                        grunt.log.writeln('');
+                        grunt.log.writeln(('TypeScript compilation complete: ' + time.toFixed(2) +
+                            's for ' + result.fileCount + ' typescript files').green);
+                    } else {
+                        // Report unsuccessful build.
+                        grunt.log.error(('Error: tsc return code: ' + result.code).yellow);
+                    }
+
+                    return isSuccessfulBuild;
                 });
             }
 
