@@ -34,6 +34,7 @@
 * change `'./../path/to/file'` to be `'../path/to/file'` when doing transforms
 
 # Planned
+* Add `failOnTypeErrors` task option. If `false` build succeeds (exit code 0) if JS can be emitted successfully. More : https://github.com/grunt-ts/grunt-ts/pull/103
 
 ## Not yet associated with a release
 * Add documentation for transforms 

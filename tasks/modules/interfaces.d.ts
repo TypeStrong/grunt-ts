@@ -44,6 +44,7 @@ interface ITaskOptions {
     sourceMap: boolean;
     sourceRoot: string;
     target: string; // es3 , es5
+    failOnTypeErrors: boolean;
 
     verbose: boolean;
     compile: boolean;
