@@ -7,7 +7,8 @@ module.exports = function (grunt) {
         ts: {
             options: {
                 target: 'es5',
-                module: 'commonjs'
+                module: 'commonjs',
+                sourceMap: false,
             },
             dev: {
                 src: [srcDir + '/**/*.ts'],
