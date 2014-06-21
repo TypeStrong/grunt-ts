@@ -1,6 +1,7 @@
 module.exports = function (grunt) {
-    "use strict";
-    
+    'use strict';
+
+    // Change this
     var srcDir = 'lib';
 
     grunt.initConfig({
@@ -13,10 +14,14 @@ module.exports = function (grunt) {
             dev: {
                 src: [srcDir + '/**/*.ts'],
                 watch: srcDir
-            }
+            },
+            build: {
+                src: [srcDir + '/**/*.ts'],
+            },
         },
     });
-    
-    grunt.loadNpmTasks("grunt-ts");
-    grunt.registerTask("default", ["ts:dev"]);
+
+    grunt.loadNpmTasks('grunt-ts');
+    grunt.registerTask('default', ['ts:dev']);
+    grunt.registerTask('build', ['ts:build']);
 };
