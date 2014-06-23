@@ -105,8 +105,17 @@ function pluginFn(grunt: IGrunt) {
             target: 'es5', // es3 , es5
             verbose: false,
             fast: 'watch',
+            htmlModuleTemplate: '<%= filename %>',
+            htmlVarTemplate: '<%= ext %>',
             failOnTypeErrors: true
         });
+
+        // get unprocessed templates from configuration
+        var rawTaskOptions = <ITaskOptions>(grunt.config.getRaw(currenttask.name + '.options') || {});
+        var rawTargetOptions = <ITaskOptions>(grunt.config.getRaw(currenttask.name + '.' + currenttask.target + '.options') || {});
+
+        options.htmlModuleTemplate = rawTargetOptions.htmlModuleTemplate || rawTaskOptions.htmlModuleTemplate;
+        options.htmlVarTemplate = rawTargetOptions.htmlVarTemplate || rawTaskOptions.htmlVarTemplate;
 
         // fix the properly cased options to their appropriate values
         options.allowBool = 'allowbool' in options ? options['allowbool'] : options.allowBool;
@@ -117,6 +126,16 @@ function pluginFn(grunt: IGrunt) {
         if (options.fast !== 'watch' && options.fast !== 'always' && options.fast !== 'never') {
             console.warn(('"fast" needs to be one of : "watch" (default) | "always" | "never" but you provided: ' + options.fast).magenta);
             options.fast = 'watch';
+        }
+
+        if (!options.htmlModuleTemplate) {
+            console.warn(('htmlModuleTemplate must be provided, reverting to default template: "<%= filename %>"').magenta);
+            options.htmlModuleTemplate = '<%= filename %>';
+        }
+
+        if (!options.htmlVarTemplate) {
+            console.warn(('htmlVarTemplate must be provided, reverting to default template: "<%= ext %>"').magenta);
+            options.htmlVarTemplate = '<%= ext %>';
         }
 
         // Remove comments based on the removeComments flag first then based on the comments flag, otherwise true
@@ -198,7 +217,7 @@ function pluginFn(grunt: IGrunt) {
             function runCompilation(files: string[], target: ITargetOptions, options: ITaskOptions): Promise<boolean> {
                 // Don't run it yet
                 grunt.log.writeln('Compiling...'.yellow);
-                
+
                 // The files to compile
                 var filesToCompile = files;
 
@@ -293,8 +312,13 @@ function pluginFn(grunt: IGrunt) {
                 //    compile html files must be before reference file creation                
                 var generatedFiles = [];
                 if (currenttask.data.html) {
+					var html2tsOptions = {
+						moduleFunction: _.template(options.htmlModuleTemplate),
+						varFunction: _.template(options.htmlVarTemplate)
+					};
+
                     var htmlFiles = grunt.file.expand(currenttask.data.html);
-                    generatedFiles = _.map(htmlFiles, (filename) => html2tsModule.compileHTML(filename));
+                    generatedFiles = _.map(htmlFiles, (filename) => html2tsModule.compileHTML(filename, html2tsOptions));
                 }
 
                 ///// Template cache

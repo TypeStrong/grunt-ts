@@ -49,4 +49,7 @@ interface ITaskOptions {
     verbose: boolean;
     compile: boolean;
     fast: string; // never | always | watch (default)
+
+    htmlModuleTemplate: string;
+    htmlVarTemplate: string;
 }
