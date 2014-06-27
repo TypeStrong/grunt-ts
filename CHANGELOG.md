@@ -37,7 +37,7 @@
 * Add `failOnTypeErrors` task option. If `false` build succeeds (exit code 0) if JS can be emitted successfully. More : https://github.com/grunt-ts/grunt-ts/pull/103
 
 ## Not yet associated with a release
-* Add documentation for transforms 
+* Add documentation for transforms (https://github.com/grunt-ts/grunt-ts/issues/85) + `ts:ref`
 * Make `///  ts:import` etc. work same as `///ts:import` i.e. whitespace independent. 
 * Show error when `/// ts:???` is detected but no transform exists for `???`
 * Add documentation for fast compile 
