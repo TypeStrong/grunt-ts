@@ -370,6 +370,8 @@ $ grunt release
 
 It runs `build` followed by `test`. This is also the default task. You should run this before sending a PR.
 
+Makes sure to use spaces and not tabs.
+
 ### Development 
 
 You will probably be working and testing a particular feature. Modify `tasksToTest` in our `Gruntfile.js` and run:  

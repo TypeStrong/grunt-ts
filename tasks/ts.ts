@@ -87,7 +87,7 @@ function pluginFn(grunt: IGrunt) {
         var done: grunt.task.AsyncResultCatcher = currenttask.async();
 
         var watch;
-		
+        
         // setup default options
         var options = currenttask.options<ITaskOptions>({
             allowBool: false,
@@ -107,12 +107,12 @@ function pluginFn(grunt: IGrunt) {
             fast: 'watch',
             htmlModuleTemplate: '<%= filename %>',
             htmlVarTemplate: '<%= ext %>',
-			htmlContentTemplate: 'module <%= modulename %> { export var <%= varname %> =  \'<%= content %>\' } ',
+            htmlContentTemplate: 'module <%= modulename %> { export var <%= varname %> =  \'<%= content %>\' } ',
             failOnTypeErrors: true
         });
 
         // get unprocessed templates from configuration
-		
+        
         var rawTaskOptions = <ITaskOptions>(grunt.config.getRaw(currenttask.name + '.options') || {});
         var rawTargetOptions = <ITaskOptions>(grunt.config.getRaw(currenttask.name + '.' + currenttask.target + '.options') || {});
 
@@ -320,17 +320,17 @@ function pluginFn(grunt: IGrunt) {
                 //    compile html files must be before reference file creation                
                 var generatedFiles = [];
                 if (currenttask.data.html) {
-					var html2tsOptions: html2tsModule.IOptions = {};
+                    var html2tsOptions: html2tsModule.IOptions = {};
 
-					grunt.verbose.writeln('HTML 2 TS Templates');
-					grunt.verbose.writeln('module template: "' + options.htmlModuleTemplate + '"');
-					html2tsOptions.moduleFunction = _.template(options.htmlModuleTemplate, null, options.htmlTemplateOptions);
+                    grunt.verbose.writeln('HTML 2 TS Templates');
+                    grunt.verbose.writeln('module template: "' + options.htmlModuleTemplate + '"');
+                    html2tsOptions.moduleFunction = _.template(options.htmlModuleTemplate, null, options.htmlTemplateOptions);
 
-					grunt.verbose.writeln('var template: "' + options.htmlVarTemplate + '"');
-					html2tsOptions.varFunction = _.template(options.htmlVarTemplate, null, options.htmlTemplateOptions);
+                    grunt.verbose.writeln('var template: "' + options.htmlVarTemplate + '"');
+                    html2tsOptions.varFunction = _.template(options.htmlVarTemplate, null, options.htmlTemplateOptions);
 
-					grunt.verbose.writeln('content template: "' + options.htmlContentTemplate + '"');
-					html2tsOptions.contentFunction = _.template(options.htmlContentTemplate, null, options.htmlTemplateOptions);
+                    grunt.verbose.writeln('content template: "' + options.htmlContentTemplate + '"');
+                    html2tsOptions.contentFunction = _.template(options.htmlContentTemplate, null, options.htmlTemplateOptions);
 
                     var htmlFiles = grunt.file.expand(currenttask.data.html);
                     generatedFiles = _.map(htmlFiles, (filename) => html2tsModule.compileHTML(filename, html2tsOptions));
