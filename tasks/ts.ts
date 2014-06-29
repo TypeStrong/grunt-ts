@@ -107,15 +107,18 @@ function pluginFn(grunt: IGrunt) {
             fast: 'watch',
             htmlModuleTemplate: '<%= filename %>',
             htmlVarTemplate: '<%= ext %>',
+			htmlContentTemplate: 'module <%= modulename %> { export var <%= varname %> =  \'<%= content %>\' } ',
             failOnTypeErrors: true
         });
 
         // get unprocessed templates from configuration
+		
         var rawTaskOptions = <ITaskOptions>(grunt.config.getRaw(currenttask.name + '.options') || {});
         var rawTargetOptions = <ITaskOptions>(grunt.config.getRaw(currenttask.name + '.' + currenttask.target + '.options') || {});
 
         options.htmlModuleTemplate = rawTargetOptions.htmlModuleTemplate || rawTaskOptions.htmlModuleTemplate;
         options.htmlVarTemplate = rawTargetOptions.htmlVarTemplate || rawTaskOptions.htmlVarTemplate;
+        options.htmlContentTemplate = rawTargetOptions.htmlContentTemplate || rawTaskOptions.htmlContentTemplate;
 
         // fix the properly cased options to their appropriate values
         options.allowBool = 'allowbool' in options ? options['allowbool'] : options.allowBool;
@@ -136,6 +139,11 @@ function pluginFn(grunt: IGrunt) {
         if (!options.htmlVarTemplate) {
             console.warn(('htmlVarTemplate must be provided, reverting to default template: "<%= ext %>"').magenta);
             options.htmlVarTemplate = '<%= ext %>';
+        }
+
+        if (!options.htmlContentTemplate) {
+            console.warn(('htmlContentTemplate must be provided, reverting to default template: "module <%= modulename %> { export var <%= varname %> =  \'<%= content %>\' } "').magenta);
+            options.htmlContentTemplate = 'module <%= modulename %> { export var <%= varname %> =  \'<%= content %>\' } ';
         }
 
         // Remove comments based on the removeComments flag first then based on the comments flag, otherwise true
@@ -316,10 +324,13 @@ function pluginFn(grunt: IGrunt) {
 
 					grunt.verbose.writeln('HTML 2 TS Templates');
 					grunt.verbose.writeln('module template: "' + options.htmlModuleTemplate + '"');
-					html2tsOptions.moduleFunction = _.template(options.htmlModuleTemplate);
+					html2tsOptions.moduleFunction = _.template(options.htmlModuleTemplate, null, options.htmlTemplateOptions);
 
 					grunt.verbose.writeln('var template: "' + options.htmlVarTemplate + '"');
-					html2tsOptions.varFunction = _.template(options.htmlVarTemplate);
+					html2tsOptions.varFunction = _.template(options.htmlVarTemplate, null, options.htmlTemplateOptions);
+
+					grunt.verbose.writeln('content template: "' + options.htmlContentTemplate + '"');
+					html2tsOptions.contentFunction = _.template(options.htmlContentTemplate, null, options.htmlTemplateOptions);
 
                     var htmlFiles = grunt.file.expand(currenttask.data.html);
                     generatedFiles = _.map(htmlFiles, (filename) => html2tsModule.compileHTML(filename, html2tsOptions));

@@ -52,4 +52,6 @@ interface ITaskOptions {
 
     htmlModuleTemplate: string;
     htmlVarTemplate: string;
+    htmlContentTemplate: string;
+	htmlTemplateOptions?: any;
 }

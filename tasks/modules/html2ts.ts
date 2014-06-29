@@ -1,6 +1,5 @@
 /// <reference path="../../defs/tsd.d.ts"/>
 
-import _ = require('underscore');
 import fs = require('fs');
 import path = require('path');
 
@@ -26,11 +25,10 @@ function stripBOM(str) {
         : str;
 }
 
-var htmlTemplate = _.template('module <%= modulename %> { export var <%= varname %> =  \'<%= content %>\' } ');
-
 export interface IOptions {
     moduleFunction?: Function;
     varFunction?: Function;
+    contentFunction?: Function;
 }
 
 // Compile an HTML file to a TS file
@@ -46,7 +44,7 @@ export function compileHTML(filename: string, options: IOptions): string {
     var moduleName = options.moduleFunction({ ext: ext, filename: extFreename });
     var varName = options.varFunction({ ext: ext, filename: extFreename }).replace(/\./g, '_');
 
-    var fileContent = htmlTemplate({ modulename: moduleName, varname: varName, content: htmlContent });
+    var fileContent = options.contentFunction({ modulename: moduleName, varname: varName, content: htmlContent });
 
     // Write the content to a file
     var outputfile = filename + '.ts';

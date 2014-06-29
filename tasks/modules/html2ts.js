@@ -1,5 +1,4 @@
 /// <reference path="../../defs/tsd.d.ts"/>
-var _ = require('underscore');
 var fs = require('fs');
 var path = require('path');
 
@@ -23,8 +22,6 @@ function stripBOM(str) {
     return 0xFEFF === str.charCodeAt(0) ? str.substring(1) : str;
 }
 
-var htmlTemplate = _.template('module <%= modulename %> { export var <%= varname %> =  \'<%= content %>\' } ');
-
 // Compile an HTML file to a TS file
 // Return the filename. This filename will be required by reference.ts
 function compileHTML(filename, options) {
@@ -38,7 +35,7 @@ function compileHTML(filename, options) {
     var moduleName = options.moduleFunction({ ext: ext, filename: extFreename });
     var varName = options.varFunction({ ext: ext, filename: extFreename }).replace(/\./g, '_');
 
-    var fileContent = htmlTemplate({ modulename: moduleName, varname: varName, content: htmlContent });
+    var fileContent = options.contentFunction({ modulename: moduleName, varname: varName, content: htmlContent });
 
     // Write the content to a file
     var outputfile = filename + '.ts';

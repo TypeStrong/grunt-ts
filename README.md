@@ -161,7 +161,9 @@ It is possible to specify this string to the template on a view: http://emberjs.
 
 Specifically: http://stackoverflow.com/a/9867375/390330
 
-#### Control generated TypeScript module and variable names
+#### Control generated TypeScript 
+
+##### module and variable names templates
 
 In the task options htmlModuleTemplate and htmlVarTemplate can specify an Underscore templates to be used in order to generate the module and variable names for the generated TypeScript.
 
@@ -178,6 +180,48 @@ The default templates are:
 Usage example is setting the module template to "MyModule.Templates" and the variable template to "<%= filename %>" this will result for the test.html file above with the generated TypeScript
 ```typescript
 module MyModule.Templates { export var test = '<div Some content </div>' }
+```
+
+##### content template and template options
+
+In the task options the htmlContentTemplate can be used to specify an Underscore template to be used to generate the actual content of the generated TypeScript file.
+
+And the htmlTemplateOptions can be used to provide configuration to the underscore template function.
+
+Together those options provide access to the full power of the  template engine inside the generate TypeScript file. Without using the options the templates must use very simple expressions:
+```html
+<%= filename %>
+```
+while more complex templates will fail the task
+```html
+<%= filename.toUpperCase() %>
+```
+due to grunt attempting to parse the template as part of the config loading.
+
+Using the htmlTemplateOptions you can provide a regex that will define other delimiters for your templates. 
+
+*NOTE:* Overriding the delimiters force you to provide all 3 templates, even if the default template provide what you need since the templates will be parsed using the given options.
+
+For example a file called `myModule.part.tmpl.html`:
+```html
+<div>My part HTML</div>
+```
+
+with options:
+```json
+ts: {
+	options: {
+		htmlModuleTemplate: "${ filename.split('.')[0] }",
+		htmlVarTemplate: "${ filename.split('.')[1] }",
+		htmlContentTemplate: "module ${ modulename } { export var ${ varname } = '${ content }' }",
+		htmlTemplateOptions: { interpolate: /\$\{(.+?)\}/g }
+	}
+}
+```
+
+will result in the generated TypeScript file
+```typescript
+module myModule { export var part = '<div>My part HTML</div>' }
 ```
 
 ### Live file watching and building
