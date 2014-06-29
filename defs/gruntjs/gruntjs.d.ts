@@ -1275,6 +1275,8 @@ interface IGrunt extends grunt.IConfigComponents, grunt.fail.FailModule, grunt.I
 
     log: grunt.log.LogModule
 
+    verbose: grunt.log.LogModule
+
     option: grunt.option.OptionModule
 
     task: grunt.task.TaskModule

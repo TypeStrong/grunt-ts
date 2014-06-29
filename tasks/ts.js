@@ -64,6 +64,8 @@ function pluginFn(grunt) {
     /////////////////////////////////////////////////////////////////////
     // The grunt task
     ////////////////////////////////////////////////////////////////////
+    console.log('Register task');
+
     // Note: this function is called once for each target
     // so task + target options are a bit blurred inside this function
     grunt.registerMultiTask('ts', 'Compile TypeScript files', function () {
@@ -73,6 +75,8 @@ function pluginFn(grunt) {
         var done = currenttask.async();
 
         var watch;
+
+        grunt.verbose.warn('Getting options');
 
         // setup default options
         var options = currenttask.options({
@@ -91,8 +95,8 @@ function pluginFn(grunt) {
             target: 'es5',
             verbose: false,
             fast: 'watch',
-            htmlModuleTemplate: '<%= filename %>',
-            htmlVarTemplate: '<%= ext %>',
+            //            htmlModuleTemplate: '<%= filename %>',
+            //            htmlVarTemplate: '<%= ext %>',
             failOnTypeErrors: true
         });
 
@@ -289,10 +293,14 @@ function pluginFn(grunt) {
                 //    compile html files must be before reference file creation
                 var generatedFiles = [];
                 if (currenttask.data.html) {
-                    var html2tsOptions = {
-                        moduleFunction: _.template(options.htmlModuleTemplate),
-                        varFunction: _.template(options.htmlVarTemplate)
-                    };
+                    var html2tsOptions = {};
+
+                    grunt.verbose.writeln('HTML 2 TS Templates');
+                    grunt.verbose.writeln('module template: "' + options.htmlModuleTemplate + '"');
+                    html2tsOptions.moduleFunction = _.template(options.htmlModuleTemplate);
+
+                    grunt.verbose.writeln('var template: "' + options.htmlVarTemplate + '"');
+                    html2tsOptions.varFunction = _.template(options.htmlVarTemplate);
 
                     var htmlFiles = grunt.file.expand(currenttask.data.html);
                     generatedFiles = _.map(htmlFiles, function (filename) {

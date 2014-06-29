@@ -28,14 +28,14 @@ function stripBOM(str) {
 
 var htmlTemplate = _.template('module <%= modulename %> { export var <%= varname %> =  \'<%= content %>\' } ');
 
-export interface IHtml2TSOptions {
-    moduleFunction: Function;
-    varFunction: Function
+export interface IOptions {
+    moduleFunction?: Function;
+    varFunction?: Function;
 }
 
 // Compile an HTML file to a TS file
 // Return the filename. This filename will be required by reference.ts
-export function compileHTML(filename: string, options: IHtml2TSOptions): string {
+export function compileHTML(filename: string, options: IOptions): string {
     var htmlContent = escapeContent(fs.readFileSync(filename).toString());
     htmlContent = stripBOM(htmlContent);
     // TODO: place a minification pipeline here if you want.
@@ -44,7 +44,7 @@ export function compileHTML(filename: string, options: IHtml2TSOptions): string 
     var extFreename = path.basename(filename, '.' + ext);
 
     var moduleName = options.moduleFunction({ ext: ext, filename: extFreename });
-    var varName = options.varFunction({ ext: ext, filename: extFreename }).replace('.', '_');
+    var varName = options.varFunction({ ext: ext, filename: extFreename }).replace(/\./g, '_');
 
     var fileContent = htmlTemplate({ modulename: moduleName, varname: varName, content: htmlContent });
 
