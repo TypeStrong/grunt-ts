@@ -36,8 +36,11 @@
 ## v1.11.3
 * Add `failOnTypeErrors` task option. If `false` build succeeds (exit code 0) if JS can be emitted successfully. More : https://github.com/grunt-ts/grunt-ts/pull/103
 
+## v1.11.4
+* Add additional error summary for type error vs. code emit preventing error : https://github.com/grunt-ts/grunt-ts/pull/120
+
 # Planned
-* Add additional error summary for type error vs. non type error : https://github.com/grunt-ts/grunt-ts/pull/120
+* Nothing staged
 
 ## Not yet associated with a release
 * Add documentation for transforms (https://github.com/grunt-ts/grunt-ts/issues/85) + `ts:ref`
