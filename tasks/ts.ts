@@ -250,22 +250,53 @@ function pluginFn(grunt: IGrunt) {
                     //   Level 1 errors = syntax errors - prevent JS emit.
                     //   Level 2 errors = semantic errors - *not* prevents JS emit.
                     //   Level 5 errors = compiler flag misuse - prevents JS emit.
+                    var level1ErrorCount = 0, level5ErrorCount = 0, nonEmitPreventingWarningCount = 0;
                     var hasPreventEmitErrors = _.foldl(result.output.split('\n'), function(memo, errorMsg: string) {
-                        var hasLevel1Errors = errorMsg.search(/error TS1\d+:/g) >= 0;
-                        // var hasLevel2PlusErrors = errorMsg.search(/error TS[2-4,6-9]\d+:/g) >= 0;
-                        var hasLevel5Errors = errorMsg.search(/error TS5\d+:/) >= 0;
-                        return memo || (hasLevel1Errors || hasLevel5Errors);
+                        var isPreventEmitError = false;
+                        if (errorMsg.search(/error TS1\d+:/g) >= 0) {
+                          level1ErrorCount += 1;
+                          isPreventEmitError = true;
+                        } else if (errorMsg.search(/error TS5\d+:/) >= 0) {
+                          level5ErrorCount += 1;
+                          isPreventEmitError = true;
+                        } else if (errorMsg.search(/error TS\d+:/) >= 0) {
+                          nonEmitPreventingWarningCount += 1;
+                        }
+                        return memo || isPreventEmitError;
                     }, false) || false;
 
                     // Because we can't think of a better way to determine it,
                     //   assume that emitted JS in spite of error codes implies type-only errors.
                     var isOnlyTypeErrors = !hasPreventEmitErrors;
 
-                    // Explain our interpretation of the tsc errors before we mark build results.
-                    if (isError) {
-                        if (isOnlyTypeErrors) {
-                            grunt.log.writeln('Type errors only.');
-                        }
+                    // Log error summary
+                    if (level1ErrorCount + level5ErrorCount + nonEmitPreventingWarningCount > 0) {
+                      if (level1ErrorCount + level5ErrorCount > 0) {
+                        grunt.log.write(('>> ').red);
+                      } else {
+                        grunt.log.write(('>> ').green);
+                      }
+
+                      if (level5ErrorCount > 0) {
+                        grunt.log.write(level5ErrorCount.toString() + ' compiler flag error' +
+                          (level5ErrorCount === 1 ? '' : 's') + '  ');
+                      }
+                      if (level1ErrorCount > 0) {
+                        grunt.log.write(level1ErrorCount.toString() + ' syntax error' +
+                          (level1ErrorCount === 1 ? '' : 's') + '  ');
+                      }
+                      if (nonEmitPreventingWarningCount > 0) {
+                        grunt.log.write(nonEmitPreventingWarningCount.toString() +
+                          ' non-emit-preventing type warning' +
+                          (nonEmitPreventingWarningCount === 1 ? '' : 's') + '  ');
+                      }
+
+                      grunt.log.writeln('');
+
+                      if (isOnlyTypeErrors) {
+                        grunt.log.write(('>> ').green);
+                        grunt.log.writeln('Type errors only.');
+                      }
                     }
 
                     // !!! To do: To really be confident that the build was actually successful,
