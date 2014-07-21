@@ -115,12 +115,12 @@ function pluginFn(grunt) {
         }
 
         if (!options.htmlModuleTemplate) {
-            console.warn(('htmlModuleTemplate must be provided, reverting to default template: "<%= filename %>"').magenta);
+            // use default value
             options.htmlModuleTemplate = '<%= filename %>';
         }
 
         if (!options.htmlVarTemplate) {
-            console.warn(('htmlVarTemplate must be provided, reverting to default template: "<%= ext %>"').magenta);
+            // use default value
             options.htmlVarTemplate = '<%= ext %>';
         }
 

@@ -39,6 +39,11 @@
 ## v1.11.4
 * Add additional error summary for type error vs. code emit preventing error : https://github.com/grunt-ts/grunt-ts/pull/120
 
+## v1.11.5
+* No need to warn when default values are usable. Ref: https://github.com/grunt-ts/grunt-ts/issues/115
+* Fix path.join error because of `grunt.task.current.target` : https://github.com/grunt-ts/grunt-ts/issues/118
+* Update LKG with self
+
 # Planned
 * Nothing staged
 
