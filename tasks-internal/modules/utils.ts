@@ -7,8 +7,12 @@ import util = require('util');
 export var grunt: IGrunt = require('grunt');
 
 // Converts "C:\boo" , "C:\boo\foo.ts" => "./foo.ts"; Works on unix as well.
-export function makeRelativePath(folderpath: string, filename: string) {
-    return path.relative(folderpath, filename).split('\\').join('/');
+export function makeRelativePath(folderpath: string, filename: string, forceRelative = false) {
+    var relativePath = path.relative(folderpath, filename).split('\\').join('/');
+    if (forceRelative && relativePath[0] !== '.') {
+        relativePath = './' + relativePath;
+    }
+    return relativePath;
 }
 
 

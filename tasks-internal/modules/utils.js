@@ -6,8 +6,13 @@ var util = require('util');
 exports.grunt = require('grunt');
 
 // Converts "C:\boo" , "C:\boo\foo.ts" => "./foo.ts"; Works on unix as well.
-function makeRelativePath(folderpath, filename) {
-    return path.relative(folderpath, filename).split('\\').join('/');
+function makeRelativePath(folderpath, filename, forceRelative) {
+    if (typeof forceRelative === "undefined") { forceRelative = false; }
+    var relativePath = path.relative(folderpath, filename).split('\\').join('/');
+    if (forceRelative && relativePath[0] !== '.') {
+        relativePath = './' + relativePath;
+    }
+    return relativePath;
 }
 exports.makeRelativePath = makeRelativePath;
 

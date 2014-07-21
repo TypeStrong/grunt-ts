@@ -1,4 +1,4 @@
-// v1.10.0 2014-04-24T10:03:55.988Z
+// v1.11.4 2014-07-21T13:22:53.218Z
 /// <reference path="../defs/tsd.d.ts"/>
 /// <reference path="./modules/interfaces.d.ts"/>
 /*
@@ -13,7 +13,6 @@ var fs = require('fs');
 // Modules of grunt-ts
 var utils = require('./modules/utils');
 var compileModule = require('./modules/compile');
-var indexModule = require('./modules/index');
 var referenceModule = require('./modules/reference');
 var amdLoaderModule = require('./modules/amdLoader');
 var html2tsModule = require('./modules/html2ts');
@@ -92,8 +91,18 @@ function pluginFn(grunt) {
             sourceRoot: '',
             target: 'es5',
             verbose: false,
-            fast: 'watch'
+            fast: 'watch',
+            htmlModuleTemplate: '<%= filename %>',
+            htmlVarTemplate: '<%= ext %>',
+            failOnTypeErrors: true
         });
+
+        // get unprocessed templates from configuration
+        var rawTaskOptions = (grunt.config.getRaw(currenttask.name + '.options') || {});
+        var rawTargetOptions = (grunt.config.getRaw(currenttask.name + '.' + currenttask.target + '.options') || {});
+
+        options.htmlModuleTemplate = rawTargetOptions.htmlModuleTemplate || rawTaskOptions.htmlModuleTemplate;
+        options.htmlVarTemplate = rawTargetOptions.htmlVarTemplate || rawTaskOptions.htmlVarTemplate;
 
         // fix the properly cased options to their appropriate values
         options.allowBool = 'allowbool' in options ? options['allowbool'] : options.allowBool;
@@ -104,6 +113,16 @@ function pluginFn(grunt) {
         if (options.fast !== 'watch' && options.fast !== 'always' && options.fast !== 'never') {
             console.warn(('"fast" needs to be one of : "watch" (default) | "always" | "never" but you provided: ' + options.fast).magenta);
             options.fast = 'watch';
+        }
+
+        if (!options.htmlModuleTemplate) {
+            // use default value
+            options.htmlModuleTemplate = '<%= filename %>';
+        }
+
+        if (!options.htmlVarTemplate) {
+            // use default value
+            options.htmlVarTemplate = '<%= ext %>';
         }
 
         // Remove comments based on the removeComments flag first then based on the comments flag, otherwise true
@@ -188,19 +207,90 @@ function pluginFn(grunt) {
                 var endtime;
 
                 // Compile the files
-                return compileModule.compileAllFiles(filesToCompile, target, options).then(function (result) {
+                return compileModule.compileAllFiles(filesToCompile, target, options, currenttask.target).then(function (result) {
                     // End the timer
                     endtime = new Date().getTime();
 
-                    // Evaluate the result
-                    if (!result || result.code) {
-                        grunt.log.error('Compilation failed'.red);
+                    grunt.log.writeln('');
+
+                    // Analyze the results of our tsc execution,
+                    //   then tell the user our analysis results
+                    //   and mark the build as fail or success
+                    if (!result) {
+                        grunt.log.error('Error: No result from tsc.'.red);
                         return false;
-                    } else {
-                        var time = (endtime - starttime) / 1000;
-                        grunt.log.writeln(('Success: ' + time.toFixed(2) + 's for ' + result.fileCount + ' typescript files').green);
-                        return true;
                     }
+
+                    var isError = (result.code === 1);
+
+                    // If the compilation errors contain only type errors, JS files are still
+                    //   generated. If tsc finds type errors, it will return an error code, even
+                    //   if JS files are generated. We should check this for this,
+                    //   only type errors, and call this a successful compilation.
+                    // Assumptions:
+                    //   Level 1 errors = syntax errors - prevent JS emit.
+                    //   Level 2 errors = semantic errors - *not* prevents JS emit.
+                    //   Level 5 errors = compiler flag misuse - prevents JS emit.
+                    var level1ErrorCount = 0, level5ErrorCount = 0, nonEmitPreventingWarningCount = 0;
+                    var hasPreventEmitErrors = _.foldl(result.output.split('\n'), function (memo, errorMsg) {
+                        var isPreventEmitError = false;
+                        if (errorMsg.search(/error TS1\d+:/g) >= 0) {
+                            level1ErrorCount += 1;
+                            isPreventEmitError = true;
+                        } else if (errorMsg.search(/error TS5\d+:/) >= 0) {
+                            level5ErrorCount += 1;
+                            isPreventEmitError = true;
+                        } else if (errorMsg.search(/error TS\d+:/) >= 0) {
+                            nonEmitPreventingWarningCount += 1;
+                        }
+                        return memo || isPreventEmitError;
+                    }, false) || false;
+
+                    // Because we can't think of a better way to determine it,
+                    //   assume that emitted JS in spite of error codes implies type-only errors.
+                    var isOnlyTypeErrors = !hasPreventEmitErrors;
+
+                    // Log error summary
+                    if (level1ErrorCount + level5ErrorCount + nonEmitPreventingWarningCount > 0) {
+                        if (level1ErrorCount + level5ErrorCount > 0) {
+                            grunt.log.write(('>> ').red);
+                        } else {
+                            grunt.log.write(('>> ').green);
+                        }
+
+                        if (level5ErrorCount > 0) {
+                            grunt.log.write(level5ErrorCount.toString() + ' compiler flag error' + (level5ErrorCount === 1 ? '' : 's') + '  ');
+                        }
+                        if (level1ErrorCount > 0) {
+                            grunt.log.write(level1ErrorCount.toString() + ' syntax error' + (level1ErrorCount === 1 ? '' : 's') + '  ');
+                        }
+                        if (nonEmitPreventingWarningCount > 0) {
+                            grunt.log.write(nonEmitPreventingWarningCount.toString() + ' non-emit-preventing type warning' + (nonEmitPreventingWarningCount === 1 ? '' : 's') + '  ');
+                        }
+
+                        grunt.log.writeln('');
+
+                        if (isOnlyTypeErrors) {
+                            grunt.log.write(('>> ').green);
+                            grunt.log.writeln('Type errors only.');
+                        }
+                    }
+
+                    // !!! To do: To really be confident that the build was actually successful,
+                    //   we have to check timestamps of the generated files in the destination.
+                    var isSuccessfulBuild = (!isError || (isError && isOnlyTypeErrors && !options.failOnTypeErrors));
+
+                    if (isSuccessfulBuild) {
+                        // Report successful build.
+                        var time = (endtime - starttime) / 1000;
+                        grunt.log.writeln('');
+                        grunt.log.writeln(('TypeScript compilation complete: ' + time.toFixed(2) + 's for ' + result.fileCount + ' typescript files').green);
+                    } else {
+                        // Report unsuccessful build.
+                        grunt.log.error(('Error: tsc return code: ' + result.code).yellow);
+                    }
+
+                    return isSuccessfulBuild;
                 });
             }
 
@@ -226,9 +316,14 @@ function pluginFn(grunt) {
                 //    compile html files must be before reference file creation
                 var generatedFiles = [];
                 if (currenttask.data.html) {
+                    var html2tsOptions = {
+                        moduleFunction: _.template(options.htmlModuleTemplate),
+                        varFunction: _.template(options.htmlVarTemplate)
+                    };
+
                     var htmlFiles = grunt.file.expand(currenttask.data.html);
                     generatedFiles = _.map(htmlFiles, function (filename) {
-                        return html2tsModule.compileHTML(filename);
+                        return html2tsModule.compileHTML(filename, html2tsOptions);
                     });
                 }
 
@@ -244,17 +339,6 @@ function pluginFn(grunt) {
                         var templateCacheBasePath = path.resolve(target.templateCache.baseUrl);
                         templateCacheModule.generateTemplateCache(templateCacheSrc, templateCacheDest, templateCacheBasePath);
                     }
-                }
-
-                ///// External Module Index
-                // Create the index if specified
-                if (target.index) {
-                    if (!_.isArray(target.index)) {
-                        grunt.warn('Index option needs to be an array of directories');
-                    }
-                    indexModule.indexDirectories(_.map(target.index, function (folder) {
-                        return path.resolve(folder);
-                    }));
                 }
 
                 ///// Reference File
