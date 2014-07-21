@@ -336,6 +336,13 @@ $ grunt dev
 
 It will watch your changes (to `grunt-ts` task as well as examples) and run your tasksToTest after updating the task (if any changes detected). 
 
+### Additional commands
+Update the current `grunt-ts` to be the last known good version (dogfood). Commit message should be `Update LKG`. 
+
+```bash
+$ grunt upgrade
+```
+
 ## License
 
 Licensed under the MIT License. 

@@ -129,12 +129,12 @@ function pluginFn(grunt: IGrunt) {
         }
 
         if (!options.htmlModuleTemplate) {
-            console.warn(('htmlModuleTemplate must be provided, reverting to default template: "<%= filename %>"').magenta);
+            // use default value
             options.htmlModuleTemplate = '<%= filename %>';
         }
 
         if (!options.htmlVarTemplate) {
-            console.warn(('htmlVarTemplate must be provided, reverting to default template: "<%= ext %>"').magenta);
+            // use default value
             options.htmlVarTemplate = '<%= ext %>';
         }
 
@@ -226,98 +226,99 @@ function pluginFn(grunt: IGrunt) {
                 var endtime;
 
                 // Compile the files
-                return compileModule.compileAllFiles(filesToCompile, target, options).then((result: compileModule.ICompileResult) => {
-                    // End the timer
-                    endtime = new Date().getTime();
+                return compileModule.compileAllFiles(filesToCompile, target, options, currenttask.target)
+                    .then((result: compileModule.ICompileResult) => {
+                        // End the timer
+                        endtime = new Date().getTime();
 
-                    grunt.log.writeln('');
-
-                    // Analyze the results of our tsc execution,
-                    //   then tell the user our analysis results
-                    //   and mark the build as fail or success
-                    if (!result) {
-                        grunt.log.error('Error: No result from tsc.'.red);
-                        return false;
-                    }
-
-                    var isError = (result.code === 1);
-
-                    // If the compilation errors contain only type errors, JS files are still
-                    //   generated. If tsc finds type errors, it will return an error code, even
-                    //   if JS files are generated. We should check this for this,
-                    //   only type errors, and call this a successful compilation.
-                    // Assumptions:
-                    //   Level 1 errors = syntax errors - prevent JS emit.
-                    //   Level 2 errors = semantic errors - *not* prevents JS emit.
-                    //   Level 5 errors = compiler flag misuse - prevents JS emit.
-                    var level1ErrorCount = 0, level5ErrorCount = 0, nonEmitPreventingWarningCount = 0;
-                    var hasPreventEmitErrors = _.foldl(result.output.split('\n'), function(memo, errorMsg: string) {
-                        var isPreventEmitError = false;
-                        if (errorMsg.search(/error TS1\d+:/g) >= 0) {
-                          level1ErrorCount += 1;
-                          isPreventEmitError = true;
-                        } else if (errorMsg.search(/error TS5\d+:/) >= 0) {
-                          level5ErrorCount += 1;
-                          isPreventEmitError = true;
-                        } else if (errorMsg.search(/error TS\d+:/) >= 0) {
-                          nonEmitPreventingWarningCount += 1;
-                        }
-                        return memo || isPreventEmitError;
-                    }, false) || false;
-
-                    // Because we can't think of a better way to determine it,
-                    //   assume that emitted JS in spite of error codes implies type-only errors.
-                    var isOnlyTypeErrors = !hasPreventEmitErrors;
-
-                    // Log error summary
-                    if (level1ErrorCount + level5ErrorCount + nonEmitPreventingWarningCount > 0) {
-                      if (level1ErrorCount + level5ErrorCount > 0) {
-                        grunt.log.write(('>> ').red);
-                      } else {
-                        grunt.log.write(('>> ').green);
-                      }
-
-                      if (level5ErrorCount > 0) {
-                        grunt.log.write(level5ErrorCount.toString() + ' compiler flag error' +
-                          (level5ErrorCount === 1 ? '' : 's') + '  ');
-                      }
-                      if (level1ErrorCount > 0) {
-                        grunt.log.write(level1ErrorCount.toString() + ' syntax error' +
-                          (level1ErrorCount === 1 ? '' : 's') + '  ');
-                      }
-                      if (nonEmitPreventingWarningCount > 0) {
-                        grunt.log.write(nonEmitPreventingWarningCount.toString() +
-                          ' non-emit-preventing type warning' +
-                          (nonEmitPreventingWarningCount === 1 ? '' : 's') + '  ');
-                      }
-
-                      grunt.log.writeln('');
-
-                      if (isOnlyTypeErrors) {
-                        grunt.log.write(('>> ').green);
-                        grunt.log.writeln('Type errors only.');
-                      }
-                    }
-
-                    // !!! To do: To really be confident that the build was actually successful,
-                    //   we have to check timestamps of the generated files in the destination.
-                    var isSuccessfulBuild = (!isError ||
-                        (isError && isOnlyTypeErrors && !options.failOnTypeErrors)
-                    );
-
-                    if (isSuccessfulBuild) {
-                        // Report successful build.
-                        var time = (endtime - starttime) / 1000;
                         grunt.log.writeln('');
-                        grunt.log.writeln(('TypeScript compilation complete: ' + time.toFixed(2) +
-                            's for ' + result.fileCount + ' typescript files').green);
-                    } else {
-                        // Report unsuccessful build.
-                        grunt.log.error(('Error: tsc return code: ' + result.code).yellow);
-                    }
 
-                    return isSuccessfulBuild;
-                });
+                        // Analyze the results of our tsc execution,
+                        //   then tell the user our analysis results
+                        //   and mark the build as fail or success
+                        if (!result) {
+                            grunt.log.error('Error: No result from tsc.'.red);
+                            return false;
+                        }
+
+                        var isError = (result.code === 1);
+
+                        // If the compilation errors contain only type errors, JS files are still
+                        //   generated. If tsc finds type errors, it will return an error code, even
+                        //   if JS files are generated. We should check this for this,
+                        //   only type errors, and call this a successful compilation.
+                        // Assumptions:
+                        //   Level 1 errors = syntax errors - prevent JS emit.
+                        //   Level 2 errors = semantic errors - *not* prevents JS emit.
+                        //   Level 5 errors = compiler flag misuse - prevents JS emit.
+                        var level1ErrorCount = 0, level5ErrorCount = 0, nonEmitPreventingWarningCount = 0;
+                        var hasPreventEmitErrors = _.foldl(result.output.split('\n'), function(memo, errorMsg: string) {
+                            var isPreventEmitError = false;
+                            if (errorMsg.search(/error TS1\d+:/g) >= 0) {
+                              level1ErrorCount += 1;
+                              isPreventEmitError = true;
+                            } else if (errorMsg.search(/error TS5\d+:/) >= 0) {
+                              level5ErrorCount += 1;
+                              isPreventEmitError = true;
+                            } else if (errorMsg.search(/error TS\d+:/) >= 0) {
+                              nonEmitPreventingWarningCount += 1;
+                            }
+                            return memo || isPreventEmitError;
+                        }, false) || false;
+
+                        // Because we can't think of a better way to determine it,
+                        //   assume that emitted JS in spite of error codes implies type-only errors.
+                        var isOnlyTypeErrors = !hasPreventEmitErrors;
+
+                        // Log error summary
+                        if (level1ErrorCount + level5ErrorCount + nonEmitPreventingWarningCount > 0) {
+                          if (level1ErrorCount + level5ErrorCount > 0) {
+                            grunt.log.write(('>> ').red);
+                          } else {
+                            grunt.log.write(('>> ').green);
+                          }
+
+                          if (level5ErrorCount > 0) {
+                            grunt.log.write(level5ErrorCount.toString() + ' compiler flag error' +
+                              (level5ErrorCount === 1 ? '' : 's') + '  ');
+                          }
+                          if (level1ErrorCount > 0) {
+                            grunt.log.write(level1ErrorCount.toString() + ' syntax error' +
+                              (level1ErrorCount === 1 ? '' : 's') + '  ');
+                          }
+                          if (nonEmitPreventingWarningCount > 0) {
+                            grunt.log.write(nonEmitPreventingWarningCount.toString() +
+                              ' non-emit-preventing type warning' +
+                              (nonEmitPreventingWarningCount === 1 ? '' : 's') + '  ');
+                          }
+
+                          grunt.log.writeln('');
+
+                          if (isOnlyTypeErrors) {
+                            grunt.log.write(('>> ').green);
+                            grunt.log.writeln('Type errors only.');
+                          }
+                        }
+
+                        // !!! To do: To really be confident that the build was actually successful,
+                        //   we have to check timestamps of the generated files in the destination.
+                        var isSuccessfulBuild = (!isError ||
+                            (isError && isOnlyTypeErrors && !options.failOnTypeErrors)
+                        );
+
+                        if (isSuccessfulBuild) {
+                            // Report successful build.
+                            var time = (endtime - starttime) / 1000;
+                            grunt.log.writeln('');
+                            grunt.log.writeln(('TypeScript compilation complete: ' + time.toFixed(2) +
+                                's for ' + result.fileCount + ' typescript files').green);
+                        } else {
+                            // Report unsuccessful build.
+                            grunt.log.error(('Error: tsc return code: ' + result.code).yellow);
+                        }
+
+                        return isSuccessfulBuild;
+                    });
             }
 
             // Find out which files to compile, codegen etc. 

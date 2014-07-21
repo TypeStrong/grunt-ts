@@ -126,7 +126,7 @@ var ImportTransformer = (function (_super) {
                 if (filename.toLowerCase() === 'index') {
                     filename = path.basename(path.dirname(completePathToFile));
                 }
-                var pathToFile = './' + utils.makeRelativePath(sourceFileDirectory, completePathToFile.replace('.ts', ''));
+                var pathToFile = utils.makeRelativePath(sourceFileDirectory, completePathToFile.replace('.ts', ''), true);
                 outputLines.push(_this.template({ filename: filename, pathToFile: pathToFile }));
             });
         } else {
@@ -160,7 +160,7 @@ var ExportTransformer = (function (_super) {
                 if (filename.toLowerCase() === 'index') {
                     filename = path.basename(path.dirname(completePathToFile));
                 }
-                var pathToFile = './' + utils.makeRelativePath(sourceFileDirectory, completePathToFile.replace('.ts', ''));
+                var pathToFile = utils.makeRelativePath(sourceFileDirectory, completePathToFile.replace('.ts', ''), true);
                 outputLines.push(_this.template({ filename: filename, pathToFile: pathToFile }));
             });
         } else {
@@ -168,6 +168,40 @@ var ExportTransformer = (function (_super) {
         }
     };
     return ExportTransformer;
+})(BaseTransformer);
+
+var ReferenceTransformer = (function (_super) {
+    __extends(ReferenceTransformer, _super);
+    function ReferenceTransformer() {
+        _super.call(this, 'ref');
+        this.importError = '/// No glob matched name: ';
+        this.template = _.template('/// <reference path="<%= pathToFile %>"/>' + this.signatureGenerated);
+    }
+    // This code is same as export transformer
+    // also we preserve .ts file extension
+    ReferenceTransformer.prototype.transform = function (sourceFile, config, outputLines) {
+        var _this = this;
+        name = config;
+        var sourceFileDirectory = path.dirname(sourceFile);
+
+        var imports = getImports(sourceFile, name, currentTargetFiles, currentTargetDirs, false);
+
+        if (imports.length) {
+            _.forEach(imports, function (completePathToFile) {
+                var filename = path.basename(completePathToFile, '.ts');
+
+                // If filename is index, we replace it with dirname:
+                if (filename.toLowerCase() === 'index') {
+                    filename = path.basename(path.dirname(completePathToFile));
+                }
+                var pathToFile = utils.makeRelativePath(sourceFileDirectory, completePathToFile, true);
+                outputLines.push(_this.template({ filename: filename, pathToFile: pathToFile }));
+            });
+        } else {
+            outputLines.push(this.importError + name + this.signatureGenerated);
+        }
+    };
+    return ReferenceTransformer;
 })(BaseTransformer);
 
 // This code fixes the line encoding to be per os.
@@ -180,7 +214,8 @@ function transformFiles(changedFiles, targetFiles, target, task) {
     ///////////////////////////////////// transformation
     var transformers = [
         new ImportTransformer(),
-        new ExportTransformer()
+        new ExportTransformer(),
+        new ReferenceTransformer()
     ];
 
     _.forEach(changedFiles, function (fileToProcess) {

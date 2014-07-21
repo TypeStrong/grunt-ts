@@ -34,9 +34,7 @@ function executeNode(args) {
 // Map to store if the cache was cleared after the gruntfile was parsed
 var cacheClearedOnce = {};
 
-function getChangedFiles(files) {
-    var targetName = exports.grunt.task.current.target;
-
+function getChangedFiles(files, targetName) {
     files = cache.getNewFilesForTarget(files, targetName);
 
     _.forEach(files, function (file) {
@@ -46,13 +44,11 @@ function getChangedFiles(files) {
     return files;
 }
 
-function resetChangedFiles(files) {
-    var targetName = exports.grunt.task.current.target;
+function resetChangedFiles(files, targetName) {
     cache.compileSuccessfull(files, targetName);
 }
 
-function clearCache() {
-    var targetName = exports.grunt.task.current.target;
+function clearCache(targetName) {
     cache.clearCache(targetName);
     cacheClearedOnce[targetName] = true;
 }
@@ -79,7 +75,7 @@ function getTsc(binPath) {
     return path.join(binPath, 'tsc');
 }
 
-function compileAllFiles(targetFiles, target, task) {
+function compileAllFiles(targetFiles, target, task, targetName) {
     // Make a local copy so we can modify files without having external side effects
     var files = _.map(targetFiles, function (file) {
         return file;
@@ -90,14 +86,14 @@ function compileAllFiles(targetFiles, target, task) {
         // if this is the first time its running after this file was loaded
         if (cacheClearedOnce[exports.grunt.task.current.target] === undefined) {
             // Then clear the cache for this target
-            clearCache();
+            clearCache(targetName);
         }
     }
     if (task.fast !== 'never') {
         if (target.out) {
             exports.grunt.log.writeln('Fast compile will not work when --out is specified. Ignoring fast compilation'.cyan);
         } else {
-            newFiles = getChangedFiles(files);
+            newFiles = getChangedFiles(files, targetName);
 
             if (newFiles.length !== 0) {
                 files = newFiles;
@@ -209,7 +205,7 @@ function compileAllFiles(targetFiles, target, task) {
     // Execute command
     return executeNode([tsc, '@' + tempfilename]).then(function (result) {
         if (task.fast !== 'never' && result.code === 0) {
-            resetChangedFiles(newFiles);
+            resetChangedFiles(newFiles, targetName);
         }
 
         result.fileCount = files.length;

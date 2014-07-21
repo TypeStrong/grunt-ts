@@ -238,11 +238,13 @@ module.exports = function (grunt) {
                         grunt.file.write(lkgPath + '/ts-internal.js', next);
                     }
                     else {
+                        console.log(err);
                         done(false);
                     }
                 });
             }
             else {
+                console.log(err);
                 done(false);
             }
         });

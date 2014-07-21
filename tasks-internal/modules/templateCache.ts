@@ -49,5 +49,15 @@ export function generateTemplateCache(src: string[], dest: string, basePath: str
         fileNameVariableSection: fileNameVariableSection,
         templateCachePut: templateCachePut
     });
+
+    // Early exit if new templateCache doesn't change
+    if (fs.existsSync(dest)) {
+        var originalContents = fs.readFileSync(dest).toString();
+        if (originalContents === fileContent) {
+            return;
+        }
+    }
+
+    // write updated contents
     fs.writeFileSync(dest, fileContent);
 }
