@@ -206,7 +206,7 @@ function pluginFn(grunt) {
                 var endtime;
 
                 // Compile the files
-                return compileModule.compileAllFiles(filesToCompile, target, options).then(function (result) {
+                return compileModule.compileAllFiles(filesToCompile, target, options, currenttask.target).then(function (result) {
                     // End the timer
                     endtime = new Date().getTime();
 

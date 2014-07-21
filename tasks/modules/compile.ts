@@ -42,9 +42,7 @@ function executeNode(args: string[]): Promise<ICompileResult> {
 // Map to store if the cache was cleared after the gruntfile was parsed
 var cacheClearedOnce: { [targetName: string]: boolean } = {};
 
-function getChangedFiles(files) {
-
-    var targetName = grunt.task.current.target;
+function getChangedFiles(files, targetName: string) {
 
     files = cache.getNewFilesForTarget(files, targetName);
 
@@ -55,13 +53,11 @@ function getChangedFiles(files) {
     return files;
 }
 
-function resetChangedFiles(files) {
-    var targetName = grunt.task.current.target;
+function resetChangedFiles(files, targetName: string) {
     cache.compileSuccessfull(files, targetName);
 }
 
-function clearCache() {
-    var targetName = grunt.task.current.target;
+function clearCache(targetName: string) {
     cache.clearCache(targetName);
     cacheClearedOnce[targetName] = true;
 }
@@ -89,7 +85,7 @@ function getTsc(binPath: string): string {
     return path.join(binPath, 'tsc');
 }
 
-export function compileAllFiles(targetFiles: string[], target: ITargetOptions, task: ITaskOptions): Promise<ICompileResult> {
+export function compileAllFiles(targetFiles: string[], target: ITargetOptions, task: ITaskOptions, targetName: string): Promise<ICompileResult> {
 
     // Make a local copy so we can modify files without having external side effects
     var files = _.map(targetFiles, (file) => file);
@@ -101,7 +97,7 @@ export function compileAllFiles(targetFiles: string[], target: ITargetOptions, t
         if (cacheClearedOnce[grunt.task.current.target] === undefined) {
 
             // Then clear the cache for this target 
-            clearCache();
+            clearCache(targetName);
         }
     }
     if (task.fast !== 'never') {
@@ -109,7 +105,7 @@ export function compileAllFiles(targetFiles: string[], target: ITargetOptions, t
             grunt.log.writeln('Fast compile will not work when --out is specified. Ignoring fast compilation'.cyan);
         }
         else {
-            newFiles = getChangedFiles(files);
+            newFiles = getChangedFiles(files, targetName);
 
             if (newFiles.length !== 0) {
                 files = newFiles;
@@ -222,7 +218,7 @@ export function compileAllFiles(targetFiles: string[], target: ITargetOptions, t
     return executeNode([tsc, '@' + tempfilename]).then((result: ICompileResult) => {
 
         if (task.fast !== 'never' && result.code === 0) {
-            resetChangedFiles(newFiles);
+            resetChangedFiles(newFiles, targetName);
         }
 
         result.fileCount = files.length;
