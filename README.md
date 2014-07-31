@@ -91,7 +91,7 @@ Grunt-ts can generate a `reference.ts` file which contains a reference to all ts
 
 This means there will never be a need to cross reference files manually, instead just reference `reference.ts` :)
 
-*Warning* Using the compiler with `--out` will slow down an incremental compile pipeline. Use *external modules* with transforms instead.
+*Warning:* Using the compiler with `--out` / `reference.ts` will slow down a fast compile pipeline. Use *external modules* with transforms instead.
 
 #### JavaScript generation and ordering
 
@@ -123,7 +123,7 @@ Everything between `grunt-start` and `grunt-end` is generated and maintained by 
 If an `outDir` is specified all output JavaScript is redirected to this folder to keep the source folder clean.
 
 #### AMD / RequireJS support
-(Deprecated) Please use [Transforms](https://github.com/grunt-ts/grunt-ts#transforms) in new projects.
+(Deprecated) Please use [Transforms](https://github.com/grunt-ts/grunt-ts#transforms) + *external modules* all things in new projects.
 [Documentation if you need it](https://github.com/grunt-ts/grunt-ts/blob/master/docs/amdLoader.md)
 
 ### Html 2 TypeScript support
@@ -156,14 +156,14 @@ Specifically: http://stackoverflow.com/a/9867375/390330
 
 ### Live file watching and building
 
-Grunt-ts can watch a directory and recompile TypeScript files when any TypeScript file changes, gets added, gets removed. Use the `watch` *target* option for this.
+Grunt-ts can watch a directory and recompile TypeScript files when any TypeScript file changes, gets added, gets removed. Use the `watch` *target* option specifying a target directory that will be watched.
 
 ### Fast compile
-If you are using *external modules* `grunt-ts` will try to do a `fast` compile **by default**, basically only compiling what's changed. It will *just work* with the built-in file watching as well as with external tools like `grunt-contrib-watch` (make sure `spawn` is false [more](https://github.com/grunt-ts/grunt-ts/blob/master/docs/fast.md)).
+If you are using *external modules* `grunt-ts` will try to do a `fast` compile **by default**, basically only compiling what's changed. It will **just work** with the built-in file watching as well as with external tools like `grunt-contrib-watch` (make sure `spawn` is false. [More](https://github.com/grunt-ts/grunt-ts/blob/master/docs/fast.md)).
 
 It maintains a cache of hashes for typescript files in the `.tscache` folder to detect changes (needed for external watch tool support). Also it creates a `.baseDir.ts` file at the root, passing it compiler to make sure that `--outDir` is always respected in the generated JavaScript.
 
-It should *just work* out of the box. You can however [customize its behaviour](https://github.com/grunt-ts/grunt-ts/blob/master/docs/fast.md).
+It should **just work** out of the box. You can however [customize its behaviour](https://github.com/grunt-ts/grunt-ts/blob/master/docs/fast.md).
 
 ## Installation
 
