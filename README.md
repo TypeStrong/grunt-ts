@@ -120,7 +120,7 @@ If an `outDir` is specified all output JavaScript is redirected to this folder t
 
 #### AMD / RequireJS support
 (Deprecated) Please use [Transforms](https://github.com/grunt-ts/grunt-ts#transforms) in new projects.
-[Documentation if you need it](https://github.com/grunt-ts/docs/amdLoader.md)
+[Documentation if you need it](https://github.com/grunt-ts/grunt-ts/blob/master/docs/amdLoader.md)
 
 ### Html 2 TypeScript support
 
