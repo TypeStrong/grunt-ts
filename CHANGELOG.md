@@ -44,14 +44,15 @@
 * Fix path.join error because of `grunt.task.current.target` : https://github.com/grunt-ts/grunt-ts/issues/118
 * Update LKG with self
 
-# Planned
+# Staged for next release
 * Add documentation for transforms (https://github.com/grunt-ts/grunt-ts/issues/85) + `ts:ref`
-* I don't like `amdLoader` anymore now that we have transforms. So deprecating it and moving its docs to its own file.
-
-## Not yet associated with a release
-* Make `///  ts:import` etc. work same as `///ts:import` i.e. whitespace independent.
-* Show error when `/// ts:???` is detected but no transform exists for `???`
+* I don't like `amdLoader` anymore now that we have transforms. So **deprecating** it and moving its docs to its own file.
+* Moved docs for customizing `html2ts` output into their own file as I want readme to be quick and effective (focused on why).
 * Add documentation for fast compile
 	* All tasks like `grunt-contrib-watch` are supported
 	* will not work with `--out`
 	* the granularity https://github.com/grunt-ts/grunt-ts/issues/96#issuecomment-38987023
+
+## Work to be done
+* Make `///  ts:import` etc. work same as `///ts:import` i.e. whitespace independent.
+* Show error when `/// ts:???` is detected but no transform exists for `???`

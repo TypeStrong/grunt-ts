@@ -16,6 +16,8 @@ Additional / longer / more basic video tutorial: http://youtu.be/Km0DpfX5ZxM
 
 For a quickstart see the full featured [Gruntfile](https://github.com/grunt-ts/grunt-ts/blob/master/sample/Gruntfile.js).
 
+If you don't know what is meant by *external modules* please see [this short video](https://www.youtube.com/watch?v=KDrWLMUY0R0&hd=1). We highly recommend you use *external modules* only in all your projects.
+
 ## Key features
 
 ### Compiler support
@@ -89,6 +91,8 @@ Grunt-ts can generate a `reference.ts` file which contains a reference to all ts
 
 This means there will never be a need to cross reference files manually, instead just reference `reference.ts` :)
 
+*Warning* Using the compiler with `--out` will slow down an incremental compile pipeline. Use *external modules* with transforms instead.
+
 #### JavaScript generation and ordering
 
 When a output file is specified via `out` in combination with a reference file via `reference` then grunt-ts uses the generated reference file to *order the code in the generated JavaScript*.
@@ -152,7 +156,12 @@ Specifically: http://stackoverflow.com/a/9867375/390330
 
 ### Live file watching and building
 
-Grunt-ts can watch a directory and recompile TypeScript files when any TypeScript file changes, gets added, gets removed. Internallythe `chokidar` module is used to makes sure the project is always build ready :)
+Grunt-ts can watch a directory and recompile TypeScript files when any TypeScript file changes, gets added, gets removed. Use the `watch` *target* option for this.
+
+### Fast compile
+If you are using *external modules* `grunt-ts` will try to do a `fast` compile **by default**, basically only compiling what's changed. It will *just work* with the built-in file watching as well as with external tools like `grunt-contrib-watch` (make sure `spawn` is false [more](https://github.com/grunt-ts/grunt-ts/blob/master/docs/fast.md)). It maintains a cache of hashes for typescript files in the `.tscache` folder to detect changes (needed for external watch tool support). Also it creates a `.baseDir.ts` file 
+
+It should *just work* out of the box. You can however [customize its behaviour](https://github.com/grunt-ts/grunt-ts/blob/master/docs/fast.md).
 
 ## Installation
 
