@@ -46,6 +46,7 @@
 
 # Planned
 * Add documentation for transforms (https://github.com/grunt-ts/grunt-ts/issues/85) + `ts:ref`
+* I don't like `amdLoader` anymore now that we have transforms. So deprecating it and moving its docs to its own file.
 
 ## Not yet associated with a release
 * Make `///  ts:import` etc. work same as `///ts:import` i.e. whitespace independent.
