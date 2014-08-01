@@ -202,6 +202,13 @@ Note: make sure to pin the exact TypeScript version (do not use `~` or `>`).
 
 ### Custom compiler
 Alternatively, you can also explicitly use a custom compiler build that is not on NPM (e.g. [current LKG](https://github.com/Microsoft/TypeScript/tree/master/bin)) by specifying the `compiler` *task* option pointing to the path of the node-executable compiler js file (i.e. raw `tsc` or `tsc.js` or `ts.js`)
+```javascript
+ts: {
+  options: {
+    compiler: './customcompiler/tsc',
+  },
+}
+```
 
 ## Configuration
 
