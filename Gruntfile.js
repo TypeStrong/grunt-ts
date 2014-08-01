@@ -187,10 +187,17 @@ module.exports = function (grunt) {
             transform: {
                 test: true,
                 src: ['test/transform/ts/**/*.ts'],
-                // watch: './test',
                 outDir: 'test/transform/js',
                 options: {
                     fast: 'always'
+                }
+            },
+            customcompiler: {
+                test: true,
+                src: ['test/customcompiler/ts/**/*.ts'],
+                outDir: 'test/customcompiler/js',
+                options: {
+                    compiler: './customcompiler/tsc'
                 }
             },
             fail: {
@@ -302,7 +309,7 @@ module.exports = function (grunt) {
     // 
     // Modify tasksToTest based on what you are working on 
 
-    var tasksToTest = ['ts:transform', 'ts:simple'];
+    var tasksToTest = ['ts:customcompiler'];
 
     grunt.registerTask('dev', ['run', 'watch']);
 

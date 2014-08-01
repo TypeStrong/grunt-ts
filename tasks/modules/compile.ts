@@ -195,7 +195,13 @@ export function compileAllFiles(targetFiles: string[], target: ITargetOptions, t
     }
 
     // Locate a compiler
-    var tsc = getTsc(resolveTypeScriptBinPath());
+    var tsc: string;
+    if (task.compiler) { // Custom compiler (task.compiler)
+        grunt.log.writeln('Using the custom compiler : ' + task.compiler);
+        tsc = task.compiler;
+    } else { // the bundled OR npm module based compiler
+        tsc = getTsc(resolveTypeScriptBinPath());
+    }
 
     // To debug the tsc command
     if (task.verbose) {

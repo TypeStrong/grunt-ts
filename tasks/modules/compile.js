@@ -184,7 +184,13 @@ function compileAllFiles(targetFiles, target, task, targetName) {
     }
 
     // Locate a compiler
-    var tsc = getTsc(resolveTypeScriptBinPath());
+    var tsc;
+    if (task.compiler) {
+        exports.grunt.log.writeln('Using the custom compiler : ' + task.compiler);
+        tsc = task.compiler;
+    } else {
+        tsc = getTsc(resolveTypeScriptBinPath());
+    }
 
     // To debug the tsc command
     if (task.verbose) {

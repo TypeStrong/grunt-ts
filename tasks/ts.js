@@ -91,6 +91,7 @@ function pluginFn(grunt) {
             target: 'es5',
             verbose: false,
             fast: 'watch',
+            compiler: '',
             htmlModuleTemplate: '<%= filename %>',
             htmlVarTemplate: '<%= ext %>',
             failOnTypeErrors: true
