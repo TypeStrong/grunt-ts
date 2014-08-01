@@ -55,5 +55,9 @@ export var typescript = {
     transform: function (test) {
         testDirectory(test, 'transform');
         test.done();
+    },
+    customcompiler: function (test) {
+        testDirectory(test, 'customcompiler');
+        test.done();
     }
 }

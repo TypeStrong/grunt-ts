@@ -49,6 +49,7 @@ interface ITaskOptions {
     verbose: boolean;
     compile: boolean;
     fast: string; // never | always | watch (default)
+    compiler: string; // If you want, the path to a custom TypeScript compiler's main JS file
 
     htmlModuleTemplate: string;
     htmlVarTemplate: string;

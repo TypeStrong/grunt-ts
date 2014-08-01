@@ -105,9 +105,10 @@ function pluginFn(grunt: IGrunt) {
             target: 'es5', // es3 , es5
             verbose: false,
             fast: 'watch',
+            compiler: '',
             htmlModuleTemplate: '<%= filename %>',
             htmlVarTemplate: '<%= ext %>',
-            failOnTypeErrors: true
+            failOnTypeErrors: true,
         });
 
         // get unprocessed templates from configuration
