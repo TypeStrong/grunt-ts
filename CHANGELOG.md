@@ -44,7 +44,8 @@
 * Fix path.join error because of `grunt.task.current.target` : https://github.com/grunt-ts/grunt-ts/issues/118
 * Update LKG with self
 
-# v1.11.6
+# Planned (v1.11.6)
+* FEAT: Add a `compiler` task option to specify a custom compiler bin path : https://github.com/grunt-ts/grunt-ts/issues/126
 * DOCS: Add documentation for transforms (https://github.com/grunt-ts/grunt-ts/issues/85) + `ts:ref`
 * DOCS: I don't like `amdLoader` anymore now that we have transforms. So **deprecating** it and moving its docs to its own file.
 * DOCS: Moved docs for customizing `html2ts` output into their own file as I want readme to be quick and effective (focused on why).

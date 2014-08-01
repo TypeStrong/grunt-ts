@@ -183,7 +183,7 @@ $ npm install grunt-ts --save-dev
 
 ### Alternate compiler version
 
-Support for both legacy or cutting-edge projects can be enabled using the compiler override:
+`grunt-ts` always ships (bundled) with the *latest* compiler. Support for legacy  projects can be enabled using the compiler override:
 
 At runtime the plugin will look for an alternate compiler in the same `node_modules` folder. To use a different version of the TypeScript compiler install the required `typescript` version as a *peer* of `grunt-ts`. If no override was found the bundled compiler is used.  
 
@@ -199,6 +199,9 @@ The `package.json` would look something like this for a legacy project:
 }
 ```
 Note: make sure to pin the exact TypeScript version (do not use `~` or `>`).
+
+### Custom compiler
+Alternatively, you can also explicitly use a custom compiler build that is not on NPM (e.g. [current LKG](https://github.com/Microsoft/TypeScript/tree/master/bin)) by specifying the `compiler` *task* option pointing to the path of the node-executable compiler js file (e.g. `tc.js`)
 
 ## Configuration
 
