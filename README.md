@@ -201,7 +201,7 @@ The `package.json` would look something like this for a legacy project:
 Note: make sure to pin the exact TypeScript version (do not use `~` or `>`).
 
 ### Custom compiler
-Alternatively, you can also explicitly use a custom compiler build that is not on NPM (e.g. [current LKG](https://github.com/Microsoft/TypeScript/tree/master/bin)) by specifying the `compiler` *task* option pointing to the path of the node-executable compiler js file (i.e. raw `tsc` or `tsc.js` or `ts.js`)
+Alternatively, you can also explicitly use a custom compiler build that is not on NPM (e.g. [current LKG](https://github.com/Microsoft/TypeScript/tree/master/bin)) by specifying the `compiler` *task* option pointing to the path of the node-executable compiler js file (i.e. raw `tsc` or `tsc.js`)
 ```javascript
 ts: {
   options: {
