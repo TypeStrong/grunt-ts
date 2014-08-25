@@ -44,7 +44,7 @@
 * Fix path.join error because of `grunt.task.current.target` : https://github.com/grunt-ts/grunt-ts/issues/118
 * Update LKG with self
 
-# Planned (v1.11.6)
+# v1.11.6
 * FEAT: Add a `compiler` task option to specify a custom compiler bin path : https://github.com/grunt-ts/grunt-ts/issues/126
 * DOCS: Add documentation for transforms (https://github.com/grunt-ts/grunt-ts/issues/85) + `ts:ref`
 * DOCS: I don't like `amdLoader` anymore now that we have transforms. So **deprecating** it and moving its docs to its own file.
@@ -54,6 +54,8 @@
 	* will not work with `--out`
 	* the granularity https://github.com/grunt-ts/grunt-ts/issues/96#issuecomment-38987023
 
+# v1.11.7
+* Fix: Make `///  ts:import` etc. work same as `///ts:import` i.e. whitespace independent.(#135)
+
 ## Work to be done
-* Make `///  ts:import` etc. work same as `///ts:import` i.e. whitespace independent.
 * Show error when `/// ts:???` is detected but no transform exists for `???`
