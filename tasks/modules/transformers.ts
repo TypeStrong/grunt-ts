@@ -86,7 +86,7 @@ function getTargetFolders(targetFiles: string[]) {
 class BaseTransformer {
 
     static tsSignature = '///ts:';
-    static tsSignatureMatch = '///ts:{0}=(.*)';
+    static tsSignatureMatch = '///\\s?ts:{0}=(.*)';
 
     intro: string;
     match: RegExp;
