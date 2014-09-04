@@ -57,5 +57,8 @@
 # v1.11.7
 * Fix: Make `///  ts:import` etc. work same as `///ts:import` i.e. whitespace independent.(#135)
 
+# v1.11.8
+* Update bundled TypeScript compiler to v1.0.1
+
 ## Work to be done
 * Show error when `/// ts:???` is detected but no transform exists for `???`
