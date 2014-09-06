@@ -21,7 +21,8 @@ function executeNode(args) {
         }, function (error, result, code) {
             var ret = {
                 code: code,
-                output: String(result)
+                // New TypeScript compiler uses stdout for user code errors. Old one used stderr.
+                output: result.stdout || result.stderr
             };
             resolve(ret);
         });

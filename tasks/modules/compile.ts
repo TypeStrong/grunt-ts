@@ -28,7 +28,8 @@ function executeNode(args: string[]): Promise<ICompileResult> {
         }, (error, result, code) => {
                 var ret: ICompileResult = {
                     code: code,
-                    output: String(result)
+                    // New TypeScript compiler uses stdout for user code errors. Old one used stderr.
+                    output: result.stdout || result.stderr
                 };
                 resolve(ret);
             });
