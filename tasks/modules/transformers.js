@@ -100,7 +100,7 @@ var BaseTransformer = (function () {
         throw new Error('Must override transform function');
     };
     BaseTransformer.tsSignature = '///ts:';
-    BaseTransformer.tsSignatureMatch = '///ts:{0}=(.*)';
+    BaseTransformer.tsSignatureMatch = '///\\s?ts:{0}=(.*)';
     return BaseTransformer;
 })();
 
