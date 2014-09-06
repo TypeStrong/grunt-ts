@@ -317,13 +317,13 @@ interface String {
       * Matches a string with a regular expression, and returns an array containing the results of that search.
       * @param regexp A variable name or string literal containing the regular expression pattern and flags.
       */
-    match(regexp: string): string[];
+    match(regexp: string): RegExpMatchArray;
 
     /** 
       * Matches a string with a regular expression, and returns an array containing the results of that search.
       * @param regexp A regular expression object that contains the regular expression pattern and applicable flags. 
       */
-    match(regexp: RegExp): string[];
+    match(regexp: RegExp): RegExpMatchArray;
 
     /**
       * Replaces text in a string, using a regular expression or search string.
@@ -790,38 +790,15 @@ declare var Date: {
     now(): number;
 }
 
-interface RegExpExecArray {
-    [index: number]: string;
-    length: number;
-
-    index: number;
-    input: string;
-
-    toString(): string;
-    toLocaleString(): string;
-    concat(...items: string[][]): string[];
-    join(separator?: string): string;
-    pop(): string;
-    push(...items: string[]): number;
-    reverse(): string[];
-    shift(): string;
-    slice(start?: number, end?: number): string[];
-    sort(compareFn?: (a: string, b: string) => number): string[];
-    splice(start: number): string[];
-    splice(start: number, deleteCount: number, ...items: string[]): string[];
-    unshift(...items: string[]): number;
-
-    indexOf(searchElement: string, fromIndex?: number): number;
-    lastIndexOf(searchElement: string, fromIndex?: number): number;
-    every(callbackfn: (value: string, index: number, array: string[]) => boolean, thisArg?: any): boolean;
-    some(callbackfn: (value: string, index: number, array: string[]) => boolean, thisArg?: any): boolean;
-    forEach(callbackfn: (value: string, index: number, array: string[]) => void, thisArg?: any): void;
-    map(callbackfn: (value: string, index: number, array: string[]) => any, thisArg?: any): any[];
-    filter(callbackfn: (value: string, index: number, array: string[]) => boolean, thisArg?: any): string[];
-    reduce(callbackfn: (previousValue: any, currentValue: any, currentIndex: number, array: string[]) => any, initialValue?: any): any;
-    reduceRight(callbackfn: (previousValue: any, currentValue: any, currentIndex: number, array: string[]) => any, initialValue?: any): any;
+interface RegExpMatchArray extends Array<string> {
+    index?: number;
+    input?: string;
 }
 
+interface RegExpExecArray extends Array<string> {
+    index: number;
+    input: string;
+}
 
 interface RegExp {
     /** 
@@ -980,10 +957,23 @@ declare var JSON: JSON;
 
 interface Array<T> {
     /**
+      * Gets or sets the length of the array. This is a number one higher than the highest element defined in an array.
+      */
+    length: number;
+    /**
       * Returns a string representation of an array.
       */
     toString(): string;
     toLocaleString(): string;
+    /**
+      * Appends new elements to an array, and returns the new length of the array.
+      * @param items New elements of the Array.
+      */
+    push(...items: T[]): number;
+    /**
+      * Removes the last element from an array and returns it.
+      */
+    pop(): T;
     /**
       * Combines two or more arrays.
       * @param items Additional items to add to the end of array1.
@@ -999,15 +989,6 @@ interface Array<T> {
       * @param separator A string used to separate one element of an array from the next in the resulting String. If omitted, the array elements are separated with a comma.
       */
     join(separator?: string): string;
-    /**
-      * Removes the last element from an array and returns it.
-      */
-    pop(): T;
-    /**
-      * Appends new elements to an array, and returns the new length of the array.
-      * @param items New elements of the Array.
-      */
-    push(...items: T[]): number;
     /**
       * Reverses the elements in an Array. 
       */
@@ -1124,11 +1105,6 @@ interface Array<T> {
       */
     reduceRight<U>(callbackfn: (previousValue: U, currentValue: T, currentIndex: number, array: T[]) => U, initialValue: U): U;
 
-    /**
-      * Gets or sets the length of the array. This is a number one higher than the highest element defined in an array.
-      */
-    length: number;
-
     [n: number]: T;
 }
 declare var Array: {
@@ -1157,6 +1133,11 @@ interface ArrayBuffer {
       * Read-only. The length of the ArrayBuffer (in bytes).
       */
     byteLength: number;
+
+    /**
+      * Returns a section of an ArrayBuffer.
+      */
+    slice(begin:number, end?:number): ArrayBuffer;
 }
 
 declare var ArrayBuffer: {
@@ -3824,6 +3805,32 @@ interface Window extends EventTarget, MSEventAttachmentTarget, WindowLocalStorag
 declare var Window: {
     prototype: Window;
     new(): Window;
+}
+
+interface FormData {
+    append(name: any, value: any, blobName?: string): void;
+}
+declare var FormData: {
+    prototype: FormData;
+    new (form?: HTMLFormElement): FormData;
+}
+
+interface SourceBuffer extends EventTarget {
+    updating: boolean;
+    appendWindowStart: number;
+    appendWindowEnd: number;
+    buffered: TimeRanges;
+    timestampOffset: number;
+    audioTracks: AudioTrackList;
+    appendBuffer(data: ArrayBufferView): void;
+    appendBuffer(data: ArrayBuffer): void;
+    remove(start: number, end: number): void;
+    abort(): void;
+    appendStream(stream: MSStream, maxSize?: number): void;
+}
+declare var SourceBuffer: {
+    prototype: SourceBuffer;
+    new(): SourceBuffer;
 }
 
 interface NavigatorID {
@@ -12157,14 +12164,6 @@ declare var MSManipulationEvent: {
     MS_MANIPULATION_STATE_CANCELLED: number;
 }
 
-interface FormData {
-    append(name: any, value: any, blobName?: string): void;
-}
-declare var FormData: {
-    prototype: FormData;
-    new(): FormData;
-}
-
 interface HTMLDataListElement extends HTMLElement {
     options: HTMLCollection;
 }
@@ -12581,23 +12580,6 @@ declare var NavigationEvent: {
 
 interface RandomSource {
     getRandomValues(array: ArrayBufferView): ArrayBufferView;
-}
-
-interface SourceBuffer extends EventTarget {
-    updating: boolean;
-    appendWindowStart: number;
-    appendWindowEnd: number;
-    buffered: TimeRanges;
-    timestampOffset: number;
-    audioTracks: AudioTrackList;
-    appendBuffer(data: ArrayBuffer): void;
-    remove(start: number, end: number): void;
-    abort(): void;
-    appendStream(stream: MSStream, maxSize?: number): void;
-}
-declare var SourceBuffer: {
-    prototype: SourceBuffer;
-    new(): SourceBuffer;
 }
 
 interface MSInputMethodContext extends EventTarget {
