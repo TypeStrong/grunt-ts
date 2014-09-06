@@ -60,7 +60,7 @@
 # v1.11.8
 * Update bundled TypeScript compiler to v1.0.1
 
-# v1.11.9 (planned)
+# v1.11.9
 * DOCS: recommend `fast:always` with `grunt-contrib-watch` because `spawn:false` breaks under stress (i.e. `interrupt:true`)
 * FIX: use `stdout` if not empty. Otherwise fall back to `stderr` (a change introduced in the latest version of the compiler for consistency with other Microsoft compilers) See https://github.com/grunt-ts/grunt-ts/issues/140
 
