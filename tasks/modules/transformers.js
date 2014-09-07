@@ -120,13 +120,13 @@ var ImportTransformer = (function (_super) {
 
         if (imports.length) {
             _.forEach(imports, function (completePathToFile) {
-                var filename = path.basename(completePathToFile, '.ts');
+                var filename = path.basename(path.basename(completePathToFile, '.ts'), '.d');
 
                 // If filename is index, we replace it with dirname:
                 if (filename.toLowerCase() === 'index') {
                     filename = path.basename(path.dirname(completePathToFile));
                 }
-                var pathToFile = utils.makeRelativePath(sourceFileDirectory, completePathToFile.replace('.ts', ''), true);
+                var pathToFile = utils.makeRelativePath(sourceFileDirectory, completePathToFile.replace(/(?:\.d)?\.ts$/, ''), true);
                 outputLines.push(_this.template({ filename: filename, pathToFile: pathToFile }));
             });
         } else {
@@ -154,13 +154,13 @@ var ExportTransformer = (function (_super) {
 
         if (imports.length) {
             _.forEach(imports, function (completePathToFile) {
-                var filename = path.basename(completePathToFile, '.ts');
+                var filename = path.basename(path.basename(completePathToFile, '.ts'), '.d');
 
                 // If filename is index, we replace it with dirname:
                 if (filename.toLowerCase() === 'index') {
                     filename = path.basename(path.dirname(completePathToFile));
                 }
-                var pathToFile = utils.makeRelativePath(sourceFileDirectory, completePathToFile.replace('.ts', ''), true);
+                var pathToFile = utils.makeRelativePath(sourceFileDirectory, completePathToFile.replace(/(?:\.d)?\.ts$/, ''), true);
                 outputLines.push(_this.template({ filename: filename, pathToFile: pathToFile }));
             });
         } else {
@@ -188,7 +188,7 @@ var ReferenceTransformer = (function (_super) {
 
         if (imports.length) {
             _.forEach(imports, function (completePathToFile) {
-                var filename = path.basename(completePathToFile, '.ts');
+                var filename = path.basename(path.basename(completePathToFile, '.ts'), '.d');
 
                 // If filename is index, we replace it with dirname:
                 if (filename.toLowerCase() === 'index') {
