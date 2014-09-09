@@ -190,6 +190,20 @@ class ReferenceTransformer extends BaseImportExportTransformer implements ITrans
    }
 }
 
+class UnknownTransformer extends BaseTransformer implements ITransformer
+{
+    constructor() {
+        super('(.*)', '');
+        this.key = "unknown";
+        this.signatureGenerated = '///ts:unknown:generated';
+        this.syntaxError = '/// Unknown transform ' + this.signatureGenerated;
+    }
+
+    transform(sourceFile: string, templateVars: string): string[] {
+       return [this.syntaxError];
+    }
+}
+
 // This code fixes the line encoding to be per os. 
 // I think it is the best option available at the moment.
 // I am open for suggestions
@@ -207,7 +221,8 @@ export function transformFiles(
     var transformers: ITransformer[] = [
         new ImportTransformer(),
         new ExportTransformer(),
-        new ReferenceTransformer()
+        new ReferenceTransformer(),
+        new UnknownTransformer()
     ];
 
     _.forEach(changedFiles, (fileToProcess) => {
