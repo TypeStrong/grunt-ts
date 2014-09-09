@@ -84,13 +84,10 @@ function getTargetFolders(targetFiles: string[]) {
 }
 
 interface ITransformer {
-   signature: string;
-   signatureGenerated: string;
    isGenerated(line: string);
    matches(line: string): string[];
    transform(sourceFile: string, config: string):string[];
    key: string;
-   syntax: string;
 }
 
 class BaseTransformer {
@@ -101,14 +98,14 @@ class BaseTransformer {
     private static tsTransformerMatch = '^///\\s*ts:{0}(=?)(.*)';
 
     private match: RegExp;
-    signature : string;
+    private signature : string;
     signatureGenerated: string;
-    syntax: string;
+    syntaxError: string;
     constructor(public key: string, variableSyntax:string) {
         this.match = new RegExp(utils.format(BaseTransformer.tsTransformerMatch, key));
         this.signature = '///ts:' + key;
         this.signatureGenerated = this.signature + ':generated';
-        this.syntax = "ts:" + this.key + "=" + variableSyntax;
+        this.syntaxError = '/// Invalid syntax for ts:' + this.key + "=" + variableSyntax + ' ' + this.signatureGenerated;
     }
 
     isGenerated(line: string):boolean {
@@ -138,28 +135,31 @@ class BaseImportExportTransformer extends BaseTransformer implements ITransforme
         this.removeExtensionFromFilePath = removeExtensionFromFilePath;
     }
 
-    importError = '/// No file or directory matched name "';
-
     transform(sourceFile: string, templateVars: string):string[] {
-        var vars = templateVars.split(',');
-        var result = [];
-        var requestedFileName = vars[0].trim();
-        var requestedVariableName = (vars.length > 1 ? vars[1].trim() : null);
-        var sourceFileDirectory = path.dirname(sourceFile);
-        var imports = getImports(sourceFile, requestedFileName, currentTargetFiles, currentTargetDirs, this.getIndexIfDir);
-        if (imports.length) {
-            _.forEach(imports, (completePathToFile) => {
-               var filename = requestedVariableName || path.basename(path.basename(completePathToFile, '.ts'), '.d');
-                // If filename is index, we replace it with dirname: 
-                if(filename.toLowerCase() === 'index') {
-                    filename = path.basename(path.dirname(completePathToFile));
-                }
-                var pathToFile = utils.makeRelativePath(sourceFileDirectory, this.removeExtensionFromFilePath ? completePathToFile.replace(/(?:\.d)?\.ts$/, '') : completePathToFile, true);
-                result.push(this.template({ filename: filename, pathToFile: pathToFile }) + " " + this.signatureGenerated);
-            });
+        var result = []; 
+        if(templateVars) {
+            var vars = templateVars.split(',');
+            var requestedFileName = vars[0].trim();
+            var requestedVariableName = (vars.length > 1 ? vars[1].trim() : null);
+            var sourceFileDirectory = path.dirname(sourceFile);
+            var imports = getImports(sourceFile, requestedFileName, currentTargetFiles, currentTargetDirs, this.getIndexIfDir);
+            if (imports.length) {
+                _.forEach(imports, (completePathToFile) => {
+                    var filename = requestedVariableName || path.basename(path.basename(completePathToFile, '.ts'), '.d');
+                    // If filename is index, we replace it with dirname: 
+                    if(filename.toLowerCase() === 'index') {
+                        filename = path.basename(path.dirname(completePathToFile));
+                    }
+                    var pathToFile = utils.makeRelativePath(sourceFileDirectory, this.removeExtensionFromFilePath ? completePathToFile.replace(/(?:\.d)?\.ts$/, '') : completePathToFile, true);
+                    result.push(this.template({ filename: filename, pathToFile: pathToFile }) + " " + this.signatureGenerated);
+                });
+            }
+            else {
+                result.push('/// No file or directory matched name "' + requestedFileName + '" ' + this.signatureGenerated);
+            }
         }
         else {
-            result.push(this.importError + requestedFileName + '" ' + this.signatureGenerated);
+           result.push(this.syntaxError);
         }
         return result;
     }
@@ -241,17 +241,8 @@ export function transformFiles(
                     // The code gen directive line automatically qualifies
                     outputLines.push(line);
 
-                    // find the name: (match[1] is the equals sign, ensure it exists but otherwise ignore it) 
-                    if(match[1] && match[2]) {
-                       var transformSettings = match[2];
-                       transformSettings = transformSettings.trim();
-                       // transform using selected settings and append generated lines to output
-                       outputLines.push.apply( outputLines, transformer.transform( fileToProcess, transformSettings ) );
-                    }
-                    else {
-                       outputLines.push('/// Invalid syntax for ' + transformer.syntax + ' ' + transformer.signatureGenerated);
-                    }
-
+                    // pass transform settings to transform (match[1] is the equals sign, ensure it exists but otherwise ignore it) 
+                    outputLines.push.apply(outputLines, transformer.transform(fileToProcess, match[1] && match[2] && match[2].trim() ));
                     return true;
                 }
                 return false;
