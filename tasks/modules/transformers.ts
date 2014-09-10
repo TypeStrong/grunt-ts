@@ -151,7 +151,7 @@ class BaseImportExportTransformer extends BaseTransformer implements ITransforme
                         filename = path.basename(path.dirname(completePathToFile));
                     }
                     var pathToFile = utils.makeRelativePath(sourceFileDirectory, this.removeExtensionFromFilePath ? completePathToFile.replace(/(?:\.d)?\.ts$/, '') : completePathToFile, true);
-                    result.push(this.template({ filename: filename, pathToFile: pathToFile }) + " " + this.signatureGenerated);
+                    result.push(this.template({ filename: filename, pathToFile: pathToFile, signatureGenerated: this.signatureGenerated }) + " " + this.signatureGenerated);
                 });
             }
             else {
@@ -176,8 +176,10 @@ class ExportTransformer extends BaseImportExportTransformer implements ITransfor
     constructor() {
         // This code is same as import transformer
         // One difference : we do not short circuit to `index.ts` if found
-        super('export', '<fileOrDirectoryName>[,<variableName>]',
-            _.template('export import <%=filename%> = require(\'<%= pathToFile %>\');'), false, true);
+       super('export', '<fileOrDirectoryName>[,<variableName>]',
+           // workaround for https://github.com/Microsoft/TypeScript/issues/512
+          _.template('import <%=filename%>_file = require(\'<%= pathToFile %>\'); <%= signatureGenerated %>' + os.EOL +
+              'export var <%=filename%> = <%=filename%>_file;'), false, true);
     }
 }
 

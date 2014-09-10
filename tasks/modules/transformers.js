@@ -134,7 +134,7 @@ var BaseImportExportTransformer = (function (_super) {
                         filename = path.basename(path.dirname(completePathToFile));
                     }
                     var pathToFile = utils.makeRelativePath(sourceFileDirectory, _this.removeExtensionFromFilePath ? completePathToFile.replace(/(?:\.d)?\.ts$/, '') : completePathToFile, true);
-                    result.push(_this.template({ filename: filename, pathToFile: pathToFile }) + " " + _this.signatureGenerated);
+                    result.push(_this.template({ filename: filename, pathToFile: pathToFile, signatureGenerated: _this.signatureGenerated }) + " " + _this.signatureGenerated);
                 });
             } else {
                 result.push('/// No file or directory matched name "' + requestedFileName + '" ' + this.signatureGenerated);
@@ -160,7 +160,7 @@ var ExportTransformer = (function (_super) {
     function ExportTransformer() {
         // This code is same as import transformer
         // One difference : we do not short circuit to `index.ts` if found
-        _super.call(this, 'export', '<fileOrDirectoryName>[,<variableName>]', _.template('export import <%=filename%> = require(\'<%= pathToFile %>\');'), false, true);
+        _super.call(this, 'export', '<fileOrDirectoryName>[,<variableName>]', _.template('import <%=filename%>_file = require(\'<%= pathToFile %>\'); <%= signatureGenerated %>' + os.EOL + 'export var <%=filename%> = <%=filename%>_file;'), false, true);
     }
     return ExportTransformer;
 })(BaseImportExportTransformer);

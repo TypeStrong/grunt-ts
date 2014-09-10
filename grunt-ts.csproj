@@ -68,7 +68,6 @@
     <TypeScriptCompile Include="tasks\modules\templateCache.ts" />
     <TypeScriptCompile Include="tasks\modules\transformers.ts" />
     <TypeScriptCompile Include="tasks\modules\utils.ts" />
-    <TypeScriptCompile Include="tasks\scratch.ts" />
     <TypeScriptCompile Include="tasks\ts.ts" />
   </ItemGroup>
   <ItemGroup>
