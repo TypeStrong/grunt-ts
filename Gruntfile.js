@@ -294,7 +294,7 @@ module.exports = function (grunt) {
 
     // Test
     grunt.registerTask('fail', ['continueOn', 'test_fail', 'continueOff']);
-    grunt.registerTask('test', ['test_all', 'nodeunit', 'fail']);
+    grunt.registerTask('test', ['test_all', 'fail', 'nodeunit']);
 
     // Release
     grunt.registerTask('release', ['build', 'test']);
@@ -309,7 +309,7 @@ module.exports = function (grunt) {
     // 
     // Modify tasksToTest based on what you are working on 
 
-    var tasksToTest = ['ts:customcompiler'];
+    var tasksToTest = ['ts:fail', 'nodeunit'];
 
     grunt.registerTask('dev', ['run', 'watch']);
 

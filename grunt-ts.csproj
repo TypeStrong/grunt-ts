@@ -1,0 +1,95 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.Default.props" Condition="Exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.Default.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <ProjectGuid>{FF8D9288-C427-4139-B162-E74D73D8F8D5}</ProjectGuid>
+    <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
+    <OutputPath>bin</OutputPath>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <DebugType>full</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+    <TypeScriptToolsVersion>1.0</TypeScriptToolsVersion>
+    <UseIISExpress>true</UseIISExpress>
+    <IISExpressSSLPort />
+    <IISExpressAnonymousAuthentication />
+    <IISExpressWindowsAuthentication />
+    <IISExpressUseClassicPipelineMode />
+  </PropertyGroup>
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">12.0</VisualStudioVersion>
+  </PropertyGroup>
+  <PropertyGroup>
+    <RootNamespace>grunt_ts</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\WebApplications\Microsoft.WebApplication.targets" Condition="Exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\WebApplications\Microsoft.WebApplication.targets')" />
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
+        <WebProjectProperties>
+          <UseIIS>True</UseIIS>
+          <AutoAssignPort>True</AutoAssignPort>
+          <DevelopmentServerPort>10690</DevelopmentServerPort>
+          <DevelopmentServerVPath>/</DevelopmentServerVPath>
+          <IISUrl>http://localhost:10690/</IISUrl>
+          <NTLMAuthentication>False</NTLMAuthentication>
+          <UseCustomServer>False</UseCustomServer>
+          <CustomServerUrl>
+          </CustomServerUrl>
+          <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
+        </WebProjectProperties>
+      </FlavorProperties>
+    </VisualStudio>
+  </ProjectExtensions>
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
+    <TypeScriptRemoveComments>false</TypeScriptRemoveComments>
+    <TypeScriptSourceMap>true</TypeScriptSourceMap>
+    <TypeScriptModuleKind>commonjs</TypeScriptModuleKind>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <TypeScriptRemoveComments>true</TypeScriptRemoveComments>
+    <TypeScriptSourceMap>false</TypeScriptSourceMap>
+  </PropertyGroup>
+  <ItemGroup>
+    <TypeScriptCompile Include="defs\es6-promises\es6-promises.d.ts" />
+    <TypeScriptCompile Include="defs\gruntjs\gruntjs.d.ts" />
+    <TypeScriptCompile Include="defs\node\node.d.ts" />
+    <TypeScriptCompile Include="defs\tsd.d.ts" />
+    <TypeScriptCompile Include="defs\underscore.string\underscore.string.d.ts" />
+    <TypeScriptCompile Include="defs\underscore\underscore.d.ts" />
+    <TypeScriptCompile Include="tasks\modules\amdLoader.ts" />
+    <TypeScriptCompile Include="tasks\modules\cacheUtils.ts" />
+    <TypeScriptCompile Include="tasks\modules\compile.ts" />
+    <TypeScriptCompile Include="tasks\modules\html2ts.ts" />
+    <TypeScriptCompile Include="tasks\modules\interfaces.d.ts" />
+    <TypeScriptCompile Include="tasks\modules\reference.ts" />
+    <TypeScriptCompile Include="tasks\modules\templateCache.ts" />
+    <TypeScriptCompile Include="tasks\modules\transformers.ts" />
+    <TypeScriptCompile Include="tasks\modules\utils.ts" />
+    <TypeScriptCompile Include="tasks\ts.ts" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Gruntfile.js" />
+    <Content Include="sample\commonjs\Gruntfile.js" />
+    <Content Include="sample\Gruntfile.js" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="docs\amdLoader.md" />
+    <Content Include="docs\fast.md" />
+    <Content Include="docs\html2ts.md" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="build.bat" />
+    <Content Include="CHANGELOG.md" />
+    <Content Include="package.json" />
+    <Content Include="README.md" />
+    <Content Include="tsd.json" />
+    <Content Include="tslint.json" />
+  </ItemGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
+    <TypeScriptTarget>ES3</TypeScriptTarget>
+  </PropertyGroup>
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets" Condition="Exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets')" />
+</Project>

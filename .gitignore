@@ -22,3 +22,7 @@ test/definitelytypedtest/reference.ts
 !test/expected/**/*.js
 !test/expected/**/*.map
 .tscache/
+bin/
+obj/
+*.user
+*.suo
