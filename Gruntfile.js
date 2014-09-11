@@ -294,7 +294,7 @@ module.exports = function (grunt) {
 
     // Test
     grunt.registerTask('fail', ['continueOn', 'test_fail', 'continueOff']);
-    grunt.registerTask('test', ['test_all', 'nodeunit', 'fail']);
+    grunt.registerTask('test', ['test_all', 'fail', 'nodeunit']);
 
     // Release
     grunt.registerTask('release', ['build', 'test']);
