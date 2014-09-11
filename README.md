@@ -203,7 +203,7 @@ Specifically: http://stackoverflow.com/a/9867375/390330
 Grunt-ts can watch a directory and recompile TypeScript files when any TypeScript file changes, gets added, gets removed. Use the `watch` *target* option specifying a target directory that will be watched.
 
 ### Fast compile
-If you are using *external modules* `grunt-ts` will try to do a `fast` compile **by default**, basically only compiling what's changed. It will **just work** with the built-in file watching as well as with external tools like `grunt-contrib-watch` (make sure `spawn` is false. [More](https://github.com/grunt-ts/grunt-ts/blob/master/docs/fast.md)).
+If you are using *external modules* `grunt-ts` will try to do a `fast` compile **by default**, basically only compiling what's changed. It will **just work** with the built-in file watching as well as with external tools like `grunt-contrib-watch` ([More](https://github.com/grunt-ts/grunt-ts/blob/master/docs/fast.md)).
 
 It maintains a cache of hashes for typescript files in the `.tscache` folder to detect changes (needed for external watch tool support). Also it creates a `.baseDir.ts` file at the root, passing it compiler to make sure that `--outDir` is always respected in the generated JavaScript.
 

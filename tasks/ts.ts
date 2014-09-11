@@ -345,10 +345,10 @@ function pluginFn(grunt: IGrunt) {
                 //    compile html files must be before reference file creation                
                 var generatedFiles = [];
                 if (currenttask.data.html) {
-               var html2tsOptions = {
-                  moduleFunction: _.template(options.htmlModuleTemplate),
-                  varFunction: _.template(options.htmlVarTemplate)
-               };
+                    var html2tsOptions = {
+                        moduleFunction: _.template(options.htmlModuleTemplate),
+                        varFunction: _.template(options.htmlVarTemplate)
+                    };
 
                     var htmlFiles = grunt.file.expand(currenttask.data.html);
                     generatedFiles = _.map(htmlFiles, (filename) => html2tsModule.compileHTML(filename, html2tsOptions));

@@ -59,5 +59,9 @@ export var typescript = {
     customcompiler: function (test) {
         testDirectory(test, 'customcompiler');
         test.done();
+    },
+    fail: function (test) {
+        testDirectory(test, 'fail'); // tested to make sure transformers still run for failing task
+        test.done();
     }
 }
