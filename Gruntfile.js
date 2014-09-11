@@ -309,7 +309,7 @@ module.exports = function (grunt) {
     // 
     // Modify tasksToTest based on what you are working on 
 
-    var tasksToTest = ['ts:customcompiler'];
+    var tasksToTest = ['ts:fail', 'nodeunit'];
 
     grunt.registerTask('dev', ['run', 'watch']);
 
