@@ -205,7 +205,7 @@ function transformFiles(changedFiles, targetFiles, target, task) {
     ];
 
     _.forEach(changedFiles, function (fileToProcess) {
-        var contents = fs.readFileSync(fileToProcess).toString();
+        var contents = fs.readFileSync(fileToProcess, 'utf8').toString();
 
         // If no signature don't bother with this file
         if (!BaseTransformer.containsTransformSignature(contents)) {
