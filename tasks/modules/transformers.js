@@ -102,7 +102,7 @@ var BaseTransformer = (function () {
     };
     BaseTransformer.tsSignatureMatch = /\/\/\/\s*ts\:/;
 
-    BaseTransformer.tsTransformerMatch = '^///\\s*ts:{0}(=?)(.*)';
+    BaseTransformer.tsTransformerMatch = '///\\s*ts:{0}(=?)(.*)';
     return BaseTransformer;
 })();
 
@@ -205,7 +205,7 @@ function transformFiles(changedFiles, targetFiles, target, task) {
     ];
 
     _.forEach(changedFiles, function (fileToProcess) {
-        var contents = fs.readFileSync(fileToProcess, 'utf8').toString();
+        var contents = fs.readFileSync(fileToProcess).toString();
 
         // If no signature don't bother with this file
         if (!BaseTransformer.containsTransformSignature(contents)) {
