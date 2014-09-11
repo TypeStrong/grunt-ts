@@ -87,7 +87,7 @@ var BaseTransformer = (function () {
         this.match = new RegExp(utils.format(BaseTransformer.tsTransformerMatch, key));
         this.signature = '///ts:' + key;
         this.signatureGenerated = this.signature + ':generated';
-        this.syntaxError = '/// Invalid syntax for ts:' + this.key + "=" + variableSyntax + ' ' + this.signatureGenerated;
+        this.syntaxError = '/// Invalid syntax for ts:' + this.key + '=' + variableSyntax + ' ' + this.signatureGenerated;
     }
     BaseTransformer.prototype.isGenerated = function (line) {
         return _str.contains(line, this.signatureGenerated);
@@ -134,7 +134,7 @@ var BaseImportExportTransformer = (function (_super) {
                         filename = path.basename(path.dirname(completePathToFile));
                     }
                     var pathToFile = utils.makeRelativePath(sourceFileDirectory, _this.removeExtensionFromFilePath ? completePathToFile.replace(/(?:\.d)?\.ts$/, '') : completePathToFile, true);
-                    result.push(_this.template({ filename: filename, pathToFile: pathToFile, signatureGenerated: _this.signatureGenerated }) + " " + _this.signatureGenerated);
+                    result.push(_this.template({ filename: filename, pathToFile: pathToFile, signatureGenerated: _this.signatureGenerated }) + ' ' + _this.signatureGenerated);
                 });
             } else {
                 result.push('/// No file or directory matched name "' + requestedFileName + '" ' + this.signatureGenerated);
@@ -179,7 +179,7 @@ var UnknownTransformer = (function (_super) {
     __extends(UnknownTransformer, _super);
     function UnknownTransformer() {
         _super.call(this, '(.*)', '');
-        this.key = "unknown";
+        this.key = 'unknown';
         this.signatureGenerated = '///ts:unknown:generated';
         this.syntaxError = '/// Unknown transform ' + this.signatureGenerated;
     }
