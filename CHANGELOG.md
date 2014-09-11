@@ -67,5 +67,6 @@
 # v1.11.10
 * FIX: `///ts:import` and `///ts:ref` will now work with `d.ts` files as well. 
 
-## Work to be done
-* Show error when `/// ts:???` is detected but no transform exists for `???`
+# v1.11.11
+* import/export transforms can provide an alternate variable name to use instead of the file name (#143)
+* Error displayed when `/// ts:???` is detected but no transform exists for `???`

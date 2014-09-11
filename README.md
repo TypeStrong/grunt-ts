@@ -39,50 +39,94 @@ Supports the following compiler flags in both original format and camelCase (pre
 There is also support for js *file concatenation* using `--out`. Additionally supported is an output directory for the generated JavaScript using `--outDir` flag. For file ordering look at JavaScript Generation below.
 
 ### Transforms
-Objective : To allow easier code refactoring (by taking the relative path maintainance burden off the developer).
-If the paths to the files changes `grunt-ts` will pick it up and regenerate the generated sections.
 
-#### Files
-User types in
+Objective : To allow easier code refactoring by taking the relative path maintainance burden off the developer. If the paths to the files changes `grunt-ts` will regenerate the relevant sections.
+
+Transforms begin with a three-slash comment `///` and are prefixed with `ts:`
+
+#### Import Transform
+
 ```typescript
-///ts:import=filename
+///ts:import=<fileOrDirectoryName>[,<variableName>]
 ```
-grunt-ts comes along, notices this and replaces it with:
+
+This will generate the relevant `import foo = require('./path/to/foo');` code without you having to figure out the relative path.
+
+If a directory is provided, the entire contents of the directory will be imported. However if a directory has a file `index.ts` inside of it, then instead of importing the entire folder only `index.ts` is imported.
+
+##### Examples
+
+Import file:
 ```typescript
 ///ts:import=filename
 import filename = require('../path/to/filename'); ///ts:import:generated
 ```
-User types in
+
+Import file with an alternate name:
 ```typescript
-///ts:ref=filename
+///ts:import=BigLongClassName,foo
+import foo = require('../path/to/BigLongClassName'); ///ts:import:generated
 ```
-grunt-ts comes along, notices this and replaces it with:
+
+Import directory:
+```typescript
+///ts:import=directoryName
+import filename = require('../path/to/directoryName/filename'); ///ts:import:generated
+import anotherfile = require('../path/to/directoryName/deeper/anotherfile'); ///ts:import:generated
+...
+```
+
+Import directory that has an `index.ts` file in it:
+```typescript
+///ts:import=directoryName
+import directoryName = require('../path/to/directoryName/index'); ///ts:import:generated
+```
+> See Exports for examples of how grunt-ts can generate an `index.ts` file for you
+
+#### Export Transform
+
+```typescript
+///ts:export=<fileOrDirectoryName>[,<variableName>]
+```
+
+This is similar to `///ts:import` but will generate `export import foo = require('./path/to/foo');` and is very useful for generating indexes of entire module directories when using external modules (which you should **always** be using).
+
+##### Examples
+
+Export file:
+```typescript
+///ts:export=filename
+export import filename = require('../path/to/filename'); ///ts:export:generated
+```
+
+Export file with an alternate name:
+```typescript
+///ts:export=filename,foo
+export import foo = require('../path/to/filename'); ///ts:export:generated
+```
+
+Export directory:
+```typescript
+///ts:export=dirName
+export import filename = require('../path/to/dirName/filename'); ///ts:export:generated
+export import anotherfile = require('../path/to/dirName/deeper/anotherfile'); ///ts:export:generated
+...
+```
+
+#### References
+
+```typescript
+///ts:ref=<fileName>
+```
+
+This will generate the relevant `/// <references path="./path/to/foo" />` code without you having to figure out the relative path.
+
+##### Examples
+
+Reference file:
 ```typescript
 ///ts:ref=filename
 /// <reference path='../path/to/filename'/> ///ts:ref:generated
-```
-#### Folders
-User types in
-```typescript
-///ts:import=foldername
-```
-grunt-ts comes along, notices this and replaces it with
-```typescript
-///ts:import=foldername
-import filename = require('../path/to/foldername/filename'); ///ts:import:generated
-import anotherfile = require('../path/to/foldername/deeper/anotherfile'); ///ts:import:generated
-...
-```
-If a folder has an `index.ts` inside of it then we do not import the entire folder and only import `index.ts`. i.e :
-```typescript
-///ts:import=foldername
-import foldername = require('../path/to/foldername/index'); ///ts:import:generated
-```
-You can also use grunt-ts to create an `index.ts` file for you.
-```typescript
-///ts:export=foldername
-export import filea= require('../path/to/foldername/filea'); ///ts:export:generated
-// so on ...
 ```
 
 ### Reference file generation
@@ -201,6 +245,7 @@ The `package.json` would look something like this for a legacy project:
 Note: make sure to pin the exact TypeScript version (do not use `~` or `>`).
 
 ### Custom compiler
+
 Alternatively, you can also explicitly use a custom compiler build that is not on NPM (e.g. [current LKG](https://github.com/Microsoft/TypeScript/tree/master/bin)) by specifying the `compiler` *task* option pointing to the path of the node-executable compiler js file (i.e. raw `tsc` or `tsc.js`)
 ```javascript
 ts: {
