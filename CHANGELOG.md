@@ -70,3 +70,6 @@
 # v1.11.11
 * import/export transforms can provide an alternate variable name to use instead of the file name (#143)
 * Error displayed when `/// ts:???` is detected but no transform exists for `???`
+
+# v1.11.12
+* FIX: transforms should now work for files with BOM (#146)
