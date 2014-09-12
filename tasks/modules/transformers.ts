@@ -95,7 +95,7 @@ class BaseTransformer {
     // equals sign is optional because we want to match on the signature regardless of any errors,
     // transformFiles() checks that the equals sign exists (by checking for the first matched capture group)
     // and fails if it is not found.
-    private static tsTransformerMatch = '///\\s*ts:{0}(=?)(.*)';
+    private static tsTransformerMatch = '^///\\s*ts:{0}(=?)(.*)';
 
     private match: RegExp;
     private signature: string;
@@ -236,7 +236,7 @@ export function transformFiles(
     ];
 
     _.forEach(changedFiles, (fileToProcess) => {
-        var contents = fs.readFileSync(fileToProcess).toString();
+        var contents = fs.readFileSync(fileToProcess).toString().replace(/^\uFEFF/, '');
 
         // If no signature don't bother with this file
         if (!BaseTransformer.containsTransformSignature(contents)) {
