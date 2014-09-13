@@ -329,20 +329,15 @@ function pluginFn(grunt: IGrunt) {
                 // Reexpand the original file glob
                 var files = grunt.file.expand(currenttask.data.src);
 
-                // ignore directories
+                // ignore directories, and clear the files of output.d.ts and baseDirFile
                 files = files.filter(function (file) {
                     var stats = fs.lstatSync(file);
-                    return !stats.isDirectory();
-                });
-
-                // Clear the files of output.d.ts and reference.ts and baseDirFile
-                files = _.filter(files, (filename: string) => {
-                    return (!isReferenceFile(filename) && !isOutFile(filename) && !isBaseDirFile(filename, files));
+                   return !stats.isDirectory() && !isOutFile(file) && !isBaseDirFile(file, files);
                 });
 
                 ///// Html files:
                 // Note:
-                //    compile html files must be before reference file creation                
+                //    compile html files must be before reference file creation
                 var generatedFiles = [];
                 if (currenttask.data.html) {
                     var html2tsOptions = {
@@ -374,7 +369,8 @@ function pluginFn(grunt: IGrunt) {
                 // Create a reference file if specified
                 if (!!referencePath) {
                     var result = timeIt(() => {
-                        return referenceModule.updateReferenceFile(files, generatedFiles, referenceFile, referencePath);
+                        return referenceModule.updateReferenceFile(
+                           files.filter( f => !isReferenceFile(f) ), generatedFiles, referenceFile, referencePath);
                     });
                     if (result.it === true) {
                         grunt.log.writeln(('Updated reference file (' + result.time + 'ms).').green);
