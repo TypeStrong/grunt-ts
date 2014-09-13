@@ -68,17 +68,16 @@ function getImports(currentFilePath, name, targetFiles, targetDirs, getIndexIfDi
 // test/fail/ts/deep/work.ts
 // So simply get dirname recursively till reach root '.'
 function getTargetFolders(targetFiles) {
-    var folders = [];
+    var folders = {};
     _.forEach(targetFiles, function (targetFile) {
         var dir = path.dirname(targetFile);
-        while (dir !== '.') {
+        while (dir !== '.' && !(dir in folders)) {
             // grunt.log.writeln(dir);
-            folders.push(dir);
+            folders[dir] = true;
             dir = path.dirname(dir);
         }
     });
-
-    return folders;
+    return Object.keys(folders);
 }
 
 var BaseTransformer = (function () {
