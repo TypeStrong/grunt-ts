@@ -6,7 +6,6 @@ import fs = require('fs');
 import _ = require('underscore');
 import utils = require('./utils');
 import cache = require('./cacheUtils');
-import transformers = require('./transformers');
 
 var Promise: typeof Promise = require('es6-promise').Promise;
 export var grunt: IGrunt = require('grunt');
@@ -131,7 +130,7 @@ export function compileAllFiles(targetFiles: string[], target: ITargetOptions, t
     }
 
     // Transform files as needed. Currently all of this logic in is one module
-    transformers.transformFiles(newFiles, targetFiles, target, task);
+    // transformers.transformFiles(newFiles, targetFiles, target, task);
 
     // If baseDir is specified create a temp tsc file to make sure that `--outDir` works fine
     // see https://github.com/grunt-ts/grunt-ts/issues/77
