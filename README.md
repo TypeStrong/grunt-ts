@@ -135,6 +135,23 @@ Grunt-ts can generate a `reference.ts` file which contains a reference to all ts
 
 This means there will never be a need to cross reference files manually, instead just reference `reference.ts` :)
 
+#### Usage
+
+In your gruntfile:
+```javascript
+grunt.initConfig({
+   ts: {
+      target: {
+         reference: "./path/to/references.ts",
+         // in addition to your standard settings:
+         // src: ...
+         // outDir: ...
+         // options: {}
+      }
+   }
+} );
+```
+
 *Warning:* Using the compiler with `--out` / `reference.ts` will slow down a fast compile pipeline. Use *external modules* with transforms instead.
 
 #### JavaScript generation and ordering
@@ -148,7 +165,6 @@ E.g. in the following case the generated JavaScript for `someBaseClass.ts` is gu
 Everything between `grunt-start` and `grunt-end` is generated and maintained by grunt-ts. If there is no `grunt-start` section found, it is created. If `reference.ts` does not exist originally, it is also created.
 
 ```typescript
-
 /// <reference path="someBaseClass.ts" />
 
 // Put comments here and they are preserved
