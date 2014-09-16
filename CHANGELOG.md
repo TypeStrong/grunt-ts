@@ -73,3 +73,6 @@
 
 # v1.11.12
 * FIX: transforms should now work for files with BOM (#146)
+
+# v1.11.13
+* FIX: transforms will now pick up a generated references.ts (#148)
