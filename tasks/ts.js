@@ -16,6 +16,7 @@ var referenceModule = require('./modules/reference');
 var amdLoaderModule = require('./modules/amdLoader');
 var html2tsModule = require('./modules/html2ts');
 var templateCacheModule = require('./modules/templateCache');
+var transformers = require('./modules/transformers');
 
 // plain vanilla imports
 var Promise = require('es6-promise').Promise;
@@ -356,6 +357,9 @@ function pluginFn(grunt) {
                     var referenceOrder = amdLoaderModule.getReferencesInOrder(referenceFile, referencePath, generatedFiles);
                     amdLoaderModule.updateAmdLoader(referenceFile, referenceOrder, amdloaderFile, amdloaderPath, target.outDir);
                 }
+
+                // Transform files as needed. Currently all of this logic in is one module
+                transformers.transformFiles(files, files, target, options);
 
                 // Return promise to compliation
                 if (options.compile) {

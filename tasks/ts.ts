@@ -18,6 +18,7 @@ import referenceModule = require('./modules/reference');
 import amdLoaderModule = require('./modules/amdLoader');
 import html2tsModule = require('./modules/html2ts');
 import templateCacheModule = require('./modules/templateCache');
+import transformers = require('./modules/transformers');
 
 // plain vanilla imports
 var Promise: typeof Promise = require('es6-promise').Promise;
@@ -385,6 +386,9 @@ function pluginFn(grunt: IGrunt) {
                     amdLoaderModule.updateAmdLoader(referenceFile, referenceOrder, amdloaderFile, amdloaderPath, target.outDir);
                 }
 
+                // Transform files as needed. Currently all of this logic in is one module
+                transformers.transformFiles(files/*TODO: only unchanged files*/, files, target, options);
+
                 // Return promise to compliation
                 if (options.compile) {
                     // Compile, if there are any files to compile!
@@ -398,7 +402,7 @@ function pluginFn(grunt: IGrunt) {
                         return Promise.resolve(true);
                     }
                 }
-                else { // Nothing to do                    
+                else { // Nothing to do
                     return Promise.resolve(true);
                 }
             }

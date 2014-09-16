@@ -44,6 +44,23 @@ Objective : To allow easier code refactoring by taking the relative path maintai
 
 Transforms begin with a three-slash comment `///` and are prefixed with `ts:`
 
+You can also run transforms without compiling your code b ysetting `compile: false` in your config. For example:
+```javascript
+grunt.initConfig({
+   ts: {
+      "transforms-only": {
+         options: {
+            compile: false
+         },
+         // in addition to your standard settings:
+         // src: ...
+         // outDir: ...
+      },
+      // ...
+   }
+} );
+```
+
 #### Import Transform
 
 ```typescript
