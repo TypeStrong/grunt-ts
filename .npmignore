@@ -23,3 +23,10 @@ npm-debug.log
 /*.tgz
 
 /tscommand*.tmp.txt
+
+/bin
+/obj
+*.user
+*.suo
+*.csproj
+*.sln
