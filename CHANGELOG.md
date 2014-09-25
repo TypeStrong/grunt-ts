@@ -77,5 +77,5 @@
 # v1.11.13
 * FIX: transforms will now pick up a generated references.ts (#148)
 
-# NEXT
+# v1.12.0
 * ENANCEMENT: Transforms are run even when the compile option is false
