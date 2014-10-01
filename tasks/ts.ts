@@ -436,8 +436,8 @@ function pluginFn(grunt: IGrunt) {
                     filterFilesAndCompile();
                 }
 
-                // get path
-                var watchpath = path.resolve(watch);
+                // get path(s)
+                var watchpath = grunt.file.expand(watch);
 
                 // create a file watcher for path
                 var chokidar = require('chokidar');
