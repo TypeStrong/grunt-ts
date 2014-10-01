@@ -1,5 +1,9 @@
 # Releases
 
+## Next
+* DOCS: changelog is now *newest on top*
+* FEAT: support watching multiple DIRS. (https://github.com/grunt-ts/grunt-ts/pull/155/)
+
 ## v1.12.0
 * ENANCEMENT: Transforms are run even when the compile option is false
 
