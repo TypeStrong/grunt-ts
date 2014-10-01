@@ -1,6 +1,6 @@
 # grunt-ts
 
-[![Build Status](https://secure.travis-ci.org/grunt-ts/grunt-ts.png?branch=master)](http://travis-ci.org/grunt-ts/grunt-ts) [![NPM version](https://badge.fury.io/js/grunt-ts.png)](http://badge.fury.io/js/grunt-ts)
+[![Build Status](https://secure.travis-ci.org/grunt-ts/grunt-ts.svg?branch=master)](http://travis-ci.org/grunt-ts/grunt-ts) [![NPM version](https://badge.fury.io/js/grunt-ts.svg)](http://badge.fury.io/js/grunt-ts)
 
 Written from scratch TypeScript compiler task for GruntJS.
 
