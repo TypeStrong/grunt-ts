@@ -5,7 +5,7 @@ import fs = require('fs');
 import path = require('path');
 import grunt = require('grunt');
 import _str = require('underscore.string');
-import _ = require('underscore');
+import _ = require('lodash');
 import os = require('os');
 import utils = require('./utils');
 
