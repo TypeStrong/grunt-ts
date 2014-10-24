@@ -5,7 +5,6 @@ var __extends = this.__extends || function (d, b) {
     d.prototype = new __();
 };
 var B1 = require('./b1');
-
 var B2 = (function (_super) {
     __extends(B2, _super);
     function B2() {
