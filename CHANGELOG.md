@@ -4,6 +4,7 @@
 * DOCS: changelog is now *newest on top*
 * FEAT: support watching multiple DIRS. (https://github.com/grunt-ts/grunt-ts/pull/155/)
 * CHORE: Use lodash instead of underscore (https://github.com/TypeStrong/grunt-ts/pull/161)
+* DOCS: More sample config for gruntfile (https://github.com/TypeStrong/grunt-ts/pull/166)
 
 ## v1.12.0
 * ENANCEMENT: Transforms are run even when the compile option is false
