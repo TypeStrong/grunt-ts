@@ -13,7 +13,6 @@ var Animal = (function () {
     };
     return Animal;
 })();
-
 var Snake = (function (_super) {
     __extends(Snake, _super);
     function Snake(name) {
@@ -25,7 +24,6 @@ var Snake = (function (_super) {
     };
     return Snake;
 })(Animal);
-
 var Horse = (function (_super) {
     __extends(Horse, _super);
     function Horse(name) {
@@ -37,10 +35,8 @@ var Horse = (function (_super) {
     };
     return Horse;
 })(Animal);
-
 var sam = new Snake("Sammy the Python");
 var tom = new Horse("Tommy the Palomino");
-
 sam.move();
 tom.move(34);
 //# sourceMappingURL=zoo.js.map

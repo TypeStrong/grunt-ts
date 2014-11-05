@@ -6,6 +6,5 @@ var A1 = (function () {
     };
     return A1;
 })();
-
 module.exports = A1;
 //# sourceMappingURL=A1.js.map

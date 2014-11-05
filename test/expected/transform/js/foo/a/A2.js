@@ -5,7 +5,6 @@ var __extends = this.__extends || function (d, b) {
     d.prototype = new __();
 };
 var A1 = require('./A1');
-
 var A2 = (function (_super) {
     __extends(A2, _super);
     function A2() {
@@ -16,6 +15,5 @@ var A2 = (function (_super) {
     };
     return A2;
 })(A1);
-
 module.exports = A2;
 //# sourceMappingURL=A2.js.map
