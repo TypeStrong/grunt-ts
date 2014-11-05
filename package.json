@@ -41,6 +41,7 @@
   "dependencies": {
     "typescript": "1.0.1",
     "chokidar": "0.8.2",
+    "lodash": "2.4.1",
     "underscore": "1.5.1",
     "underscore.string": "2.3.3",
     "es6-promise": "~0.1.1",

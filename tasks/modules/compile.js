@@ -2,7 +2,7 @@
 /// <reference path="./interfaces.d.ts"/>
 var path = require('path');
 var fs = require('fs');
-var _ = require('underscore');
+var _ = require('lodash');
 var utils = require('./utils');
 var cache = require('./cacheUtils');
 

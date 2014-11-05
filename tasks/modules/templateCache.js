@@ -1,5 +1,5 @@
 /// <reference path="../../defs/tsd.d.ts"/>
-var _ = require('underscore');
+var _ = require('lodash');
 var fs = require('fs');
 var path = require('path');
 var os = require('os');

@@ -4,7 +4,7 @@ var grunt: IGrunt = require('grunt');
 import fs = require('fs');
 import path = require('path');
 import utils = require('../tasks/modules/utils');
-import _ = require('underscore');
+import _ = require('lodash');
 
 function testFile(test, path) {
     var actual = grunt.file.read('test/' + path);

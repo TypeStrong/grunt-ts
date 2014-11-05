@@ -6,7 +6,7 @@
 * Licensed under the MIT license.
 */
 // Typescript imports
-var _ = require('underscore');
+var _ = require('lodash');
 var path = require('path');
 var fs = require('fs');
 

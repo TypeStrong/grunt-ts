@@ -7,7 +7,7 @@
  */
 
 // Typescript imports
-import _ = require('underscore');
+import _ = require('lodash');
 import path = require('path');
 import fs = require('fs');
 

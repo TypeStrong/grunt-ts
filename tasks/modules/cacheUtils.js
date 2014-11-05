@@ -1,7 +1,7 @@
 /// <reference path="../../defs/tsd.d.ts"/>
 // Source based on : https://github.com/tschaub/grunt-newer/blob/master/lib/util.js
 var fs = require('fs');
-var _ = require('underscore');
+var _ = require('lodash');
 var path = require('path');
 var crypto = require('crypto');
 var grunt = require('grunt');

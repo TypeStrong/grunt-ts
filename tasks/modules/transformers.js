@@ -10,7 +10,7 @@ var fs = require('fs');
 var path = require('path');
 var grunt = require('grunt');
 var _str = require('underscore.string');
-var _ = require('underscore');
+var _ = require('lodash');
 var os = require('os');
 var utils = require('./utils');
 
