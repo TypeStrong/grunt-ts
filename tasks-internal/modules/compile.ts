@@ -3,7 +3,7 @@
 
 import path = require('path');
 import fs = require('fs');
-import _ = require('underscore');
+import _ = require('lodash');
 import utils = require('./utils');
 import cache = require('./cacheUtils');
 import transformers = require('./transformers');

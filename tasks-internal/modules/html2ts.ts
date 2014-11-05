@@ -1,6 +1,6 @@
 /// <reference path="../../defs/tsd.d.ts"/>
 
-import _ = require('underscore');
+import _ = require('lodash');
 import fs = require('fs');
 import path = require('path');
 

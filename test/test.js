@@ -1,7 +1,8 @@
 /// <reference path="../defs/tsd.d.ts" />
 var grunt = require('grunt');
 var utils = require('../tasks/modules/utils');
-var _ = require('underscore');
+var _ = require('lodash');
+
 function testFile(test, path) {
     var actual = grunt.file.read('test/' + path);
     var expected = grunt.file.read('test/expected/' + path);
