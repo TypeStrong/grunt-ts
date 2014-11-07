@@ -299,12 +299,12 @@ function pluginFn(grunt) {
             // Then calls the appropriate functions + compile function on those files
             function filterFilesAndCompile() {
                 // Reexpand the original file glob
-                var files = grunt.file.expand(currenttask.data.src);
+                var filesToCompile = grunt.file.expand(currenttask.data.src);
 
                 // ignore directories, and clear the files of output.d.ts and baseDirFile
-                files = files.filter(function (file) {
+                filesToCompile = filesToCompile.filter(function (file) {
                     var stats = fs.lstatSync(file);
-                    return !stats.isDirectory() && !isOutFile(file) && !isBaseDirFile(file, files);
+                    return !stats.isDirectory() && !isOutFile(file) && !isBaseDirFile(file, filesToCompile);
                 });
 
                 ///// Html files:
@@ -342,7 +342,7 @@ function pluginFn(grunt) {
                 // Create a reference file if specified
                 if (!!referencePath) {
                     var result = timeIt(function () {
-                        return referenceModule.updateReferenceFile(files.filter(function (f) {
+                        return referenceModule.updateReferenceFile(filesToCompile.filter(function (f) {
                             return !isReferenceFile(f);
                         }), generatedFiles, referenceFile, referencePath);
                     });
@@ -359,13 +359,13 @@ function pluginFn(grunt) {
                 }
 
                 // Transform files as needed. Currently all of this logic in is one module
-                transformers.transformFiles(files, files, target, options);
+                transformers.transformFiles(filesToCompile, filesToCompile, target, options);
 
                 // Return promise to compliation
                 if (options.compile) {
                     // Compile, if there are any files to compile!
-                    if (files.length > 0) {
-                        return runCompilation(files, target, options).then(function (success) {
+                    if (filesToCompile.length > 0) {
+                        return runCompilation(filesToCompile, target, options).then(function (success) {
                             return success;
                         });
                     } else {
