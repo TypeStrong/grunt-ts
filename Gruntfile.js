@@ -92,6 +92,11 @@ module.exports = function (grunt) {
                 src: ['test/simple/ts/zoo.ts'],
                 outDir: 'test/simple/js/',
             },
+            multifiletest: {
+                test: true,
+                files: [{ src: ['test/multifile/a/**/*.ts'], dest: 'test/multifile/a/out.js' },
+                    { src: ['test/multifile/b/**/*.ts'], dest: 'test/multifile/b/out.js' }]
+            },
             abtest: {
                 test: true,
                 src: ['test/abtest/**/*.ts'],
@@ -295,6 +300,7 @@ module.exports = function (grunt) {
     // Test
     grunt.registerTask('fail', ['continueOn', 'test_fail', 'continueOff']);
     grunt.registerTask('test', ['test_all', 'fail', 'nodeunit']);
+    grunt.registerTask('multifiletest', ['ts:multifiletest']);
 
     // Release
     grunt.registerTask('release', ['build', 'test']);
