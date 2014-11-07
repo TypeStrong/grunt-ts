@@ -4,7 +4,7 @@ interface ITargetOptions {
     files: {
         src: string[];
         dest: string;
-    }[]; 
+    }[];
     reference: string; // path to a reference.ts e.g. './approot/'
     out: string; // if sepecified e.g. 'single.js' all output js files are merged into single.js using tsc --out command     
     outDir: string; // if sepecified e.g. '/build/js' all output js files are put in this location

@@ -75,7 +75,7 @@ function pluginFn(grunt) {
 
         var watch;
 
-        //tracks which index in the task "files" property is next for processing
+        // tracks which index in the task "files" property is next for processing
         var filesCompilationIndex = 0;
 
         // setup default options
