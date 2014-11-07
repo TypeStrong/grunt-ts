@@ -95,7 +95,10 @@ module.exports = function (grunt) {
             multifiletest: {
                 test: true,
                 files: [{ src: ['test/multifile/a/**/*.ts'], dest: 'test/multifile/a/out.js' },
-                    { src: ['test/multifile/b/**/*.ts'], dest: 'test/multifile/b/out.js' }]
+                    { src: ['test/multifile/b/**/*.ts'], dest: 'test/multifile/b/out.js' }],
+                options: {
+                    fast: "never"
+                }
             },
             abtest: {
                 test: true,

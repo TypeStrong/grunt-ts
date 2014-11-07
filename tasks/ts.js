@@ -75,6 +75,9 @@ function pluginFn(grunt) {
 
         var watch;
 
+        //tracks which index in the task "files" property is next for processing
+        var filesCompilationIndex = 0;
+
         // setup default options
         var options = currenttask.options({
             allowBool: false,
@@ -298,8 +301,15 @@ function pluginFn(grunt) {
             // Find out which files to compile, codegen etc.
             // Then calls the appropriate functions + compile function on those files
             function filterFilesAndCompile() {
-                // Reexpand the original file glob
-                var filesToCompile = grunt.file.expand(currenttask.data.src);
+                var filesToCompile;
+
+                if (currenttask.data.src) {
+                    // Reexpand the original file glob
+                    filesToCompile = grunt.file.expand(currenttask.data.src);
+                } else {
+                    filesToCompile = grunt.file.expand(currenttask.data.files[filesCompilationIndex].src);
+                    filesCompilationIndex += 1;
+                }
 
                 // ignore directories, and clear the files of output.d.ts and baseDirFile
                 filesToCompile = filesToCompile.filter(function (file) {
