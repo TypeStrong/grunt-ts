@@ -100,6 +100,21 @@ module.exports = function (grunt) {
                     fast: 'never'
                 }
             },
+            files_testsingle: {
+                test: true,
+                files: [{ src: ['test/multifile/a/**/*.ts'], dest: 'test/multifile/a/out.js' }],
+                options: {
+                    fast: 'never'
+                }
+            },
+            files_testFailedCompilation: {
+                test: true,
+                files: [{ src: ['test/files_testFailedCompilation/a/**/*.ts'], dest: 'test/files_testFailedCompilation/a/out.js' },
+                        { src: ['test/files_testFailedCompilation/b/**/*.ts'], dest: 'test/files_testFailedCompilation/b/out.js' }],
+                options: {
+                    fast: 'never'
+                }
+            },
             abtest: {
                 test: true,
                 src: ['test/abtest/**/*.ts'],
