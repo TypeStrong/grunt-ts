@@ -1,4 +1,4 @@
-/// <reference path="../defs/tsd.d.ts"/>
+﻿/// <reference path="../defs/tsd.d.ts"/>
 /// <reference path="./modules/interfaces.d.ts"/>
 /*
 * grunt-ts
@@ -103,6 +103,7 @@ function pluginFn(grunt) {
 
         // get unprocessed templates from configuration
         var rawTaskOptions = (grunt.config.getRaw(currenttask.name + '.options') || {});
+        var rawTargetConfig = (grunt.config.getRaw(currenttask.name + '.' + currenttask.target) || {});
         var rawTargetOptions = (grunt.config.getRaw(currenttask.name + '.' + currenttask.target + '.options') || {});
 
         options.htmlModuleTemplate = rawTargetOptions.htmlModuleTemplate || rawTaskOptions.htmlModuleTemplate;
@@ -116,7 +117,23 @@ function pluginFn(grunt) {
         // Warn the user of invalid values
         if (options.fast !== 'watch' && options.fast !== 'always' && options.fast !== 'never') {
             console.warn(('"fast" needs to be one of : "watch" (default) | "always" | "never" but you provided: ' + options.fast).magenta);
-            options.fast = 'watch';
+            if (currenttask.files) {
+                options.fast = 'never'; // to keep things simple, we are not supporting fast with files.
+            } else {
+                options.fast = 'watch';
+            }
+        }
+
+        if (rawTargetConfig.files && rawTargetConfig.src) {
+            console.warn(('Warning: In task "' + currenttask.target + '", either "files" or "src" should be used - not both.').magenta);
+        }
+
+        if (rawTargetConfig.files && rawTargetConfig.out) {
+            console.warn(('Warning: In task "' + currenttask.target + '", either "files" or "out" should be used - not both.').magenta);
+        }
+
+        if (rawTargetConfig.files && rawTargetConfig.outDir) {
+            console.warn(('Warning: In task "' + currenttask.target + '", either "files" or "outDir" should be used - not both.').magenta);
         }
 
         if (!options.htmlModuleTemplate) {

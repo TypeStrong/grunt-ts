@@ -114,17 +114,27 @@ module.exports = function (grunt) {
                     fast: 'never'
                 }
             },
-            files_testmissing: {
+            files_testMissing: {
                 test: true,
                 files: [{ src: ['test/THIS_FOLDER_DOES_NOT_EXIST/**/*.ts'], dest: 'test/THIS_FOLDER_DOES_NOT_EXIST/out.js' }],
                 options: {
                     fast: 'never'
                 }
             },
-            files_testFailedCompilation: {
+            files_showWarningIfFilesIsUsedWithSrcOrOut: {
                 test: true,
-                files: [{ src: ['test/files_testFailedCompilation/a/**/*.ts'], dest: 'test/files_testFailedCompilation/a/out.js' },
-                        { src: ['test/files_testFailedCompilation/b/**/*.ts'], dest: 'test/files_testFailedCompilation/b/out.js' }],
+                files: [{ src: ['test/multifile/a/**/*.ts'], dest: 'test/multifile/a/out.js' }],
+                src: ['test/multifile/b/**/*.ts'],
+                out: 'test/multifile/a/out.js',
+                options: {
+                    fast: 'never'
+                }
+            },
+            files_showWarningIfFilesIsUsedWithSrcOrOutDir: {
+                test: true,
+                files: [{ src: ['test/multifile/a/**/*.ts'], dest: 'test/multifile/a' }],
+                src: ['test/multifile/b/**/*.ts'],
+                outDir: 'test/multifile/a',
                 options: {
                     fast: 'never'
                 }
@@ -247,6 +257,14 @@ module.exports = function (grunt) {
                     sourcemap: false
                 }
             },
+            files_testfailedcompilation: {
+                fail: true,                  // a designed to fail target
+                files: [{ src: ['test/files_testfailedcompilation/a/**/*.ts'], dest: 'test/files_testfailedcompilation/a/out.js' },
+                        { src: ['test/files_testfailedcompilation/b/**/*.ts'], dest: 'test/files_testfailedcompilation/b/out.js' }],
+                options: {
+                    fast: 'never'
+                }
+            }
         }
     });
 
