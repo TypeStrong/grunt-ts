@@ -107,6 +107,20 @@ module.exports = function (grunt) {
                     fast: 'never'
                 }
             },
+            files_testempty: {
+                test: true,
+                files: [],
+                options: {
+                    fast: 'never'
+                }
+            },
+            files_testmissing: {
+                test: true,
+                files: [{ src: ['test/THIS_FOLDER_DOES_NOT_EXIST/**/*.ts'], dest: 'test/THIS_FOLDER_DOES_NOT_EXIST/out.js' }],
+                options: {
+                    fast: 'never'
+                }
+            },
             files_testFailedCompilation: {
                 test: true,
                 files: [{ src: ['test/files_testFailedCompilation/a/**/*.ts'], dest: 'test/files_testFailedCompilation/a/out.js' },
