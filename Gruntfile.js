@@ -358,7 +358,6 @@ module.exports = function (grunt) {
     // Test
     grunt.registerTask('fail', ['continueOn', 'test_fail', 'continueOff']);
     grunt.registerTask('test', ['test_all', 'fail', 'nodeunit']);
-    grunt.registerTask('multifiletest', ['ts:multifiletest']);
 
     // Release
     grunt.registerTask('release', ['build', 'test']);
