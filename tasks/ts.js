@@ -1,4 +1,4 @@
-﻿/// <reference path="../defs/tsd.d.ts"/>
+/// <reference path="../defs/tsd.d.ts"/>
 /// <reference path="./modules/interfaces.d.ts"/>
 /*
 * grunt-ts
@@ -125,15 +125,15 @@ function pluginFn(grunt) {
         }
 
         if (rawTargetConfig.files && rawTargetConfig.src) {
-            console.warn(('Warning: In task "' + currenttask.target + '", either "files" or "src" should be used - not both.').magenta);
+            grunt.log.writeln(('Warning: In task "' + currenttask.target + '", either "files" or "src" should be used - not both.').magenta);
         }
 
         if (rawTargetConfig.files && rawTargetConfig.out) {
-            console.warn(('Warning: In task "' + currenttask.target + '", either "files" or "out" should be used - not both.').magenta);
+            grunt.log.writeln(('Warning: In task "' + currenttask.target + '", either "files" or "out" should be used - not both.').magenta);
         }
 
         if (rawTargetConfig.files && rawTargetConfig.outDir) {
-            console.warn(('Warning: In task "' + currenttask.target + '", either "files" or "outDir" should be used - not both.').magenta);
+            grunt.log.writeln(('Warning: In task "' + currenttask.target + '", either "files" or "outDir" should be used - not both.').magenta);
         }
 
         if (!options.htmlModuleTemplate) {
@@ -406,6 +406,10 @@ function pluginFn(grunt) {
 
             // Time (in ms) when last compile took place
             var lastCompile = 0;
+
+            if (rawTargetConfig.files && rawTargetConfig.watch) {
+                grunt.log.writeln(('WARNING: Use of "files" with "watch" in target ' + currenttask.target + ' is not supported in grunt-ts.  The "watch" will be ignored.  Use "src", or use grunt-contrib-watch if you really do need to use "files".').magenta);
+            }
 
             // Watch a folder?
             watch = target.watch;
