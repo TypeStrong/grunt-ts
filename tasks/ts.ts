@@ -138,6 +138,11 @@ function pluginFn(grunt: IGrunt) {
             }
         }
 
+        if ((options.fast === 'watch' || options.fast === 'always') && rawTargetConfig.files) {
+            grunt.log.writeln(('Warning: Task "' + currenttask.target + '" is attempting to use fast compilation with "files".  This is not currently supported.  Setting "fast" to "never".').magenta);
+            options.fast = 'never';
+        }
+
         if (rawTargetConfig.files && rawTargetConfig.src) {
             grunt.log.writeln(('Warning: In task "' + currenttask.target + '", either "files" or "src" should be used - not both.').magenta);
         }

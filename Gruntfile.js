@@ -147,6 +147,13 @@ module.exports = function (grunt) {
                     fast: 'never'
                 }
             },
+            files_showWarningIfFilesIsUsedWithFast: {
+                //note this should not actually watch.
+                files: [{ src: ['test/multifile/a/**/*.ts'], dest: 'test/multifile/a' }],
+                options: {
+                    fast: 'always'
+                }
+            },
             abtest: {
                 test: true,
                 src: ['test/abtest/**/*.ts'],
