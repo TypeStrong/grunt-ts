@@ -161,6 +161,13 @@ module.exports = function (grunt) {
                     fast: 'never'
                 }
             },
+            files_testFilesUsedWithDestAsAFolder: {
+                test: true,
+                files: [{ src: ['test/multifile/a/**/*.ts'], dest: 'test/multifile/a' }],
+                options: {
+                    fast: 'never'
+                }
+            },
             files_testFilesWithMissingDest: {
                 test: true,
                 files: [{ src: ['test/multifile/a/**/*.ts']}],

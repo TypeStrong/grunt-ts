@@ -168,8 +168,6 @@ function compileAllFiles(targetFiles, target, task, targetName) {
     // Target options:
     if (target.out) {
         args.push('--out', target.out);
-    } else if (target.dest) {
-        args.push('--out', target.dest);
     }
 
     if (target.outDir) {
@@ -178,6 +176,15 @@ function compileAllFiles(targetFiles, target, task, targetName) {
         }
         args.push('--outDir', target.outDir);
     }
+
+    if (target.dest && (!target.out) && (!target.outDir)) {
+        if (utils.isJavaScriptFile(target.dest)) {
+            args.push('--out', target.dest);
+        } else {
+            args.push('--outDir', target.dest);
+        }
+    }
+
     if (task.sourceRoot) {
         args.push('--sourceRoot', task.sourceRoot);
     }
