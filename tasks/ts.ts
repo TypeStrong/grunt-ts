@@ -211,7 +211,7 @@ function pluginFn(grunt: IGrunt) {
             function getTargetOutOrElseTryTargetDest(target: ITargetOptions) {
                 var o = target.out;
                 if (!o) {
-                    if (target.dest && utils.endsWith(target.dest.toLowerCase(), ".js")) {
+                    if (target.dest && utils.isJavaScriptFile(target.dest)) {
                         o = target.dest;
                     }
                 }

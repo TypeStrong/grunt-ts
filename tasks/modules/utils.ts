@@ -71,6 +71,10 @@ export function endsWith(str: string, suffix: string): boolean {
     return str.indexOf(suffix, str.length - suffix.length) !== -1;
 }
 
+export function isJavaScriptFile(filePath: string): boolean {
+    return this.endsWith(filePath.toLowerCase(), ".js");
+}
+
 /** function for formatting strings 
  * ('{0} says {1}','la','ba' ) => 'la says ba'
  */
