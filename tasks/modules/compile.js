@@ -1,4 +1,4 @@
-﻿/// <reference path="../../defs/tsd.d.ts"/>
+/// <reference path="../../defs/tsd.d.ts"/>
 /// <reference path="./interfaces.d.ts"/>
 var path = require('path');
 var fs = require('fs');

@@ -139,7 +139,8 @@ function pluginFn(grunt: IGrunt) {
         }
 
         if ((options.fast === 'watch' || options.fast === 'always') && rawTargetConfig.files) {
-            grunt.log.writeln(('Warning: Task "' + currenttask.target + '" is attempting to use fast compilation with "files".  This is not currently supported.  Setting "fast" to "never".').magenta);
+            grunt.log.writeln(('Warning: Task "' + currenttask.target +
+                '" is attempting to use fast compilation with "files".  This is not currently supported.  Setting "fast" to "never".').magenta);
             options.fast = 'never';
         }
 
@@ -154,7 +155,7 @@ function pluginFn(grunt: IGrunt) {
         if (rawTargetConfig.files && rawTargetConfig.outDir) {
             grunt.log.writeln(('Warning: In task "' + currenttask.target + '", either "files" or "outDir" should be used - not both.').magenta);
         }
-        
+
         if (!options.htmlModuleTemplate) {
             // use default value
             options.htmlModuleTemplate = '<%= filename %>';
@@ -455,7 +456,9 @@ function pluginFn(grunt: IGrunt) {
             var lastCompile = 0;
 
             if (rawTargetConfig.files && rawTargetConfig.watch) {
-                grunt.log.writeln(('WARNING: Use of "files" with "watch" in target ' + currenttask.target + ' is not supported in grunt-ts.  The "watch" will be ignored.  Use "src", or use grunt-contrib-watch if you really do need to use "files".').magenta);
+                grunt.log.writeln(('WARNING: Use of "files" with "watch" in target ' + currenttask.target +
+                    ' is not supported in grunt-ts.  The "watch" will be ignored.  Use "src", or use grunt-contrib-watch' +
+                    ' if you really do need to use "files".').magenta);
             }
 
             // Watch a folder?

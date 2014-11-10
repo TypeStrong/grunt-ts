@@ -72,7 +72,7 @@ function endsWith(str, suffix) {
 exports.endsWith = endsWith;
 
 function isJavaScriptFile(filePath) {
-    return this.endsWith(filePath.toLowerCase(), ".js");
+    return this.endsWith(filePath.toLowerCase(), '.js');
 }
 exports.isJavaScriptFile = isJavaScriptFile;
 

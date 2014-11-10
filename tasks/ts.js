@@ -424,7 +424,7 @@ function pluginFn(grunt) {
             var lastCompile = 0;
 
             if (rawTargetConfig.files && rawTargetConfig.watch) {
-                grunt.log.writeln(('WARNING: Use of "files" with "watch" in target ' + currenttask.target + ' is not supported in grunt-ts.  The "watch" will be ignored.  Use "src", or use grunt-contrib-watch if you really do need to use "files".').magenta);
+                grunt.log.writeln(('WARNING: Use of "files" with "watch" in target ' + currenttask.target + ' is not supported in grunt-ts.  The "watch" will be ignored.  Use "src", or use grunt-contrib-watch' + ' if you really do need to use "files".').magenta);
             }
 
             // Watch a folder?
