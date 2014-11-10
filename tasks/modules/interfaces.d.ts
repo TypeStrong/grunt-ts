@@ -1,6 +1,7 @@
 
 interface ITargetOptions {
     src: string[]; // input files  // Note : this is a getter and returns a new "live globbed" array 
+    dest?: string;
     files: {
         src: string[];
         dest: string;

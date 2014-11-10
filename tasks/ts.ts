@@ -208,8 +208,20 @@ function pluginFn(grunt: IGrunt) {
                 return path.resolve(filename) === referenceFile;
             }
 
+            function getTargetOutOrElseTryTargetDest(target: ITargetOptions) {
+                var o = target.out;
+                if (!o) {
+                    if (target.dest && utils.endsWith(target.dest.toLowerCase(), ".js")) {
+                        o = target.dest;
+                    }
+                }
+                return o;
+            }
+
             // Create an output file?
-            var out = target.out;
+            var out = getTargetOutOrElseTryTargetDest(target);
+
+
             var outFile;
             var outFile_d_ts;
             if (!!out) {

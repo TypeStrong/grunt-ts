@@ -1,4 +1,4 @@
-/// <reference path="../../defs/tsd.d.ts"/>
+﻿/// <reference path="../../defs/tsd.d.ts"/>
 /// <reference path="./interfaces.d.ts"/>
 var path = require('path');
 var fs = require('fs');
@@ -168,7 +168,10 @@ function compileAllFiles(targetFiles, target, task, targetName) {
     // Target options:
     if (target.out) {
         args.push('--out', target.out);
+    } else if (target.dest) {
+        args.push('--out', target.dest);
     }
+
     if (target.outDir) {
         if (target.out) {
             console.warn('WARNING: Option "out" and "outDir" should not be used together'.magenta);

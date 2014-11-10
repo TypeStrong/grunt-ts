@@ -154,6 +154,13 @@ module.exports = function (grunt) {
                     fast: 'always'
                 }
             },
+            files_testFilesUsedWithDestAsAJSFile: {
+                test: true,
+                files: [{ src: ['test/multifile/a/**/*.ts'], dest: 'test/multifile/a/testDest.js' }],
+                options: {
+                    fast: 'never'
+                }
+            },
             abtest: {
                 test: true,
                 src: ['test/abtest/**/*.ts'],

@@ -180,7 +180,10 @@ export function compileAllFiles(targetFiles: string[], target: ITargetOptions, t
     // Target options:
     if (target.out) {
         args.push('--out', target.out);
+    } else if (target.dest) {
+        args.push('--out', target.dest);
     }
+
     if (target.outDir) {
         if (target.out) {
             console.warn('WARNING: Option "out" and "outDir" should not be used together'.magenta);
