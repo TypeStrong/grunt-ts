@@ -193,6 +193,11 @@ export function compileAllFiles(targetFiles: string[], target: ITargetOptions, t
         if (utils.isJavaScriptFile(target.dest)) {
             args.push('--out', target.dest);
         } else {
+            if (target.dest === 'src') {
+                console.warn(('WARNING: Destination for target "' + targetName + '" is "src", which is the default.  If you have' +
+                    ' forgotten to specify a "dest" parameter, please add it.  If this is correct, you may wish' +
+                    ' to change the "dest" parameter to "src/" or just ignore this warning.').magenta);
+            }
             args.push('--outDir', target.dest);
         }
     }

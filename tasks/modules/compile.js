@@ -1,4 +1,4 @@
-/// <reference path="../../defs/tsd.d.ts"/>
+﻿/// <reference path="../../defs/tsd.d.ts"/>
 /// <reference path="./interfaces.d.ts"/>
 var path = require('path');
 var fs = require('fs');
@@ -181,6 +181,9 @@ function compileAllFiles(targetFiles, target, task, targetName) {
         if (utils.isJavaScriptFile(target.dest)) {
             args.push('--out', target.dest);
         } else {
+            if (target.dest === 'src') {
+                console.warn(('WARNING: Destination for target "' + targetName + '" is "src", which is the default.  If you have' + ' forgotten to specify a "dest" parameter, please add it.  If this is correct, you may wish' + ' to change the "dest" parameter to "src/" or just ignore this warning.').magenta);
+            }
             args.push('--outDir', target.dest);
         }
     }

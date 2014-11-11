@@ -178,6 +178,23 @@ module.exports = function (grunt) {
                     fast: 'never'
                 }
             },
+            files_testWarnIfFilesIsAnObjectWithSrcOnly: {
+                test: true,
+                files: { src: ['test/multifile/a/**/*.ts']},
+                options: {
+                    fast: 'never'
+                }
+            },
+            files_testFilesObjectFormatWorks: {
+                test: true,
+                files: {
+                    'test/multifile/a.js': ['test/multifile/a/**/*.ts'],
+                    'test/multifile/b.js': ['test/multifile/b/**/*.ts']
+                },
+                options: {
+                    fast: 'never'
+                }
+            },
             abtest: {
                 test: true,
                 src: ['test/abtest/**/*.ts'],
