@@ -144,16 +144,18 @@ function pluginFn(grunt: IGrunt) {
             options.fast = 'never';
         }
 
-        if (rawTargetConfig.files && rawTargetConfig.src) {
-            grunt.log.writeln(('Warning: In task "' + currenttask.target + '", either "files" or "src" should be used - not both.').magenta);
-        }
+        if (rawTargetConfig.files) {
+            if (rawTargetConfig.src) {
+                grunt.log.writeln(('Warning: In task "' + currenttask.target + '", either "files" or "src" should be used - not both.').magenta);
+            }
 
-        if (rawTargetConfig.files && rawTargetConfig.out) {
-            grunt.log.writeln(('Warning: In task "' + currenttask.target + '", either "files" or "out" should be used - not both.').magenta);
-        }
+            if (rawTargetConfig.out) {
+                grunt.log.writeln(('Warning: In task "' + currenttask.target + '", either "files" or "out" should be used - not both.').magenta);
+            }
 
-        if (rawTargetConfig.files && rawTargetConfig.outDir) {
-            grunt.log.writeln(('Warning: In task "' + currenttask.target + '", either "files" or "outDir" should be used - not both.').magenta);
+            if (rawTargetConfig.outDir) {
+                grunt.log.writeln(('Warning: In task "' + currenttask.target + '", either "files" or "outDir" should be used - not both.').magenta);
+            }
         }
 
         if (!options.htmlModuleTemplate) {
@@ -221,7 +223,6 @@ function pluginFn(grunt: IGrunt) {
 
             // Create an output file?
             var out = getTargetOutOrElseTryTargetDest(target);
-
 
             var outFile;
             var outFile_d_ts;
@@ -365,14 +366,20 @@ function pluginFn(grunt: IGrunt) {
             // Then calls the appropriate functions + compile function on those files
             function filterFilesAndCompile(): Promise<boolean> {
 
-                var filesToCompile: string[];
+                var filesToCompile: string[] = [];
 
                 if (currenttask.data.src) {
                     // Reexpand the original file glob
                     filesToCompile = grunt.file.expand(currenttask.data.src);
                 } else {
-                    filesToCompile = grunt.file.expand(currenttask.data.files[filesCompilationIndex].src);
-                    filesCompilationIndex += 1;
+                    if (Array.isArray(currenttask.data.files)) {
+                        filesToCompile = grunt.file.expand(currenttask.data.files[filesCompilationIndex].src);
+                        filesCompilationIndex += 1;
+                    } else if (currenttask.data.files[target.dest]) {
+                        filesToCompile = grunt.file.expand(currenttask.data.files[target.dest]);
+                    } else {
+                        filesToCompile = grunt.file.expand([(<{src: string}><any>currenttask.data.files).src]);
+                    }
                 }
 
                 // ignore directories, and clear the files of output.d.ts and baseDirFile
