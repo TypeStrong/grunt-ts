@@ -158,7 +158,8 @@ function pluginFn(grunt: IGrunt) {
             }
         } else {
             if (!rawTargetConfig.src) {
-                grunt.log.writeln(('Warning: In task "' + currenttask.target + '", neither "files" nor "src" is used.  Nothing will be compiled.').magenta);
+                grunt.log.writeln(('Warning: In task "' + currenttask.target +
+                    '", neither "files" nor "src" is used.  Nothing will be compiled.').magenta);
             }
         }
 
