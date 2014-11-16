@@ -72,7 +72,10 @@ export function endsWith(str: string, suffix: string): boolean {
 }
 
 export function isJavaScriptFile(filePath: string): boolean {
-    return this.endsWith(filePath.toLowerCase(), '.js');
+    if (filePath.toLowerCase) {
+        return this.endsWith(filePath.toLowerCase(), '.js');
+    }
+    return false;
 }
 
 /** function for formatting strings 

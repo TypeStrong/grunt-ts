@@ -1,4 +1,4 @@
-﻿/// <reference path="../../defs/tsd.d.ts"/>
+/// <reference path="../../defs/tsd.d.ts"/>
 var path = require('path');
 var fs = require('fs');
 var util = require('util');
@@ -72,7 +72,10 @@ function endsWith(str, suffix) {
 exports.endsWith = endsWith;
 
 function isJavaScriptFile(filePath) {
-    return this.endsWith(filePath.toLowerCase(), '.js');
+    if (filePath.toLowerCase) {
+        return this.endsWith(filePath.toLowerCase(), '.js');
+    }
+    return false;
 }
 exports.isJavaScriptFile = isJavaScriptFile;
 
