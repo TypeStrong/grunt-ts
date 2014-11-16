@@ -1,4 +1,4 @@
-﻿/// <reference path="../../defs/tsd.d.ts"/>
+/// <reference path="../../defs/tsd.d.ts"/>
 /// <reference path="./interfaces.d.ts"/>
 var path = require('path');
 var fs = require('fs');
@@ -184,7 +184,16 @@ function compileAllFiles(targetFiles, target, task, targetName) {
             if (target.dest === 'src') {
                 console.warn(('WARNING: Destination for target "' + targetName + '" is "src", which is the default.  If you have' + ' forgotten to specify a "dest" parameter, please add it.  If this is correct, you may wish' + ' to change the "dest" parameter to "src/" or just ignore this warning.').magenta);
             }
-            args.push('--outDir', target.dest);
+            if (Array.isArray(target.dest)) {
+                if (target.dest.length === 0) {
+                    // ignore it and do nothing.
+                } else if (target.dest.length > 0) {
+                    console.warn((('WARNING: "dest" for target "' + targetName + '" is an array.  This is not supported by the' + ' TypeScript compiler or grunt-ts.' + ((target.dest.length > 1) ? '  Only the first "dest" will be used.  The' + ' remaining items will be truncated.' : ''))).magenta);
+                    args.push('--outDir', target.dest[0]);
+                }
+            } else {
+                args.push('--outDir', target.dest);
+            }
         }
     }
 

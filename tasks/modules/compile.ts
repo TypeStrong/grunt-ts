@@ -198,7 +198,19 @@ export function compileAllFiles(targetFiles: string[], target: ITargetOptions, t
                     ' forgotten to specify a "dest" parameter, please add it.  If this is correct, you may wish' +
                     ' to change the "dest" parameter to "src/" or just ignore this warning.').magenta);
             }
-            args.push('--outDir', target.dest);
+            if (Array.isArray(target.dest)) {
+                if ((<string[]><any>target.dest).length === 0) {
+                    // ignore it and do nothing.
+                } else if ((<string[]><any>target.dest).length > 0) {
+                    console.warn((('WARNING: "dest" for target "' + targetName + '" is an array.  This is not supported by the' +
+                        ' TypeScript compiler or grunt-ts.' +
+                        (((<string[]><any>target.dest).length > 1) ? '  Only the first "dest" will be used.  The' +
+                        ' remaining items will be truncated.' : ''))).magenta);
+                    args.push('--outDir', (<string[]><any>target.dest)[0]);
+                }
+            } else {
+                args.push('--outDir', target.dest);
+            }
         }
     }
 

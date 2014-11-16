@@ -197,8 +197,16 @@ function pluginFn(grunt) {
             function getTargetOutOrElseTryTargetDest(target) {
                 var o = target.out;
                 if (!o) {
-                    if (target.dest && utils.isJavaScriptFile(target.dest)) {
-                        o = target.dest;
+                    if (target.dest) {
+                        if (Array.isArray(target.dest)) {
+                            if (target.dest.length > 0) {
+                                // A dest array is meaningless in TypeScript, so just take
+                                // the first one.
+                                return target.dest[0];
+                            }
+                        } else if (utils.isJavaScriptFile(target.dest)) {
+                            o = target.dest;
+                        }
                     }
                 }
                 return o;
