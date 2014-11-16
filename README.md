@@ -382,6 +382,8 @@ Examples of using the target `files` property with grunt-ts.  Both should produc
 grunt.initConfig({
     ts: {
         compileTwoSetsOfFilesUsingArrayStyle: {
+            // This will run tsc twice.  The first time, the result of the 'files1/**/*.ts' glob will be
+            // passed to tsc with the --out switch as 'out/ArrayStyle/1.js'.
             // see https://github.com/gruntjs/grunt-docs/blob/master/Configuring-tasks.md#files-array-format
             files: [{ src: ['files1/**/*.ts'], dest: 'out/ArrayStyle/1.js' },
                     { src: ['files2/**/*.ts'], dest: 'out/ArrayStyle/2.js' }],
@@ -389,10 +391,35 @@ grunt.initConfig({
                 fast: 'never'
             }
         },
+        compileTwoSetsOfFilesToDirUsingArrayStyle: {
+            // This will run tsc twice.  The first time, the result of the 'files1/**/*.ts' glob will be
+            // passed to tsc with the --outDir switch as 'out/ArrayStyle'.
+            // see https://github.com/gruntjs/grunt-docs/blob/master/Configuring-tasks.md#files-array-format
+            files: [{ src: ['files1/**/*.ts'], dest: 'out/ArrayStyle' },
+                    { src: ['files2/**/*.ts'], dest: 'out/ArrayStyle' }],
+            options: {
+                fast: 'never'
+            }
+        },
         compileTwoSetsOfFilesUsingObjectStyle: {
+            // This will run tsc twice.  The first time, the result of the 'files1/**/*.ts' glob will be
+            // passed to tsc with the --out switch as 'out/ObjectStyle/1.js'.
             // see https://github.com/gruntjs/grunt-docs/blob/master/Configuring-tasks.md#files-object-format
-            files: { 'out/ObjectStyle/1.js' : ['files1/**/*.ts'],
-                     'out/ObjectStyle/2.js' : ['files2/**/*.ts'] },
+            files: {
+                'out/ObjectStyle/1.js': ['files1/**/*.ts'],
+                'out/ObjectStyle/2.js': ['files2/**/*.ts']
+            },
+            options: {
+                fast: 'never'
+            }
+        },
+        compileTwoSetsOfFilesToDirUsingObjectStyle: {
+            // This will run tsc once.  The result of the globs will be passed to tsc with the
+            // --outDir switch as 'out/ObjectStyle'.
+            // see https://github.com/gruntjs/grunt-docs/blob/master/Configuring-tasks.md#files-object-format
+            files: {
+                'out/ObjectStyle': ['files1/**/*.ts','files2/**/*.ts']
+            },
             options: {
                 fast: 'never'
             }
