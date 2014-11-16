@@ -375,7 +375,7 @@ Notes:
  * If the `dest` parameter ends with ".js", the value will be passed to the `--out` parameter of the TypeScript compiler.  Otherwise, if there is a non-blank value, it will be passed to the `--outDir` parameter.
  * If you intend to pass the specific value "src" to the TypeScript `--outDir` parameter, specify it as "src/" in the dest parameter to avoid grunt-ts warnings.
 
-Examples of using the target `files` property with grunt-ts.  Both should produce the same result other than the subfolder from `out/`:
+Here are some examples of using the target `files` property with grunt-ts:
 
 ````js
 
