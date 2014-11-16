@@ -11,6 +11,12 @@ module.exports = function (grunt) {
                 '.tscache/**/*',
                 '!test/test.js',
                 '!test/expected/**/*'
+            ],
+            testPost: [
+                'src/a.js',
+                'src/b.js',
+                'src/c.js',
+                'src/reference.js'
             ]
         },
         jshint: {
@@ -174,6 +180,13 @@ module.exports = function (grunt) {
             files_testFilesWithMissingDest: {
                 test: true,
                 files: [{ src: ['test/multifile/a/**/*.ts']}],
+                options: {
+                    fast: 'never'
+                }
+            },
+            files_testWarnIfFilesHasDestArray: {
+                test: true,
+                files: [{ src: ['test/multifile/a/**/*.ts'], dest: ['test/multifile/a', 'test/multifile/b'] }],
                 options: {
                     fast: 'never'
                 }
@@ -411,12 +424,12 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-debug-task');
 
     // Build
-    grunt.registerTask('prep', ['clean', 'jshint:support']);
+    grunt.registerTask('prep', ['clean:test', 'jshint:support']);
     grunt.registerTask('build', ['prep', 'ts-internal', 'tslint:source']);
 
     // Test
     grunt.registerTask('fail', ['continueOn', 'test_fail', 'continueOff']);
-    grunt.registerTask('test', ['test_all', 'fail', 'nodeunit']);
+    grunt.registerTask('test', ['test_all', 'fail', 'nodeunit', 'clean:testPost']);
 
     // Release
     grunt.registerTask('release', ['build', 'test']);
