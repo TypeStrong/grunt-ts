@@ -236,6 +236,11 @@ module.exports = function (grunt) {
                     removeComments: false,
                 },
             },
+            htmlSpecifiedButNoTypeScriptSource_ShouldWarn: {
+                test: true,
+                html: ['test/html/**/*.tpl.html'],
+                out: 'test/html/out.js',
+            },
             htmltest: {
                 test: true,
                 src: ['test/html/**/*.ts'],

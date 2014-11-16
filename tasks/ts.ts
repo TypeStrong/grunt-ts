@@ -156,7 +156,13 @@ function pluginFn(grunt: IGrunt) {
             if (rawTargetConfig.outDir) {
                 grunt.log.writeln(('Warning: In task "' + currenttask.target + '", either "files" or "outDir" should be used - not both.').magenta);
             }
+        } else {
+            if (!rawTargetConfig.src) {
+                grunt.log.writeln(('Warning: In task "' + currenttask.target + '", neither "files" nor "src" is used.  Nothing will be compiled.').magenta);
+            }
         }
+
+
 
         if (!options.htmlModuleTemplate) {
             // use default value
