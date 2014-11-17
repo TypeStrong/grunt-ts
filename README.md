@@ -44,7 +44,7 @@ Objective : To allow easier code refactoring by taking the relative path maintai
 
 Transforms begin with a three-slash comment `///` and are prefixed with `ts:`
 
-You can also run transforms without compiling your code b ysetting `compile: false` in your config. For example:
+You can also run transforms without compiling your code by setting `compile: false` in your config. For example:
 ```javascript
 grunt.initConfig({
    ts: {
@@ -364,6 +364,71 @@ Grunt-ts supports the Grunt convention of having [multiple configuration targets
 ### Awesome file globs
 
 For advanced use-cases there is support for [Grunt's selection options](http://gruntjs.com/configuring-tasks#files), such as using globbing or using a callback to filter paths.
+
+### Use of the files target attribute
+
+As an alternative to the TypeScript-centric use of `src` and `out`/`outDir`, grunt-ts now also supports use of the standard `files` property on a target.
+
+Notes:
+ * The the `fast` grunt-ts option is not supported in this configuration. You should specify `fast: 'never'` to avoid warnings when `files` is used.
+ * It is not supported to specify an array of values for `dest` with grunt-ts.  A warning will be issued to the log.  If a non-empty array is passed, the first element will be used and the rest will be truncated.
+ * If the `dest` parameter ends with ".js", the value will be passed to the `--out` parameter of the TypeScript compiler.  Otherwise, if there is a non-blank value, it will be passed to the `--outDir` parameter.
+ * If you intend to pass the specific value "src" to the TypeScript `--outDir` parameter, specify it as "src/" in the dest parameter to avoid grunt-ts warnings.
+
+Here are some examples of using the target `files` property with grunt-ts:
+
+````js
+
+grunt.initConfig({
+    ts: {
+        compileTwoSetsOfFilesUsingArrayStyle: {
+            // This will run tsc twice.  The first time, the result of the 'files1/**/*.ts' glob will be
+            // passed to tsc with the --out switch as 'out/ArrayStyle/1.js'.
+            // see https://github.com/gruntjs/grunt-docs/blob/master/Configuring-tasks.md#files-array-format
+            files: [{ src: ['files1/**/*.ts'], dest: 'out/ArrayStyle/1.js' },
+                    { src: ['files2/**/*.ts'], dest: 'out/ArrayStyle/2.js' }],
+            options: {
+                fast: 'never'
+            }
+        },
+        compileTwoSetsOfFilesToDirUsingArrayStyle: {
+            // This will run tsc twice.  The first time, the result of the 'files1/**/*.ts' glob will be
+            // passed to tsc with the --outDir switch as 'out/ArrayStyle'.
+            // see https://github.com/gruntjs/grunt-docs/blob/master/Configuring-tasks.md#files-array-format
+            files: [{ src: ['files1/**/*.ts'], dest: 'out/ArrayStyle' },
+                    { src: ['files2/**/*.ts'], dest: 'out/ArrayStyle' }],
+            options: {
+                fast: 'never'
+            }
+        },
+        compileTwoSetsOfFilesUsingObjectStyle: {
+            // This will run tsc twice.  The first time, the result of the 'files1/**/*.ts' glob will be
+            // passed to tsc with the --out switch as 'out/ObjectStyle/1.js'.
+            // see https://github.com/gruntjs/grunt-docs/blob/master/Configuring-tasks.md#files-object-format
+            files: {
+                'out/ObjectStyle/1.js': ['files1/**/*.ts'],
+                'out/ObjectStyle/2.js': ['files2/**/*.ts']
+            },
+            options: {
+                fast: 'never'
+            }
+        },
+        compileTwoSetsOfFilesToDirUsingObjectStyle: {
+            // This will run tsc once.  The result of the globs will be passed to tsc with the
+            // --outDir switch as 'out/ObjectStyle'.
+            // see https://github.com/gruntjs/grunt-docs/blob/master/Configuring-tasks.md#files-object-format
+            files: {
+                'out/ObjectStyle': ['files1/**/*.ts','files2/**/*.ts']
+            },
+            options: {
+                fast: 'never'
+            }
+        }
+    }
+});
+
+
+````
 
 ## Contributing
 

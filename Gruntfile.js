@@ -11,6 +11,12 @@ module.exports = function (grunt) {
                 '.tscache/**/*',
                 '!test/test.js',
                 '!test/expected/**/*'
+            ],
+            testPost: [
+                'src/a.js',
+                'src/b.js',
+                'src/c.js',
+                'src/reference.js'
             ]
         },
         jshint: {
@@ -92,6 +98,116 @@ module.exports = function (grunt) {
                 src: ['test/simple/ts/zoo.ts'],
                 outDir: 'test/simple/js/',
             },
+            multifiletest: {
+                test: true,
+                files: [{ src: ['test/multifile/a/**/*.ts'], dest: 'test/multifile/a/out.js' },
+                    { src: ['test/multifile/b/**/*.ts'], dest: 'test/multifile/b/out.js' }],
+                options: {
+                    fast: 'never'
+                }
+            },
+            files_testsingle: {
+                test: true,
+                files: [{ src: ['test/multifile/a/**/*.ts'], dest: 'test/multifile/a/out.js' }],
+                options: {
+                    fast: 'never'
+                }
+            },
+            files_testempty: {
+                test: true,
+                files: [],
+                options: {
+                    fast: 'never'
+                }
+            },
+            files_testMissing: {
+                test: true,
+                files: [{
+                    src: ['test/THIS_FOLDER_DOES_NOT_EXIST/**/*.ts'],
+                    dest: 'test/THIS_FOLDER_DOES_NOT_EXIST/out.js'
+                }],
+                options: {
+                    fast: 'never'
+                }
+            },
+            files_showWarningIfFilesIsUsedWithSrcOrOut: {
+                test: true,
+                files: [{ src: ['test/multifile/a/**/*.ts'], dest: 'test/multifile/a/out.js' }],
+                src: ['test/multifile/b/**/*.ts'],
+                out: 'test/multifile/a/out.js',
+                options: {
+                    fast: 'never'
+                }
+            },
+            files_showWarningIfFilesIsUsedWithSrcOrOutDir: {
+                test: true,
+                files: [{ src: ['test/multifile/a/**/*.ts'], dest: 'test/multifile/a' }],
+                src: ['test/multifile/b/**/*.ts'],
+                outDir: 'test/multifile/a',
+                options: {
+                    fast: 'never'
+                }
+            },
+            files_showWarningIfFilesIsUsedWithWatch: {
+                //note this should not actually watch.
+                files: [{ src: ['test/multifile/a/**/*.ts'], dest: 'test/multifile/a' }],
+                watch: ['test/multifile/a/**/*.ts'],
+                options: {
+                    fast: 'never'
+                }
+            },
+            files_showWarningIfFilesIsUsedWithFast: {
+                test: true,
+                files: [{ src: ['test/multifile/a/**/*.ts'], dest: 'test/multifile/a' }],
+                options: {
+                    fast: 'always'
+                }
+            },
+            files_testFilesUsedWithDestAsAJSFile: {
+                test: true,
+                files: [{ src: ['test/multifile/a/**/*.ts'], dest: 'test/multifile/a/testDest.js' }],
+                options: {
+                    fast: 'never'
+                }
+            },
+            files_testFilesUsedWithDestAsAFolder: {
+                test: true,
+                files: [{ src: ['test/multifile/a/**/*.ts'], dest: 'test/multifile/a' }],
+                options: {
+                    fast: 'never'
+                }
+            },
+            files_testFilesWithMissingDest: {
+                test: true,
+                files: [{ src: ['test/multifile/a/**/*.ts']}],
+                options: {
+                    fast: 'never'
+                }
+            },
+            files_testWarnIfFilesHasDestArray: {
+                test: true,
+                files: [{ src: ['test/multifile/a/**/*.ts'], dest: ['test/multifile/a', 'test/multifile/b'] }],
+                options: {
+                    fast: 'never'
+                }
+            },
+            files_testWarnIfFilesIsAnObjectWithSrcOnly: {
+                test: true,
+                files: { src: ['test/multifile/a/**/*.ts']},
+                options: {
+                    fast: 'never'
+                }
+            },
+            files_testFilesObjectFormatWorks: {
+                test: true,
+                files: {
+                    'test/multifile/a.js': ['test/multifile/a/**/*.ts'],
+                    'test/multifile/b.js': ['test/multifile/b/**/*.ts']
+                },
+                options: {
+                    fast: 'never'
+                }
+            },
             abtest: {
                 test: true,
                 src: ['test/abtest/**/*.ts'],
@@ -132,6 +248,11 @@ module.exports = function (grunt) {
                     comments: true,
                     removeComments: false,
                 },
+            },
+            htmlSpecifiedButNoTypeScriptSource_ShouldWarn: {
+                test: true,
+                html: ['test/html/**/*.tpl.html'],
+                out: 'test/html/out.js',
             },
             htmltest: {
                 test: true,
@@ -210,6 +331,20 @@ module.exports = function (grunt) {
                     sourcemap: false
                 }
             },
+            files_testfailedcompilation: {
+                fail: true,                  // a designed to fail target
+                files: [{
+                    src: ['test/files_testfailedcompilation/a/**/*.ts'],
+                    dest: 'test/files_testfailedcompilation/a/out.js'
+                },
+                {
+                    src: ['test/files_testfailedcompilation/b/**/*.ts'],
+                    dest: 'test/files_testfailedcompilation/b/out.js'
+                }],
+                options: {
+                    fast: 'never'
+                }
+            }
         }
     });
 
@@ -289,12 +424,12 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-debug-task');
 
     // Build
-    grunt.registerTask('prep', ['clean', 'jshint:support']);
+    grunt.registerTask('prep', ['clean:test', 'jshint:support']);
     grunt.registerTask('build', ['prep', 'ts-internal', 'tslint:source']);
 
     // Test
     grunt.registerTask('fail', ['continueOn', 'test_fail', 'continueOff']);
-    grunt.registerTask('test', ['test_all', 'fail', 'nodeunit']);
+    grunt.registerTask('test', ['test_all', 'fail', 'nodeunit', 'clean:testPost']);
 
     // Release
     grunt.registerTask('release', ['build', 'test']);

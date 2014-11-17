@@ -181,12 +181,39 @@ export function compileAllFiles(targetFiles: string[], target: ITargetOptions, t
     if (target.out) {
         args.push('--out', target.out);
     }
+
     if (target.outDir) {
         if (target.out) {
             console.warn('WARNING: Option "out" and "outDir" should not be used together'.magenta);
         }
         args.push('--outDir', target.outDir);
     }
+
+    if (target.dest && (!target.out) && (!target.outDir)) {
+        if (utils.isJavaScriptFile(target.dest)) {
+            args.push('--out', target.dest);
+        } else {
+            if (target.dest === 'src') {
+                console.warn(('WARNING: Destination for target "' + targetName + '" is "src", which is the default.  If you have' +
+                    ' forgotten to specify a "dest" parameter, please add it.  If this is correct, you may wish' +
+                    ' to change the "dest" parameter to "src/" or just ignore this warning.').magenta);
+            }
+            if (Array.isArray(target.dest)) {
+                if ((<string[]><any>target.dest).length === 0) {
+                    // ignore it and do nothing.
+                } else if ((<string[]><any>target.dest).length > 0) {
+                    console.warn((('WARNING: "dest" for target "' + targetName + '" is an array.  This is not supported by the' +
+                        ' TypeScript compiler or grunt-ts.' +
+                        (((<string[]><any>target.dest).length > 1) ? '  Only the first "dest" will be used.  The' +
+                        ' remaining items will be truncated.' : ''))).magenta);
+                    args.push('--outDir', (<string[]><any>target.dest)[0]);
+                }
+            } else {
+                args.push('--outDir', target.dest);
+            }
+        }
+    }
+
     if (task.sourceRoot) {
         args.push('--sourceRoot', task.sourceRoot);
     }

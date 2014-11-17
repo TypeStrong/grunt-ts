@@ -71,6 +71,14 @@ function endsWith(str, suffix) {
 }
 exports.endsWith = endsWith;
 
+function isJavaScriptFile(filePath) {
+    if (filePath.toLowerCase) {
+        return this.endsWith(filePath.toLowerCase(), '.js');
+    }
+    return false;
+}
+exports.isJavaScriptFile = isJavaScriptFile;
+
 /** function for formatting strings
 * ('{0} says {1}','la','ba' ) => 'la says ba'
 */

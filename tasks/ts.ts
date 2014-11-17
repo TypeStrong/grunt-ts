@@ -89,6 +89,9 @@ function pluginFn(grunt: IGrunt) {
 
         var watch;
 
+        // tracks which index in the task "files" property is next for processing
+        var filesCompilationIndex = 0;
+
         // setup default options
         var options = currenttask.options<ITaskOptions>({
             allowBool: false,
@@ -114,6 +117,7 @@ function pluginFn(grunt: IGrunt) {
 
         // get unprocessed templates from configuration
         var rawTaskOptions = <ITaskOptions>(grunt.config.getRaw(currenttask.name + '.options') || {});
+        var rawTargetConfig = <ITargetOptions>(grunt.config.getRaw(currenttask.name + '.' + currenttask.target) || {});
         var rawTargetOptions = <ITaskOptions>(grunt.config.getRaw(currenttask.name + '.' + currenttask.target + '.options') || {});
 
         options.htmlModuleTemplate = rawTargetOptions.htmlModuleTemplate || rawTaskOptions.htmlModuleTemplate;
@@ -127,8 +131,39 @@ function pluginFn(grunt: IGrunt) {
         // Warn the user of invalid values
         if (options.fast !== 'watch' && options.fast !== 'always' && options.fast !== 'never') {
             console.warn(('"fast" needs to be one of : "watch" (default) | "always" | "never" but you provided: ' + options.fast).magenta);
-            options.fast = 'watch';
+            if (currenttask.files) {
+                options.fast = 'never';  // to keep things simple, we are not supporting fast with files.
+            } else {
+                options.fast = 'watch';
+            }
         }
+
+        if ((options.fast === 'watch' || options.fast === 'always') && rawTargetConfig.files) {
+            grunt.log.writeln(('Warning: Task "' + currenttask.target +
+                '" is attempting to use fast compilation with "files".  This is not currently supported.  Setting "fast" to "never".').magenta);
+            options.fast = 'never';
+        }
+
+        if (rawTargetConfig.files) {
+            if (rawTargetConfig.src) {
+                grunt.log.writeln(('Warning: In task "' + currenttask.target + '", either "files" or "src" should be used - not both.').magenta);
+            }
+
+            if (rawTargetConfig.out) {
+                grunt.log.writeln(('Warning: In task "' + currenttask.target + '", either "files" or "out" should be used - not both.').magenta);
+            }
+
+            if (rawTargetConfig.outDir) {
+                grunt.log.writeln(('Warning: In task "' + currenttask.target + '", either "files" or "outDir" should be used - not both.').magenta);
+            }
+        } else {
+            if (!rawTargetConfig.src) {
+                grunt.log.writeln(('Warning: In task "' + currenttask.target +
+                    '", neither "files" nor "src" is used.  Nothing will be compiled.').magenta);
+            }
+        }
+
+
 
         if (!options.htmlModuleTemplate) {
             // use default value
@@ -183,8 +218,27 @@ function pluginFn(grunt: IGrunt) {
                 return path.resolve(filename) === referenceFile;
             }
 
+            function getTargetOutOrElseTryTargetDest(target: ITargetOptions) {
+                var o = target.out;
+                if (!o) {
+                    if (target.dest) {
+                        if (Array.isArray(target.dest)) {
+                            if ((<string[]><any>target.dest).length > 0) {
+                                // A dest array is meaningless in TypeScript, so just take
+                                // the first one.
+                                return (<string[]><any>target.dest)[0];
+                            }
+                        } else if (utils.isJavaScriptFile(target.dest)) {
+                            o = target.dest;
+                        }
+                    }
+                }
+                return o;
+            }
+
             // Create an output file?
-            var out = target.out;
+            var out = getTargetOutOrElseTryTargetDest(target);
+
             var outFile;
             var outFile_d_ts;
             if (!!out) {
@@ -327,13 +381,26 @@ function pluginFn(grunt: IGrunt) {
             // Then calls the appropriate functions + compile function on those files
             function filterFilesAndCompile(): Promise<boolean> {
 
-                // Reexpand the original file glob
-                var files = grunt.file.expand(currenttask.data.src);
+                var filesToCompile: string[] = [];
+
+                if (currenttask.data.src) {
+                    // Reexpand the original file glob
+                    filesToCompile = grunt.file.expand(currenttask.data.src);
+                } else {
+                    if (Array.isArray(currenttask.data.files)) {
+                        filesToCompile = grunt.file.expand(currenttask.data.files[filesCompilationIndex].src);
+                        filesCompilationIndex += 1;
+                    } else if (currenttask.data.files[target.dest]) {
+                        filesToCompile = grunt.file.expand(currenttask.data.files[target.dest]);
+                    } else {
+                        filesToCompile = grunt.file.expand([(<{src: string}><any>currenttask.data.files).src]);
+                    }
+                }
 
                 // ignore directories, and clear the files of output.d.ts and baseDirFile
-                files = files.filter(function (file) {
+                filesToCompile = filesToCompile.filter(function (file) {
                     var stats = fs.lstatSync(file);
-                   return !stats.isDirectory() && !isOutFile(file) && !isBaseDirFile(file, files);
+                   return !stats.isDirectory() && !isOutFile(file) && !isBaseDirFile(file, filesToCompile);
                 });
 
                 ///// Html files:
@@ -371,7 +438,7 @@ function pluginFn(grunt: IGrunt) {
                 if (!!referencePath) {
                     var result = timeIt(() => {
                         return referenceModule.updateReferenceFile(
-                           files.filter( f => !isReferenceFile(f) ), generatedFiles, referenceFile, referencePath);
+                           filesToCompile.filter( f => !isReferenceFile(f) ), generatedFiles, referenceFile, referencePath);
                     });
                     if (result.it === true) {
                         grunt.log.writeln(('Updated reference file (' + result.time + 'ms).').green);
@@ -387,13 +454,13 @@ function pluginFn(grunt: IGrunt) {
                 }
 
                 // Transform files as needed. Currently all of this logic in is one module
-                transformers.transformFiles(files/*TODO: only unchanged files*/, files, target, options);
+                transformers.transformFiles(filesToCompile/*TODO: only unchanged files*/, filesToCompile, target, options);
 
                 // Return promise to compliation
                 if (options.compile) {
                     // Compile, if there are any files to compile!
-                    if (files.length > 0) {
-                        return runCompilation(files, target, options).then((success: boolean) => {
+                    if (filesToCompile.length > 0) {
+                        return runCompilation(filesToCompile, target, options).then((success: boolean) => {
                             return success;
                         });
                     }
@@ -409,6 +476,12 @@ function pluginFn(grunt: IGrunt) {
 
             // Time (in ms) when last compile took place
             var lastCompile = 0;
+
+            if (rawTargetConfig.files && rawTargetConfig.watch) {
+                grunt.log.writeln(('WARNING: Use of "files" with "watch" in target ' + currenttask.target +
+                    ' is not supported in grunt-ts.  The "watch" will be ignored.  Use "src", or use grunt-contrib-watch' +
+                    ' if you really do need to use "files".').magenta);
+            }
 
             // Watch a folder?
             watch = target.watch;
