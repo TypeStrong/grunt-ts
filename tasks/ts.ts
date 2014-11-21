@@ -297,6 +297,11 @@ function pluginFn(grunt: IGrunt) {
                             return false;
                         }
 
+                        if (result.code === 8) {
+                            grunt.log.error('Error: Node was unable to run tsc.  Possibly it could not be found?'.red);
+                            return false;
+                        }
+
                         var isError = (result.code === 1);
 
                         // If the compilation errors contain only type errors, JS files are still
