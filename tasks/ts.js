@@ -98,7 +98,8 @@ function pluginFn(grunt) {
             compiler: '',
             htmlModuleTemplate: '<%= filename %>',
             htmlVarTemplate: '<%= ext %>',
-            failOnTypeErrors: true
+            failOnTypeErrors: true,
+            strictMode: false
         });
 
         // get unprocessed templates from configuration
@@ -303,7 +304,7 @@ function pluginFn(grunt) {
 
                     // Log error summary
                     if (level1ErrorCount + level5ErrorCount + nonEmitPreventingWarningCount > 0) {
-                        if (level1ErrorCount + level5ErrorCount > 0) {
+                        if (level1ErrorCount + level5ErrorCount > 0 || options.strictMode) {
                             grunt.log.write(('>> ').red);
                         } else {
                             grunt.log.write(('>> ').green);
@@ -321,9 +322,14 @@ function pluginFn(grunt) {
 
                         grunt.log.writeln('');
 
-                        if (isOnlyTypeErrors) {
+                        if (isOnlyTypeErrors && !options.strictMode) {
                             grunt.log.write(('>> ').green);
                             grunt.log.writeln('Type errors only.');
+                        }
+
+                        if (options.strictMode && nonEmitPreventingWarningCount > 0) {
+                            isError = true;
+                            isOnlyTypeErrors = false;
                         }
                     }
 
