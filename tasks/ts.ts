@@ -113,6 +113,7 @@ function pluginFn(grunt: IGrunt) {
             htmlModuleTemplate: '<%= filename %>',
             htmlVarTemplate: '<%= ext %>',
             failOnTypeErrors: true,
+            strictMode: false,
         });
 
         // get unprocessed templates from configuration
@@ -328,7 +329,7 @@ function pluginFn(grunt: IGrunt) {
 
                         // Log error summary
                         if (level1ErrorCount + level5ErrorCount + nonEmitPreventingWarningCount > 0) {
-                          if (level1ErrorCount + level5ErrorCount > 0) {
+                          if (level1ErrorCount + level5ErrorCount > 0 || options.strictMode) {
                             grunt.log.write(('>> ').red);
                           } else {
                             grunt.log.write(('>> ').green);
@@ -350,9 +351,14 @@ function pluginFn(grunt: IGrunt) {
 
                           grunt.log.writeln('');
 
-                          if (isOnlyTypeErrors) {
+                          if (isOnlyTypeErrors && !options.strictMode) {
                             grunt.log.write(('>> ').green);
                             grunt.log.writeln('Type errors only.');
+                          }
+
+                          if (options.strictMode && nonEmitPreventingWarningCount > 0) {
+                            isError = true;
+                            isOnlyTypeErrors = false;
                           }
                         }
 
@@ -377,7 +383,7 @@ function pluginFn(grunt: IGrunt) {
                     });
             }
 
-            // Find out which files to compile, codegen etc. 
+            // Find out which files to compile, codegen etc.
             // Then calls the appropriate functions + compile function on those files
             function filterFilesAndCompile(): Promise<boolean> {
 
@@ -446,7 +452,7 @@ function pluginFn(grunt: IGrunt) {
                 }
 
                 ///// AMD loader
-                // Create the amdLoader if specified 
+                // Create the amdLoader if specified
                 if (!!amdloaderPath) {
                     var referenceOrder: amdLoaderModule.IReferences
                         = amdLoaderModule.getReferencesInOrder(referenceFile, referencePath, generatedFiles);
