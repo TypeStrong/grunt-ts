@@ -333,7 +333,9 @@ grunt.initConfig({
 				// true | false (default)
                 declaration: false,
 				// true (default) | false
-                removeComments: true
+                removeComments: true,
+				// true (default) | false
+                failOnTypeErrors: true,
             },
         },
 		// Another target
