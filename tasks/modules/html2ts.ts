@@ -30,7 +30,8 @@ var htmlTemplate = _.template('module <%= modulename %> { export var <%= varname
 
 export interface IHtml2TSOptions {
     moduleFunction: Function;
-    varFunction: Function
+    varFunction: Function;
+    htmlOutDir: string;
 }
 
 // Compile an HTML file to a TS file
@@ -49,8 +50,32 @@ export function compileHTML(filename: string, options: IHtml2TSOptions): string 
     var fileContent = htmlTemplate({ modulename: moduleName, varname: varName, content: htmlContent });
 
     // Write the content to a file
-    var outputfile = filename + '.ts';
+    var outputfile = getOutputFile(filename, options.htmlOutDir);
 
     fs.writeFileSync(outputfile, fileContent);
     return outputfile;
+}
+
+function getOutputFile(filename: string, htmlOutDir: string): string {
+    var outputfile = filename;
+
+    // NOTE If an htmlOutDir was specified
+    if (htmlOutDir !== null) {
+        var dir = getPath(htmlOutDir);
+
+        if (fs.existsSync(dir)) {
+            var unqualifiedFilename = path.basename(filename);
+            outputfile = path.join(dir, unqualifiedFilename);
+        }
+    }
+    return outputfile + '.ts';
+}
+
+function getPath(dir: string): string {
+    // NOTE If we don't have a valid absolute path
+    if (!fs.existsSync(dir)) {
+        // NOTE Try relative from the current working directory
+        dir = path.join(process.cwd(), dir);
+    }
+    return dir;
 }

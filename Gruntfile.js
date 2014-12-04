@@ -261,6 +261,17 @@ module.exports = function (grunt) {
                 reference: 'test/html/reference.ts',
                 out: 'test/html/out.js',
             },
+            htmlWithHtmlOutDirTest: {
+                test: true,
+                src: ['test/htmlOutDir/reference.ts','test/htmlOutDir/src/bar.ts',
+                    'test/htmlOutDir/src/foo.ts',
+                    //NOTE Not strictly necessarily based on the implementation
+                    'test/htmlOutDir/generated/**/*.ts'],
+                html: ['test/htmlOutDir/**/*.tpl.html'],
+                reference: 'test/htmlOutDir/reference.ts',
+                htmlOutDir: 'test/htmlOutDir/generated',
+                out: 'test/htmlOutDir/out.js'
+            },
             definitelyTypedTest: {
                 test: true,
                 src: ['test/definitelytypedtest/**/*.ts'],
