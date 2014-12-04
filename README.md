@@ -295,7 +295,7 @@ grunt.initConfig({
 
 To use another compiler version, download it from the current [TypeScript repository on GitHub](https://github.com/Microsoft/TypeScript/releases) or the old [TypeScript repository on CodePlex](http://typescript.codeplex.com/releases) and extract it to a folder in your project.  The compiler will be in the `bin` folder.  Copy all of the files to your project folder and then reference `tsc` using the `compiler` task option.  For example, if you extracted everything to a `mycompiler` folder in your project, you'd set the grunt-ts `compiler` property to `'./mycompiler/tsc'`.
 
-#### noresolve
+#### noResolve
 
 ````javascript
 true | false (default)
