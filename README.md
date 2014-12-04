@@ -259,6 +259,10 @@ grunt.initConfig({
 
 #### compile
 
+````javascript
+true (default)| false
+````
+
 Indicates if the TypeScript compilation should be attempted.  Turn this off if you wish to just run transforms.
 
 ````javascript
@@ -293,9 +297,17 @@ To use another compiler version, download it from the current [TypeScript reposi
 
 #### noresolve
 
+````javascript
+true | false (default)
+````
+
 *Deprecated:* Grunt-ts supports passing this parameter to legacy versions of `tsc`.  It will pass `--noResolve` on the command line.
 
 #### removeComments
+
+````javascript
+true (default)| false
+````
 
 Removes comments in the emitted JavaScript if set to `true`.  Preserves comments if set to `false`.
 
@@ -311,6 +323,10 @@ grunt.initConfig({
 
 #### declaration
 
+````javascript
+true | false (default)
+````
+
 Generates corresponding .d.ts file(s) for compiled TypeScript files.
 
 ````javascript
@@ -324,6 +340,10 @@ grunt.initConfig({
 ````
 
 #### failOnTypeErrors
+
+````javascript
+true | false (default)
+````
 
 TypeScript has two types of errors: emit preventing and non-emit preventing.  Generally, type errors do not prevent the JavaScript emit.  Therefore, it can be useful to allow the Grunt pipeline to continue even if there are type errors because `tsc` will still generate JavaScript.
 
@@ -340,6 +360,10 @@ grunt.initConfig({
 ````
 
 #### fast
+
+````javascript
+"watch" (default) | "always" | "never"
+````
 
 If you are using *external modules*, grunt-ts will try to do a `fast` compile **by default**, basically only compiling what's changed. It should "just work" with the built-in file watching as well as with external tools like `grunt-contrib-watch`.
 
@@ -415,6 +439,10 @@ grunt.initConfig({
 
 #### module
 
+````javascript
+"amd" (default) | "commonjs" | ""
+````
+
 Specifies if TypeScript should emit AMD or CommonJS-style external modules.  Has no effect if internal modules are used.
 
 ````javascript
@@ -451,6 +479,10 @@ grunt.initConfig({
 
 #### sourceMap
 
+````javascript
+true (default) | false
+````
+
 If true, grunt-ts will instruct `tsc` to emit source maps (`.js.map` files).
 
 ````javascript
@@ -474,7 +506,7 @@ grunt.initConfig({
   ts: {
     default: {
       options: {
-        sourceMap: true
+        sourceRoot: "/dev"
       }
     }
   }
@@ -483,7 +515,11 @@ grunt.initConfig({
 
 #### target
 
-Allows the developer to specify if they are targeting ES3 or ES5.  Only select ES3 if you are targeting old browsers (IE8 or below).
+````javascript
+"es5" (default) | "es3"
+````
+
+Allows the developer to specify if they are targeting ECMAScript version 3 or 5.  Only select ES3 if you are targeting old browsers (IE8 or below).  The default for grunt-ts (es5) is different than the default for `tsc` (es3).
 
 ````javascript
 grunt.initConfig({
@@ -499,7 +535,23 @@ grunt.initConfig({
 
 #### verbose
 
+````javascript
+false (default) | true
+````
+
 Will print the switches passed to `tsc` on the console.  Helpful for debugging.
+
+````javascript
+grunt.initConfig({
+  ts: {
+    default: {
+      options: {
+        verbose: true
+      }
+    }
+  }
+});
+````
 
 ### Transforms
 
