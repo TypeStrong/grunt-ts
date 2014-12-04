@@ -50,19 +50,19 @@ A more extensive sample gruntfile.js is available [here](https://github.com/Type
 
 Grunt-ts supports most `tsc` switches.  Click the link to cross-reference to the grunt-ts option.
 
-|`tsc` switch|grunt-ts analogue|description|
-|:----:|:----:|:-----|
-| --declaration|[declaration](#declaration)|Generates a .d.ts definitions file for compiled TypeScript files|
-|--mapRoot LOCATION|[mapRoot](#maproot)|Specifies the location where debugger should locate map files instead of generated locations.|
-|--module KIND|[module](#module)|Specify module code generation: "commonjs" or "amd"|
-|--noImplicitAny|[noImplicitAny](#noimplicitany)|Warn on expressions and declarations with an implied 'any' type.|
-|--noResolve|[noResolve](#noresolve)|Skip resolution and preprocessing (deprecated)|
-|--removeComments|[removeComments](#removecomments)|Configures if comments should be included in the output|
-|--sourceMap|[sourceMap](#sourcemap)|Generates corresponding .map file|
-|--sourceRoot LOCATION|[sourceRoot](#sourceroot)|Specifies the location where debugger should locate TypeScript files instead of source locations.|
-|--target VERSION|[target](#target)|Specify ECMAScript target version: "es3" or "es5"|
-|--out FILE|[out](#out)|Concatenate and emit output to a single file.|
-|--outDir DIRECTORY|[outDir](#outdir)|Redirect output structure to the directory.|
+|`tsc` switch|grunt-ts analogue|grunt-ts values & default|description|
+|:----:|:----:|:----:|:-----|
+| --declaration|[declaration](#declaration)|`string`|Generates a .d.ts definitions file for compiled TypeScript files|
+|--mapRoot LOCATION|[mapRoot](#maproot)|`string`|Specifies the location where debugger should locate map files instead of generated locations.|
+|--module KIND|[module](#module)|`'amd'` (default), `'commonjs'`|Specify module style for code generation|
+|--noImplicitAny|[noImplicitAny](#noimplicitany)|`true`, `false` (default)|Warn on expressions and declarations with an implied 'any' type.|
+|--noResolve|[noResolve](#noresolve)|`true`, `false` (default)|Skip resolution and preprocessing (deprecated)|
+|--removeComments|[removeComments](#removecomments)|`true` (default), `false`|Configures if comments should be included in the output|
+|--sourceMap|[sourceMap](#sourcemap)|`true` (default), `false`|Generates corresponding .map file|
+|--sourceRoot LOCATION|[sourceRoot](#sourceroot)|`string`|Specifies the location where debugger should locate TypeScript files instead of source locations.|
+|--target VERSION|[target](#target)|`'es5'` (default), `'es3'`|Specify ECMAScript target version: "es3" or "es5"|
+|--out FILE|[out](#out)|`string`|Concatenate and emit output to a single file.|
+|--outDir DIRECTORY|[outDir](#outdir)|`string`|Redirect output structure to the directory.|
 
 For file ordering, look at [JavaScript Generation](#javascript-generation) below.
 
