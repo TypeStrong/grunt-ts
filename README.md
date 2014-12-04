@@ -2,41 +2,504 @@
 
 [![Build Status](https://secure.travis-ci.org/TypeStrong/grunt-ts.svg?branch=master)](http://travis-ci.org/TypeStrong/grunt-ts) [![NPM version](https://badge.fury.io/js/grunt-ts.svg)](http://badge.fury.io/js/grunt-ts)
 
-Written from scratch TypeScript compiler task for GruntJS.
+## TypeScript Compilation Task for GruntJS
 
-Following are the reasons why grunt-ts was created:
+Grunt-ts is an npm package that handles TypeScript compilation work in GruntJS build scripts.  It provides a Grunt-compatible wrapper for the `tsc` command-line compiler, and provides some additional functionality that improves the TypeScript development workflow.  Grunt-ts is itself written in [TypeScript](./tasks/ts.ts).
 
-- Written in [TypeScript](https://github.com/grunt-ts/grunt-ts/blob/master/tasks/ts.ts)
-- Enables a TypeScript development workflow in addition to simple file compilation.
-- Supports overriding the bundled compiler with an alternate version.
+## Getting Started
 
-Check how grunt-ts can help streamline front end development: [Sample usage with AngularJS](http://www.youtube.com/watch?v=0-6vT7xgE4Y&hd=1)
+If you've never used GruntJS on your computer, you should [follow the detailed instructions here](/docs/DetailedGettingStartedInstructions.md) to get Node.js and the grunt-cli working.  If you're a Grunt expert, simply follow these steps:
 
-Additional / longer / more basic video tutorial: http://youtu.be/Km0DpfX5ZxM
+ * Run `npm install grunt-ts` in your project directory; this will install `grunt-ts`, TypeScript, and GruntJS.
+ * Add the `ts` task in your `gruntfile.js` (see below for a minimalist one).
+ * Run `grunt` at the command line in your project folder to compile your TypeScript code.
 
-For a quickstart see the full featured [Gruntfile](https://github.com/grunt-ts/grunt-ts/blob/master/sample/Gruntfile.js).
+This minimalist `gruntfile.js` will compile `*.ts` files in all subdirectories of the project folder, excluding anything under `node_modules`:
 
-If you don't know what is meant by *external modules* please see [this short video](https://www.youtube.com/watch?v=KDrWLMUY0R0&hd=1). We highly recommend you use *external modules* only in all your projects.
+````javascript
+module.exports = function(grunt) {
+  grunt.initConfig({
+    ts: {
+      default : {
+        src: ["**/*.ts", "!node_modules/**/*.ts"]
+      }
+    }
+  });
+  grunt.loadNpmTasks("grunt-ts");
+  grunt.registerTask("default", ["ts"]);
+};
+````
 
-## Key features
+A more extensive sample gruntfile.js is available [here](https://github.com/TypeStrong/grunt-ts/blob/master/sample/Gruntfile.js).
 
-### Compiler support
+## Grunt-ts Features
 
-Supports the following compiler flags in both original format and camelCase (preferred):
+ * Allows use of all standard GruntJS functionality such as use of customizable task targets, globbing, use of the `files` object (for instantiating multiple independent `tsc` runs in a single target), etc.
+ * Allows the developer to [select a custom TypeScript compiler version](#compiler) for their project, or even use a custom (in-house) version.
+ * Supports most switches of the `tsc` TypeScript Compiler via options in the gruntfile `ts` task, and also supports switch overrides per-target.
+ * Provides a transforms feature that eases code refactoring by taking the burden of relative path maintenance off the developer. If the paths to a set of files changes, grunt-ts will regenerate the relevant sections.  This feature supports:
+   * External module import transforms by file name, aliasing, directories, indexed directories, and re-exported imports.
+   * Internal module reference maintenance
+   * Common reference file management
+ * Allows concatenation where supported by the TypeScript compiler's `--out` switch
+ * Encodes HTML files as TypeScript variables (for HTML templating engines)
+ * Performs live file watching (compile on save)
+ * Enables "Fast" compile when using external modules
 
-    --allowBool                   Allow 'bool' as a synonym for 'boolean'.
-    --allowImportModule           Allow 'module(...)' as a synonym for 'require(...)'.
-    --declaration                 Generates corresponding .d.ts file
-    --mapRoot LOCATION            Specifies the location where debugger should locate map files instead of generated locations.
-    --module KIND                 Specify module code generation: "commonjs" or "amd" (grunt-ts default)
-    --noImplicitAny               Warn on expressions and declarations with an implied 'any' type.
-    --noResolve                   Skip resolution and preprocessing
-    --removeComments              Do not emit comments to output (grunt-ts default)
-    --sourceMap                   Generates corresponding .map file (grunt-ts default)
-    --sourceRoot LOCATION         Specifies the location where debugger should locate TypeScript files instead of source locations.
-    --target VERSION              Specify ECMAScript target version: "ES3" (tsc default), or "ES5" (grunt-ts default)
+### Support for tsc Switches
 
-There is also support for js *file concatenation* using `--out`. Additionally supported is an output directory for the generated JavaScript using `--outDir` flag. For file ordering look at JavaScript Generation below.
+Grunt-ts supports most `tsc` switches.  Click the link to cross-reference to the grunt-ts option.
+
+|`tsc` switch|grunt-ts analogue|description|
+|:----:|:----:|:-----|
+| --declaration|[declaration](#declaration)|Generates a .d.ts definitions file for compiled TypeScript files|
+|--mapRoot LOCATION|[mapRoot](#maproot)|Specifies the location where debugger should locate map files instead of generated locations.|
+|--module KIND|[module](#module)|Specify module code generation: "commonjs" or "amd"|
+|--noImplicitAny|[noImplicitAny](#noimplicitany)|Warn on expressions and declarations with an implied 'any' type.|
+|--noResolve|[noResolve](#noresolve)|Skip resolution and preprocessing (deprecated)|
+|--removeComments|[removeComments](#removecomments)|Configures if comments should be included in the output|
+|--sourceMap|[sourceMap](#sourcemap)|Generates corresponding .map file|
+|--sourceRoot LOCATION|[sourceRoot](#sourceroot)|Specifies the location where debugger should locate TypeScript files instead of source locations.|
+|--target VERSION|[target](#target)|Specify ECMAScript target version: "es3" or "es5"|
+|--out FILE|[out](#out)|Concatenate and emit output to a single file.|
+|--outDir DIRECTORY|[outDir](#outdir)|Redirect output structure to the directory.|
+
+For file ordering, look at [JavaScript Generation](#javascript-generation) below.
+
+### grunt-ts target properties
+
+#### dest
+
+Grunt-ts does not support the GruntJS standard `dest` target property.  Instead, you should use [files](#files), [out](#out), or [outDir](#outdir).
+
+#### files
+Grunt-ts supports use of the GruntJS-centric `files` property on a target as an alternative to the `tsc`-centric use of `src` and `out`/`outDir`.
+
+Notes:
+* The the `fast` grunt-ts option is not supported in this configuration. You should specify `fast: 'never'` to avoid warnings when `files` is used.
+* It is not supported to specify an array of values for `dest` with grunt-ts.  A warning will be issued to the console.  If a non-empty array is passed, the first element will be used and the rest will be truncated.
+* If the `dest` parameter ends with ".js", the value will be passed to the `--out` parameter of the TypeScript compiler.  Otherwise, if there is a non-blank value, it will be passed to the `--outDir` parameter.
+* If you intend to pass the specific value "src" to the TypeScript `--outDir` parameter, specify it as "src/" in the dest parameter to avoid grunt-ts warnings.
+
+Here are some examples of using the target `files` property with grunt-ts:
+
+````js
+grunt.initConfig({
+  ts: {
+    compileTwoSetsOfFilesUsingArrayStyle: {
+      // This will run tsc twice.  The first time, the result of the 'files1/**/*.ts' glob will be
+      // passed to tsc with the --out switch as 'out/ArrayStyle/1.js'.
+      // see https://github.com/gruntjs/grunt-docs/blob/master/Configuring-tasks.md#files-array-format
+      files: [{ src: ['files1/**/*.ts'], dest: 'out/ArrayStyle/1.js' },
+              { src: ['files2/**/*.ts'], dest: 'out/ArrayStyle/2.js' }],
+      options: {
+        fast: 'never'
+      }
+    },
+    compileTwoSetsOfFilesToDirUsingArrayStyle: {
+      // This will run tsc twice.  The first time, the result of the 'files1/**/*.ts' glob will be
+      // passed to tsc with the --outDir switch as 'out/ArrayStyle'.
+      // see https://github.com/gruntjs/grunt-docs/blob/master/Configuring-tasks.md#files-array-format
+      files: [{ src: ['files1/**/*.ts'], dest: 'out/ArrayStyle' },
+              { src: ['files2/**/*.ts'], dest: 'out/ArrayStyle' }],
+      options: {
+        fast: 'never'
+      }
+    },
+    compileTwoSetsOfFilesUsingObjectStyle: {
+      // This will run tsc twice.  The first time, the result of the 'files1/**/*.ts' glob will be
+      // passed to tsc with the --out switch as 'out/ObjectStyle/1.js'.
+      // see https://github.com/gruntjs/grunt-docs/blob/master/Configuring-tasks.md#files-object-format
+      files: {
+        'out/ObjectStyle/1.js': ['files1/**/*.ts'],
+        'out/ObjectStyle/2.js': ['files2/**/*.ts']
+      },
+      options: {
+        fast: 'never'
+      }
+    },
+    compileTwoSetsOfFilesToDirUsingObjectStyle: {
+      // This will run tsc once.  The result of the globs will be passed to tsc with the
+      // --outDir switch as 'out/ObjectStyle'.
+      // see https://github.com/gruntjs/grunt-docs/blob/master/Configuring-tasks.md#files-object-format
+      files: {
+        'out/ObjectStyle': ['files1/**/*.ts','files2/**/*.ts']
+        },
+        options: {
+          fast: 'never'
+        }
+      }
+    }
+});
+````
+
+#### html
+
+Grunt-ts supports compilation of `.html` file content to TypeScript variables which is explained in detail [here](/docs/html2ts.md).  The `html` target property acts similarly to `src`, except that it searches for html files to convert to TypeScript variables.  See also [htmlModuleTemplate](#htmlmoduletemplate) and [htmlVarTemplate](#htmlvartemplate).
+
+````javascript
+// How to use the html target property (incomplete example)
+grunt.initConfig({
+  ts: {
+    default: {
+      html: ["templates/**/*.html"]
+    }
+  }
+});
+````
+
+Note: the `html` compilation functionality will not fire if the `src` property is not specified.  If you wish to only have the HTML compile to TypeScript without compiling the resulting `.ts` files to JavaScript, make sure they're excluded from the `src` globs, or else specify an empty `src` array alongside the `html` task property, and set the target `compile` option to `false`:
+
+````javascript
+// Example of how to compile html files to TypeScript without compiling the resulting
+// .ts files to JavaScript.
+grunt.initConfig({
+  ts: {
+    default: {
+      html: ["templates/**/*.html"],
+      src: [],
+      options: {
+        compile: false
+      }
+    }
+  }
+});
+````
+
+
+#### options
+
+This section allows global configuration for the grunt-ts task.  All [target-specific options](#grunt-ts-target-options) are supported.  If a target also has options set, the target's options override the global task options.
+
+<!--
+#### nolib
+
+Specify this option if you do not want the lib.d.ts to be loaded by the TypeScript compiler.
+-->
+
+#### out
+
+Passes the --out switch to `tsc`.  This will cause the emitted JavaScript to be concatenated to a single file if your code allows for that.
+
+````javascript
+grunt.initConfig({
+  ts: {
+    default: {
+      out: "dist/myscript.js"
+    }
+  }
+});
+````
+
+*Warning:* Using the compiler with `out` and `reference` will prevent  grunt-ts from using its fast compile feature.  Consider using external modules with transforms instead.
+
+#### outDir
+
+Passes the --outDir switch to `tsc`.  This will redirect the emitted JavaScript to the specified directory and subdirectories.
+
+````javascript
+grunt.initConfig({
+  ts: {
+    default: {
+      outDir: "dist"
+    }
+  }
+});
+````
+
+#### reference
+
+Grunt-ts can generate a reference TypeScript file which will contains a reference to all other found `.ts` files.
+
+This means that the developer will not need to cross-reference files manually; instead they can just reference `reference.ts`.
+
+````javascript
+grunt.initConfig({
+  ts: {
+    default: {
+      reference: "references.ts"
+    }
+  }
+});
+````
+
+*Warning:* Using the compiler with `out` and `reference` will prevent  grunt-ts from using its fast compile feature.  Consider using external modules with transforms instead.
+
+#### src
+
+Allows you to specify the TypeScript files that will be passed to the compiler.  Supports standard GruntJS functionality such as globbing.  More info at Configuring GruntJS Tasks](http://gruntjs.com/configuring-tasks#files).
+
+````javascript
+grunt.initConfig({
+  ts: {
+    default: {
+      src: ["app/**/*.ts"]
+    }
+  }
+});
+````
+
+#### watch
+
+Grunt-ts can watch a directory and recompile TypeScript files when any TypeScript or HTML file is changed, added, or removed. Use the `watch` *target* option specifying a target directory that will be watched.  All subdirectories are automatically included.
+
+Note: this feature does not allow for additional tasks to run after the compilation step is done - for that you should use `grunt-contrib-watch`.
+
+````javascript
+grunt.initConfig({
+  ts: {
+    default: {
+      watch: "."  //will re-run this task if any .ts or .html file is changed.
+    }
+  }
+});
+````
+
+### grunt-ts target options
+
+#### compile
+
+Indicates if the TypeScript compilation should be attempted.  Turn this off if you wish to just run transforms.
+
+````javascript
+grunt.initConfig({
+  ts: {
+    default: {
+      options: {
+        compile: false
+      }
+    }
+  }
+});
+````
+
+#### compiler
+
+This target option allows the developer to select an alternate TypeScript compiler.
+
+To use the alternate compiler that is included with grunt-ts, update your gruntfile.js file with this code:
+
+````javascript
+grunt.initConfig({
+  ts: {
+    options: {
+      compiler: './node_modules/grunt-ts/customcompiler/tsc'
+    }
+  }
+});
+````
+
+To use another compiler version, download it from the current [TypeScript repository on GitHub](https://github.com/Microsoft/TypeScript/releases) or the old [TypeScript repository on CodePlex](http://typescript.codeplex.com/releases) and extract it to a folder in your project.  The compiler will be in the `bin` folder.  Copy all of the files to your project folder and then reference `tsc` using the `compiler` task option.  For example, if you extracted everything to a `mycompiler` folder in your project, you'd set the grunt-ts `compiler` property to `'./mycompiler/tsc'`.
+
+#### noresolve
+
+*Deprecated:* Grunt-ts supports passing this parameter to legacy versions of `tsc`.  It will pass `--noResolve` on the command line.
+
+#### removeComments
+
+Removes comments in the emitted JavaScript if set to `true`.  Preserves comments if set to `false`.
+
+````javascript
+grunt.initConfig({
+  ts: {
+    options: {
+      removeComments: false //preserves comments in output.
+    }
+  }
+});
+````
+
+#### declaration
+
+Generates corresponding .d.ts file(s) for compiled TypeScript files.
+
+````javascript
+grunt.initConfig({
+  ts: {
+    options: {
+      declaration: true
+    }
+  }
+});
+````
+
+#### failOnTypeErrors
+
+TypeScript has two types of errors: emit preventing and non-emit preventing.  Generally, type errors do not prevent the JavaScript emit.  Therefore, it can be useful to allow the Grunt pipeline to continue even if there are type errors because `tsc` will still generate JavaScript.
+
+If `failOnTypeErrors` is enabled, grunt-ts will *halt* the Grunt pipeline if there is a TypeScript type error even if it wouldn't have prevented the emit.  Note that syntax errors or other general `tsc` errors will always halt the pipeline.
+
+````javascript
+grunt.initConfig({
+  ts: {
+    options: {
+      failOnTypeErrors: true
+    }
+  }
+});
+````
+
+#### fast
+
+If you are using *external modules*, grunt-ts will try to do a `fast` compile **by default**, basically only compiling what's changed. It should "just work" with the built-in file watching as well as with external tools like `grunt-contrib-watch`.
+
+To do a fast compile, grunt-ts maintains a cache of hashes for TypeScript files in the `.tscache` folder to detect changes (needed for external watch tool support).  It also creates a `.baseDir.ts` file at the root, passing it to the compiler to make sure that `--outDir` is always respected in the generated JavaScript.
+
+You can [customize the behaviour](https://github.com/grunt-ts/grunt-ts/blob/master/docs/fast.md) of grunt-ts `fast`.
+
+If you are using `files`, grunt-ts can't do a fast compile.  You should set `fast` to 'never'.
+
+````javascript
+grunt.initConfig({
+  ts: {
+    options: {
+      // disable the grunt-ts fast feature
+      fast: 'never'
+    }
+  }
+});
+````
+
+#### htmlModuleTemplate
+
+Grunt-ts supports compilation of `.html` file content to TypeScript variables which is explained in detail [here](/docs/html2ts.md).  The `htmlModuleTemplate` target property allows the developer to define a namespace for the templates.  See also [html](#html) and [htmlVarTemplate](#htmlvartemplate).
+
+````javascript
+//Note: incomplete - combine with html and htmlVarTemplate
+grunt.initConfig({
+  ts: {
+    default: {
+      options: {
+        //MyTemplate.html will be accessible as HtmlTemplates.MyTemplate
+        htmlModuleTemplate: 'HtmlTemplates.<%= filename %>'
+      }
+    }
+  }
+});
+````
+
+#### htmlVarTemplate
+
+Grunt-ts supports compilation of `.html` file content to TypeScript variables which is explained in detail [here](/docs/html2ts.md).  The `htmlVarTemplate` target property allows the developer to define a property name for the template contents.  See also [html](#html) and [htmlModuleTemplate](#htmlmoduletemplate).
+
+````javascript
+//Note: incomplete - combine with html and htmlModuleTemplate
+grunt.initConfig({
+  ts: {
+    default: {
+      options: {
+        //HTML template objects will expose their content via a property called markup.
+        htmlVarTemplate: 'markup'
+      }
+    }
+  }
+});
+````
+
+#### mapRoot
+
+Specifies the root for where `.js.map` sourcemap files should be referenced.  This is useful if you intend to move your `.js.map` files to a different location.  Leave this blank or omit entirely if the `.js.map` files will be deployed to the same folder as the corresponding `.js` files.  See also [sourceRoot](#sourceRoot).
+
+````javascript
+grunt.initConfig({
+  ts: {
+    default: {
+      options: {
+        //When abc.ts is compiled to abc.js, it will reference /maps/abc.js.map
+        mapRoot: "/maps"
+      }
+    }
+  }
+});
+````
+
+#### module
+
+Specifies if TypeScript should emit AMD or CommonJS-style external modules.  Has no effect if internal modules are used.
+
+````javascript
+grunt.initConfig({
+  ts: {
+    default: {
+      options: {
+        module: "amd"
+      }
+    }
+  }
+});
+````
+
+#### noImplicitAny
+
+````javascript
+true | false (default)
+````
+
+Set to true to pass `--noImplicitAny` to the compiler. Enables more strict type checking.
+
+````javascript
+grunt.initConfig({
+  ts: {
+    default: {
+      options: {
+        noImplicitAny: true
+      }
+    }
+  }
+});
+````
+
+#### sourceMap
+
+If true, grunt-ts will instruct `tsc` to emit source maps (`.js.map` files).
+
+````javascript
+grunt.initConfig({
+  ts: {
+    default: {
+      options: {
+        sourceMap: true
+      }
+    }
+  }
+});
+````
+
+#### sourceRoot
+
+The sourceRoot to use in the emitted source map files.  Allows mapping moved `.js.map` files back to the original TypeScript files.  See also [mapRoot](#maproot).
+
+````javascript
+grunt.initConfig({
+  ts: {
+    default: {
+      options: {
+        sourceMap: true
+      }
+    }
+  }
+});
+````
+
+#### target
+
+Allows the developer to specify if they are targeting ES3 or ES5.  Only select ES3 if you are targeting old browsers (IE8 or below).
+
+````javascript
+grunt.initConfig({
+  ts: {
+    default: {
+      options: {
+        target: "es3" //for IE8 and below
+      }
+    }
+  }
+});
+````
+
+#### verbose
+
+Will print the switches passed to `tsc` on the console.  Helpful for debugging.
 
 ### Transforms
 
@@ -47,17 +510,17 @@ Transforms begin with a three-slash comment `///` and are prefixed with `ts:`
 You can also run transforms without compiling your code by setting `compile: false` in your config. For example:
 ```javascript
 grunt.initConfig({
-   ts: {
-      "transforms-only": {
-         options: {
-            compile: false
-         },
-         // in addition to your standard settings:
-         // src: ...
-         // outDir: ...
+  ts: {
+    "transforms-only": {
+      options: {
+        compile: false
       },
-      // ...
-   }
+      // in addition to your standard settings:
+      // src: ...
+      // outDir: ...
+    },
+    // ...
+  }
 } );
 ```
 
@@ -146,42 +609,17 @@ Reference file:
 /// <reference path='../path/to/filename'/> ///ts:ref:generated
 ```
 
-### Reference file generation
-
-Grunt-ts can generate a `reference.ts` file which contains a reference to all ts files.
-
-This means there will never be a need to cross reference files manually, instead just reference `reference.ts` :)
-
-#### Usage
-
-In your gruntfile:
-```javascript
-grunt.initConfig({
-   ts: {
-      target: {
-         reference: "./path/to/references.ts",
-         // in addition to your standard settings:
-         // src: ...
-         // outDir: ...
-         // options: {}
-      }
-   }
-} );
-```
-
-*Warning:* Using the compiler with `--out` / `reference.ts` will slow down a fast compile pipeline. Use *external modules* with transforms instead.
-
-#### JavaScript generation and ordering
+### JavaScript Generation
 
 When a output file is specified via `out` in combination with a reference file via `reference` then grunt-ts uses the generated reference file to *order the code in the generated JavaScript*.
 
 Use `reference.ts` to specify the order for the few files the build really cares about and leave the rest to be maintained by grunt-ts.
 
-E.g. in the following case the generated JavaScript for `someBaseClass.ts` is guaranteed to be at the top, and the generated JavaScript for `main.ts` is guaranteed to be at the bottom of the single merged js file.
+E.g. in the following case the generated JavaScript for `someBaseClass.ts` is guaranteed to be at the top, and the generated JavaScript for `main.ts` is guaranteed to be at the bottom of the single merged `js` file.
 
 Everything between `grunt-start` and `grunt-end` is generated and maintained by grunt-ts. If there is no `grunt-start` section found, it is created. If `reference.ts` does not exist originally, it is also created.
 
-```typescript
+````typescript
 /// <reference path="someBaseClass.ts" />
 
 // Put comments here and they are preserved
@@ -193,108 +631,16 @@ Everything between `grunt-start` and `grunt-end` is generated and maintained by 
 
 
 /// <reference path="main.ts" />
-```
-
-#### JavaScript generation redirect
-
-If an `outDir` is specified all output JavaScript is redirected to this folder to keep the source folder clean.
-
-#### AMD / RequireJS support
-(Deprecated) Please use [Transforms](https://github.com/grunt-ts/grunt-ts#transforms) + *external modules* all things in new projects.
-[Documentation if you need it](https://github.com/grunt-ts/grunt-ts/blob/master/docs/amdLoader.md)
-
-### Html 2 TypeScript support
-
-Grunt-ts can re-encode html files into TypeScript and make them available as a variable.
-
-For example a file called `test.html`:
-```html
-<div> Some Content </div>
-```
-
-Will be compiled to a TypeScript file `test.html.ts` containing:
-```typescript
-module test { export var html =  '<div> Some content </div>' }
-```
-
-This will export the variable `test.html` within the TypeScript scope to get the content of test.html as a string, with the main benefit of limiting the http-requests needed to load templates in various front-end frameworks.
-
-You can also [customize this variable](https://github.com/grunt-ts/grunt-ts/blob/master/docs/html2ts.md).
-
-#### Html 2 TypeScript usage in AngularJS
-
-This is great for putting variables in templateCache: http://docs.angularjs.org/api/ng.$templateCache or even using the html string directly by setting it to the `template` properties (directives/views) instead of `templateUrl`
-
-#### Html 2 TypeScript usage in EmberJS
-
-It is possible to specify this string to the template on a view: http://emberjs.com/api/classes/Ember.View.html
-
-Specifically: http://stackoverflow.com/a/9867375/390330
-
-### Live file watching and building
-
-Grunt-ts can watch a directory and recompile TypeScript files when any TypeScript file changes, gets added, gets removed. Use the `watch` *target* option specifying a target directory that will be watched.
-
-### Fast compile
-If you are using *external modules* `grunt-ts` will try to do a `fast` compile **by default**, basically only compiling what's changed. It will **just work** with the built-in file watching as well as with external tools like `grunt-contrib-watch` ([More](https://github.com/grunt-ts/grunt-ts/blob/master/docs/fast.md)).
-
-It maintains a cache of hashes for typescript files in the `.tscache` folder to detect changes (needed for external watch tool support). Also it creates a `.baseDir.ts` file at the root, passing it compiler to make sure that `--outDir` is always respected in the generated JavaScript.
-
-It should **just work** out of the box. You can however [customize its behaviour](https://github.com/grunt-ts/grunt-ts/blob/master/docs/fast.md).
-
-## Installation
-
-Grunt-ts is published as [npm package](https://npmjs.org/package/grunt-ts):
-
-For new projects make sure to have installed nodejs, then install grunt-cli:
-
-````bash
-$ npm install -g grunt-cli
 ````
 
-Install the and save to `package.json` devDependencies:
+## Video Examples
+**TypeScript programming using grunt-ts (YouTube):**
 
-````bash
-$ npm install grunt-ts --save-dev
-````
+<a href="https://youtu.be/Km0DpfX5ZxM" target="_blank" alt="TypeScript programming using grunt-ts"><img src="https://img.youtube.com/vi/Km0DpfX5ZxM/0.jpg" /></a>
 
-### Alternate compiler version
+**AngularJS + TypeScript : Workflow with grunt-ts (YouTube)**
 
-`grunt-ts` always ships (bundled) with the *latest* compiler. Support for legacy  projects can be enabled using the compiler override:
-
-At runtime the plugin will look for an alternate compiler in the same `node_modules` folder. To use a different version of the TypeScript compiler install the required `typescript` version as a *peer* of `grunt-ts`. If no override was found the bundled compiler is used.  
-
-The `package.json` would look something like this for a legacy project:
-
-```javascript
-{
-  "devDependencies": {
-    "grunt" : "~0.4.1",
-    "grunt-ts" : "~1.9.2",
-    "typescript" : "0.9.7"
-  }
-}
-```
-Note: make sure to pin the exact TypeScript version (do not use `~` or `>`).
-
-### Custom compiler
-
-Alternatively, you can also explicitly use a custom compiler build that is not on NPM (e.g. [current LKG](https://github.com/Microsoft/TypeScript/tree/master/bin)) by specifying the `compiler` *task* option pointing to the path of the node-executable compiler js file (i.e. raw `tsc` or `tsc.js`)
-```javascript
-ts: {
-  options: {
-    compiler: './customcompiler/tsc',
-  },
-}
-```
-
-## Configuration
-
-Create a `Gruntfile.js`. Modify it to load grunt-ts by adding the following lines:
-
-```javascript
-module.exports = function (grunt) {
-
+<<<<<<< HEAD
     // load the task
     grunt.loadNpmTasks("grunt-ts");
 
@@ -431,6 +777,9 @@ grunt.initConfig({
 
 
 ````
+=======
+<a href="https://youtu.be/0-6vT7xgE4Y" target="_blank" alt="AngularJS + TypeScript : Workflow"><img src="https://img.youtube.com/vi/0-6vT7xgE4Y/0.jpg" /></a>
+>>>>>>> Documentation-Refresh
 
 ## Contributing
 
