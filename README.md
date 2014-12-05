@@ -70,30 +70,31 @@ For file ordering, look at [JavaScript Generation](#javascript-generation).
 
 |property|where to define|description|
 |:----|:----|:-----|
-|compile|option|`true` (default), `false` - compile TypeScript code.|
-|compiler|option|`string` - path to custom compiler|
-|declaration|option|`true`, `false` (default)|
-|failOnTypeErrors|option|`true`, `false` (default)|
-|fast|option|`'watch'` (default), `'always'`, `'never'` - how to decide on a "fast" grunt-ts compile.|
+|[comments](#comments)|option|`true`, `false` (default) - include comments in emitted JS.|
+|[compile](#compile)|option|`true` (default), `false` - compile TypeScript code.|
+|[compiler](#compiler)|option|`string` - path to custom compiler|
+|[declaration](#declaration)|option|`true`, `false` (default) - indicates that definition files should be emitted.|
+|[failOnTypeErrors](#failontypeerrors)|option|`true`, `false` (default) - fail Grunt pipeline if there is a type error|
+|[fast](#fast)|option|`'watch'` (default), `'always'`, `'never'` - how to decide on a "fast" grunt-ts compile.|
 |[files](#files)|target|`string` - sets of files to compile and optional output destination|
-|html|target|`string` or `string[]` - glob to HTML templates|
-|htmlModuleTemplate|option|`string` - HTML template namespace|
-|htmlVarTemplate|option|`string` - HTML property name|
+|[html](#html)|target|`string` or `string[]` - glob to HTML templates|
+|[htmlModuleTemplate](#htmlmoduletemplate)|option|`string` - HTML template namespace|
+|[htmlVarTemplate](#htmlvartemplate)|option|`string` - HTML property name|
 |[mapRoot](#maproot)|option|`string` - root for referencing `.js.map` files in JS|
-|module|option||
+|[module](#module)|option|`'amd'` (default) or `'commonjs'` - specifies external module style|
 |[noImplicitAny](#noimplicitany)|option|`true`, `false` (default) - enable for stricter type checking|
-|noResolve|option||
-|options|target||
-|out|target||
-|outDir|target||
-|reference|target||
-|removeComments|option||
+|[noResolve](#noresolve)|option|`true`, `false` (default) - for deprecated version of TypeScript|
+|[options](#grunt-ts-target-options)|target||
+|[out](#out)|target|`string` - instruct `tsc` to concatenate output to this file.|
+|[outDir](#outdir)|target|`string` - instruct `tsc` to emit JS to this directory.|
+|[reference](#reference)|target|`string` - tells grunt-ts which file to use for maintaining references|
+|[removeComments](#removecomments)|option|`true` (default), `false` - removes comments in emitted JS|
 |[sourceRoot](#sourceroot)|option|`string` - root for referencing TS files in `.js.map`|
-|sourceMap|option||
-|src|target|`string` or `string[]` - glob to TypeScript files to compile.|
-|target|option|`'es5'` (default) or `'es3'` - targeted ECMAScript version|
-|verbose|option||
-|watch|target||
+|[sourceMap](#sourcemap)|option|`true` (default), `false` - indicates if source maps should be generated (`.js.map`)|
+|[src](#src)|target|`string` or `string[]` - glob to TypeScript files to compile.|
+|[target](#target)|option|`'es5'` (default) or `'es3'` - targeted ECMAScript version|
+|[verbose](#verbose)|option|`true`, `false` (default) - logs `tsc` command-line options to console|
+|[watch](#watch)|target|`string` - will watch for changes in the specified directory or below|
 
 
 Note: In the above chart, if "where to define" is "target", the property must be defined on a target or on the `ts` object directly.  If "where to define" is "options", then the property must be defined on an `options` object on `ts` or on a target under `ts`.
@@ -336,13 +337,31 @@ true | false (default)
 
 *Deprecated:* Grunt-ts supports passing this parameter to legacy versions of `tsc`.  It will pass `--noResolve` on the command line.
 
+#### comments
+
+````javascript
+true | false (default)
+````
+
+Retains comments in the emitted JavaScript if set to `true`.  Removes comments if set to `false`.  Note that if `comments` and `removeComments` are both used, the value of `removeComments` will win; regardless, please don't do this as it is just confusing to everyone.
+
+````javascript
+grunt.initConfig({
+  ts: {
+    options: {
+      comments: true //preserves comments in output.
+    }
+  }
+});
+````
+
 #### removeComments
 
 ````javascript
 true (default)| false
 ````
 
-Removes comments in the emitted JavaScript if set to `true`.  Preserves comments if set to `false`.
+Removes comments in the emitted JavaScript if set to `true`.  Preserves comments if set to `false`.  Note that if `comments` and `removeComments` are both used, the value of `removeComments` will win; regardless, please don't do this as it is just confusing to everyone.
 
 ````javascript
 grunt.initConfig({
