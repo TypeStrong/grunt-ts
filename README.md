@@ -76,7 +76,7 @@ For file ordering, look at [JavaScript Generation](#javascript-generation).
 |[declaration](#declaration)|option|`true`, `false` (default) - indicates that definition files should be emitted.|
 |[failOnTypeErrors](#failontypeerrors)|option|`true`, `false` (default) - fail Grunt pipeline if there is a type error|
 |[fast](#fast)|option|`'watch'` (default), `'always'`, `'never'` - how to decide on a "fast" grunt-ts compile.|
-|[files](#files)|target|`string` - sets of files to compile and optional output destination|
+|[files](#files)|target|Sets of files to compile and optional output destination|
 |[html](#html)|target|`string` or `string[]` - glob to HTML templates|
 |[htmlModuleTemplate](#htmlmoduletemplate)|option|`string` - HTML template namespace|
 |[htmlVarTemplate](#htmlvartemplate)|option|`string` - HTML property name|
