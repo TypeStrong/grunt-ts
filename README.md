@@ -68,7 +68,7 @@ For file ordering, look at [JavaScript Generation](#javascript-generation).
 
 ## grunt-ts gruntfile.js options
 
-|property|where to define|type or values & default|description|
+|property|where to define|description|
 |:----|:----|:-----|
 |compile|option|`true` (default), `false` - compile TypeScript code.|
 |compiler|option|`string` - path to custom compiler|
