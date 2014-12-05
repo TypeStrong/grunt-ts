@@ -10,7 +10,8 @@ module.exports = function (grunt) {
                 'test/**/*.html.ts',
                 '.tscache/**/*',
                 '!test/test.js',
-                '!test/expected/**/*'
+                '!test/expected/**/*',
+                'test/htmlOutDir/generated/test'
             ],
             testPost: [
                 'src/a.js',
@@ -271,6 +272,18 @@ module.exports = function (grunt) {
                 reference: 'test/htmlOutDir/reference.ts',
                 htmlOutDir: 'test/htmlOutDir/generated',
                 out: 'test/htmlOutDir/out.js'
+            },
+            htmlWithFlatHtmlOutDirTest: {
+                test: true,
+                src: ['test/htmlOutDirFlat/reference.ts','test/htmlOutDirFlat/src/bar.ts',
+                    'test/htmlOutDirFlat/src/foo.ts',
+                    //NOTE Not strictly necessarily based on the implementation
+                    'test/htmlOutDirFlat/generated/**/*.ts'],
+                html: ['test/htmlOutDirFlat/**/*.tpl.html'],
+                reference: 'test/htmlOutDirFlat/reference.ts',
+                htmlOutDir: 'test/htmlOutDirFlat/generated',
+                htmlOutDirFlatten: true,
+                out: 'test/htmlOutDirFlat/out.js'
             },
             definitelyTypedTest: {
                 test: true,

@@ -32,6 +32,7 @@ export interface IHtml2TSOptions {
     moduleFunction: Function;
     varFunction: Function;
     htmlOutDir: string;
+    flatten: boolean;
 }
 
 // Compile an HTML file to a TS file
@@ -50,13 +51,15 @@ export function compileHTML(filename: string, options: IHtml2TSOptions): string 
     var fileContent = htmlTemplate({ modulename: moduleName, varname: varName, content: htmlContent });
 
     // Write the content to a file
-    var outputfile = getOutputFile(filename, options.htmlOutDir);
+    var outputfile = getOutputFile(filename, options.htmlOutDir, options.flatten);
+
+    mkdirParent(path.dirname(outputfile));
 
     fs.writeFileSync(outputfile, fileContent);
     return outputfile;
 }
 
-function getOutputFile(filename: string, htmlOutDir: string): string {
+function getOutputFile(filename: string, htmlOutDir: string, flatten: boolean): string {
     var outputfile = filename;
 
     // NOTE If an htmlOutDir was specified
@@ -64,8 +67,11 @@ function getOutputFile(filename: string, htmlOutDir: string): string {
         var dir = getPath(htmlOutDir);
 
         if (fs.existsSync(dir)) {
-            var unqualifiedFilename = path.basename(filename);
-            outputfile = path.join(dir, unqualifiedFilename);
+            var relativeFilename = filename;
+            if (flatten) {
+                relativeFilename = path.basename(filename);
+            }
+            outputfile = path.join(dir, relativeFilename);
         }
     }
     return outputfile + '.ts';
@@ -78,4 +84,19 @@ function getPath(dir: string): string {
         dir = path.join(process.cwd(), dir);
     }
     return dir;
+}
+
+function mkdirParent(dirPath: string, mode?: number) {
+    // NOTE Call the standard fs.mkdirSync
+    try {
+        fs.mkdirSync(dirPath, mode);
+    } catch (error) {
+        // NOTE When it fail in this way, do the custom steps
+        if (error && error.errno === 34) {
+            // NOTE Create all the parents recursively
+            mkdirParent(path.dirname(dirPath), mode);
+            // NOTE And then the directory
+            mkdirParent(dirPath, mode);
+        }
+    }
 }

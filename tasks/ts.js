@@ -99,6 +99,7 @@ function pluginFn(grunt) {
             htmlModuleTemplate: '<%= filename %>',
             htmlVarTemplate: '<%= ext %>',
             htmlOutDir: null,
+            htmlOutDirFlatten: false,
             failOnTypeErrors: true
         });
 
@@ -110,6 +111,7 @@ function pluginFn(grunt) {
         options.htmlModuleTemplate = rawTargetOptions.htmlModuleTemplate || rawTaskOptions.htmlModuleTemplate;
         options.htmlVarTemplate = rawTargetOptions.htmlVarTemplate || rawTaskOptions.htmlVarTemplate;
         options.htmlOutDir = rawTargetConfig.htmlOutDir;
+        options.htmlOutDirFlatten = rawTargetConfig.htmlOutDirFlatten;
 
         // fix the properly cased options to their appropriate values
         options.allowBool = 'allowbool' in options ? options['allowbool'] : options.allowBool;
@@ -162,6 +164,11 @@ function pluginFn(grunt) {
         if (!options.htmlOutDir) {
             // use default value
             options.htmlOutDir = null;
+        }
+
+        if (!options.htmlOutDirFlatten) {
+            // use default value
+            options.htmlOutDirFlatten = false;
         }
 
         // Remove comments based on the removeComments flag first then based on the comments flag, otherwise true
@@ -385,7 +392,8 @@ function pluginFn(grunt) {
                     var html2tsOptions = {
                         moduleFunction: _.template(options.htmlModuleTemplate),
                         varFunction: _.template(options.htmlVarTemplate),
-                        htmlOutDir: options.htmlOutDir
+                        htmlOutDir: options.htmlOutDir,
+                        flatten: options.htmlOutDirFlatten
                     };
 
                     var htmlFiles = grunt.file.expand(currenttask.data.html);
