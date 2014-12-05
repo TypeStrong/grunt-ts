@@ -60,7 +60,7 @@ Grunt-ts supports most `tsc` switches.  Click the link to cross-reference to the
 |--removeComments|[removeComments](#removecomments)|Configures if comments should be included in the output|
 |--sourceMap|[sourceMap](#sourcemap)|Generates corresponding `.map` file|
 |--sourceRoot LOCATION|[sourceRoot](#sourceroot)|Specifies the location where debugger should locate TypeScript files instead of source locations.|
-|--target VERSION|[target](#target)|Specify ECMAScript target version: "es3" or "es5"|
+|--target VERSION|[target](#target)|Specify ECMAScript target version: `'es3'` or `'es5'`|
 |--out FILE|[out](#out)|Concatenate and emit output to a single file.|
 |--outDir DIRECTORY|[outDir](#outdir)|Redirect output structure to the directory.|
 
@@ -91,7 +91,7 @@ For file ordering, look at [JavaScript Generation](#javascript-generation).
 |[removeComments](#removecomments)|option|`true` (default), `false` - removes comments in emitted JS|
 |[sourceRoot](#sourceroot)|option|`string` - root for referencing TS files in `.js.map`|
 |[sourceMap](#sourcemap)|option|`true` (default), `false` - indicates if source maps should be generated (`.js.map`)|
-|[src](#src)|target|`string` or `string[]` - glob to TypeScript files to compile.|
+|[src](#src)|target|`string` or `string[]` - glob of TypeScript files to compile.|
 |[target](#target)|option|`'es5'` (default) or `'es3'` - targeted ECMAScript version|
 |[verbose](#verbose)|option|`true`, `false` (default) - logs `tsc` command-line options to console|
 |[watch](#watch)|target|`string` - will watch for changes in the specified directory or below|
