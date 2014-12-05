@@ -607,7 +607,7 @@ grunt.initConfig({
 
 ### Transforms
 
-Objective : To allow easier code refactoring by taking the relative path maintainance burden off the developer. If the paths to the files changes `grunt-ts` will regenerate the relevant sections.
+Objective : To allow easier code refactoring by taking the relative path maintenance burden off the developer. If the paths to the files changes `grunt-ts` will regenerate the relevant sections.
 
 Transforms begin with a three-slash comment `///` and are prefixed with `ts:`
 
