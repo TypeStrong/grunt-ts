@@ -4,7 +4,7 @@
 
 ## TypeScript Compilation Task for GruntJS
 
-Grunt-ts is an npm package that handles TypeScript compilation work in GruntJS build scripts.  It provides a Grunt-compatible wrapper for the `tsc` command-line compiler, and provides some additional functionality that improves the TypeScript development workflow.  Grunt-ts is itself written in [TypeScript](./tasks/ts.ts).
+Grunt-ts is an npm package that handles TypeScript compilation work in GruntJS build scripts.  It provides a [Grunt-compatible wrapper](#support-for-tsc-switches) for the `tsc` command-line compiler, and provides some [additional functionality](#grunt-ts-gruntfilejs-options) that improves the TypeScript development workflow.  Grunt-ts is itself written in [TypeScript](./tasks/ts.ts).
 
 ## Getting Started
 
@@ -36,15 +36,15 @@ A more extensive sample gruntfile.js is available [here](https://github.com/Type
 
  * Allows use of all standard GruntJS functionality such as use of customizable task targets, globbing, use of the `files` object (for instantiating multiple independent `tsc` runs in a single target), etc.
  * Allows the developer to [select a custom TypeScript compiler version](#compiler) for their project, or even use a custom (in-house) version.
- * Supports most switches of the `tsc` TypeScript Compiler via options in the gruntfile `ts` task, and also supports switch overrides per-target.
- * Provides a transforms feature that eases code refactoring by taking the burden of relative path maintenance off the developer. If the paths to a set of files changes, grunt-ts will regenerate the relevant sections.  This feature supports:
-   * External module import transforms by file name, aliasing, directories, indexed directories, and re-exported imports.
-   * Internal module reference maintenance
-   * Common reference file management
- * Allows concatenation where supported by the TypeScript compiler's `--out` switch
- * Encodes HTML files as TypeScript variables (for HTML templating engines)
- * Performs live file watching (compile on save)
- * Enables "Fast" compile when using external modules
+ * Supports [most switches](#support-for-tsc-switches) of the `tsc` TypeScript Compiler via options in the gruntfile `ts` task, and also supports switch overrides per-target.
+ * Provides a [transforms](#transforms) feature that eases code refactoring by taking the burden of relative path maintenance off the developer. If the paths to a set of files changes, grunt-ts will regenerate the relevant sections.  This feature supports:
+   * External module [import transforms](#import-transform) by file name, aliasing, directories, indexed directories, and re-exported imports.
+   * Internal module [reference maintenance](#references)
+   * Common [reference file](#reference) management
+ * Allows [concatenation](#out) where supported by the TypeScript compiler's `--out` switch
+ * [Encodes HTML](#html) files as TypeScript variables (for HTML templating engines)
+ * Performs live file [watching](#watch) (compile on save)
+ * Enables ["Fast" compile](#fast) when using external modules
 
 ## Support for tsc Switches
 
@@ -110,7 +110,7 @@ Grunt-ts does not support the GruntJS standard `dest` target property.  Instead,
 Grunt-ts supports use of the GruntJS-centric `files` property on a target as an alternative to the `tsc`-centric use of `src` and `out`/`outDir`.
 
 Notes:
-* The the `fast` grunt-ts option is not supported in this configuration. You should specify `fast: 'never'` to avoid warnings when `files` is used.
+* The `fast` grunt-ts option is not supported in this configuration. You should specify `fast: 'never'` to avoid warnings when `files` is used.
 * It is not supported to specify an array of values for `dest` with grunt-ts.  A warning will be issued to the console.  If a non-empty array is passed, the first element will be used and the rest will be truncated.
 * If the `dest` parameter ends with ".js", the value will be passed to the `--out` parameter of the TypeScript compiler.  Otherwise, if there is a non-blank value, it will be passed to the `--outDir` parameter.
 * If you intend to pass the specific value "src" to the TypeScript `--outDir` parameter, specify it as "src/" in the dest parameter to avoid grunt-ts warnings.
@@ -474,7 +474,7 @@ grunt.initConfig({
 
 #### mapRoot
 
-Specifies the root for where `.js.map` sourcemap files should be referenced.  This is useful if you intend to move your `.js.map` files to a different location.  Leave this blank or omit entirely if the `.js.map` files will be deployed to the same folder as the corresponding `.js` files.  See also [sourceRoot](#sourceRoot).
+Specifies the root for where `.js.map` sourcemap files should be referenced.  This is useful if you intend to move your `.js.map` files to a different location.  Leave this blank or omit entirely if the `.js.map` files will be deployed to the same folder as the corresponding `.js` files.  See also [sourceRoot](#sourceroot).
 
 ````javascript
 grunt.initConfig({
@@ -515,7 +515,7 @@ grunt.initConfig({
 true | false (default)
 ````
 
-Set to true to pass `--noImplicitAny` to the compiler. Enables more strict type checking.
+Set to true to pass `--noImplicitAny` to the compiler.  Requires more strict type checking.  If `noImplicitAny` is enabled, TypeScript will raise a type error whenever it is unable to infer the type of a variable.
 
 ````javascript
 grunt.initConfig({
