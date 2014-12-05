@@ -793,6 +793,14 @@ Update the current `grunt-ts` to be the last known good version (dogfood). Commi
 $ grunt upgrade
 ```
 
+### Publishing Checklist
+
+ * Update the version in package.json.
+ * Update CHANGELOG.md.
+ * Commit to master.
+ * Push to npm.
+ * Push version tag to GitHub.
+
 ## License
 
 Licensed under the MIT License.
