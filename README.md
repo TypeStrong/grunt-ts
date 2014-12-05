@@ -231,10 +231,6 @@ It is possible to specify this string to the template on a view: http://emberjs.
 
 Specifically: http://stackoverflow.com/a/9867375/390330
 
-#### Html 2 TypeScript: Separate generation directory
-
-It is possible to specify an alternative directory to which the `.html.ts` files will be generated using the option `htmlOutDir`.
-
 ### Live file watching and building
 
 Grunt-ts can watch a directory and recompile TypeScript files when any TypeScript file changes, gets added, gets removed. Use the `watch` *target* option specifying a target directory that will be watched.
@@ -318,8 +314,6 @@ grunt.initConfig({
 			src: ["test/work/**/*.ts"],
 			// The source html files, https://github.com/grunt-ts/grunt-ts#html-2-typescript-support
             html: ["test/work/**/*.tpl.html"],
-			// The directory generated .html.ts files are stored.
-            htmlOutDir: ["test/work/generated"],
 			// If specified, generate this file that to can use for reference management
 			reference: "./test/reference.ts",  
 			// If specified, generate an out.js file which is the merged js file
