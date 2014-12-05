@@ -46,25 +46,58 @@ A more extensive sample gruntfile.js is available [here](https://github.com/Type
  * Performs live file watching (compile on save)
  * Enables "Fast" compile when using external modules
 
-### Support for tsc Switches
+## Support for tsc Switches
 
 Grunt-ts supports most `tsc` switches.  Click the link to cross-reference to the grunt-ts option.
 
-|`tsc` switch|grunt-ts analogue|grunt-ts values & default|description|
+|`tsc` switch|grunt-ts analogue|description|
 |:----:|:----:|:----:|:-----|
-| --declaration|[declaration](#declaration)|`string`|Generates a .d.ts definitions file for compiled TypeScript files|
+| --declaration|[declaration](#declaration)|Generates a `.d.ts` definitions file for compiled TypeScript files|
 |--mapRoot LOCATION|[mapRoot](#maproot)|`string`|Specifies the location where debugger should locate map files instead of generated locations.|
 |--module KIND|[module](#module)|`'amd'` (default), `'commonjs'`|Specify module style for code generation|
-|--noImplicitAny|[noImplicitAny](#noimplicitany)|`true`, `false` (default)|Warn on expressions and declarations with an implied 'any' type.|
+|--noImplicitAny|[noImplicitAny](#noimplicitany)|`true`, `false` (default)|Warn on expressions and declarations with an implied `any` type.|
 |--noResolve|[noResolve](#noresolve)|`true`, `false` (default)|Skip resolution and preprocessing (deprecated)|
 |--removeComments|[removeComments](#removecomments)|`true` (default), `false`|Configures if comments should be included in the output|
-|--sourceMap|[sourceMap](#sourcemap)|`true` (default), `false`|Generates corresponding .map file|
+|--sourceMap|[sourceMap](#sourcemap)|`true` (default), `false`|Generates corresponding `.map` file|
 |--sourceRoot LOCATION|[sourceRoot](#sourceroot)|`string`|Specifies the location where debugger should locate TypeScript files instead of source locations.|
 |--target VERSION|[target](#target)|`'es5'` (default), `'es3'`|Specify ECMAScript target version: "es3" or "es5"|
 |--out FILE|[out](#out)|`string`|Concatenate and emit output to a single file.|
 |--outDir DIRECTORY|[outDir](#outdir)|`string`|Redirect output structure to the directory.|
 
-For file ordering, look at [JavaScript Generation](#javascript-generation) below.
+For file ordering, look at [JavaScript Generation](#javascript-generation).
+
+## grunt-ts gruntfile.js options
+
+|property|where to define|type or values & default|description|
+|:----:|:----:|:----:|:-----|
+|compile|option|||
+|compiler|option|||
+|declaration|option|`true`, `false` (default)||
+|failOnTypeErrors|option|`true`, `false` (default)||
+|fast|option|||
+|[files](#files)|target|`string`|selection of files to compile and output destination|
+|html|target|||
+|htmlModuleTemplate|option|||
+|htmlVarTemplate|option|||
+|mapRoot|option|||
+|module|option|||
+|noImplicitAny|option|||
+|noResolve|option|||
+|options|target|||
+|out|target|||
+|outDir|target|||
+|reference|target|||
+|removeComments|option|||
+|sourceRoot|option|||
+|sourceMap|option|||
+|src|target|||
+|target|option|||
+|verbose|option|||
+|watch|target|||
+
+
+Note: In the above chart, if "where to define" is "target", the property must be defined on a target or on the `ts` object directly.  If "where to define" is "options", then the property must be defined on an `options` object on `ts` or on a target under `ts`.
+
 
 ### grunt-ts target properties
 
