@@ -1,11 +1,14 @@
 # Releases
 
 ## Next
-* DOCS: changelog is now *newest on top*
-* FEAT: support watching multiple DIRS. (https://github.com/grunt-ts/grunt-ts/pull/155/)
-* CHORE: Use lodash instead of underscore (https://github.com/TypeStrong/grunt-ts/pull/161)
+
+## v2.0.0
+* DOCS: Major documentation overhaul (https://github.com/TypeStrong/grunt-ts/pull/185)
 * DOCS: More sample config for gruntfile (https://github.com/TypeStrong/grunt-ts/pull/166)
+* DOCS: changelog is now *newest on top*
 * FEAT: support for `files` in gruntfile (https://github.com/TypeStrong/grunt-ts/pull/171)
+* FEAT: support watching multiple DIRS. (https://github.com/grunt-ts/grunt-ts/pull/155)
+* CHORE: Use lodash instead of underscore (https://github.com/TypeStrong/grunt-ts/pull/161)
 * FIX: missing tsc.js will now fail the build step (#177)
 
 ## v1.12.0
