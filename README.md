@@ -399,7 +399,7 @@ true (default) | false
 
 TypeScript has two types of errors: emit preventing and non-emit preventing.  Generally, type errors do not prevent the JavaScript emit.  Therefore, it can be useful to allow the Grunt pipeline to continue even if there are type errors because `tsc` will still generate JavaScript.
 
-If `failOnTypeErrors` is enabled, grunt-ts will *halt* the Grunt pipeline if there is a TypeScript type error even if it wouldn't have prevented the emit.  Note that syntax errors or other general `tsc` errors will always halt the pipeline.
+If `failOnTypeErrors` is set to `false`, grunt-ts will not halt the Grunt pipeline if a TypeScript type error is encountered.  Note that syntax errors or other general `tsc` errors will always halt the pipeline.
 
 ````javascript
 grunt.initConfig({
