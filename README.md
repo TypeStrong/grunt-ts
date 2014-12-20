@@ -799,7 +799,7 @@ $ grunt upgrade
  * Update the version in package.json.
  * Update CHANGELOG.md.
  * Commit to master.
- * Push to npm.
+ * Publish to npm.
  * Push version tag to GitHub.
 
 ## License
