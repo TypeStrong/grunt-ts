@@ -322,14 +322,20 @@ module.exports = function (grunt) {
                 }
             },
             fail: {
-                fail: true,                  // a designed to fail target                
+                fail: true,                  // a designed to fail target
                 src: ['test/fail/**/*.ts'],
                 outDir: 'test/fail/js',
                 baseDir: 'test/fail/ts',
                 // watch: 'test',
-                options: {                  // overide the main options for this target 
+                options: {                  // overide the main options for this target
                     sourcemap: false
                 }
+            },
+            failontypeerror: {
+                fail: true,
+                failOnTypeError: true,
+                src: ['test/failontypeerror/**/*.ts'],
+                outDir: 'test/failontypeerror/js',
             },
             files_testfailedcompilation: {
                 fail: true,                  // a designed to fail target
@@ -408,9 +414,9 @@ module.exports = function (grunt) {
         return memo;
     }, []));
 
-    // Loading it for testing since we have in a local 'tasks' folder 
+    // Loading it for testing since we have in a local 'tasks' folder
     grunt.loadTasks('tasks');
-    // in your configuration you would load this like: 
+    // in your configuration you would load this like:
     //grunt.loadNpmTasks('grunt-ts')
 
     grunt.loadTasks(lkgPath); // dogfood
@@ -436,13 +442,13 @@ module.exports = function (grunt) {
     grunt.registerTask('default', ['release']);
 
     //////////////////////////////////////////////
-    // Dev   
+    // Dev
     //
     // `grunt dev` if using grunt watch
-    // Or 
+    // Or
     // `grunt run` if using webstorm / manual run
-    // 
-    // Modify tasksToTest based on what you are working on 
+    //
+    // Modify tasksToTest based on what you are working on
 
     var tasksToTest = ['ts:fail', 'nodeunit'];
 
@@ -450,7 +456,7 @@ module.exports = function (grunt) {
 
     grunt.registerTask('run', function () {
 
-        // Clear the console and move to 0 0 
+        // Clear the console and move to 0 0
         // http://stackoverflow.com/a/14976765/390330
         console.log('\u001b[2J\u001b[0;0H');
         console.log('>>>>>>>>>>> Cleared console >>>>>>>>>>> \n\n'.grey);

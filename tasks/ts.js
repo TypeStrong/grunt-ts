@@ -277,7 +277,7 @@ function pluginFn(grunt) {
                         return false;
                     }
 
-                    var isError = (result.code === 1);
+                    var isError = (result.code !== 0);
 
                     // If the compilation errors contain only type errors, JS files are still
                     //   generated. If tsc finds type errors, it will return an error code, even
