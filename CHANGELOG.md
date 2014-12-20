@@ -2,6 +2,11 @@
 
 ## Next
 
+## v2.0.1
+ * FIX: Compatibility with TypeScript 1.3 exit codes (#189).
+ * FIX: Show issue count in red if failOnTypeError option is set and there are non-emit preventing errors  (#189).
+ * FIX: Fixed bad `failontypeerror` test. (Used incorrect location for parameter in Gruntfile.js).
+
 ## v2.0.0
 * DOCS: Major documentation overhaul (https://github.com/TypeStrong/grunt-ts/pull/185)
 * DOCS: More sample config for gruntfile (https://github.com/TypeStrong/grunt-ts/pull/166)

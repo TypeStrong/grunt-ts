@@ -795,6 +795,7 @@ $ grunt upgrade
 
 ### Publishing Checklist
 
+ * Run `grunt release` and ensure it comes back clean (should finish but with warnings).
  * Update the version in package.json.
  * Update CHANGELOG.md.
  * Commit to master.

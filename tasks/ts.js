@@ -277,6 +277,8 @@ function pluginFn(grunt) {
                         return false;
                     }
 
+                    // In TypeScript 1.3 and above, the result code corresponds to the ExitCode enum in
+                    //   TypeScript/src/compiler/sys.ts
                     var isError = (result.code !== 0);
 
                     // If the compilation errors contain only type errors, JS files are still
@@ -308,7 +310,7 @@ function pluginFn(grunt) {
 
                     // Log error summary
                     if (level1ErrorCount + level5ErrorCount + nonEmitPreventingWarningCount > 0) {
-                        if (level1ErrorCount + level5ErrorCount > 0) {
+                        if ((level1ErrorCount + level5ErrorCount > 0) || options.failOnTypeErrors) {
                             grunt.log.write(('>> ').red);
                         } else {
                             grunt.log.write(('>> ').green);
@@ -326,7 +328,7 @@ function pluginFn(grunt) {
 
                         grunt.log.writeln('');
 
-                        if (isOnlyTypeErrors) {
+                        if (isOnlyTypeErrors && !options.failOnTypeErrors) {
                             grunt.log.write(('>> ').green);
                             grunt.log.writeln('Type errors only.');
                         }
