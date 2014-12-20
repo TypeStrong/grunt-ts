@@ -321,6 +321,14 @@ module.exports = function (grunt) {
                     compiler: './customcompiler/tsc'
                 }
             },
+            continueIfTypeErrorAndNoFailOnTypeErrors: {
+                test: true,
+                src: ['test/failontypeerror/**/*.ts'],
+                outDir: 'test/failontypeerror/js',
+                options: {
+                    failOnTypeErrors: false
+                }
+            },
             fail: {
                 fail: true,                  // a designed to fail target
                 src: ['test/fail/**/*.ts'],
@@ -331,11 +339,13 @@ module.exports = function (grunt) {
                     sourcemap: false
                 }
             },
-            failontypeerror: {
+            failOnTypeErrors: {
                 fail: true,
-                failOnTypeError: true,
                 src: ['test/failontypeerror/**/*.ts'],
                 outDir: 'test/failontypeerror/js',
+                options: {
+                    failOnTypeErrors: true
+                }
             },
             files_testfailedcompilation: {
                 fail: true,                  // a designed to fail target
