@@ -1,6 +1,7 @@
 # Releases
 
 ## Next
+* CHORE: updated chokidar. Needed to decrease CPU utilization on certain OSes (https://github.com/TypeStrong/grunt-ts/issues/192#issuecomment-68136726)
 
 ## v2.0.1
  * FIX: Compatibility with TypeScript 1.3 exit codes (#189).
