@@ -6,6 +6,8 @@ interface ITargetOptions {
     outDir: string; // if sepecified e.g. '/build/js' all output js files are put in this location
     baseDir: string; // If specified. outDir files are made relative to this. 
     html: string[];  // if specified this is used to generate typescript files with a single variable which contains the content of the html
+    htmlOutDir: string; // if specified with html, the generated typescript file will be produce in the directory
+    htmlOutDirFlatten: boolean; // if specified with htmlOutDir, the files will be flat in the htmlOutDir
     watch: string; // if specified watches all files in this directory for changes. 
     amdloader: string;  // if specified creates a js file to load all the generated typescript files in order using requirejs + order
     templateCache: {
@@ -52,4 +54,6 @@ interface ITaskOptions {
 
     htmlModuleTemplate: string;
     htmlVarTemplate: string;
+    htmlOutDir: string;
+    htmlOutDirFlatten: boolean;
 }
