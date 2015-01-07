@@ -26,8 +26,4 @@ var A = (function (_super) {
     return A;
 })(B);
 /// <reference path="c.ts" />
-//grunt-start
-/// <reference path="b.ts" />
-//grunt-end
-/// <reference path="a.ts" />
 //# sourceMappingURL=out.js.map
