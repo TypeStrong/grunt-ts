@@ -185,9 +185,7 @@ class ExportTransformer extends BaseImportExportTransformer implements ITransfor
         // This code is same as import transformer
         // One difference : we do not short circuit to `index.ts` if found
         super('export', '<fileOrDirectoryName>[,<variableName>]',
-            // workaround for https://github.com/Microsoft/TypeScript/issues/512
-            _.template('import <%=filename%>_file = require(\'<%= pathToFile %>\'); <%= signatureGenerated %>' + os.EOL +
-                'export var <%=filename%> = <%=filename%>_file;'), false, true);
+            _.template('export import <%=filename%> = require(\'<%= pathToFile %>\');'), false, true);
     }
 }
 
