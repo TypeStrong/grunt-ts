@@ -159,7 +159,7 @@ var ExportTransformer = (function (_super) {
     function ExportTransformer() {
         // This code is same as import transformer
         // One difference : we do not short circuit to `index.ts` if found
-        _super.call(this, 'export', '<fileOrDirectoryName>[,<variableName>]', _.template('import <%=filename%>_file = require(\'<%= pathToFile %>\'); <%= signatureGenerated %>' + os.EOL + 'export var <%=filename%> = <%=filename%>_file;'), false, true);
+        _super.call(this, 'export', '<fileOrDirectoryName>[,<variableName>]', _.template('export import <%=filename%> = require(\'<%= pathToFile %>\');'), false, true);
     }
     return ExportTransformer;
 })(BaseImportExportTransformer);
