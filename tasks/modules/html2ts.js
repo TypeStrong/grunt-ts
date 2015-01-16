@@ -33,9 +33,47 @@ function compileHTML(filename, options) {
     var varName = options.varFunction({ ext: ext, filename: extFreename }).replace('.', '_');
     var fileContent = htmlTemplate({ modulename: moduleName, varname: varName, content: htmlContent });
     // Write the content to a file
-    var outputfile = filename + '.ts';
+    var outputfile = getOutputFile(filename, options.htmlOutDir, options.flatten);
+    mkdirParent(path.dirname(outputfile));
     fs.writeFileSync(outputfile, fileContent);
     return outputfile;
 }
 exports.compileHTML = compileHTML;
+function getOutputFile(filename, htmlOutDir, flatten) {
+    var outputfile = filename;
+    // NOTE If an htmlOutDir was specified
+    if (htmlOutDir !== null) {
+        var dir = getPath(htmlOutDir);
+        if (fs.existsSync(dir)) {
+            var relativeFilename = filename;
+            if (flatten) {
+                relativeFilename = path.basename(filename);
+            }
+            outputfile = path.join(dir, relativeFilename);
+        }
+    }
+    return outputfile + '.ts';
+}
+function getPath(dir) {
+    // NOTE If we don't have a valid absolute path
+    if (!fs.existsSync(dir)) {
+        // NOTE Try relative from the current working directory
+        dir = path.join(process.cwd(), dir);
+    }
+    return dir;
+}
+function mkdirParent(dirPath, mode) {
+    try {
+        fs.mkdirSync(dirPath, mode);
+    }
+    catch (error) {
+        // NOTE When it fail in this way, do the custom steps
+        if (error && error.errno === 34) {
+            // NOTE Create all the parents recursively
+            mkdirParent(path.dirname(dirPath), mode);
+            // NOTE And then the directory
+            mkdirParent(dirPath, mode);
+        }
+    }
+}
 //# sourceMappingURL=html2ts.js.map
