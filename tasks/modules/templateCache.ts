@@ -3,11 +3,10 @@
 import _ = require('lodash');
 import fs = require('fs');
 import path = require('path');
-import os = require('os');
 
 import utils = require('./utils');
 
-var eol = os.EOL;
+var eol = utils.eol;
 
 
 /////////////////////////////////////////////////////////////////////

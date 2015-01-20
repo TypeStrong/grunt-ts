@@ -4,6 +4,7 @@ var fs = require('fs');
 var util = require('util');
 
 exports.grunt = require('grunt');
+exports.eol = exports.grunt.util.linefeed;
 
 // Converts "C:\boo" , "C:\boo\foo.ts" => "./foo.ts"; Works on unix as well.
 function makeRelativePath(folderpath, filename, forceRelative) {

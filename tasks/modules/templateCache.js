@@ -2,11 +2,10 @@
 var _ = require('lodash');
 var fs = require('fs');
 var path = require('path');
-var os = require('os');
 
 var utils = require('./utils');
 
-var eol = os.EOL;
+var eol = utils.eol;
 
 /////////////////////////////////////////////////////////////////////
 // AngularJS templateCache

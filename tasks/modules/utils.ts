@@ -5,6 +5,7 @@ import fs = require('fs');
 import util = require('util');
 
 export var grunt: IGrunt = require('grunt');
+export var eol: string = grunt.util.linefeed;
 
 // Converts "C:\boo" , "C:\boo\foo.ts" => "./foo.ts"; Works on unix as well.
 export function makeRelativePath(folderpath: string, filename: string, forceRelative = false) {
