@@ -515,7 +515,7 @@ grunt.initConfig({
 true | false (default)
 ````
 
-Set to true to pass `--noImplicitAny` to the compiler.  Requires more strict type checking.  If `noImplicitAny` is enabled, TypeScript will raise a type error whenever it is unable to infer the type of a variable.
+Set to true to pass `--noImplicitAny` to the compiler.  Requires more strict type checking.  If `noImplicitAny` is enabled, TypeScript will raise a type error whenever it is unable to infer the type of a variable.  By default, grunt-ts will halt the Grunt pipeline on type errors.  See [failOnTypeErrors](#failontypeerrors) for more info.
 
 ````javascript
 grunt.initConfig({
