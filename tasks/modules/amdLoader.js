@@ -3,11 +3,10 @@ var _ = require('lodash');
 var _str = require('underscore.string');
 var path = require('path');
 var fs = require('fs');
-var os = require('os');
 
 var utils = require('./utils');
 
-var eol = os.EOL;
+var eol = utils.eol;
 var grunt = utils.grunt;
 var pathSeperator = path.sep;
 

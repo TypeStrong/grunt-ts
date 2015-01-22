@@ -11,7 +11,6 @@ var path = require('path');
 var grunt = require('grunt');
 var _str = require('underscore.string');
 var _ = require('lodash');
-var os = require('os');
 var utils = require('./utils');
 
 // Setup when transformers are triggered
@@ -159,7 +158,7 @@ var ExportTransformer = (function (_super) {
     function ExportTransformer() {
         // This code is same as import transformer
         // One difference : we do not short circuit to `index.ts` if found
-        _super.call(this, 'export', '<fileOrDirectoryName>[,<variableName>]', _.template('import <%=filename%>_file = require(\'<%= pathToFile %>\'); <%= signatureGenerated %>' + os.EOL + 'export var <%=filename%> = <%=filename%>_file;'), false, true);
+        _super.call(this, 'export', '<fileOrDirectoryName>[,<variableName>]', _.template('import <%=filename%>_file = require(\'<%= pathToFile %>\'); <%= signatureGenerated %>' + utils.eol + 'export var <%=filename%> = <%=filename%>_file;'), false, true);
     }
     return ExportTransformer;
 })(BaseImportExportTransformer);
@@ -246,7 +245,7 @@ function transformFiles(changedFiles, targetFiles, target, task) {
             // Lines not generated or not directives
             outputLines.push(line);
         }
-        var transformedContent = outputLines.join(os.EOL);
+        var transformedContent = outputLines.join(utils.eol);
         if (transformedContent !== contents) {
             grunt.file.write(fileToProcess, transformedContent);
         }

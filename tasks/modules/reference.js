@@ -5,7 +5,6 @@ var fs = require('fs');
 var grunt = require('grunt');
 
 var utils = require('./utils');
-var os = require('os');
 
 /////////////////////////////////////////////////////////////////////
 // Reference file logic
@@ -95,7 +94,7 @@ function updateReferenceFile(files, generatedFiles, referenceFile, referencePath
     contents.push(ourSignatureEnd);
 
     var updatedFileLines = utils.insertArrayAt(origFileLines, signatureSectionPosition, contents);
-    var updatedFileContents = updatedFileLines.join(os.EOL);
+    var updatedFileContents = updatedFileLines.join(utils.eol);
 
     // Modify the orig contents to put in our contents only if changed
     // Also Return whether the file was changed
