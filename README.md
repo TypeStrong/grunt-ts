@@ -315,7 +315,9 @@ grunt.initConfig({
 
 This target option allows the developer to select an alternate TypeScript compiler.
 
-To use the alternate compiler that is included with grunt-ts, update your gruntfile.js file with this code:
+By default, `grunt-ts` will use the TypeScript compiler that came bundled with it.  Alternate compilers can be used by this target option (for custom compiler builds) or using `package.json` (for npm released version of `typescript`).
+
+To use a custom compiler, update your gruntfile.js file with this code:
 
 ````javascript
 grunt.initConfig({
@@ -327,7 +329,24 @@ grunt.initConfig({
 });
 ````
 
-To use another compiler version, download it from the current [TypeScript repository on GitHub](https://github.com/Microsoft/TypeScript/releases) or the old [TypeScript repository on CodePlex](http://typescript.codeplex.com/releases) and extract it to a folder in your project.  The compiler will be in the `bin` folder.  Copy all of the files to your project folder and then reference `tsc` using the `compiler` task option.  For example, if you extracted everything to a `mycompiler` folder in your project, you'd set the grunt-ts `compiler` property to `'./mycompiler/tsc'`.
+Download custom compilers from the current [TypeScript repository on GitHub](https://github.com/Microsoft/TypeScript/releases) or the old [TypeScript repository on CodePlex](http://typescript.codeplex.com/releases) and extract it to a folder in your project.  The compiler will be in the `bin` folder.  Copy all of the files to your project folder and then reference `tsc` using the `compiler` task option.  For example, if you extracted everything to a `mycompiler` folder in your project, you'd set the grunt-ts `compiler` property to `'./mycompiler/tsc'`.
+
+In the absence of a compiler argument, `grunt-ts` will look for an alternate compiler in its *peer* `node_modules` folder (where `grunt-ts` and `typescript` are peers).
+
+The `package.json` would look something like this for a legacy project:
+
+```javascript
+{
+  "devDependencies": {
+    "grunt" : "~0.4.1",
+    "grunt-ts" : "~1.9.2",
+    "typescript" : "0.9.7"
+  }
+}
+```
+Note: It is safest to pin the exact TypeScript version (do not use `~` or `>`).
+
+
 
 #### noResolve
 
