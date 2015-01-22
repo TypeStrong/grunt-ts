@@ -11,10 +11,10 @@ Grunt-ts is an npm package that handles TypeScript compilation work in GruntJS b
 If you've never used GruntJS on your computer, you should [follow the detailed instructions here](/docs/DetailedGettingStartedInstructions.md) to get Node.js and the grunt-cli working.  If you're a Grunt expert, simply follow these steps:
 
  * Run `npm install grunt-ts` in your project directory; this will install `grunt-ts`, TypeScript, and GruntJS.
- * Add the `ts` task in your `gruntfile.js` (see below for a minimalist one).
+ * Add the `ts` task in your `Gruntfile.js` (see below for a minimalist one).
  * Run `grunt` at the command line in your project folder to compile your TypeScript code.
 
-This minimalist `gruntfile.js` will compile `*.ts` files in all subdirectories of the project folder, excluding anything under `node_modules`:
+This minimalist `Gruntfile.js` will compile `*.ts` files in all subdirectories of the project folder, excluding anything under `node_modules`:
 
 ````javascript
 module.exports = function(grunt) {
@@ -30,7 +30,7 @@ module.exports = function(grunt) {
 };
 ````
 
-A more extensive sample gruntfile.js is available [here](https://github.com/TypeStrong/grunt-ts/blob/master/sample/Gruntfile.js).
+A more extensive sample `Gruntfile.js` is available [here](https://github.com/TypeStrong/grunt-ts/blob/master/sample/Gruntfile.js).
 
 ## Grunt-ts Features
 
@@ -736,6 +736,22 @@ Everything between `grunt-start` and `grunt-end` is generated and maintained by 
 
 /// <reference path="main.ts" />
 ````
+
+### Standardizing Line Endings
+
+As of grunt-ts v2.0.2, If you wish to standardize the line endings used by grunt-ts transforms, you can set the `grunt.util.linefeed` property in your gruntfile.js to the desired standard line ending for the grunt-ts managed TypeScript files.
+
+````javascript
+module.exports = function(grunt) {
+
+  grunt.util.linefeed = '\r\n';  // this would standardize on CRLF
+
+  /* rest of config */
+};
+````
+
+Note that it is not currently possible to force TypeScript to emit all JavaScript with a particular line ending, but a switch to allow that is under discussion here: https://github.com/Microsoft/TypeScript/issues/1693
+
 
 ## Video Examples
 **TypeScript programming using grunt-ts (YouTube):**
