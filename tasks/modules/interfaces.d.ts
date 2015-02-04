@@ -50,7 +50,8 @@ interface ITaskOptions {
     removeComments: boolean; // true to remove comments
     sourceMap: boolean;
     sourceRoot: string;
-    target: string; // es3 , es5
+    /** es3, es5, es6 */
+    target: string;
     failOnTypeErrors: boolean;
 
     verbose: boolean;

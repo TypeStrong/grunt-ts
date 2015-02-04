@@ -241,6 +241,22 @@ module.exports = function (grunt) {
                     module: 'amd'
                 }
             },
+            es6test: {
+                test: true,
+                src: 'test/es6/stringTemplate.ts',
+                outDir: 'test/es6/es6',
+                options: {
+                    target: 'es6'
+                }
+            },
+            es6_to_es5test: {
+                test: true,
+                src: 'test/es6/stringTemplate.ts',
+                outDir: 'test/es6/es5',
+                options: {
+                    target: 'es5'
+                }
+            },
             warnbothcomments: {
                 test: true,
                 src: ['test/abtest/**/*.ts'],

@@ -73,5 +73,9 @@ export var typescript = {
     fail: function (test) {
         testDirectory(test, 'fail'); // tested to make sure transformers still run for failing task
         test.done();
+    },
+    es6: function (test) {
+        testDirectory(test, 'es6');
+        test.done();
     }
 }

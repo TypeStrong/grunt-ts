@@ -60,7 +60,7 @@ Grunt-ts supports most `tsc` switches.  Click the link to cross-reference to the
 |--removeComments|[removeComments](#removecomments)|Configures if comments should be included in the output|
 |--sourceMap|[sourceMap](#sourcemap)|Generates corresponding `.map` file|
 |--sourceRoot LOCATION|[sourceRoot](#sourceroot)|Specifies the location where debugger should locate TypeScript files instead of source locations.|
-|--target VERSION|[target](#target)|Specify ECMAScript target version: `'es3'` or `'es5'`|
+|--target VERSION|[target](#target)|Specify ECMAScript target version: `'es3'`, `'es5'`, or `'es6'`|
 |--out FILE|[out](#out)|Concatenate and emit output to a single file.|
 |--outDir DIRECTORY|[outDir](#outdir)|Redirect output structure to the directory.|
 
@@ -92,7 +92,7 @@ For file ordering, look at [JavaScript Generation](#javascript-generation).
 |[sourceRoot](#sourceroot)|option|`string` - root for referencing TS files in `.js.map`|
 |[sourceMap](#sourcemap)|option|`true` (default), `false` - indicates if source maps should be generated (`.js.map`)|
 |[src](#src)|target|`string` or `string[]` - glob of TypeScript files to compile.|
-|[target](#target)|option|`'es5'` (default) or `'es3'` - targeted ECMAScript version|
+|[target](#target)|option|`'es5'` (default), `'es3'`, or `'es6'` - targeted ECMAScript version|
 |[verbose](#verbose)|option|`true`, `false` (default) - logs `tsc` command-line options to console|
 |[watch](#watch)|target|`string` - will watch for changes in the specified directory or below|
 
@@ -587,10 +587,10 @@ grunt.initConfig({
 #### target
 
 ````javascript
-"es5" (default) | "es3"
+"es5" (default) | "es3" | "es6"
 ````
 
-Allows the developer to specify if they are targeting ECMAScript version 3 or 5.  Only select ES3 if you are targeting old browsers (IE8 or below).  The default for grunt-ts (es5) is different than the default for `tsc` (es3).
+Allows the developer to specify if they are targeting ECMAScript version 3, 5, or 6.  Support for `es6` emit was added in TypeScript 1.4 and is listed as experimental.  Only select ES3 if you are targeting old browsers (IE8 or below).  The default for grunt-ts (es5) is different than the default for `tsc` (es3).
 
 ````javascript
 grunt.initConfig({

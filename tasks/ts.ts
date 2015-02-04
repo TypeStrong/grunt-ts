@@ -106,7 +106,7 @@ function pluginFn(grunt: IGrunt) {
             removeComments: null, // true to remove comments
             sourceMap: true,
             sourceRoot: '',
-            target: 'es5', // es3 , es5
+            target: 'es5', // es3, es5, es6
             verbose: false,
             fast: 'watch',
             compiler: '',
@@ -114,7 +114,7 @@ function pluginFn(grunt: IGrunt) {
             htmlVarTemplate: '<%= ext %>',
             htmlOutDir: null,
             htmlOutDirFlatten: false,
-            failOnTypeErrors: true,
+            failOnTypeErrors: true
         });
 
         // get unprocessed templates from configuration
