@@ -7,16 +7,26 @@ import utils = require('../tasks/modules/utils');
 import _ = require('lodash');
 
 function testFile(test, path) {
-    var actual = grunt.file.read('test/' + path);
-    var expected = grunt.file.read('test/expected/' + path);
-    test.equal(expected, actual, 'tested path: ' + path);
+    var actualFileName = 'test/' + path,
+        expectedFileName = 'test/expected/' + path;
+    var actual = grunt.file.read(actualFileName);
+    var expected = grunt.file.read(expectedFileName);
+    test.equal(expected, actual, 'Actual did not match expected:' + grunt.util.linefeed +
+        actualFileName + grunt.util.linefeed + 
+        expectedFileName);
 }
 
 function testExpectedFile(test, path: string) {
-    var actual = grunt.file.read(path.replace('\\expected', '').replace('/expected', ''));
-    var expected = grunt.file.read(path);
-    test.equal(expected, actual, 'tested path: ' + path);
+    var actualFileName = path.replace('\\expected', '').replace('/expected', ''),
+        expectedFileName = path;
+
+    var actual = grunt.file.read(actualFileName);
+    var expected = grunt.file.read(expectedFileName);
+    test.equal(expected, actual, 'Actual did not match expected:' + grunt.util.linefeed +
+        actualFileName + grunt.util.linefeed +
+        expectedFileName);
 }
+
 
 function testDirectory(test, folder) {
     var files = utils.getFiles(('test/expected/' + folder));
