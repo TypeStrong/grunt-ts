@@ -29,5 +29,5 @@ var A = (function (_super) {
 //grunt-start
 /// <reference path="b.ts" />
 //grunt-end
-/// <reference path="a.ts" />
+/// <reference path="a.ts" /> 
 //# sourceMappingURL=out.js.map
