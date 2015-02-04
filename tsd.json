@@ -11,9 +11,6 @@
     "underscore.string/underscore.string.d.ts": {
       "commit": "1c1c12eaea0040c2c4493319c286f7d8e8968827"
     },
-    "underscore/underscore.d.ts": {
-      "commit": "1c1c12eaea0040c2c4493319c286f7d8e8968827"
-    },
     "gruntjs/gruntjs.d.ts": {
       "commit": "1c1c12eaea0040c2c4493319c286f7d8e8968827"
     },

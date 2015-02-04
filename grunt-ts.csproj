@@ -58,7 +58,6 @@
     <TypeScriptCompile Include="defs\node\node.d.ts" />
     <TypeScriptCompile Include="defs\tsd.d.ts" />
     <TypeScriptCompile Include="defs\underscore.string\underscore.string.d.ts" />
-    <TypeScriptCompile Include="defs\underscore\underscore.d.ts" />
     <TypeScriptCompile Include="tasks\modules\amdLoader.ts" />
     <TypeScriptCompile Include="tasks\modules\cacheUtils.ts" />
     <TypeScriptCompile Include="tasks\modules\compile.ts" />
