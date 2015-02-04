@@ -11,13 +11,15 @@ module.exports = function (grunt) {
                 '.tscache/**/*',
                 '!test/test.js',
                 '!test/expected/**/*',
-                'test/htmlOutDir/generated/test'
+                'test/htmlOutDir/generated/test',
+                'tscommand-*.txt'
             ],
             testPost: [
                 'src/a.js',
                 'src/b.js',
                 'src/c.js',
-                'src/reference.js'
+                'src/reference.js',
+                '**/.baseDir.ts'
             ]
         },
         jshint: {
