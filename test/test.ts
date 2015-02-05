@@ -91,5 +91,10 @@ export var typescript = {
     preserveConstEnums: function (test) {
         testDirectory(test, 'preserveConstEnums');
         test.done();
+    },
+    suppressImplicitAnyIndexErrors: function (test) {
+        testDirectory(test, 'suppressImplicitAnyIndexErrors');
+        assertFileDoesNotExist(test, 'test/suppressImplicitAnyIndexErrors/test_suppressImplicitAnyIndexError_false.js');
+        test.done();
     }
 }

@@ -45,6 +45,9 @@ interface ITaskOptions {
     /** Const enums will be kept as enums in the emitted JS. If false, the enum values will
      * look like magic numbers with a comment in the emitted JS. */
     preserveConstEnums: boolean;
+    /** Allows access to properties of an object by string indexer when --noImplicitAny is 
+     * active, even if TypeScript doesn't know about them. */
+    suppressImplicitAnyIndexErrors: boolean;
     verbose: boolean;
     compile: boolean;
     fast: string; // never | always | watch (default)

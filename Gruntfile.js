@@ -377,7 +377,8 @@ module.exports = function (grunt) {
                 out: 'test/noEmitOnError/testNoEmitOnError_false.js',
                 options: {
                     failOnTypeErrors: false,
-                    noEmitOnError: false
+                    noEmitOnError: false,
+                    fast: 'never'
                 }
             },
             doesNotHaveEmitIfTypeErrorAnd_noEmitOnError_IsTrue: {
@@ -386,7 +387,8 @@ module.exports = function (grunt) {
                 out: 'test/noEmitOnError/testNoEmitOnError_true.js',
                 options: {
                     failOnTypeErrors: false,
-                    noEmitOnError: true
+                    noEmitOnError: true,
+                    fast: 'never'
                 }
             },
             notPreservedIf_preserveConstEnums_IsFalse: {
@@ -394,7 +396,8 @@ module.exports = function (grunt) {
                 src: 'test/preserveConstEnums/test_preserveConstEnums.ts',
                 out: 'test/preserveConstEnums/test_preserveConstEnums_false.js',
                 options: {
-                    preserveConstEnums: false
+                    preserveConstEnums: false,
+                    fast: 'never'
                 }
             },
             preservedIf_preserveConstEnums_IsTrue: {
@@ -402,7 +405,32 @@ module.exports = function (grunt) {
                 src: 'test/preserveConstEnums/test_preserveConstEnums.ts',
                 out: 'test/preserveConstEnums/test_preserveConstEnums_true.js',
                 options: {
-                    preserveConstEnums: true
+                    preserveConstEnums: true,
+                    fast: 'never'
+                }
+            },
+            emitIf_suppressImplicitAnyIndexError_IsTrue: {
+                test: true,
+                src: 'test/suppressImplicitAnyIndexErrors/test_suppressImplicitAnyIndexError.ts',
+                out: 'test/suppressImplicitAnyIndexErrors/test_suppressImplicitAnyIndexError_true.js',
+                options: {
+                    suppressImplicitAnyIndexErrors: true,
+                    noImplicitAny: true,
+                    failOnTypeErrors: true,
+                    noEmitOnError: true,
+                    fast: 'never'
+                }
+            },
+            doNotEmitIf_suppressImplicitAnyIndexError_IsFalse: {
+                test: true,
+                src: 'test/suppressImplicitAnyIndexErrors/test_suppressImplicitAnyIndexError.ts',
+                out: 'test/suppressImplicitAnyIndexErrors/test_suppressImplicitAnyIndexError_false.js',
+                options: {
+                    suppressImplicitAnyIndexErrors: false,
+                    noImplicitAny: true,
+                    failOnTypeErrors: false,
+                    noEmitOnError: true,
+                    fast: 'never'
                 }
             },
             fail: {

@@ -143,6 +143,9 @@ function compileAllFiles(targetFiles, target, task, targetName) {
     if (task.preserveConstEnums) {
         args.push('--preserveConstEnums');
     }
+    if (task.suppressImplicitAnyIndexErrors) {
+        args.push('--suppressImplicitAnyIndexErrors');
+    }
     // string options
     args.push('--target', task.target.toUpperCase());
     args.push('--module', task.module.toLowerCase());

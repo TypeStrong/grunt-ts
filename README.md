@@ -63,6 +63,7 @@ Grunt-ts supports most `tsc` switches.  Click the link to cross-reference to the
 |--removeComments|[removeComments](#removecomments)|Configures if comments should be included in the output|
 |--sourceMap|[sourceMap](#sourcemap)|Generates corresponding `.map` file|
 |--sourceRoot LOCATION|[sourceRoot](#sourceroot)|Specifies the location where debugger should locate TypeScript files instead of source locations.|
+|--suppressImplicitAnyIndexErrors|[suppressImplicitAnyIndexErrors](#suppressimplicitanyindexerrors)|Specifies the location where debugger should locate TypeScript files instead of source locations.|
 |--target VERSION|[target](#target)|Specify ECMAScript target version: `'es3'`, `'es5'`, or `'es6'`|
 
 
@@ -94,6 +95,7 @@ For file ordering, look at [JavaScript Generation](#javascript-generation).
 |[removeComments](#removecomments)|option|`true` (default), `false` - removes comments in emitted JS|
 |[sourceRoot](#sourceroot)|option|`string` - root for referencing TS files in `.js.map`|
 |[sourceMap](#sourcemap)|option|`true` (default), `false` - indicates if source maps should be generated (`.js.map`)|
+|[suppressImplicitAnyIndexErrors](#suppressimplicitanyindexerrors)|option|`false` (default), `true` - indicates if TypeScript should allow access to properties of an object by string indexer when --noImplicitAny is active, even if TypeScript doesn't know about them.|
 |[src](#src)|target|`string` or `string[]` - glob of TypeScript files to compile.|
 |[target](#target)|option|`'es5'` (default), `'es3'`, or `'es6'` - targeted ECMAScript version|
 |[verbose](#verbose)|option|`true`, `false` (default) - logs `tsc` command-line options to console|
@@ -625,6 +627,40 @@ grunt.initConfig({
     }
   }
 });
+````
+
+
+#### suppressImplicitAnyIndexErrors
+
+````javascript
+true | false (default)
+````
+
+Set to true to pass `--suppressImplicitAnyIndexErrors` to the compiler.  If set to true, TypeScript will allow access to properties of an object by string indexer when --noImplicitAny is active, even if TypeScript doesn't know about them.  This setting has no effect unless `--noImplicitAny` is active.
+
+````javascript
+grunt.initConfig({
+  ts: {
+    default: {
+      options: {
+        suppressImplicitAnyIndexErrors: true,
+        noImplicitAny: true
+      }
+    }
+  }
+});
+````
+
+For example, the following code would not compile with `--noImplicitAny` alone, but it would be legal with `--noImplicitAny` and `--suppressImplicitAnyIndexErrors` both enabled:
+
+````typescript
+interface person {
+    name: string;
+}
+
+var p : person = { name: "Test" };
+p["age"] = 101;  //property age does not exist on interface person.
+console.log(p["age"]);
 ````
 
 #### target

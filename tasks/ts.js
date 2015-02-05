@@ -91,7 +91,8 @@ function pluginFn(grunt) {
             htmlOutDirFlatten: false,
             failOnTypeErrors: true,
             noEmitOnError: false,
-            preserveConstEnums: false
+            preserveConstEnums: false,
+            suppressImplicitAnyIndexErrors: false
         });
         // get unprocessed templates from configuration
         var rawTaskOptions = (grunt.config.getRaw(currenttask.name + '.options') || {});
@@ -272,8 +273,12 @@ function pluginFn(grunt) {
                     //   Level 2 errors = semantic errors - *not* prevents JS emit.
                     //   Level 5 errors = compiler flag misuse - prevents JS emit.
                     var level1ErrorCount = 0, level5ErrorCount = 0, nonEmitPreventingWarningCount = 0;
+                    var hasTS7017Error = false;
                     var hasPreventEmitErrors = _.foldl(result.output.split('\n'), function (memo, errorMsg) {
                         var isPreventEmitError = false;
+                        if (errorMsg.search(/error TS7017:/g) >= 0) {
+                            hasTS7017Error = true;
+                        }
                         if (errorMsg.search(/error TS1\d+:/g) >= 0) {
                             level1ErrorCount += 1;
                             isPreventEmitError = true;
@@ -290,6 +295,9 @@ function pluginFn(grunt) {
                     // Because we can't think of a better way to determine it,
                     //   assume that emitted JS in spite of error codes implies type-only errors.
                     var isOnlyTypeErrors = !hasPreventEmitErrors;
+                    if (hasTS7017Error) {
+                        grunt.log.writeln(('Note:  You may wish to enable the suppressImplicitAnyIndexError' + ' grunt-ts option to allow dynamic property access by index.  This will' + ' suppress TypeScript error TS7017.').magenta);
+                    }
                     // Log error summary
                     if (level1ErrorCount + level5ErrorCount + nonEmitPreventingWarningCount > 0) {
                         if ((level1ErrorCount + level5ErrorCount > 0) || options.failOnTypeErrors) {
