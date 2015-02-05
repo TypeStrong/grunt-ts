@@ -115,7 +115,8 @@ function pluginFn(grunt: IGrunt) {
             htmlOutDir: null,
             htmlOutDirFlatten: false,
             failOnTypeErrors: true,
-            noEmitOnError: false
+            noEmitOnError: false,
+            preserveConstEnums: false
         });
 
         // get unprocessed templates from configuration
@@ -167,8 +168,6 @@ function pluginFn(grunt: IGrunt) {
                     '", neither "files" nor "src" is used.  Nothing will be compiled.').magenta);
             }
         }
-
-
 
         if (!options.htmlModuleTemplate) {
             // use default value

@@ -140,6 +140,9 @@ function compileAllFiles(targetFiles, target, task, targetName) {
     if (task.noEmitOnError) {
         args.push('--noEmitOnError');
     }
+    if (task.preserveConstEnums) {
+        args.push('--preserveConstEnums');
+    }
     // string options
     args.push('--target', task.target.toUpperCase());
     args.push('--module', task.module.toLowerCase());

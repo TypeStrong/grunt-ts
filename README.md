@@ -57,6 +57,7 @@ Grunt-ts supports most `tsc` switches.  Click the link to cross-reference to the
 |--module KIND|[module](#module)|Specify module style for code generation|
 |--noImplicitAny|[noImplicitAny](#noimplicitany)|Warn on expressions and declarations with an implied `any` type.|
 |--noResolve|[noResolve](#noresolve)|Skip resolution and preprocessing (deprecated)|
+|--preserveConstEnums|[preserveConstEnums](#preserveconstenums)|Const enums will be kept as enums in the emitted JS.|
 |--removeComments|[removeComments](#removecomments)|Configures if comments should be included in the output|
 |--sourceMap|[sourceMap](#sourcemap)|Generates corresponding `.map` file|
 |--sourceRoot LOCATION|[sourceRoot](#sourceroot)|Specifies the location where debugger should locate TypeScript files instead of source locations.|
@@ -87,6 +88,7 @@ For file ordering, look at [JavaScript Generation](#javascript-generation).
 |[options](#grunt-ts-target-options)|target||
 |[out](#out)|target|`string` - instruct `tsc` to concatenate output to this file.|
 |[outDir](#outdir)|target|`string` - instruct `tsc` to emit JS to this directory.|
+|[preserveConstEnums](#preserveconstenums)|option|`true`, `false` (default) - If true, const enums will be kept as enums in the emitted JS.|
 |[reference](#reference)|target|`string` - tells grunt-ts which file to use for maintaining references|
 |[removeComments](#removecomments)|option|`true` (default), `false` - removes comments in emitted JS|
 |[sourceRoot](#sourceroot)|option|`string` - root for referencing TS files in `.js.map`|
@@ -542,6 +544,26 @@ grunt.initConfig({
     default: {
       options: {
         noImplicitAny: true
+      }
+    }
+  }
+});
+````
+
+#### preserveConstEnums
+
+````javascript
+true | false (default)
+````
+
+Set to true to pass `--preserveConstEnums` to the compiler.  If set to true, TypeScript will emit code that allows other JavaScript code to use the enum.  If false (the default), TypeScript will inline the enum values as magic numbers with a comment in the emitted JS.
+
+````javascript
+grunt.initConfig({
+  ts: {
+    default: {
+      options: {
+        preserveConstEnums: true
       }
     }
   }

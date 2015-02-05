@@ -71,6 +71,10 @@ exports.typescript = {
         testDirectory(test, 'noEmitOnError');
         assertFileDoesNotExist(test, 'test/noEmitOnError/testNoEmitOnError_true.js');
         test.done();
+    },
+    preserveConstEnums: function (test) {
+        testDirectory(test, 'preserveConstEnums');
+        test.done();
     }
 };
 //# sourceMappingURL=test.js.map

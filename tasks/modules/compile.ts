@@ -175,6 +175,9 @@ export function compileAllFiles(targetFiles: string[], target: ITargetOptions, t
     if (task.noEmitOnError) {
         args.push('--noEmitOnError');
     }
+    if (task.preserveConstEnums) {
+        args.push('--preserveConstEnums');
+    }
 
     // string options
     args.push('--target', task.target.toUpperCase());

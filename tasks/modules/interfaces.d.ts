@@ -42,6 +42,9 @@ interface ITaskOptions {
     failOnTypeErrors: boolean;
     /** If a type error occurs, do not emit the JavaScript.  New in TypeScript 1.4.  */
     noEmitOnError: boolean;
+    /** Const enums will be kept as enums in the emitted JS. If false, the enum values will
+     * look like magic numbers with a comment in the emitted JS. */
+    preserveConstEnums: boolean;
     verbose: boolean;
     compile: boolean;
     fast: string; // never | always | watch (default)

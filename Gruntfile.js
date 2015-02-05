@@ -389,6 +389,22 @@ module.exports = function (grunt) {
                     noEmitOnError: true
                 }
             },
+            notPreservedIf_preserveConstEnums_IsFalse: {
+                test: true,
+                src: 'test/preserveConstEnums/test_preserveConstEnums.ts',
+                out: 'test/preserveConstEnums/test_preserveConstEnums_false.js',
+                options: {
+                    preserveConstEnums: false
+                }
+            },
+            preservedIf_preserveConstEnums_IsTrue: {
+                test: true,
+                src: 'test/preserveConstEnums/test_preserveConstEnums.ts',
+                out: 'test/preserveConstEnums/test_preserveConstEnums_true.js',
+                options: {
+                    preserveConstEnums: true
+                }
+            },
             fail: {
                 fail: true,                  // a designed to fail target
                 src: ['test/fail/**/*.ts'],
