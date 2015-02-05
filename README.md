@@ -531,6 +531,26 @@ grunt.initConfig({
 });
 ````
 
+#### noEmitOnError
+
+````javascript
+true | false (default)
+````
+
+Set to true to pass `--noEmitOnError` to the compiler.  If set to true, TypeScript will not emit JavaScript if there is a type error.  This flag does not affect the Grunt pipeline; to force the Grunt pipeline to continue (or halt) in the presence of TypeScript type errors, see [failOnTypeErrors](#failontypeerrors).
+
+````javascript
+grunt.initConfig({
+  ts: {
+    default: {
+      options: {
+        noEmitOnError: true
+      }
+    }
+  }
+});
+````
+
 #### noImplicitAny
 
 ````javascript
