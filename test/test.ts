@@ -6,7 +6,7 @@ import path = require('path');
 import utils = require('../tasks/modules/utils');
 import _ = require('lodash');
 
-function testFile(test, path) {
+function testFile(test, path: string) {
     var actualFileName = 'test/' + path,
         expectedFileName = 'test/expected/' + path;
     var actual = grunt.file.read(actualFileName);
@@ -14,6 +14,11 @@ function testFile(test, path) {
     test.equal(expected, actual, 'Actual did not match expected:' + grunt.util.linefeed +
         actualFileName + grunt.util.linefeed + 
         expectedFileName);
+}
+
+function assertFileDoesNotExist(test, path: string) {
+    var exists = grunt.file.exists(path);
+    test.equal(false, exists, 'Expected this file to not exist: ' + path);
 }
 
 function testExpectedFile(test, path: string) {
@@ -76,6 +81,11 @@ export var typescript = {
     },
     es6: function (test) {
         testDirectory(test, 'es6');
+        test.done();
+    },
+    noEmitOnError: function (test) {
+        testDirectory(test, 'noEmitOnError');
+        assertFileDoesNotExist(test, 'test/noEmitOnError/testNoEmitOnError_true.js');
         test.done();
     }
 }

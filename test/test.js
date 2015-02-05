@@ -8,6 +8,10 @@ function testFile(test, path) {
     var expected = grunt.file.read(expectedFileName);
     test.equal(expected, actual, 'Actual did not match expected:' + grunt.util.linefeed + actualFileName + grunt.util.linefeed + expectedFileName);
 }
+function assertFileDoesNotExist(test, path) {
+    var exists = grunt.file.exists(path);
+    test.equal(false, exists, 'Expected this file to not exist: ' + path);
+}
 function testExpectedFile(test, path) {
     var actualFileName = path.replace('\\expected', '').replace('/expected', ''), expectedFileName = path;
     var actual = grunt.file.read(actualFileName);
@@ -61,6 +65,11 @@ exports.typescript = {
     },
     es6: function (test) {
         testDirectory(test, 'es6');
+        test.done();
+    },
+    noEmitOnError: function (test) {
+        testDirectory(test, 'noEmitOnError');
+        assertFileDoesNotExist(test, 'test/noEmitOnError/testNoEmitOnError_true.js');
         test.done();
     }
 };

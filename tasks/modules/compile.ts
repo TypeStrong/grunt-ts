@@ -172,6 +172,9 @@ export function compileAllFiles(targetFiles: string[], target: ITargetOptions, t
     if (task.noResolve) {
         args.push('--noResolve');
     }
+    if (task.noEmitOnError) {
+        args.push('--noEmitOnError');
+    }
 
     // string options
     args.push('--target', task.target.toUpperCase());

@@ -371,6 +371,24 @@ module.exports = function (grunt) {
                     failOnTypeErrors: false
                 }
             },
+            hasEmitIfTypeErrorAnd_noEmitOnError_IsFalse: {
+                test: true,
+                src: 'test/noEmitOnError/testNoEmitOnError.ts',
+                out: 'test/noEmitOnError/testNoEmitOnError_false.js',
+                options: {
+                    failOnTypeErrors: false,
+                    noEmitOnError: false
+                }
+            },
+            doesNotHaveEmitIfTypeErrorAnd_noEmitOnError_IsTrue: {
+                test: true,
+                src: 'test/noEmitOnError/testNoEmitOnError.ts',
+                out: 'test/noEmitOnError/testNoEmitOnError_true.js',
+                options: {
+                    failOnTypeErrors: false,
+                    noEmitOnError: true
+                }
+            },
             fail: {
                 fail: true,                  // a designed to fail target
                 src: ['test/fail/**/*.ts'],

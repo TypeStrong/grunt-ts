@@ -22,25 +22,12 @@ interface ITargetOptions {
     };
 }
 
-/**
- * Version 0.9.5.0
- *
- * Bare Options Supported:
- * --allowbool                   Allow 'bool' as a synonym for 'boolean'.
- * --allowimportmodule           Allow 'module(...)' as a synonym for 'require(...)'.
- * --declaration                 Generates corresponding .d.ts file
- * --mapRoot LOCATION            Specifies the location where debugger should locate map files instead of generated locations.
- * --module KIND                 Specify module code generation: "commonjs" or "amd"
- * --noImplicitAny               Warn on expressions and declarations with an implied 'any' type.
- * --noResolve                   Skip resolution and preprocessing
- * --removeComments              Do not emit comments to output
- * --sourcemap                   Generates corresponding .map file
- * --sourceRoot LOCATION         Specifies the location where debugger should locate TypeScript files instead of source locations.
- * --target VERSION              Specify ECMAScript target version: "ES3" (default), or "ES5"
- */
 interface ITaskOptions {
+    /** Deprecated in tsc */
     allowBool: boolean;
+    /** Deprecated in tsc */
     allowImportModule: boolean;
+    /** Emit declarations*/
     declaration: boolean;
     mapRoot: string;
     module: string; // amd, commonjs
@@ -53,12 +40,12 @@ interface ITaskOptions {
     /** es3, es5, es6 */
     target: string;
     failOnTypeErrors: boolean;
-
+    /** If a type error occurs, do not emit the JavaScript.  New in TypeScript 1.4.  */
+    noEmitOnError: boolean;
     verbose: boolean;
     compile: boolean;
     fast: string; // never | always | watch (default)
     compiler: string; // If you want, the path to a custom TypeScript compiler's main JS file
-
     htmlModuleTemplate: string;
     htmlVarTemplate: string;
     htmlOutDir: string;

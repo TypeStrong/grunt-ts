@@ -114,7 +114,8 @@ function pluginFn(grunt: IGrunt) {
             htmlVarTemplate: '<%= ext %>',
             htmlOutDir: null,
             htmlOutDirFlatten: false,
-            failOnTypeErrors: true
+            failOnTypeErrors: true,
+            noEmitOnError: false
         });
 
         // get unprocessed templates from configuration

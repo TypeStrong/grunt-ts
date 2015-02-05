@@ -89,7 +89,8 @@ function pluginFn(grunt) {
             htmlVarTemplate: '<%= ext %>',
             htmlOutDir: null,
             htmlOutDirFlatten: false,
-            failOnTypeErrors: true
+            failOnTypeErrors: true,
+            noEmitOnError: false
         });
         // get unprocessed templates from configuration
         var rawTaskOptions = (grunt.config.getRaw(currenttask.name + '.options') || {});
