@@ -95,7 +95,7 @@ For file ordering, look at [JavaScript Generation](#javascript-generation).
 |[removeComments](#removecomments)|option|`true` (default), `false` - removes comments in emitted JS|
 |[sourceRoot](#sourceroot)|option|`string` - root for referencing TS files in `.js.map`|
 |[sourceMap](#sourcemap)|option|`true` (default), `false` - indicates if source maps should be generated (`.js.map`)|
-|[suppressImplicitAnyIndexErrors](#suppressimplicitanyindexerrors)|option|`false` (default), `true` - indicates if TypeScript should allow access to properties of an object by string indexer when --noImplicitAny is active, even if TypeScript doesn't know about them.|
+|[suppressImplicitAnyIndexErrors](#suppressimplicitanyindexerrors)|option|`false` (default), `true` - indicates if TypeScript should allow access to properties of an object by string indexer when `--noImplicitAny` is active, even if TypeScript doesn't know about them.|
 |[src](#src)|target|`string` or `string[]` - glob of TypeScript files to compile.|
 |[target](#target)|option|`'es5'` (default), `'es3'`, or `'es6'` - targeted ECMAScript version|
 |[verbose](#verbose)|option|`true`, `false` (default) - logs `tsc` command-line options to console|
@@ -636,7 +636,7 @@ grunt.initConfig({
 true | false (default)
 ````
 
-Set to true to pass `--suppressImplicitAnyIndexErrors` to the compiler.  If set to true, TypeScript will allow access to properties of an object by string indexer when --noImplicitAny is active, even if TypeScript doesn't know about them.  This setting has no effect unless `--noImplicitAny` is active.
+Set to true to pass `--suppressImplicitAnyIndexErrors` to the compiler.  If set to true, TypeScript will allow access to properties of an object by string indexer when `--noImplicitAny` is active, even if TypeScript doesn't know about them.  This setting has no effect unless `--noImplicitAny` is active.
 
 ````javascript
 grunt.initConfig({
