@@ -57,13 +57,14 @@ Grunt-ts supports most `tsc` switches.  Click the link to cross-reference to the
 |--module KIND|[module](#module)|Specify module style for code generation|
 |--noImplicitAny|[noImplicitAny](#noimplicitany)|Warn on expressions and declarations with an implied `any` type.|
 |--noResolve|[noResolve](#noresolve)|Skip resolution and preprocessing (deprecated)|
+|--out FILE|[out](#out)|Concatenate and emit output to a single file.|
+|--outDir DIRECTORY|[outDir](#outdir)|Redirect output structure to the directory.|
 |--preserveConstEnums|[preserveConstEnums](#preserveconstenums)|Const enums will be kept as enums in the emitted JS.|
 |--removeComments|[removeComments](#removecomments)|Configures if comments should be included in the output|
 |--sourceMap|[sourceMap](#sourcemap)|Generates corresponding `.map` file|
 |--sourceRoot LOCATION|[sourceRoot](#sourceroot)|Specifies the location where debugger should locate TypeScript files instead of source locations.|
 |--target VERSION|[target](#target)|Specify ECMAScript target version: `'es3'`, `'es5'`, or `'es6'`|
-|--out FILE|[out](#out)|Concatenate and emit output to a single file.|
-|--outDir DIRECTORY|[outDir](#outdir)|Redirect output structure to the directory.|
+
 
 For file ordering, look at [JavaScript Generation](#javascript-generation).
 
