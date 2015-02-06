@@ -10,7 +10,6 @@
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <DebugType>full</DebugType>
     <DebugSymbols>true</DebugSymbols>
-    <TypeScriptToolsVersion>1.0</TypeScriptToolsVersion>
     <UseIISExpress>true</UseIISExpress>
     <IISExpressSSLPort />
     <IISExpressAnonymousAuthentication />
@@ -58,7 +57,6 @@
     <TypeScriptCompile Include="defs\node\node.d.ts" />
     <TypeScriptCompile Include="defs\tsd.d.ts" />
     <TypeScriptCompile Include="defs\underscore.string\underscore.string.d.ts" />
-    <TypeScriptCompile Include="defs\underscore\underscore.d.ts" />
     <TypeScriptCompile Include="tasks\modules\amdLoader.ts" />
     <TypeScriptCompile Include="tasks\modules\cacheUtils.ts" />
     <TypeScriptCompile Include="tasks\modules\compile.ts" />
@@ -69,6 +67,7 @@
     <TypeScriptCompile Include="tasks\modules\transformers.ts" />
     <TypeScriptCompile Include="tasks\modules\utils.ts" />
     <TypeScriptCompile Include="tasks\ts.ts" />
+    <TypeScriptCompile Include="test\test.ts" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Gruntfile.js" />

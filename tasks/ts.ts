@@ -106,7 +106,7 @@ function pluginFn(grunt: IGrunt) {
             removeComments: null, // true to remove comments
             sourceMap: true,
             sourceRoot: '',
-            target: 'es5', // es3 , es5
+            target: 'es5', // es3, es5, es6
             verbose: false,
             fast: 'watch',
             compiler: '',
@@ -115,6 +115,9 @@ function pluginFn(grunt: IGrunt) {
             htmlOutDir: null,
             htmlOutDirFlatten: false,
             failOnTypeErrors: true,
+            noEmitOnError: false,
+            preserveConstEnums: false,
+            suppressImplicitAnyIndexErrors: false
         });
 
         // get unprocessed templates from configuration
@@ -166,8 +169,6 @@ function pluginFn(grunt: IGrunt) {
                     '", neither "files" nor "src" is used.  Nothing will be compiled.').magenta);
             }
         }
-
-
 
         if (!options.htmlModuleTemplate) {
             // use default value
@@ -330,8 +331,12 @@ function pluginFn(grunt: IGrunt) {
                         //   Level 2 errors = semantic errors - *not* prevents JS emit.
                         //   Level 5 errors = compiler flag misuse - prevents JS emit.
                         var level1ErrorCount = 0, level5ErrorCount = 0, nonEmitPreventingWarningCount = 0;
+                        var hasTS7017Error = false;
                         var hasPreventEmitErrors = _.foldl(result.output.split('\n'), function(memo, errorMsg: string) {
                             var isPreventEmitError = false;
+                            if (errorMsg.search(/error TS7017:/g) >= 0) {
+                                hasTS7017Error = true;
+                            }
                             if (errorMsg.search(/error TS1\d+:/g) >= 0) {
                               level1ErrorCount += 1;
                               isPreventEmitError = true;
@@ -347,6 +352,12 @@ function pluginFn(grunt: IGrunt) {
                         // Because we can't think of a better way to determine it,
                         //   assume that emitted JS in spite of error codes implies type-only errors.
                         var isOnlyTypeErrors = !hasPreventEmitErrors;
+
+                        if (hasTS7017Error) {
+                            grunt.log.writeln(('Note:  You may wish to enable the suppressImplicitAnyIndexError' +
+                                ' grunt-ts option to allow dynamic property access by index.  This will' +
+                                ' suppress TypeScript error TS7017.').magenta);
+                        }
 
                         // Log error summary
                         if (level1ErrorCount + level5ErrorCount + nonEmitPreventingWarningCount > 0) {

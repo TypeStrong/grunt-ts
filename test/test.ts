@@ -6,17 +6,32 @@ import path = require('path');
 import utils = require('../tasks/modules/utils');
 import _ = require('lodash');
 
-function testFile(test, path) {
-    var actual = grunt.file.read('test/' + path);
-    var expected = grunt.file.read('test/expected/' + path);
-    test.equal(expected, actual, 'tested path: ' + path);
+function testFile(test, path: string) {
+    var actualFileName = 'test/' + path,
+        expectedFileName = 'test/expected/' + path;
+    var actual = grunt.file.read(actualFileName);
+    var expected = grunt.file.read(expectedFileName);
+    test.equal(expected, actual, 'Actual did not match expected:' + grunt.util.linefeed +
+        actualFileName + grunt.util.linefeed + 
+        expectedFileName);
+}
+
+function assertFileDoesNotExist(test, path: string) {
+    var exists = grunt.file.exists(path);
+    test.equal(false, exists, 'Expected this file to not exist: ' + path);
 }
 
 function testExpectedFile(test, path: string) {
-    var actual = grunt.file.read(path.replace('\\expected', '').replace('/expected', ''));
-    var expected = grunt.file.read(path);
-    test.equal(expected, actual, 'tested path: ' + path);
+    var actualFileName = path.replace('\\expected', '').replace('/expected', ''),
+        expectedFileName = path;
+
+    var actual = grunt.file.read(actualFileName);
+    var expected = grunt.file.read(expectedFileName);
+    test.equal(expected, actual, 'Actual did not match expected:' + grunt.util.linefeed +
+        actualFileName + grunt.util.linefeed +
+        expectedFileName);
 }
+
 
 function testDirectory(test, folder) {
     var files = utils.getFiles(('test/expected/' + folder));
@@ -62,6 +77,24 @@ export var typescript = {
     },
     fail: function (test) {
         testDirectory(test, 'fail'); // tested to make sure transformers still run for failing task
+        test.done();
+    },
+    es6: function (test) {
+        testDirectory(test, 'es6');
+        test.done();
+    },
+    noEmitOnError: function (test) {
+        testDirectory(test, 'noEmitOnError');
+        assertFileDoesNotExist(test, 'test/noEmitOnError/testNoEmitOnError_true.js');
+        test.done();
+    },
+    preserveConstEnums: function (test) {
+        testDirectory(test, 'preserveConstEnums');
+        test.done();
+    },
+    suppressImplicitAnyIndexErrors: function (test) {
+        testDirectory(test, 'suppressImplicitAnyIndexErrors');
+        assertFileDoesNotExist(test, 'test/suppressImplicitAnyIndexErrors/test_suppressImplicitAnyIndexError_false.js');
         test.done();
     }
 }

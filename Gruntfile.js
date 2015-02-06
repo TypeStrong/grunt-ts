@@ -11,13 +11,15 @@ module.exports = function (grunt) {
                 '.tscache/**/*',
                 '!test/test.js',
                 '!test/expected/**/*',
-                'test/htmlOutDir/generated/test'
+                'test/htmlOutDir/generated/test',
+                'tscommand-*.txt'
             ],
             testPost: [
                 'src/a.js',
                 'src/b.js',
                 'src/c.js',
-                'src/reference.js'
+                'src/reference.js',
+                '**/.baseDir.ts'
             ]
         },
         jshint: {
@@ -239,6 +241,22 @@ module.exports = function (grunt) {
                     module: 'amd'
                 }
             },
+            es6test: {
+                test: true,
+                src: 'test/es6/stringTemplate.ts',
+                outDir: 'test/es6/es6',
+                options: {
+                    target: 'es6'
+                }
+            },
+            es6_to_es5test: {
+                test: true,
+                src: 'test/es6/stringTemplate.ts',
+                outDir: 'test/es6/es5',
+                options: {
+                    target: 'es5'
+                }
+            },
             warnbothcomments: {
                 test: true,
                 src: ['test/abtest/**/*.ts'],
@@ -351,6 +369,68 @@ module.exports = function (grunt) {
                 outDir: 'test/failontypeerror/js',
                 options: {
                     failOnTypeErrors: false
+                }
+            },
+            hasEmitIfTypeErrorAnd_noEmitOnError_IsFalse: {
+                test: true,
+                src: 'test/noEmitOnError/testNoEmitOnError.ts',
+                out: 'test/noEmitOnError/testNoEmitOnError_false.js',
+                options: {
+                    failOnTypeErrors: false,
+                    noEmitOnError: false,
+                    fast: 'never'
+                }
+            },
+            doesNotHaveEmitIfTypeErrorAnd_noEmitOnError_IsTrue: {
+                test: true,
+                src: 'test/noEmitOnError/testNoEmitOnError.ts',
+                out: 'test/noEmitOnError/testNoEmitOnError_true.js',
+                options: {
+                    failOnTypeErrors: false,
+                    noEmitOnError: true,
+                    fast: 'never'
+                }
+            },
+            notPreservedIf_preserveConstEnums_IsFalse: {
+                test: true,
+                src: 'test/preserveConstEnums/test_preserveConstEnums.ts',
+                out: 'test/preserveConstEnums/test_preserveConstEnums_false.js',
+                options: {
+                    preserveConstEnums: false,
+                    fast: 'never'
+                }
+            },
+            preservedIf_preserveConstEnums_IsTrue: {
+                test: true,
+                src: 'test/preserveConstEnums/test_preserveConstEnums.ts',
+                out: 'test/preserveConstEnums/test_preserveConstEnums_true.js',
+                options: {
+                    preserveConstEnums: true,
+                    fast: 'never'
+                }
+            },
+            emitIf_suppressImplicitAnyIndexError_IsTrue: {
+                test: true,
+                src: 'test/suppressImplicitAnyIndexErrors/test_suppressImplicitAnyIndexError.ts',
+                out: 'test/suppressImplicitAnyIndexErrors/test_suppressImplicitAnyIndexError_true.js',
+                options: {
+                    suppressImplicitAnyIndexErrors: true,
+                    noImplicitAny: true,
+                    failOnTypeErrors: true,
+                    noEmitOnError: true,
+                    fast: 'never'
+                }
+            },
+            doNotEmitIf_suppressImplicitAnyIndexError_IsFalse: {
+                test: true,
+                src: 'test/suppressImplicitAnyIndexErrors/test_suppressImplicitAnyIndexError.ts',
+                out: 'test/suppressImplicitAnyIndexErrors/test_suppressImplicitAnyIndexError_false.js',
+                options: {
+                    suppressImplicitAnyIndexErrors: false,
+                    noImplicitAny: true,
+                    failOnTypeErrors: false,
+                    noEmitOnError: true,
+                    fast: 'never'
                 }
             },
             fail: {

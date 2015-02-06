@@ -57,12 +57,15 @@ Grunt-ts supports most `tsc` switches.  Click the link to cross-reference to the
 |--module KIND|[module](#module)|Specify module style for code generation|
 |--noImplicitAny|[noImplicitAny](#noimplicitany)|Warn on expressions and declarations with an implied `any` type.|
 |--noResolve|[noResolve](#noresolve)|Skip resolution and preprocessing (deprecated)|
+|--out FILE|[out](#out)|Concatenate and emit output to a single file.|
+|--outDir DIRECTORY|[outDir](#outdir)|Redirect output structure to the directory.|
+|--preserveConstEnums|[preserveConstEnums](#preserveconstenums)|Const enums will be kept as enums in the emitted JS.|
 |--removeComments|[removeComments](#removecomments)|Configures if comments should be included in the output|
 |--sourceMap|[sourceMap](#sourcemap)|Generates corresponding `.map` file|
 |--sourceRoot LOCATION|[sourceRoot](#sourceroot)|Specifies the location where debugger should locate TypeScript files instead of source locations.|
-|--target VERSION|[target](#target)|Specify ECMAScript target version: `'es3'` or `'es5'`|
-|--out FILE|[out](#out)|Concatenate and emit output to a single file.|
-|--outDir DIRECTORY|[outDir](#outdir)|Redirect output structure to the directory.|
+|--suppressImplicitAnyIndexErrors|[suppressImplicitAnyIndexErrors](#suppressimplicitanyindexerrors)|Specifies the location where debugger should locate TypeScript files instead of source locations.|
+|--target VERSION|[target](#target)|Specify ECMAScript target version: `'es3'`, `'es5'`, or `'es6'`|
+
 
 For file ordering, look at [JavaScript Generation](#javascript-generation).
 
@@ -87,12 +90,14 @@ For file ordering, look at [JavaScript Generation](#javascript-generation).
 |[options](#grunt-ts-target-options)|target||
 |[out](#out)|target|`string` - instruct `tsc` to concatenate output to this file.|
 |[outDir](#outdir)|target|`string` - instruct `tsc` to emit JS to this directory.|
+|[preserveConstEnums](#preserveconstenums)|option|`true`, `false` (default) - If true, const enums will be kept as enums in the emitted JS.|
 |[reference](#reference)|target|`string` - tells grunt-ts which file to use for maintaining references|
 |[removeComments](#removecomments)|option|`true` (default), `false` - removes comments in emitted JS|
 |[sourceRoot](#sourceroot)|option|`string` - root for referencing TS files in `.js.map`|
 |[sourceMap](#sourcemap)|option|`true` (default), `false` - indicates if source maps should be generated (`.js.map`)|
+|[suppressImplicitAnyIndexErrors](#suppressimplicitanyindexerrors)|option|`false` (default), `true` - indicates if TypeScript should allow access to properties of an object by string indexer when `--noImplicitAny` is active, even if TypeScript doesn't know about them.|
 |[src](#src)|target|`string` or `string[]` - glob of TypeScript files to compile.|
-|[target](#target)|option|`'es5'` (default) or `'es3'` - targeted ECMAScript version|
+|[target](#target)|option|`'es5'` (default), `'es3'`, or `'es6'` - targeted ECMAScript version|
 |[verbose](#verbose)|option|`true`, `false` (default) - logs `tsc` command-line options to console|
 |[watch](#watch)|target|`string` - will watch for changes in the specified directory or below|
 
@@ -528,6 +533,26 @@ grunt.initConfig({
 });
 ````
 
+#### noEmitOnError
+
+````javascript
+true | false (default)
+````
+
+Set to true to pass `--noEmitOnError` to the compiler.  If set to true, TypeScript will not emit JavaScript if there is a type error.  This flag does not affect the Grunt pipeline; to force the Grunt pipeline to continue (or halt) in the presence of TypeScript type errors, see [failOnTypeErrors](#failontypeerrors).
+
+````javascript
+grunt.initConfig({
+  ts: {
+    default: {
+      options: {
+        noEmitOnError: true
+      }
+    }
+  }
+});
+````
+
 #### noImplicitAny
 
 ````javascript
@@ -542,6 +567,26 @@ grunt.initConfig({
     default: {
       options: {
         noImplicitAny: true
+      }
+    }
+  }
+});
+````
+
+#### preserveConstEnums
+
+````javascript
+true | false (default)
+````
+
+Set to true to pass `--preserveConstEnums` to the compiler.  If set to true, TypeScript will emit code that allows other JavaScript code to use the enum.  If false (the default), TypeScript will inline the enum values as magic numbers with a comment in the emitted JS.
+
+````javascript
+grunt.initConfig({
+  ts: {
+    default: {
+      options: {
+        preserveConstEnums: true
       }
     }
   }
@@ -584,13 +629,47 @@ grunt.initConfig({
 });
 ````
 
+
+#### suppressImplicitAnyIndexErrors
+
+````javascript
+true | false (default)
+````
+
+Set to true to pass `--suppressImplicitAnyIndexErrors` to the compiler.  If set to true, TypeScript will allow access to properties of an object by string indexer when `--noImplicitAny` is active, even if TypeScript doesn't know about them.  This setting has no effect unless `--noImplicitAny` is active.
+
+````javascript
+grunt.initConfig({
+  ts: {
+    default: {
+      options: {
+        suppressImplicitAnyIndexErrors: true,
+        noImplicitAny: true
+      }
+    }
+  }
+});
+````
+
+For example, the following code would not compile with `--noImplicitAny` alone, but it would be legal with `--noImplicitAny` and `--suppressImplicitAnyIndexErrors` both enabled:
+
+````typescript
+interface person {
+    name: string;
+}
+
+var p : person = { name: "Test" };
+p["age"] = 101;  //property age does not exist on interface person.
+console.log(p["age"]);
+````
+
 #### target
 
 ````javascript
-"es5" (default) | "es3"
+"es5" (default) | "es3" | "es6"
 ````
 
-Allows the developer to specify if they are targeting ECMAScript version 3 or 5.  Only select ES3 if you are targeting old browsers (IE8 or below).  The default for grunt-ts (es5) is different than the default for `tsc` (es3).
+Allows the developer to specify if they are targeting ECMAScript version 3, 5, or 6.  Support for `es6` emit was added in TypeScript 1.4 and is listed as experimental.  Only select ES3 if you are targeting old browsers (IE8 or below).  The default for grunt-ts (es5) is different than the default for `tsc` (es3).
 
 ````javascript
 grunt.initConfig({

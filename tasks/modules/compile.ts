@@ -172,6 +172,15 @@ export function compileAllFiles(targetFiles: string[], target: ITargetOptions, t
     if (task.noResolve) {
         args.push('--noResolve');
     }
+    if (task.noEmitOnError) {
+        args.push('--noEmitOnError');
+    }
+    if (task.preserveConstEnums) {
+        args.push('--preserveConstEnums');
+    }
+    if (task.suppressImplicitAnyIndexErrors) {
+        args.push('--suppressImplicitAnyIndexErrors');
+    }
 
     // string options
     args.push('--target', task.target.toUpperCase());
