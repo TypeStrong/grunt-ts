@@ -6,6 +6,7 @@ npm-debug.log
 .npmignore
 
 /test
+/customcompiler
 /.idea
 /defs
 /sample

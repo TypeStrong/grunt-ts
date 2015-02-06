@@ -1,8 +1,14 @@
 # Releases
 
 ## Next
+* Nothing yet
+
+## v3.0.0
+* **Breaking Change**: the default bundled typescript compiler is now `1.4.1`
+* FEAT: More compiler flags supported (https://github.com/TypeStrong/grunt-ts/pull/206)
 * CHORE: updated chokidar. Needed to decrease CPU utilization on certain OSes (https://github.com/TypeStrong/grunt-ts/issues/192#issuecomment-68136726)
 * FIX: now will default to Grunt end of line character, but supports Grunt override (#200).
+* CHORE: do not publish `/customcompiler` folder to npm
 
 ## v2.0.1
  * FIX: Compatibility with TypeScript 1.3 exit codes (#189).
