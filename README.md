@@ -248,19 +248,19 @@ grunt.initConfig({
 
 #### reference
 
-Grunt-ts can generate a reference TypeScript file which will contains a reference to all other found `.ts` files.
-
-This means that the developer will not need to cross-reference files manually; instead they can just reference `reference.ts`.
+Grunt-ts can automatically generate a TypeScript file containing a reference to all other found `.ts` files.  This means that the developer will not need to cross-reference each of their TypeScript files manually; instead, they can just reference the single `reference` file in each of their code files.
 
 ````javascript
 grunt.initConfig({
   ts: {
     default: {
+      src: ["references.ts","some/other/path/**/*.ts"]
       reference: "references.ts"
     }
   }
 });
 ````
+Note: the TypeScript file identified in the `reference` property *must* be included in the `src` or `files` property in the Grunt target, or `reference` won't work.
 
 *Warning:* Using the compiler with `out` and `reference` will prevent  grunt-ts from using its fast compile feature.  Consider using external modules with transforms instead.
 
