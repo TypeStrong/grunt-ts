@@ -260,7 +260,7 @@ grunt.initConfig({
   }
 });
 ````
-**Note:** the TypeScript file identified in the `reference` property *must* be included in the `src` or `files` property in the Grunt target, or `reference` won't work.
+**Note:** the TypeScript file identified in the `reference` property *must* be included in the `src` or `files` property in the Grunt target, or `reference` won't work (either directly or via wildcard/glob).
 
 *Warning:* Using the compiler with `out` and `reference` will prevent  grunt-ts from using its fast compile feature.  Consider using external modules with transforms instead.
 
