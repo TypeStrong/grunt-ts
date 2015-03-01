@@ -464,6 +464,13 @@ module.exports = function (grunt) {
                 options: {
                     fast: 'never'
                 }
+            },
+            withemptymodule: {
+                options: {
+                    module: '',
+                },
+                src: 'test/withemptymodule/ts/Main.ts',
+                out: 'test/withemptymodule/js/Main.js'
             }
         }
     });

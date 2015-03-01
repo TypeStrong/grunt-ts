@@ -148,7 +148,9 @@ function compileAllFiles(targetFiles, target, task, targetName) {
     }
     // string options
     args.push('--target', task.target.toUpperCase());
-    args.push('--module', task.module.toLowerCase());
+    if (!_.isNull(task.module) && !_.isUndefined(task.module) && !_.isEmpty(task.module)) {
+        args.push('--module', task.module.toLowerCase());
+    }
     // Target options:
     if (target.out) {
         args.push('--out', target.out);
