@@ -148,8 +148,16 @@ function compileAllFiles(targetFiles, target, task, targetName) {
     }
     // string options
     args.push('--target', task.target.toUpperCase());
-    if (!_.isNull(task.module) && !_.isUndefined(task.module) && !_.isEmpty(task.module)) {
-        args.push('--module', task.module.toLowerCase());
+    // check the module compile option
+    var moduleOptionString = task.module.toLowerCase();
+    if (moduleOptionString === 'amd' || moduleOptionString === 'commonjs' || moduleOptionString === '') {
+        if (!_.isEmpty(moduleOptionString)) {
+            args.push('--module', moduleOptionString);
+        }
+    }
+    else {
+        console.warn('WARNING: Option "module" does only support "amd" (default) | "commonjs" | ""'.magenta);
+        args.push('--module', 'amd');
     }
     // Target options:
     if (target.out) {
