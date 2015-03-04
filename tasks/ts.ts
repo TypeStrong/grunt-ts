@@ -99,7 +99,7 @@ function pluginFn(grunt: IGrunt) {
             compile: true,
             declaration: false,
             mapRoot: '',
-            module: 'amd', // amd, commonjs
+            module: null, // amd, commonjs
             noImplicitAny: false,
             noResolve: false,
             comments: null, // false to remove comments

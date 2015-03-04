@@ -186,14 +186,13 @@ export function compileAllFiles(targetFiles: string[], target: ITargetOptions, t
     args.push('--target', task.target.toUpperCase());
 
     // check the module compile option
-    var moduleOptionString: string = task.module.toLowerCase();
-    if (moduleOptionString === 'amd' || moduleOptionString === 'commonjs' || moduleOptionString === '') {
-        if (!_.isEmpty(moduleOptionString)) {
+    if (task.module) {
+   	    var moduleOptionString: string = task.module.toLowerCase();
+    	if (moduleOptionString === 'amd' || moduleOptionString === 'commonjs') {
             args.push('--module', moduleOptionString);
-        }
-    } else {
-        console.warn('WARNING: Option "module" does only support "amd" (default) | "commonjs" | ""'.magenta);
-        args.push('--module', 'amd');
+    	} else {
+	        console.warn('WARNING: Option "module" does only support "amd" | "commonjs"'.magenta);
+    	}
     }
 
     // Target options:
