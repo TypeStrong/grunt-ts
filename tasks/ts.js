@@ -74,7 +74,7 @@ function pluginFn(grunt) {
             compile: true,
             declaration: false,
             mapRoot: '',
-            module: 'amd',
+            module: null,
             noImplicitAny: false,
             noResolve: false,
             comments: null,

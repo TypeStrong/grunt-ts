@@ -26,3 +26,5 @@ bin/
 obj/
 *.user
 *.suo
+.project
+.settings/

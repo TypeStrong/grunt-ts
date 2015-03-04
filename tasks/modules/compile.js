@@ -148,7 +148,16 @@ function compileAllFiles(targetFiles, target, task, targetName) {
     }
     // string options
     args.push('--target', task.target.toUpperCase());
-    args.push('--module', task.module.toLowerCase());
+    // check the module compile option
+    if (task.module) {
+        var moduleOptionString = task.module.toLowerCase();
+        if (moduleOptionString === 'amd' || moduleOptionString === 'commonjs') {
+            args.push('--module', moduleOptionString);
+        }
+        else {
+            console.warn('WARNING: Option "module" does only support "amd" | "commonjs"'.magenta);
+        }
+    }
     // Target options:
     if (target.out) {
         args.push('--out', target.out);
