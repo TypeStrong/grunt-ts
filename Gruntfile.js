@@ -474,7 +474,7 @@ module.exports = function (grunt) {
                 out: 'test/withemptymodule/js/Main.js'
             },
             withwrongmodule: {
-                test: true,
+                fail: true,
                 options: {
                     module: 'nothing'
                 },
