@@ -1,7 +1,7 @@
 # Releases
 
 ## Next
-* Nothing yet
+* FIX: report error on wrong `module` option. (https://github.com/TypeStrong/grunt-ts/pull/212)
 
 ## v3.0.0
 * **Breaking Change**: the default bundled typescript compiler is now `1.4.1`
