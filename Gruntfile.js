@@ -257,6 +257,36 @@ module.exports = function (grunt) {
                     target: 'es5'
                 }
             },
+            vsproj_test: {
+                test: true,
+                vs: 'test/vsproj/ts/testproject.csproj'
+            },
+            vsproj_test_config: {
+                test: true,
+                vs: {
+                    project: 'test/vsproj/ts/testproject.csproj',
+                    config: 'Release'
+                }
+            },
+            vsproj_ignoreFiles_test: {
+                test: true,
+                src: 'test/vsproj/ts/**/*.ts',
+                vs: {
+                    project: 'test/vsproj/ts/testproject.csproj',
+                    ignoreFiles: true
+                }
+            },
+            vsproj_ignoreSettings_test: {
+                test: true,
+                vs: {
+                    project: 'test/vsproj/ts/testproject.csproj',
+                    ignoreSettings: true
+                },
+                outDir: 'test/vsproj/js/vsproj_ignoreSettings_test',
+                options: {
+                    target: 'es6'
+                }
+            },
             warnbothcomments: {
                 test: true,
                 src: ['test/abtest/**/*.ts'],
