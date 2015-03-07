@@ -614,6 +614,12 @@ module.exports = function (grunt) {
 
     grunt.registerTask('dev', ['run', 'watch']);
 
+    grunt.registerTask('nycdotnet', ['ts-internal',
+        'tslint:source',
+        'jshint:support',
+        'ts:vsproj_test',
+        'nodeunit']);
+
     grunt.registerTask('run', function () {
 
         // Clear the console and move to 0 0

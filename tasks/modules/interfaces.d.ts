@@ -20,6 +20,7 @@ interface ITargetOptions {
         dest: string;
         baseUrl: string;
     };
+    vs?: string | IVisualStudioProjectSupport;
 }
 
 interface ITaskOptions {
@@ -56,4 +57,11 @@ interface ITaskOptions {
     htmlVarTemplate: string;
     htmlOutDir: string;
     htmlOutDirFlatten: boolean;
+}
+
+interface IVisualStudioProjectSupport {
+    project: string;
+    config?: string;
+    ignoreFiles?: boolean;
+    ignoreSettings?: boolean;
 }

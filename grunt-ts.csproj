@@ -52,8 +52,10 @@
     <TypeScriptSourceMap>false</TypeScriptSourceMap>
   </PropertyGroup>
   <ItemGroup>
+    <TypeScriptCompile Include="defs\csproj2ts\csproj2ts.d.ts" />
     <TypeScriptCompile Include="defs\es6-promises\es6-promises.d.ts" />
     <TypeScriptCompile Include="defs\gruntjs\gruntjs.d.ts" />
+    <TypeScriptCompile Include="defs\lodash\lodash.d.ts" />
     <TypeScriptCompile Include="defs\node\node.d.ts" />
     <TypeScriptCompile Include="defs\tsd.d.ts" />
     <TypeScriptCompile Include="defs\underscore.string\underscore.string.d.ts" />
@@ -87,6 +89,7 @@
     <Content Include="tsd.json" />
     <Content Include="tslint.json" />
   </ItemGroup>
+  <ItemGroup />
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
     <TypeScriptTarget>ES3</TypeScriptTarget>
   </PropertyGroup>

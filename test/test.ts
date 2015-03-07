@@ -41,60 +41,65 @@ function testDirectory(test, folder) {
 }
 
 export var typescript = {
-    simple: function (test) {
-        testFile(test, 'simple/js/zoo.js');
-        testFile(test, 'simple/js/zoo.d.ts');
-        test.done();
-    },
-    abtest: function (test) {
-        testFile(test, 'abtest/reference.ts');
-        testFile(test, 'abtest/out.js');
-        test.done();
-    },
-    amdloader: function (test) {
-        testDirectory(test, 'amdloader');
-        test.done();
-    },
-    templateCache: function (test) {
-        testDirectory(test, 'templateCache');
-        test.done();
-    },
-    html2ts: function (test) {
-        testDirectory(test, 'html');
-        test.done();
-    },
-    index: function (test) {
-        testDirectory(test, 'index');
-        test.done();
-    },
-    transform: function (test) {
-        testDirectory(test, 'transform');
-        test.done();
-    },
-    customcompiler: function (test) {
-        testDirectory(test, 'customcompiler');
-        test.done();
-    },
-    fail: function (test) {
-        testDirectory(test, 'fail'); // tested to make sure transformers still run for failing task
-        test.done();
-    },
-    es6: function (test) {
-        testDirectory(test, 'es6');
-        test.done();
-    },
-    noEmitOnError: function (test) {
-        testDirectory(test, 'noEmitOnError');
-        assertFileDoesNotExist(test, 'test/noEmitOnError/testNoEmitOnError_true.js');
-        test.done();
-    },
-    preserveConstEnums: function (test) {
-        testDirectory(test, 'preserveConstEnums');
-        test.done();
-    },
-    suppressImplicitAnyIndexErrors: function (test) {
-        testDirectory(test, 'suppressImplicitAnyIndexErrors');
-        assertFileDoesNotExist(test, 'test/suppressImplicitAnyIndexErrors/test_suppressImplicitAnyIndexError_false.js');
+    //simple: function (test) {
+    //    testFile(test, 'simple/js/zoo.js');
+    //    testFile(test, 'simple/js/zoo.d.ts');
+    //    test.done();
+    //},
+    //abtest: function (test) {
+    //    testFile(test, 'abtest/reference.ts');
+    //    testFile(test, 'abtest/out.js');
+    //    test.done();
+    //},
+    //amdloader: function (test) {
+    //    testDirectory(test, 'amdloader');
+    //    test.done();
+    //},
+    //templateCache: function (test) {
+    //    testDirectory(test, 'templateCache');
+    //    test.done();
+    //},
+    //html2ts: function (test) {
+    //    testDirectory(test, 'html');
+    //    test.done();
+    //},
+    //index: function (test) {
+    //    testDirectory(test, 'index');
+    //    test.done();
+    //},
+    //transform: function (test) {
+    //    testDirectory(test, 'transform');
+    //    test.done();
+    //},
+    //customcompiler: function (test) {
+    //    testDirectory(test, 'customcompiler');
+    //    test.done();
+    //},
+    //fail: function (test) {
+    //    testDirectory(test, 'fail'); // tested to make sure transformers still run for failing task
+    //    test.done();
+    //},
+    //es6: function (test) {
+    //    testDirectory(test, 'es6');
+    //    test.done();
+    //},
+    //noEmitOnError: function (test) {
+    //    testDirectory(test, 'noEmitOnError');
+    //    assertFileDoesNotExist(test, 'test/noEmitOnError/testNoEmitOnError_true.js');
+    //    test.done();
+    //},
+    //preserveConstEnums: function (test) {
+    //    testDirectory(test, 'preserveConstEnums');
+    //    test.done();
+    //},
+    //suppressImplicitAnyIndexErrors: function (test) {
+    //    testDirectory(test, 'suppressImplicitAnyIndexErrors');
+    //    assertFileDoesNotExist(test, 'test/suppressImplicitAnyIndexErrors/test_suppressImplicitAnyIndexError_false.js');
+    //    test.done();
+    //},
+    vsproj_test: function (test) {
+        testDirectory(test, 'vsproj');
         test.done();
     }
 }
+1

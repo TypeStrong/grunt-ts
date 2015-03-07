@@ -1,5 +1,6 @@
 /// <reference path="../defs/tsd.d.ts"/>
 /// <reference path="./modules/interfaces.d.ts"/>
+/// <reference path="../defs/csproj2ts/csproj2ts.d.ts" />
 
 /*
  * grunt-ts
@@ -10,6 +11,7 @@
 import _ = require('lodash');
 import path = require('path');
 import fs = require('fs');
+import csproj2ts = require('csproj2ts');
 
 // Modules of grunt-ts
 import utils = require('./modules/utils');
@@ -125,6 +127,15 @@ function pluginFn(grunt: IGrunt) {
         var rawTargetConfig = <ITargetOptions>(grunt.config.getRaw(currenttask.name + '.' + currenttask.target) || {});
         var rawTargetOptions = <ITaskOptions>(grunt.config.getRaw(currenttask.name + '.' + currenttask.target + '.options') || {});
 
+        var vs: IVisualStudioProjectSupport = getVSSettings(rawTargetConfig);
+        var vsConfig = null;
+        if (vs) {
+            vsConfig = csproj2ts.getTypeScriptSettings({
+                ProjectFileName: vs.project,
+
+            }
+        }
+
         options.htmlModuleTemplate = rawTargetOptions.htmlModuleTemplate || rawTaskOptions.htmlModuleTemplate;
         options.htmlVarTemplate = rawTargetOptions.htmlVarTemplate || rawTaskOptions.htmlVarTemplate;
         options.htmlOutDir = rawTargetConfig.htmlOutDir;
@@ -164,9 +175,9 @@ function pluginFn(grunt: IGrunt) {
                 grunt.log.writeln(('Warning: In task "' + currenttask.target + '", either "files" or "outDir" should be used - not both.').magenta);
             }
         } else {
-            if (!rawTargetConfig.src) {
+            if (!rawTargetConfig.src && !rawTargetConfig.vs) {
                 grunt.log.writeln(('Warning: In task "' + currenttask.target +
-                    '", neither "files" nor "src" is used.  Nothing will be compiled.').magenta);
+                    '", neither "files" nor "src" nor "vs" is used.  Nothing will be compiled.').magenta);
             }
         }
 
@@ -596,5 +607,29 @@ function pluginFn(grunt: IGrunt) {
                 }
             }, done);
     });
+
+    function getVSSettings(rawTargetOptions: ITargetOptions) {
+        var vs: IVisualStudioProjectSupport = null;
+        if (rawTargetOptions.vs) {
+            var targetvs = rawTargetOptions.vs;
+            if (typeof targetvs === 'string') {
+                vs = {
+                    project: targetvs,
+                    config: "",
+                    ignoreFiles: false,
+                    ignoreSettings: false
+                };
+            } else {
+                vs = {
+                    project: targetvs.project || '',
+                    config: targetvs.config || '',
+                    ignoreFiles: targetvs.ignoreFiles || false,
+                    ignoreSettings: targetvs.ignoreSettings || false
+                };
+            }
+        }
+        return vs;
+    }
+
 }
 export = pluginFn;

@@ -45,12 +45,12 @@
     <TypeScriptRemoveComments>false</TypeScriptRemoveComments>
     <TypeScriptSourceMap>true</TypeScriptSourceMap>
     <TypeScriptModuleKind>commonjs</TypeScriptModuleKind>
-    <TypeScriptOutDir>..\js\vsproj_test</TypeScriptOutDir>
+    <TypeScriptOutDir>vsproj_test</TypeScriptOutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)' == 'Release'">
     <TypeScriptRemoveComments>true</TypeScriptRemoveComments>
     <TypeScriptSourceMap>false</TypeScriptSourceMap>
-    <TypeScriptOutDir>..\js\vsproj_test_config</TypeScriptOutDir>
+    <TypeScriptOutDir>vsproj_test_config</TypeScriptOutDir>
   </PropertyGroup>
   <ItemGroup>
     <TypeScriptCompile Include="vsprojtest1.ts" />
