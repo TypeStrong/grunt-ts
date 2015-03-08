@@ -269,20 +269,20 @@ module.exports = function (grunt) {
                 }
             },
             vsproj_ignoreFiles_test: {
-                //test: true,
-                src: 'test/vsproj/ts/**/*.ts',
+                test: true,
+                src: 'test/vsproj/ignoreFiles/**/*.ts',
                 vs: {
                     project: 'test/vsproj/testproject.csproj',
                     ignoreFiles: true
                 }
             },
             vsproj_ignoreSettings_test: {
-                //test: true,
+                test: true,
                 vs: {
                     project: 'test/vsproj/testproject.csproj',
                     ignoreSettings: true
                 },
-                outDir: 'test/vsproj/js/vsproj_ignoreSettings_test',
+                outDir: 'test/vsproj/ignoreSettings',
                 options: {
                     target: 'es6'
                 }
@@ -617,8 +617,9 @@ module.exports = function (grunt) {
     grunt.registerTask('nycdotnet', [
         'ts-internal:build',
         'ts-internal:test',
-        //'ts:vsproj_test',
-        'ts:transform',
+        'ts:vsproj_ignoreFiles_test',
+        'ts:vsproj_ignoreSettings_test',
+        //'ts:transform',
         //'ts:vsproj_test_config',
         //'nodeunit'
     ]);

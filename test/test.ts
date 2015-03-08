@@ -104,5 +104,9 @@ export var typescript = {
     vsproj_test_config: function (test) {
         testDirectory(test, 'vsproj/vsproj_test_config');
         test.done();
+    },
+    vsproj_test_ignoreSettings: function (test) {
+        testDirectory(test, 'vsproj/ignoreSettings');
+        test.done();
     }
 }
