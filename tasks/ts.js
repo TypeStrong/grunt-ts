@@ -229,7 +229,7 @@ function pluginFn(grunt) {
             if (options.removeComments === null) {
                 options.removeComments = !options.comments;
             }
-            else if (options.comments !== null) {
+            else if (options.comments !== null && !vs) {
                 console.warn('WARNING: Option "comments" and "removeComments" should not be used together'.magenta);
                 if (options.removeComments === options.comments) {
                     console.warn('Either option will suffice (and removing the other will have no effect).'.magenta);
