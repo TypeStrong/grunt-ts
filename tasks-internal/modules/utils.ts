@@ -3,8 +3,10 @@
 import path = require('path');
 import fs = require('fs');
 import util = require('util');
+import _ = require('lodash');
 
 export var grunt: IGrunt = require('grunt');
+export var eol: string = grunt.util.linefeed;
 
 // Converts "C:\boo" , "C:\boo\foo.ts" => "./foo.ts"; Works on unix as well.
 export function makeRelativePath(folderpath: string, filename: string, forceRelative = false) {
@@ -69,6 +71,13 @@ export function insertArrayAt<T>(array: T[], index: number, arrayToInsert: T[]):
  */
 export function endsWith(str: string, suffix: string): boolean {
     return str.indexOf(suffix, str.length - suffix.length) !== -1;
+}
+
+export function isJavaScriptFile(filePath: string): boolean {
+    if (filePath.toLowerCase) {
+        return this.endsWith(filePath.toLowerCase(), '.js');
+    }
+    return false;
 }
 
 /** function for formatting strings 
@@ -230,4 +239,16 @@ function _checkExcludeArgument(exclude) {
     }
 
     return exclude;
+}
+
+
+export function firstElementWithValue<T>(elements: T[], defaultResult: T = null): T {
+    var result: T = defaultResult;
+    _.each(elements,(item) => {
+        if (!_.isNull(item) && !_.isUndefined(item)) {
+            result = item;
+            return false; //break out of lodash loop
+        }
+    });
+    return result;
 }

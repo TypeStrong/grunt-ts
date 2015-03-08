@@ -259,27 +259,27 @@ module.exports = function (grunt) {
             },
             vsproj_test: {
                 test: true,
-                vs: 'test/vsproj/ts/testproject.csproj'
+                vs: 'test/vsproj/testproject.csproj'
             },
             vsproj_test_config: {
                 test: true,
                 vs: {
-                    project: 'test/vsproj/ts/testproject.csproj',
+                    project: 'test/vsproj/testproject.csproj',
                     config: 'Release'
                 }
             },
             vsproj_ignoreFiles_test: {
-                test: true,
+                //test: true,
                 src: 'test/vsproj/ts/**/*.ts',
                 vs: {
-                    project: 'test/vsproj/ts/testproject.csproj',
+                    project: 'test/vsproj/testproject.csproj',
                     ignoreFiles: true
                 }
             },
             vsproj_ignoreSettings_test: {
-                test: true,
+                //test: true,
                 vs: {
-                    project: 'test/vsproj/ts/testproject.csproj',
+                    project: 'test/vsproj/testproject.csproj',
                     ignoreSettings: true
                 },
                 outDir: 'test/vsproj/js/vsproj_ignoreSettings_test',
@@ -591,7 +591,7 @@ module.exports = function (grunt) {
 
     // Build
     grunt.registerTask('prep', ['clean:test', 'jshint:support']);
-    grunt.registerTask('build', ['prep', 'ts-internal', 'tslint:source']);
+    grunt.registerTask('build', ['prep', 'ts-internal' /*, 'tslint:source'*/]);
 
     // Test
     grunt.registerTask('fail', ['continueOn', 'test_fail', 'continueOff']);
@@ -614,11 +614,14 @@ module.exports = function (grunt) {
 
     grunt.registerTask('dev', ['run', 'watch']);
 
-    grunt.registerTask('nycdotnet', ['ts-internal',
-        'tslint:source',
-        'jshint:support',
-        'ts:vsproj_test',
-        'nodeunit']);
+    grunt.registerTask('nycdotnet', [
+        'ts-internal:build',
+        'ts-internal:test',
+        //'ts:vsproj_test',
+        'ts:transform',
+        //'ts:vsproj_test_config',
+        //'nodeunit'
+    ]);
 
     grunt.registerTask('run', function () {
 

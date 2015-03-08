@@ -23,4 +23,5 @@ import a1 = require('./foo/a/A1'); ///ts:import:generated
 /// No file or directory matched name "nonexistent" ///ts:import:generated
 
 ///ts:someunknowntransform
+/// Unknown transform ///ts:(.*):generated
 /// Unknown transform ///ts:unknown:generated

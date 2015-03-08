@@ -3,6 +3,7 @@
 import path = require('path');
 import fs = require('fs');
 import util = require('util');
+import _ = require('lodash');
 
 export var grunt: IGrunt = require('grunt');
 export var eol: string = grunt.util.linefeed;
@@ -238,4 +239,16 @@ function _checkExcludeArgument(exclude) {
     }
 
     return exclude;
+}
+
+
+export function firstElementWithValue<T>(elements: T[], defaultResult: T = null): T {
+    var result: T = defaultResult;
+    _.each(elements,(item) => {
+        if (!_.isNull(item) && !_.isUndefined(item)) {
+            result = item;
+            return false; //break out of lodash loop
+        }
+    });
+    return result;
 }

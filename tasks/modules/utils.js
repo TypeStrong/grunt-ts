@@ -2,6 +2,7 @@
 var path = require('path');
 var fs = require('fs');
 var util = require('util');
+var _ = require('lodash');
 exports.grunt = require('grunt');
 exports.eol = exports.grunt.util.linefeed;
 // Converts "C:\boo" , "C:\boo\foo.ts" => "./foo.ts"; Works on unix as well.
@@ -224,4 +225,16 @@ function _checkExcludeArgument(exclude) {
     }
     return exclude;
 }
+function firstElementWithValue(elements, defaultResult) {
+    if (defaultResult === void 0) { defaultResult = null; }
+    var result = defaultResult;
+    _.each(elements, function (item) {
+        if (!_.isNull(item) && !_.isUndefined(item)) {
+            result = item;
+            return false; //break out of lodash loop
+        }
+    });
+    return result;
+}
+exports.firstElementWithValue = firstElementWithValue;
 //# sourceMappingURL=utils.js.map
