@@ -139,7 +139,7 @@ function pluginFn(grunt: IGrunt) {
                 if (error.errno === 34) {
                     errormessage = 'In task "' + currenttask.target + '" - could not find VS project at "' + error.path + '".';
                 } else {
-                    errormessage = 'In task "' + currenttask.target + '".  Error #' + error.errno + ".  " + error;
+                    errormessage = 'In task "' + currenttask.target + '".  Error #' + error.errno + '.  ' + error;
                 }
                 grunt.fail.warn(errormessage, error.errno);
                 done(error);
@@ -148,43 +148,61 @@ function pluginFn(grunt: IGrunt) {
             proceed();
         }
 
-        function proceed(vsProjectTypeScriptSettings? : csproj2ts.TypeScriptSettings)
-        {
+        function proceed(vsProjectTypeScriptSettings? : csproj2ts.TypeScriptSettings) {
 
             if (vsProjectTypeScriptSettings && !vs.ignoreSettings) {
-                options.declaration = utils.firstElementWithValue([vsProjectTypeScriptSettings.GeneratesDeclarations, options.declaration]);
-                options.mapRoot = utils.firstElementWithValue([vsProjectTypeScriptSettings.MapRoot, options.mapRoot]);
-                options.module = utils.firstElementWithValue([vsProjectTypeScriptSettings.ModuleKind, options.module]);
+                options.declaration = utils.firstElementWithValue([vsProjectTypeScriptSettings.GeneratesDeclarations,
+                    options.declaration]);
+                options.mapRoot = utils.firstElementWithValue([vsProjectTypeScriptSettings.MapRoot,
+                    options.mapRoot]);
+                options.module = utils.firstElementWithValue([vsProjectTypeScriptSettings.ModuleKind,
+                    options.module]);
+
                 if (options.module === 'none') {
                     options.module = null;
                 }
-                options.noEmitOnError = utils.firstElementWithValue([vsProjectTypeScriptSettings.NoEmitOnError, options.noEmitOnError]);
-                options.noImplicitAny = utils.firstElementWithValue([vsProjectTypeScriptSettings.NoImplicitAny, options.noImplicitAny]);
-                options.noResolve = utils.firstElementWithValue([vsProjectTypeScriptSettings.NoResolve, options.noResolve]);
-                rawTargetConfig.outDir = utils.firstElementWithValue([vsProjectTypeScriptSettings.OutDir, rawTargetConfig.outDir]);
-                rawTargetConfig.out = utils.firstElementWithValue([vsProjectTypeScriptSettings.OutFile, rawTargetConfig.out]);
-                options.preserveConstEnums = utils.firstElementWithValue([vsProjectTypeScriptSettings.PreserveConstEnums, options.preserveConstEnums]);
-                options.removeComments = utils.firstElementWithValue([vsProjectTypeScriptSettings.RemoveComments, options.removeComments]);
+
+                options.noEmitOnError = utils.firstElementWithValue([vsProjectTypeScriptSettings.NoEmitOnError,
+                    options.noEmitOnError]);
+                options.noImplicitAny = utils.firstElementWithValue([vsProjectTypeScriptSettings.NoImplicitAny,
+                    options.noImplicitAny]);
+                options.noResolve = utils.firstElementWithValue([vsProjectTypeScriptSettings.NoResolve,
+                    options.noResolve]);
+                rawTargetConfig.outDir = utils.firstElementWithValue([vsProjectTypeScriptSettings.OutDir,
+                    rawTargetConfig.outDir]);
+                rawTargetConfig.out = utils.firstElementWithValue([vsProjectTypeScriptSettings.OutFile,
+                    rawTargetConfig.out]);
+                options.preserveConstEnums = utils.firstElementWithValue([vsProjectTypeScriptSettings.PreserveConstEnums,
+                    options.preserveConstEnums]);
+                options.removeComments = utils.firstElementWithValue([vsProjectTypeScriptSettings.RemoveComments,
+                    options.removeComments]);
+
                 if (options.removeComments) {
                     options.comments = null;
                 }
-                options.sourceMap = utils.firstElementWithValue([vsProjectTypeScriptSettings.SourceMap, options.sourceMap]);
-                options.sourceRoot = utils.firstElementWithValue([vsProjectTypeScriptSettings.SourceRoot, options.sourceRoot]);
-                options.suppressImplicitAnyIndexErrors = utils.firstElementWithValue([vsProjectTypeScriptSettings.SuppressImplicitAnyIndexErrors, options.suppressImplicitAnyIndexErrors]);
-                options.target = utils.firstElementWithValue([vsProjectTypeScriptSettings.Target, options.target]);
+
+                options.sourceMap = utils.firstElementWithValue([vsProjectTypeScriptSettings.SourceMap,
+                    options.sourceMap]);
+                options.sourceRoot = utils.firstElementWithValue([vsProjectTypeScriptSettings.SourceRoot,
+                    options.sourceRoot]);
+                options.suppressImplicitAnyIndexErrors = utils.firstElementWithValue([vsProjectTypeScriptSettings.SuppressImplicitAnyIndexErrors,
+                    options.suppressImplicitAnyIndexErrors]);
+                options.target = utils.firstElementWithValue([vsProjectTypeScriptSettings.Target,
+                    options.target]);
             }
 
             var srcFromVS_RelativePathsFromGruntFile: string[] = [];
-            
+
             if (vsProjectTypeScriptSettings) {
-                //make all VS project paths relative to the gruntfile.
-                var absolutePathToVSProjectFolder = path.resolve(vsProjectTypeScriptSettings.VSProjectDetails.ProjectFileName, "..");    
+                // make all VS project paths relative to the gruntfile.
+                var absolutePathToVSProjectFolder = path.resolve(vsProjectTypeScriptSettings.VSProjectDetails.ProjectFileName, '..');
 
                 if (!vs.ignoreFiles) {
-                    _.map(_.uniq(vsProjectTypeScriptSettings.files),(file) => {
+                    _.map(_.uniq(vsProjectTypeScriptSettings.files), (file) => {
                         var absolutePathToFile = path.normalize(path.join(absolutePathToVSProjectFolder, file));
-                        //bug: this may cause an issue with UNC paths...
-                        var relativePathToFile = path.relative(path.resolve("."), absolutePathToFile).replace(new RegExp("\\" + path.sep, 'g'), '/');
+
+                        // note: this may cause an issue with UNC paths...
+                        var relativePathToFile = path.relative(path.resolve('.'), absolutePathToFile).replace(new RegExp('\\' + path.sep, 'g'), '/');
                         if (srcFromVS_RelativePathsFromGruntFile.indexOf(relativePathToFile) === -1) {
                             srcFromVS_RelativePathsFromGruntFile.push(relativePathToFile);
                         }
@@ -193,15 +211,15 @@ function pluginFn(grunt: IGrunt) {
                         }
                     });
                 }
-            
+
                 if (!vs.ignoreSettings) {
                     if (vsProjectTypeScriptSettings.OutDir) {
-                        rawTargetConfig.outDir = path.relative(path.resolve("."),
+                        rawTargetConfig.outDir = path.relative(path.resolve('.'),
                             path.normalize(path.join(absolutePathToVSProjectFolder, vsProjectTypeScriptSettings.OutDir)));
                     }
 
                     if (vsProjectTypeScriptSettings.OutFile) {
-                        rawTargetConfig.out = path.relative(path.resolve("."),
+                        rawTargetConfig.out = path.relative(path.resolve('.'),
                             path.normalize(path.join(absolutePathToVSProjectFolder, vsProjectTypeScriptSettings.OutFile)));
                     }
                 }
@@ -216,7 +234,7 @@ function pluginFn(grunt: IGrunt) {
             options.allowBool = 'allowbool' in options ? options['allowbool'] : options.allowBool;
             options.allowImportModule = 'allowimportmodule' in options ? options['allowimportmodule'] : options.allowImportModule;
             options.sourceMap = 'sourcemap' in options ? options['sourcemap'] : options.sourceMap;
-        
+
             // Warn the user of invalid values
             if (options.fast !== 'watch' && options.fast !== 'always' && options.fast !== 'never') {
                 console.warn(('"fast" needs to be one of : "watch" (default) | "always" | "never" but you provided: ' + options.fast).magenta);
@@ -235,15 +253,18 @@ function pluginFn(grunt: IGrunt) {
 
             if (rawTargetConfig.files) {
                 if (rawTargetConfig.src) {
-                    grunt.log.writeln(('Warning: In task "' + currenttask.target + '", either "files" or "src" should be used - not both.').magenta);
+                    grunt.log.writeln(('Warning: In task "' + currenttask.target +
+                        '", either "files" or "src" should be used - not both.').magenta);
                 }
 
                 if (rawTargetConfig.out) {
-                    grunt.log.writeln(('Warning: In task "' + currenttask.target + '", either "files" or "out" should be used - not both.').magenta);
+                    grunt.log.writeln(('Warning: In task "' + currenttask.target +
+                        '", either "files" or "out" should be used - not both.').magenta);
                 }
 
                 if (rawTargetConfig.outDir) {
-                    grunt.log.writeln(('Warning: In task "' + currenttask.target + '", either "files" or "outDir" should be used - not both.').magenta);
+                    grunt.log.writeln(('Warning: In task "' + currenttask.target +
+                        '", either "files" or "outDir" should be used - not both.').magenta);
                 }
             } else {
                 if (!rawTargetConfig.src && !rawTargetConfig.vs && rawTargetOptions.compile) {
@@ -251,7 +272,7 @@ function pluginFn(grunt: IGrunt) {
                         '", neither "files" nor "src" nor "vs" is specified.  Nothing will be compiled.').magenta);
                 }
             }
-            
+
             if (!options.htmlModuleTemplate) {
                 // use default value
                 options.htmlModuleTemplate = '<%= filename %>';
@@ -289,11 +310,11 @@ function pluginFn(grunt: IGrunt) {
 
 
             if (currenttask.files.length === 0 && rawTargetOptions.compile) {
-                grunt.log.writeln('Zero files found to compile in target "' + currenttask.target + "'. Compilation will be skipped.");
+                grunt.log.writeln('Zero files found to compile in target "' + currenttask.target + '". Compilation will be skipped.');
             }
-            
+
             // Run compiler
-            asyncSeries(currenttask.files,(target) => {
+            asyncSeries(currenttask.files, (target) => {
 
                 // Create a reference file?
                 var reference = rawTargetConfig.reference;
@@ -340,9 +361,9 @@ function pluginFn(grunt: IGrunt) {
 
                 // see https://github.com/grunt-ts/grunt-ts/issues/77
                 function isBaseDirFile(filename: string, targetFiles: string[]) {
-                    
+
                     var baseDirFile: string = '.baseDir.ts';
-                    var bd = "";
+                    var bd = '';
                     if (!rawTargetConfig.baseDir) {
                         bd = utils.findCommonPath(targetFiles, '/');
                         rawTargetConfig.baseDir = bd;
@@ -369,7 +390,7 @@ function pluginFn(grunt: IGrunt) {
 
                     // The files to compile
                     var filesToCompile = files;
-                    
+
                     // Time the compiler process
                     var starttime = new Date().getTime();
                     var endtime;
@@ -499,8 +520,8 @@ function pluginFn(grunt: IGrunt) {
                         if (currenttask.data.src) {
                             filesToCompile = grunt.file.expand(currenttask.data.src);
                         }
-                        
-                        _.map(srcFromVS_RelativePathsFromGruntFile,(file) => {
+
+                        _.map(srcFromVS_RelativePathsFromGruntFile, (file) => {
                             if (filesToCompile.indexOf(file) === -1) {
                                 filesToCompile.push(file);
                             }
@@ -538,9 +559,9 @@ function pluginFn(grunt: IGrunt) {
                         };
 
                         var htmlFiles = grunt.file.expand(currenttask.data.html);
-                        generatedFiles = _.map(htmlFiles,(filename) => html2tsModule.compileHTML(filename, html2tsOptions));
+                        generatedFiles = _.map(htmlFiles, (filename) => html2tsModule.compileHTML(filename, html2tsOptions));
                     }
-                    
+
                     ///// Template cache
                     // Note: The template cache files do not go into generated files.
                     // Note: You are free to generate a `ts OR js` file for template cache, both should just work
@@ -685,7 +706,6 @@ function pluginFn(grunt: IGrunt) {
                 }
             }, done);
         }
-        
     });
 
     function getVSSettings(rawTargetOptions: ITargetOptions) {
@@ -695,7 +715,7 @@ function pluginFn(grunt: IGrunt) {
             if (typeof targetvs === 'string') {
                 vs = {
                     project: targetvs,
-                    config: "",
+                    config: '',
                     ignoreFiles: false,
                     ignoreSettings: false
                 };

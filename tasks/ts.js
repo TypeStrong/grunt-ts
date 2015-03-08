@@ -113,7 +113,7 @@ function pluginFn(grunt) {
                     errormessage = 'In task "' + currenttask.target + '" - could not find VS project at "' + error.path + '".';
                 }
                 else {
-                    errormessage = 'In task "' + currenttask.target + '".  Error #' + error.errno + ".  " + error;
+                    errormessage = 'In task "' + currenttask.target + '".  Error #' + error.errno + '.  ' + error;
                 }
                 grunt.fail.warn(errormessage, error.errno);
                 done(error);
@@ -147,13 +147,13 @@ function pluginFn(grunt) {
             }
             var srcFromVS_RelativePathsFromGruntFile = [];
             if (vsProjectTypeScriptSettings) {
-                //make all VS project paths relative to the gruntfile.
-                var absolutePathToVSProjectFolder = path.resolve(vsProjectTypeScriptSettings.VSProjectDetails.ProjectFileName, "..");
+                // make all VS project paths relative to the gruntfile.
+                var absolutePathToVSProjectFolder = path.resolve(vsProjectTypeScriptSettings.VSProjectDetails.ProjectFileName, '..');
                 if (!vs.ignoreFiles) {
                     _.map(_.uniq(vsProjectTypeScriptSettings.files), function (file) {
                         var absolutePathToFile = path.normalize(path.join(absolutePathToVSProjectFolder, file));
-                        //bug: this may cause an issue with UNC paths...
-                        var relativePathToFile = path.relative(path.resolve("."), absolutePathToFile).replace(new RegExp("\\" + path.sep, 'g'), '/');
+                        // note: this may cause an issue with UNC paths...
+                        var relativePathToFile = path.relative(path.resolve('.'), absolutePathToFile).replace(new RegExp('\\' + path.sep, 'g'), '/');
                         if (srcFromVS_RelativePathsFromGruntFile.indexOf(relativePathToFile) === -1) {
                             srcFromVS_RelativePathsFromGruntFile.push(relativePathToFile);
                         }
@@ -164,10 +164,10 @@ function pluginFn(grunt) {
                 }
                 if (!vs.ignoreSettings) {
                     if (vsProjectTypeScriptSettings.OutDir) {
-                        rawTargetConfig.outDir = path.relative(path.resolve("."), path.normalize(path.join(absolutePathToVSProjectFolder, vsProjectTypeScriptSettings.OutDir)));
+                        rawTargetConfig.outDir = path.relative(path.resolve('.'), path.normalize(path.join(absolutePathToVSProjectFolder, vsProjectTypeScriptSettings.OutDir)));
                     }
                     if (vsProjectTypeScriptSettings.OutFile) {
-                        rawTargetConfig.out = path.relative(path.resolve("."), path.normalize(path.join(absolutePathToVSProjectFolder, vsProjectTypeScriptSettings.OutFile)));
+                        rawTargetConfig.out = path.relative(path.resolve('.'), path.normalize(path.join(absolutePathToVSProjectFolder, vsProjectTypeScriptSettings.OutFile)));
                     }
                 }
             }
@@ -240,7 +240,7 @@ function pluginFn(grunt) {
             }
             options.removeComments = !!options.removeComments;
             if (currenttask.files.length === 0 && rawTargetOptions.compile) {
-                grunt.log.writeln('Zero files found to compile in target "' + currenttask.target + "'. Compilation will be skipped.");
+                grunt.log.writeln('Zero files found to compile in target "' + currenttask.target + '". Compilation will be skipped.');
             }
             // Run compiler
             asyncSeries(currenttask.files, function (target) {
@@ -287,7 +287,7 @@ function pluginFn(grunt) {
                 // see https://github.com/grunt-ts/grunt-ts/issues/77
                 function isBaseDirFile(filename, targetFiles) {
                     var baseDirFile = '.baseDir.ts';
-                    var bd = "";
+                    var bd = '';
                     if (!rawTargetConfig.baseDir) {
                         bd = utils.findCommonPath(targetFiles, '/');
                         rawTargetConfig.baseDir = bd;
@@ -577,7 +577,7 @@ function pluginFn(grunt) {
             if (typeof targetvs === 'string') {
                 vs = {
                     project: targetvs,
-                    config: "",
+                    config: '',
                     ignoreFiles: false,
                     ignoreSettings: false
                 };
