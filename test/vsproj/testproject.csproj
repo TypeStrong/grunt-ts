@@ -1,6 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.Default.props" Condition="Exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.Default.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <ProjectGuid>{FF8D9288-C427-4139-B162-E74D73D8F8D5}</ProjectGuid>
@@ -46,50 +45,16 @@
     <TypeScriptRemoveComments>false</TypeScriptRemoveComments>
     <TypeScriptSourceMap>true</TypeScriptSourceMap>
     <TypeScriptModuleKind>commonjs</TypeScriptModuleKind>
+    <TypeScriptOutDir>vsproj_test</TypeScriptOutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)' == 'Release'">
     <TypeScriptRemoveComments>true</TypeScriptRemoveComments>
     <TypeScriptSourceMap>false</TypeScriptSourceMap>
+    <TypeScriptOutDir>vsproj_test_config</TypeScriptOutDir>
   </PropertyGroup>
   <ItemGroup>
-    <TypeScriptCompile Include="defs\csproj2ts\csproj2ts.d.ts" />
-    <TypeScriptCompile Include="defs\es6-promises\es6-promises.d.ts" />
-    <TypeScriptCompile Include="defs\gruntjs\gruntjs.d.ts" />
-    <TypeScriptCompile Include="defs\lodash\lodash.d.ts" />
-    <TypeScriptCompile Include="defs\node\node.d.ts" />
-    <TypeScriptCompile Include="defs\tsd.d.ts" />
-    <TypeScriptCompile Include="defs\underscore.string\underscore.string.d.ts" />
-    <TypeScriptCompile Include="tasks\modules\amdLoader.ts" />
-    <TypeScriptCompile Include="tasks\modules\cacheUtils.ts" />
-    <TypeScriptCompile Include="tasks\modules\compile.ts" />
-    <TypeScriptCompile Include="tasks\modules\html2ts.ts" />
-    <TypeScriptCompile Include="tasks\modules\interfaces.d.ts" />
-    <TypeScriptCompile Include="tasks\modules\reference.ts" />
-    <TypeScriptCompile Include="tasks\modules\templateCache.ts" />
-    <TypeScriptCompile Include="tasks\modules\transformers.ts" />
-    <TypeScriptCompile Include="tasks\modules\utils.ts" />
-    <TypeScriptCompile Include="tasks\ts.ts" />
-    <TypeScriptCompile Include="test\test.ts" />
+    <TypeScriptCompile Include="vsprojtest1.ts" />
   </ItemGroup>
-  <ItemGroup>
-    <Content Include="Gruntfile.js" />
-    <Content Include="sample\commonjs\Gruntfile.js" />
-    <Content Include="sample\Gruntfile.js" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="docs\amdLoader.md" />
-    <Content Include="docs\fast.md" />
-    <Content Include="docs\html2ts.md" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="build.bat" />
-    <Content Include="CHANGELOG.md" />
-    <Content Include="package.json" />
-    <Content Include="README.md" />
-    <Content Include="tsd.json" />
-    <Content Include="tslint.json" />
-  </ItemGroup>
-  <ItemGroup />
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
     <TypeScriptTarget>ES3</TypeScriptTarget>
   </PropertyGroup>

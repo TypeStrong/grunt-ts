@@ -4,11 +4,10 @@ import _ = require('lodash');
 import _str = require('underscore.string');
 import path = require('path');
 import fs = require('fs');
-import os = require('os');
 
 import utils = require('./utils');
 
-var eol = os.EOL;
+var eol = utils.eol;
 var grunt = utils.grunt;
 var pathSeperator = path.sep;
 
