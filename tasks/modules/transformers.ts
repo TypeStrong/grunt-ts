@@ -99,9 +99,15 @@ class BaseTransformer {
     private signature: string;
     signatureGenerated: string;
     syntaxError: string;
+    protected tripleSlashTS() {
+        // This is a function and broken into two strings to prevent the transformers module from
+        // transforming *itself* (a-la Skynet).
+        return '//' + '/ts:';
+    }
     constructor(public key: string, variableSyntax: string) {
         this.match = new RegExp(utils.format(BaseTransformer.tsTransformerMatch, key));
-        this.signature = '///ts:' + key;
+
+        this.signature = this.tripleSlashTS() + key;
         this.signatureGenerated = this.signature + ':generated';
         this.syntaxError = '/// Invalid syntax for ts:' + this.key + '=' + variableSyntax + ' ' + this.signatureGenerated;
     }
@@ -203,7 +209,7 @@ class UnknownTransformer extends BaseTransformer implements ITransformer {
     constructor() {
         super('(.*)', '');
         this.key = 'unknown';
-        this.signatureGenerated = '///ts:unknown:generated';
+        this.signatureGenerated = this.tripleSlashTS() + 'unknown:generated';
         this.syntaxError = '/// Unknown transform ' + this.signatureGenerated;
     }
 
