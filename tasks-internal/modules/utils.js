@@ -231,7 +231,7 @@ function firstElementWithValue(elements, defaultResult) {
     _.each(elements, function (item) {
         if (!_.isNull(item) && !_.isUndefined(item)) {
             result = item;
-            return false; //break out of lodash loop
+            return false; // break out of lodash loop
         }
     });
     return result;

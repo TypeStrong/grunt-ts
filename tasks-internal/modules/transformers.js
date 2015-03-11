@@ -75,10 +75,15 @@ var BaseTransformer = (function () {
     function BaseTransformer(key, variableSyntax) {
         this.key = key;
         this.match = new RegExp(utils.format(BaseTransformer.tsTransformerMatch, key));
-        this.signature = '///ts:' + key;
+        this.signature = this.tripleSlashTS() + key;
         this.signatureGenerated = this.signature + ':generated';
         this.syntaxError = '/// Invalid syntax for ts:' + this.key + '=' + variableSyntax + ' ' + this.signatureGenerated;
     }
+    BaseTransformer.prototype.tripleSlashTS = function () {
+        // This is a function and broken into two strings to prevent the transformers module from
+        // transforming *itself* (a-la Skynet).
+        return '//' + '/ts:';
+    };
     BaseTransformer.prototype.isGenerated = function (line) {
         return _str.contains(line, this.signatureGenerated);
     };
@@ -166,6 +171,7 @@ var UnknownTransformer = (function (_super) {
     function UnknownTransformer() {
         _super.call(this, '(.*)', '');
         this.key = 'unknown';
+        this.signatureGenerated = this.tripleSlashTS() + 'unknown:generated';
         this.syntaxError = '/// Unknown transform ' + this.signatureGenerated;
     }
     UnknownTransformer.prototype.transform = function (sourceFile, templateVars) {
