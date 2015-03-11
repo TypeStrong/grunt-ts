@@ -364,7 +364,7 @@ function pluginFn(grunt) {
                         //   assume that emitted JS in spite of error codes implies type-only errors.
                         var isOnlyTypeErrors = !hasPreventEmitErrors;
                         if (hasTS7017Error) {
-                            grunt.log.writeln(('Note:  You may wish to enable the suppressImplicitAnyIndexError' + ' grunt-ts option to allow dynamic property access by index.  This will' + ' suppress TypeScript error TS7017.').magenta);
+                            grunt.log.writeln(('Note:  You may wish to enable the suppressImplicitAnyIndexErrors' + ' grunt-ts option to allow dynamic property access by index.  This will' + ' suppress TypeScript error TS7017.').magenta);
                         }
                         // Log error summary
                         if (level1ErrorCount + level5ErrorCount + nonEmitPreventingWarningCount > 0) {
