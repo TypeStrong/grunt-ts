@@ -201,7 +201,6 @@ function pluginFn(grunt: IGrunt) {
                     _.map(_.uniq(vsProjectTypeScriptSettings.files), (file) => {
                         var absolutePathToFile = path.normalize(path.join(absolutePathToVSProjectFolder, file));
 
-                        // note: this may cause an issue with UNC paths...
                         var relativePathToFile = path.relative(path.resolve('.'), absolutePathToFile).replace(new RegExp('\\' + path.sep, 'g'), '/');
                         if (srcFromVS_RelativePathsFromGruntFile.indexOf(relativePathToFile) === -1) {
                             srcFromVS_RelativePathsFromGruntFile.push(relativePathToFile);
