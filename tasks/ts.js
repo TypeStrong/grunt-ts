@@ -192,22 +192,7 @@ function pluginFn(grunt) {
                 grunt.log.writeln(('Warning: Task "' + currenttask.target + '" is attempting to use fast compilation with "files".  This is not currently supported.  Setting "fast" to "never".').magenta);
                 options.fast = 'never';
             }
-            if (rawTargetConfig.files) {
-                if (rawTargetConfig.src) {
-                    grunt.log.writeln(('Warning: In task "' + currenttask.target + '", either "files" or "src" should be used - not both.').magenta);
-                }
-                if (rawTargetConfig.out) {
-                    grunt.log.writeln(('Warning: In task "' + currenttask.target + '", either "files" or "out" should be used - not both.').magenta);
-                }
-                if (rawTargetConfig.outDir) {
-                    grunt.log.writeln(('Warning: In task "' + currenttask.target + '", either "files" or "outDir" should be used - not both.').magenta);
-                }
-            }
-            else {
-                if (!rawTargetConfig.src && !rawTargetConfig.vs && rawTargetOptions.compile) {
-                    grunt.log.writeln(('Warning: In task "' + currenttask.target + '", neither "files" nor "src" nor "vs" is specified.  Nothing will be compiled.').magenta);
-                }
-            }
+            logBadConfigWithFiles(rawTargetConfig, currenttask, rawTargetOptions);
             if (!options.htmlModuleTemplate) {
                 // use default value
                 options.htmlModuleTemplate = '<%= filename %>';
@@ -569,6 +554,32 @@ function pluginFn(grunt) {
             }, done);
         }
     });
+    function logBadConfigWithFiles(config, task, targetOpt) {
+        if (config.files) {
+            if (config.vs) {
+                grunt.log.writeln(('Warning: In task "' + task.target + '", either "files" or "vs" should be used - not both.').magenta);
+                return;
+            }
+            if (config.src) {
+                grunt.log.writeln(('Warning: In task "' + task.target + '", either "files" or "src" should be used - not both.').magenta);
+                return;
+            }
+            if (config.out) {
+                grunt.log.writeln(('Warning: In task "' + task.target + '", either "files" or "out" should be used - not both.').magenta);
+                return;
+            }
+            if (config.outDir) {
+                grunt.log.writeln(('Warning: In task "' + task.target + '", either "files" or "outDir" should be used - not both.').magenta);
+                return;
+            }
+        }
+        else {
+            if (!config.src && !config.vs && targetOpt.compile) {
+                grunt.log.writeln(('Warning: In task "' + task.target + '", neither "files" nor "src" nor "vs" is specified.  Nothing will be compiled.').magenta);
+                return;
+            }
+        }
+    }
     function getVSSettings(rawTargetOptions) {
         var vs = null;
         if (rawTargetOptions.vs) {

@@ -250,27 +250,7 @@ function pluginFn(grunt: IGrunt) {
                 options.fast = 'never';
             }
 
-            if (rawTargetConfig.files) {
-                if (rawTargetConfig.src) {
-                    grunt.log.writeln(('Warning: In task "' + currenttask.target +
-                        '", either "files" or "src" should be used - not both.').magenta);
-                }
-
-                if (rawTargetConfig.out) {
-                    grunt.log.writeln(('Warning: In task "' + currenttask.target +
-                        '", either "files" or "out" should be used - not both.').magenta);
-                }
-
-                if (rawTargetConfig.outDir) {
-                    grunt.log.writeln(('Warning: In task "' + currenttask.target +
-                        '", either "files" or "outDir" should be used - not both.').magenta);
-                }
-            } else {
-                if (!rawTargetConfig.src && !rawTargetConfig.vs && rawTargetOptions.compile) {
-                    grunt.log.writeln(('Warning: In task "' + currenttask.target +
-                        '", neither "files" nor "src" nor "vs" is specified.  Nothing will be compiled.').magenta);
-                }
-            }
+            logBadConfigWithFiles(rawTargetConfig, currenttask, rawTargetOptions);
 
             if (!options.htmlModuleTemplate) {
                 // use default value
@@ -706,6 +686,42 @@ function pluginFn(grunt: IGrunt) {
             }, done);
         }
     });
+
+    function logBadConfigWithFiles(config: ITargetOptions,
+            task: grunt.task.IMultiTask<ITargetOptions>,
+            targetOpt: ITaskOptions) {
+        if (config.files) {
+            if (config.vs) {
+                grunt.log.writeln(('Warning: In task "' + task.target +
+                    '", either "files" or "vs" should be used - not both.').magenta);
+                return;
+            }
+
+            if (config.src) {
+                grunt.log.writeln(('Warning: In task "' + task.target +
+                    '", either "files" or "src" should be used - not both.').magenta);
+                return;
+            }
+
+            if (config.out) {
+                grunt.log.writeln(('Warning: In task "' + task.target +
+                    '", either "files" or "out" should be used - not both.').magenta);
+                return;
+            }
+
+            if (config.outDir) {
+                grunt.log.writeln(('Warning: In task "' + task.target +
+                    '", either "files" or "outDir" should be used - not both.').magenta);
+                return;
+            }
+        } else {
+            if (!config.src && !config.vs && targetOpt.compile) {
+                grunt.log.writeln(('Warning: In task "' + task.target +
+                    '", neither "files" nor "src" nor "vs" is specified.  Nothing will be compiled.').magenta);
+                return;
+            }
+        }
+    }
 
     function getVSSettings(rawTargetOptions: ITargetOptions) {
         var vs: IVisualStudioProjectSupport = null;

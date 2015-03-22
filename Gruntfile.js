@@ -151,6 +151,14 @@ module.exports = function (grunt) {
                     fast: 'never'
                 }
             },
+            files_showWarningIfFilesIsUsedWithVs: {
+                test: true,
+                files: [{ src: ['test/multifile/a/**/*.ts'], dest: 'test/multifile/a' }],
+                vs: 'test/vsproj/testproject.csproj',
+                options: {
+                    fast: 'never'
+                }
+            },
             files_showWarningIfFilesIsUsedWithWatch: {
                 //note this should not actually watch.
                 files: [{ src: ['test/multifile/a/**/*.ts'], dest: 'test/multifile/a' }],
