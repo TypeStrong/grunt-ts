@@ -392,6 +392,14 @@ module.exports = function (grunt) {
                     fast: 'always'
                 }
             },
+            refTransform: {
+                test: true,
+                src: ['test/references-transform/**/*.ts','test/references*.d.ts'],
+                options: {
+                    fast: 'always',
+                    noImplicitAny: true
+                }
+            },
             customcompiler: {
                 test: true,
                 src: ['test/customcompiler/ts/**/*.ts'],

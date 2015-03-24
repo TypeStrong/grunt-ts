@@ -71,6 +71,10 @@ export var typescript = {
         testDirectory(test, 'transform');
         test.done();
     },
+    referencesTransform: function (test) {
+        testDirectory(test, 'references-transform');
+        test.done();
+    },
     customcompiler: function (test) {
         testDirectory(test, 'customcompiler');
         test.done();
