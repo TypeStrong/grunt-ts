@@ -30,8 +30,7 @@ module.exports = function (grunt) {
         },
         tslint: {
             options: {
-                configuration: grunt.file.readJSON('tslint.json'),
-                formatter: 'tslint-path-formatter'
+                configuration: grunt.file.readJSON('tslint.json')
             },
             source: {
                 src: ['tasks/**/*.ts']
