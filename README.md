@@ -1,5 +1,7 @@
 # grunt-ts
 
+[![Join the chat at https://gitter.im/TypeStrong/grunt-ts](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/TypeStrong/grunt-ts?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 [![Build Status](https://secure.travis-ci.org/TypeStrong/grunt-ts.svg?branch=master)](http://travis-ci.org/TypeStrong/grunt-ts) [![NPM version](https://badge.fury.io/js/grunt-ts.svg)](http://badge.fury.io/js/grunt-ts)
 
 ## TypeScript Compilation Task for GruntJS
