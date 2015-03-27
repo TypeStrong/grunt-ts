@@ -204,13 +204,17 @@ function pluginFn(grunt: IGrunt) {
                         var absolutePathToFile = path.normalize(path.join(absolutePathToVSProjectFolder, file));
 
                         var relativePathToFile = path.relative(path.resolve('.'), absolutePathToFile).replace(new RegExp('\\' + path.sep, 'g'), '/');
-                        if (srcFromVS_RelativePathsFromGruntFile.indexOf(relativePathToFile) === -1) {
+
+                        if (srcFromVS_RelativePathsFromGruntFile.indexOf(relativePathToFile) === -1 &&
+                            currenttask.filesSrc.indexOf(relativePathToFile) === -1) {
                             srcFromVS_RelativePathsFromGruntFile.push(relativePathToFile);
                         }
-                        if (currenttask.files.indexOf(relativePathToFile) === -1) {
-                            currenttask.files.push(relativePathToFile);
-                        }
+
                     });
+
+                    if (srcFromVS_RelativePathsFromGruntFile.length > 0) {
+                        currenttask.files.push({ src: srcFromVS_RelativePathsFromGruntFile });
+                    }
                 }
 
                 if (!vs.ignoreSettings) {
