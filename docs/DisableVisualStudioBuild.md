@@ -28,7 +28,4 @@ Modify one of the previous examples to point to the `custom.TypeScript.targets` 
   * Reload Visual Studio and confirm that the TypeScript Build pane still appears in the project properties.
   * Then, introduce an error in a TypeScript file such as a mismatched parenthesis.
   * Finally, press Ctrl+Shift+B to initiate a build.  If the build succeeds, you've successfully disabled the TypeScript compilation in Visual Studio.  Run Grunt to build your project and it should fail.  Fix the error and Grunt should then succeed (assuming it was prior to you making these changes).
-  
-  
-  
-  
+  * Note that "Compile on Save" *will still work* with the Visual Studio TypeScript Build disabled.  If you don't want Visual Studio to *ever* write TypeScript-emitted JavaScript files to disk, you will also need to disable "Compile on Save" in each project and configuration via the TypeScript Build pane.
