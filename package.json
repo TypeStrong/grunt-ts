@@ -2,7 +2,7 @@
   "author": "basarat",
   "name": "grunt-ts",
   "description": "Compile and manage your TypeScript project",
-  "version": "3.0.0",
+  "version": "4.0.0",
   "homepage": "https://github.com/grunt-ts/grunt-ts",
   "repository": {
     "type": "git",
@@ -72,6 +72,8 @@
   "keywords": [
     "gruntplugin",
     "typescript",
-    "compiler"
+    "compiler",
+	"visualstudio",
+	"build"
   ]
 }
