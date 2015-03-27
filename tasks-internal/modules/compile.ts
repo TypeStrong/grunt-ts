@@ -6,7 +6,6 @@ import fs = require('fs');
 import _ = require('lodash');
 import utils = require('./utils');
 import cache = require('./cacheUtils');
-import transformers = require('./transformers');
 
 var Promise: typeof Promise = require('es6-promise').Promise;
 export var grunt: IGrunt = require('grunt');
@@ -28,7 +27,8 @@ function executeNode(args: string[]): Promise<ICompileResult> {
         }, (error, result, code) => {
                 var ret: ICompileResult = {
                     code: code,
-                    output: String(result)
+                    // New TypeScript compiler uses stdout for user code errors. Old one used stderr.
+                    output: result.stdout || result.stderr
                 };
                 resolve(ret);
             });
@@ -130,7 +130,7 @@ export function compileAllFiles(targetFiles: string[], target: ITargetOptions, t
     }
 
     // Transform files as needed. Currently all of this logic in is one module
-    transformers.transformFiles(newFiles, targetFiles, target, task);
+    // transformers.transformFiles(newFiles, targetFiles, target, task);
 
     // If baseDir is specified create a temp tsc file to make sure that `--outDir` works fine
     // see https://github.com/grunt-ts/grunt-ts/issues/77
@@ -172,21 +172,66 @@ export function compileAllFiles(targetFiles: string[], target: ITargetOptions, t
     if (task.noResolve) {
         args.push('--noResolve');
     }
+    if (task.noEmitOnError) {
+        args.push('--noEmitOnError');
+    }
+    if (task.preserveConstEnums) {
+        args.push('--preserveConstEnums');
+    }
+    if (task.suppressImplicitAnyIndexErrors) {
+        args.push('--suppressImplicitAnyIndexErrors');
+    }
 
     // string options
     args.push('--target', task.target.toUpperCase());
-    args.push('--module', task.module.toLowerCase());
+
+    // check the module compile option
+    if (task.module) {
+   	    var moduleOptionString: string = task.module.toLowerCase();
+    	if (moduleOptionString === 'amd' || moduleOptionString === 'commonjs') {
+            args.push('--module', moduleOptionString);
+    	} else {
+	        console.warn('WARNING: Option "module" does only support "amd" | "commonjs"'.magenta);
+    	}
+    }
 
     // Target options:
     if (target.out) {
         args.push('--out', target.out);
     }
+
     if (target.outDir) {
         if (target.out) {
             console.warn('WARNING: Option "out" and "outDir" should not be used together'.magenta);
         }
         args.push('--outDir', target.outDir);
     }
+
+    if (target.dest && (!target.out) && (!target.outDir)) {
+        if (utils.isJavaScriptFile(target.dest)) {
+            args.push('--out', target.dest);
+        } else {
+            if (target.dest === 'src') {
+                console.warn(('WARNING: Destination for target "' + targetName + '" is "src", which is the default.  If you have' +
+                    ' forgotten to specify a "dest" parameter, please add it.  If this is correct, you may wish' +
+                    ' to change the "dest" parameter to "src/" or just ignore this warning.').magenta);
+            }
+            if (Array.isArray(target.dest)) {
+                if ((<string[]><any>target.dest).length === 0) {
+                    // ignore it and do nothing.
+                } else if ((<string[]><any>target.dest).length > 0) {
+                    console.warn((('WARNING: "dest" for target "' + targetName + '" is an array.  This is not supported by the' +
+                        ' TypeScript compiler or grunt-ts.' +
+                        (((<string[]><any>target.dest).length > 1) ? '  Only the first "dest" will be used.  The' +
+                        ' remaining items will be truncated.' : ''))).magenta);
+                    args.push('--outDir', (<string[]><any>target.dest)[0]);
+                }
+            } else {
+                args.push('--outDir', target.dest);
+            }
+        }
+    }
+
     if (task.sourceRoot) {
         args.push('--sourceRoot', task.sourceRoot);
     }
@@ -195,7 +240,13 @@ export function compileAllFiles(targetFiles: string[], target: ITargetOptions, t
     }
 
     // Locate a compiler
-    var tsc = getTsc(resolveTypeScriptBinPath());
+    var tsc: string;
+    if (task.compiler) { // Custom compiler (task.compiler)
+        grunt.log.writeln('Using the custom compiler : ' + task.compiler);
+        tsc = task.compiler;
+    } else { // the bundled OR npm module based compiler
+        tsc = getTsc(resolveTypeScriptBinPath());
+    }
 
     // To debug the tsc command
     if (task.verbose) {

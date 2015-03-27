@@ -1,0 +1,13 @@
+﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <CfgPropertyPagesGuidsAddCSharp>{d4683cae-88c4-4b85-863d-ac8014f3ba36}</CfgPropertyPagesGuidsAddCSharp>
+    <CfgPropertyPagesGuidsAddVB>{d4683cae-88c4-4b85-863d-ac8014f3ba36}</CfgPropertyPagesGuidsAddVB>
+    <CfgPropertyPagesGuidsAddTypeScript>{d4683cae-88c4-4b85-863d-ac8014f3ba36}</CfgPropertyPagesGuidsAddTypeScript>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectCapability Include="TypeScript" />
+  </ItemGroup>
+  <PropertyGroup>
+    <TypeScriptEnabled>true</TypeScriptEnabled>
+  </PropertyGroup>
+</Project>

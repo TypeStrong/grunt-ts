@@ -30,8 +30,7 @@ module.exports = function (grunt) {
         },
         tslint: {
             options: {
-                configuration: grunt.file.readJSON('tslint.json'),
-                formatter: 'tslint-path-formatter'
+                configuration: grunt.file.readJSON('tslint.json')
             },
             source: {
                 src: ['tasks/**/*.ts']
@@ -151,6 +150,14 @@ module.exports = function (grunt) {
                     fast: 'never'
                 }
             },
+            files_showWarningIfFilesIsUsedWithVs: {
+                test: true,
+                files: [{ src: ['test/multifile/a/**/*.ts'], dest: 'test/multifile/a' }],
+                vs: 'test/vsproj/testproject.csproj',
+                options: {
+                    fast: 'never'
+                }
+            },
             files_showWarningIfFilesIsUsedWithWatch: {
                 //note this should not actually watch.
                 files: [{ src: ['test/multifile/a/**/*.ts'], dest: 'test/multifile/a' }],
@@ -257,6 +264,36 @@ module.exports = function (grunt) {
                     target: 'es5'
                 }
             },
+            vsproj_test: {
+                test: true,
+                vs: 'test/vsproj/testproject.csproj'
+            },
+            vsproj_test_config: {
+                test: true,
+                vs: {
+                    project: 'test/vsproj/testproject.csproj',
+                    config: 'Release'
+                }
+            },
+            vsproj_ignoreFiles_test: {
+                test: true,
+                src: 'test/vsproj/ignoreFiles/**/*.ts',
+                vs: {
+                    project: 'test/vsproj/testproject.csproj',
+                    ignoreFiles: true
+                }
+            },
+            vsproj_ignoreSettings_test: {
+                test: true,
+                vs: {
+                    project: 'test/vsproj/testproject.csproj',
+                    ignoreSettings: true
+                },
+                outDir: 'test/vsproj/ignoreSettings',
+                options: {
+                    target: 'es6'
+                }
+            },
             warnbothcomments: {
                 test: true,
                 src: ['test/abtest/**/*.ts'],
@@ -353,6 +390,14 @@ module.exports = function (grunt) {
                 outDir: 'test/transform/js',
                 options: {
                     fast: 'always'
+                }
+            },
+            refTransform: {
+                test: true,
+                src: ['test/references-transform/**/*.ts','test/references*.d.ts'],
+                options: {
+                    fast: 'always',
+                    noImplicitAny: true
                 }
             },
             customcompiler: {

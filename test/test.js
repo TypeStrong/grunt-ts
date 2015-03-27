@@ -55,6 +55,10 @@ exports.typescript = {
         testDirectory(test, 'transform');
         test.done();
     },
+    referencesTransform: function (test) {
+        testDirectory(test, 'references-transform');
+        test.done();
+    },
     customcompiler: function (test) {
         testDirectory(test, 'customcompiler');
         test.done();
@@ -79,6 +83,18 @@ exports.typescript = {
     suppressImplicitAnyIndexErrors: function (test) {
         testDirectory(test, 'suppressImplicitAnyIndexErrors');
         assertFileDoesNotExist(test, 'test/suppressImplicitAnyIndexErrors/test_suppressImplicitAnyIndexError_false.js');
+        test.done();
+    },
+    vsproj_test: function (test) {
+        testDirectory(test, 'vsproj/vsproj_test');
+        test.done();
+    },
+    vsproj_test_config: function (test) {
+        testDirectory(test, 'vsproj/vsproj_test_config');
+        test.done();
+    },
+    vsproj_test_ignoreSettings: function (test) {
+        testDirectory(test, 'vsproj/ignoreSettings');
         test.done();
     }
 };

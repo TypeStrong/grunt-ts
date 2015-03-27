@@ -4,7 +4,7 @@
 
 ## TypeScript Compilation Task for GruntJS
 
-Grunt-ts is an npm package that handles TypeScript compilation work in GruntJS build scripts.  It provides a [Grunt-compatible wrapper](#support-for-tsc-switches) for the `tsc` command-line compiler, and provides some [additional functionality](#grunt-ts-gruntfilejs-options) that improves the TypeScript development workflow.  Grunt-ts is itself written in [TypeScript](./tasks/ts.ts).
+Grunt-ts is an npm package that handles TypeScript compilation work in GruntJS build scripts.  It provides a [Grunt-compatible wrapper](#support-for-tsc-switches) for the `tsc` command-line compiler, and provides some [additional functionality](#grunt-ts-gruntfilejs-options) that improves the TypeScript development workflow. Grunt-ts even supports compiling against a [Visual Studio project](#vs) directly.  Grunt-ts is itself written in [TypeScript](./tasks/ts.ts).
 
 ## Getting Started
 
@@ -37,6 +37,7 @@ A more extensive sample `Gruntfile.js` is available [here](https://github.com/Ty
  * Allows use of all standard GruntJS functionality such as use of customizable task targets, globbing, use of the `files` object (for instantiating multiple independent `tsc` runs in a single target), etc.
  * Allows the developer to [select a custom TypeScript compiler version](#compiler) for their project, or even use a custom (in-house) version.
  * Supports [most switches](#support-for-tsc-switches) of the `tsc` TypeScript Compiler via options in the gruntfile `ts` task, and also supports switch overrides per-target.
+ * Supports [Visual Studio Projects](#vs) as a compile target for identifying TypeScript files, setting up compile configuration, or both.
  * Provides a [transforms](#transforms) feature that eases code refactoring by taking the burden of relative path maintenance off the developer. If the paths to a set of files changes, grunt-ts will regenerate the relevant sections.  This feature supports:
    * External module [import transforms](#import-transform) by file name, aliasing, directories, indexed directories, and re-exported imports.
    * Internal module [reference maintenance](#references)
@@ -99,8 +100,8 @@ For file ordering, look at [JavaScript Generation](#javascript-generation).
 |[src](#src)|target|`string` or `string[]` - glob of TypeScript files to compile.|
 |[target](#target)|option|`'es5'` (default), `'es3'`, or `'es6'` - targeted ECMAScript version|
 |[verbose](#verbose)|option|`true`, `false` (default) - logs `tsc` command-line options to console|
+|[vs](#vs)|target|`string` referencing a `.csproj` or `.vbproj` file or, `{}` (object) (see [Visual Studio Projects](#vs) for details)|
 |[watch](#watch)|target|`string` - will watch for changes in the specified directory or below|
-
 
 Note: In the above chart, if "where to define" is "target", the property must be defined on a target or on the `ts` object directly.  If "where to define" is "options", then the property must be defined on an `options` object on `ts` or on a target under `ts`.
 
@@ -262,7 +263,10 @@ grunt.initConfig({
 ````
 **Note:** the TypeScript file identified in the `reference` property *must* be included in the `src` or `files` property in the Grunt target, or `reference` won't work (either directly or via wildcard/glob).
 
-*Warning:* Using the compiler with `out` and `reference` will prevent  grunt-ts from using its fast compile feature.  Consider using external modules with transforms instead.
+*Note:* It is not supported to use `reference` with `files`.
+
+*Warning:* Using the compiler with `out` and `reference` will prevent grunt-ts from using its fast compile feature.  Consider using external modules with transforms instead.
+
 
 #### src
 
@@ -277,6 +281,54 @@ grunt.initConfig({
   }
 });
 ````
+
+#### vs
+
+Grunt-ts can use the TypeScript compilation settings from a Visual Studio project file (.csproj or .vbproj).
+
+In the simplest use case, specify a string identifying the Visual Studio project file name in the `vs` target property.  Grunt-ts will extract the TypeScript settings *last saved* into the project file and compile the TypeScript files identified in the project in the manner specified by the Visual Studio project's configuration.
+
+````javascript
+grunt.initConfig({
+  ts: {
+    default: {
+      vs: 'test/vsproj/testproject.csproj'
+    }
+  }
+});
+````
+
+If more control is desired, you may pass the `vs` target property as an object literal with the following properties:
+
+  * `project`: (`string`, mandatory) the relative path (from the `gruntfile.js`) to the Visual Studio project file.
+  * `config`: (`string`, optional, default = '') the Visual Studio project configuration to use (allows choosing a different project configuration than the one currently in-use/saved in Visual Studio).
+  * `ignoreFiles`: (`boolean`, optional, default = `false`) Will ignore the files identified in the Visual Studio project.  This is useful if you want to keep your command-line build settings synchronized with the project's TypeScript Build settings, but want to specify a custom set of files to compile in your own `src` glob.  If not specified or set to false, the TypeScript files referenced in the Visual Studio project will be compiled in addition to any files identified in the `src` target property.
+  * `ignoreSettings`: (`boolean`, optional, default = `false`) Will ignore the compile settings identified in the Visual Studio project.  If specified, grunt-ts will follow its normal behavior and use any TypeScript build settings specified on the target or its defaults.
+
+All features of grunt-ts other than `files`, are compatible with the `vs` target property.  If you wish to add more files to the compilation than are referenced in the Visual Studio project, the `src` grunt-ts property can be used; any files found in the glob are *added* to the compilation list (grunt-ts will resolve duplicates).  All other target properties and target options specified in the gruntfile.js will **override** the settings in the Visual Studio project file.  For example, if you were referencing a Visual Studio project configuration that had source maps enabled, specifying `sourcemap: false` in the gruntfile.js would keep all other Visual Studio build settings, but disable generation of source maps.
+
+**Note:** Using the `vs` target property with `files` is not supported.
+
+Example: Use all compilation settings specified in the "Release" TypeScript configuration from the project, but compile only the TypeScript files in the `lib` subfolder to a single file in the `built` folder.
+
+````javascript
+grunt.initConfig({
+  ts: {
+    CompileMyLibsOnly: {
+      src: 'MyProject/lib/**/*.ts',
+      out: 'built/mylibs.js',
+      vs: {
+        project: 'MyProject/MyProject.csproj',
+        ignoreFiles: true,
+        config: 'Release'
+      }
+    }
+  }
+});
+````
+
+If you wish to disable the Visual Studio built-in TypeScript build, but keep the Visual Studio project properties TypeScript Build pane working, follow [these instructions](./docs/DisableVisualStudioBuild.md).
+
 
 #### watch
 
@@ -705,9 +757,25 @@ grunt.initConfig({
 
 ### Transforms
 
-Objective : To allow easier code refactoring by taking the relative path maintenance burden off the developer. If the paths to the files changes `grunt-ts` will regenerate the relevant sections.
+Objective: To allow for easier code refactoring by taking relative path maintenance burden off the developer.  If the path to a referenced file changes, `grunt-ts` will regenerate the relevant lines.
 
-Transforms begin with a three-slash comment `///` and are prefixed with `ts:`
+Transforms begin with a three-slash comment `///` and are prefixed with `ts:`.  When grunt-ts is run against your TypeScript file, it will add a new line with the appropriate TypeScript code to reference the file, or it will generate a comment indicating that the file you referenced could not be found.
+
+For example, if you put this in your code:
+
+```typescript
+///ts:ref=mylibrary
+```
+
+The next time grunt-ts runs, it might change that line to this:
+
+```typescript
+///ts:ref=mylibrary
+/// <reference path='../path/to/mylibrary.d.ts'/> ///ts:ref:generated
+```
+
+**Important Note:** All transforms require the searched-for file to be *included* in the result of the `files`, `src`, or `vs` Grunt globs.  Grunt-ts will only search within the results that *Grunt has identified*; it does not go searching through your disk for files!
+
 
 You can also run transforms without compiling your code by setting `compile: false` in your config. For example:
 ```javascript
@@ -803,6 +871,8 @@ export import anotherfile = require('../path/to/dirName/deeper/anotherfile'); //
 
 This will generate the relevant `/// <references path="./path/to/foo" />` code without you having to figure out the relative path.
 
+**Note:** grunt-ts only searches through the enumerated results of the `src` or `files` property in the Grunt target.  The referenced TypeScript file *must* be included for compilation (either directly or via wildcard/glob) or the transform won't work.  This is so that grunt-ts doesn't go searching through your whole drive for files.
+
 ##### Examples
 
 Reference file:
@@ -892,13 +962,10 @@ It runs `build` followed by `test`. This is also the default task. You should ru
 
 ### Development
 
-You will probably be working and testing a particular feature. Modify `tasksToTest` in our `Gruntfile.js` and run:  
+The easiest/fastest way to work on grunt-ts is to modify `tasksToTest` toward the bottom of the `gruntfile.js`.  The `grunt dev` command is set up to compile grunt-ts with your changes and then reload itself; then, your newly-compiled grunt-ts will be used to run whatever tasks are listed in the `tasksToTest` array.
 
-```bash
-$ grunt dev
-```
+Without using `tasksToTest` while working on grunt-ts, the old grunt-ts remains in memory for successive tasks on the same run.  This means you might have to run your grunt commands twice; once to compile grunt-ts and once to see how the new grunt-ts works with your code.
 
-It will watch your changes (to `grunt-ts` task as well as examples) and run your tasksToTest after updating the task (if any changes detected).
 
 ### Additional commands
 Update the current `grunt-ts` to be the last known good version (dogfood). Commit message should be `Update LKG`.

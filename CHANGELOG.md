@@ -1,7 +1,16 @@
 # Releases
 
 ## Next
+
+## v4.0.0
+* FEAT: Now supports parsing and compiling directly against the TypeScript files and configuration specified in a Visual Studio project file - .csproj or .vbproj.  Visual Studio *not* required and files list/config override-able, ignorable and extend-able.  (https://github.com/TypeStrong/grunt-ts/pull/215)
+* FEAT: Now includes a custom TypeScript targets file to easily disable the internal Visual Studio TypeScript build.
+* DOCS: New detailed instructions on how to disable TypeScript build within Visual Studio while keeping TypeScript Build project properties pane functional.
+* DOCS: Several documentation improvements and clarifications.
 * FIX: report error on wrong `module` option. (https://github.com/TypeStrong/grunt-ts/pull/212)
+* FIX: Corrected an issue where the grunt-ts transforms module might transform itself.  #SkyNet
+* CHORE: Added unit test for ///ts:ref= transform.
+* CHORE: Removed dependency on tslint-path-formatter and upgraded grunt-tslint dev dependency to 2.0.0.
 
 ## v3.0.0
 * **Breaking Change**: the default bundled typescript compiler is now `1.4.1`
