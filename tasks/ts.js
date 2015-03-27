@@ -242,30 +242,32 @@ function pluginFn(grunt) {
                 function isReferenceFile(filename) {
                     return path.resolve(filename) === referenceFile;
                 }
-                function getTargetOutOrElseTryTargetDest(target) {
-                    var o = target.out;
-                    if (!o) {
+                function expandAndFetchTargetOutOrElseTryTargetDest(target) {
+                    var targetout = target.out;
+                    if (!targetout) {
                         if (target.dest) {
                             if (Array.isArray(target.dest)) {
                                 if (target.dest.length > 0) {
                                     // A dest array is meaningless in TypeScript, so just take
                                     // the first one.
-                                    return target.dest[0];
+                                    targetout = target.dest[0];
                                 }
                             }
                             else if (utils.isJavaScriptFile(target.dest)) {
-                                o = target.dest;
+                                targetout = target.dest;
                             }
                         }
                     }
-                    return o;
+                    if (targetout) {
+                        target.out = grunt.template.process(targetout, {});
+                    }
                 }
                 // Create an output file?
-                var out = getTargetOutOrElseTryTargetDest(rawTargetConfig);
+                expandAndFetchTargetOutOrElseTryTargetDest(rawTargetConfig);
                 var outFile;
                 var outFile_d_ts;
-                if (!!out) {
-                    outFile = path.resolve(out);
+                if (!!rawTargetConfig.out) {
+                    outFile = path.resolve(rawTargetConfig.out);
                     outFile_d_ts = outFile.replace('.js', '.d.ts');
                 }
                 function isOutFile(filename) {

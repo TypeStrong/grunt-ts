@@ -294,6 +294,16 @@ module.exports = function (grunt) {
                     target: 'es6'
                 }
             },
+            variablesReplacedInOut: {
+                test: true,
+                src: ['test/simple/ts/zoo.ts'],
+                out: 'test/varreplacedtest/<%= pkg.name %>-test.js',
+                options: {
+                    target: 'es5',
+                    declaration: false,
+                    sourceMap: false
+                }
+            },
             warnbothcomments: {
                 test: true,
                 src: ['test/abtest/**/*.ts'],

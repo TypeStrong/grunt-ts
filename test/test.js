@@ -85,6 +85,10 @@ exports.typescript = {
         assertFileDoesNotExist(test, 'test/suppressImplicitAnyIndexErrors/test_suppressImplicitAnyIndexError_false.js');
         test.done();
     },
+    varReplacedTest: function (test) {
+        testDirectory(test, 'varreplacedtest');
+        test.done();
+    },
     vsproj_test: function (test) {
         testDirectory(test, 'vsproj/vsproj_test');
         test.done();
