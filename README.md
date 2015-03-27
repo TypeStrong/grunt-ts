@@ -327,6 +327,8 @@ grunt.initConfig({
 });
 ````
 
+If you wish to disable the Visual Studio built-in TypeScript build, but keep the Visual Studio project properties TypeScript Build pane working, follow [these instructions](./docs/DisableVisualStudioBuild.md).
+
 
 #### watch
 
