@@ -242,7 +242,7 @@ function pluginFn(grunt) {
                 function isReferenceFile(filename) {
                     return path.resolve(filename) === referenceFile;
                 }
-                function expandAndFetchTargetOutOrElseTryTargetDest(target) {
+                function fetchTargetOutOrElseTryTargetDest(target) {
                     var targetout = target.out;
                     if (!targetout) {
                         if (target.dest) {
@@ -258,15 +258,12 @@ function pluginFn(grunt) {
                             }
                         }
                     }
-                    if (targetout) {
-                        target.out = grunt.template.process(targetout, {});
-                    }
+                    return targetout;
                 }
                 // Create an output file?
-                expandAndFetchTargetOutOrElseTryTargetDest(rawTargetConfig);
-                var outFile;
+                var outFile = fetchTargetOutOrElseTryTargetDest(rawTargetConfig);
                 var outFile_d_ts;
-                if (!!rawTargetConfig.out) {
+                if (!!outFile) {
                     outFile = path.resolve(rawTargetConfig.out);
                     outFile_d_ts = outFile.replace('.js', '.d.ts');
                 }
@@ -291,6 +288,7 @@ function pluginFn(grunt) {
                     amdloaderFile = path.resolve(amdloader);
                     amdloaderPath = path.dirname(amdloaderFile);
                 }
+                processAllTemplates(rawTargetConfig, rawTargetOptions);
                 // Compiles all the files
                 // Uses the blind tsc compile task
                 // logs errors
@@ -584,6 +582,19 @@ function pluginFn(grunt) {
                 return;
             }
         }
+    }
+    function processAllTemplates(targetCfg, targetOpt) {
+        targetCfg.out = processTemplate(targetCfg.out);
+        targetCfg.outDir = processTemplate(targetCfg.outDir);
+        targetCfg.reference = processTemplate(targetCfg.reference);
+        targetOpt.mapRoot = processTemplate(targetOpt.mapRoot);
+        targetOpt.sourceRoot = processTemplate(targetOpt.sourceRoot);
+    }
+    function processTemplate(template) {
+        if (template) {
+            return grunt.template.process(template, {});
+        }
+        return template;
     }
     function getVSSettings(rawTargetOptions) {
         var vs = null;

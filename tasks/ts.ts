@@ -148,7 +148,7 @@ function pluginFn(grunt: IGrunt) {
             proceed();
         }
 
-        function proceed(vsProjectTypeScriptSettings? : csproj2ts.TypeScriptSettings) {
+        function proceed(vsProjectTypeScriptSettings?: csproj2ts.TypeScriptSettings) {
 
             if (vsProjectTypeScriptSettings && !vs.ignoreSettings) {
                 options.declaration = utils.firstElementWithValue([vsProjectTypeScriptSettings.GeneratesDeclarations,
@@ -313,7 +313,7 @@ function pluginFn(grunt: IGrunt) {
                     return path.resolve(filename) === referenceFile;
                 }
 
-                function expandAndFetchTargetOutOrElseTryTargetDest(target: ITargetOptions) {
+                function fetchTargetOutOrElseTryTargetDest(target: ITargetOptions) {
                     var targetout = target.out;
                     if (!targetout) {
                         if (target.dest) {
@@ -328,17 +328,14 @@ function pluginFn(grunt: IGrunt) {
                             }
                         }
                     }
-                    if (targetout) {
-                        target.out = grunt.template.process(targetout, {});
-                    }
+                    return targetout;
                 }
 
                 // Create an output file?
-                expandAndFetchTargetOutOrElseTryTargetDest(rawTargetConfig);
+                var outFile = fetchTargetOutOrElseTryTargetDest(rawTargetConfig);
+                var outFile_d_ts: string;
 
-                var outFile;
-                var outFile_d_ts;
-                if (!!rawTargetConfig.out) {
+                if (!!outFile) {
                     outFile = path.resolve(rawTargetConfig.out);
                     outFile_d_ts = outFile.replace('.js', '.d.ts');
                 }
@@ -367,6 +364,8 @@ function pluginFn(grunt: IGrunt) {
                     amdloaderFile = path.resolve(amdloader);
                     amdloaderPath = path.dirname(amdloaderFile);
                 }
+
+                processAllTemplates(rawTargetConfig, rawTargetOptions);
 
                 // Compiles all the files
                 // Uses the blind tsc compile task
@@ -696,8 +695,8 @@ function pluginFn(grunt: IGrunt) {
     });
 
     function logBadConfigWithFiles(config: ITargetOptions,
-            task: grunt.task.IMultiTask<ITargetOptions>,
-            targetOpt: ITaskOptions) {
+        task: grunt.task.IMultiTask<ITargetOptions>,
+        targetOpt: ITaskOptions) {
         if (config.files) {
             if (config.vs) {
                 grunt.log.writeln(('Warning: In task "' + task.target +
@@ -729,6 +728,20 @@ function pluginFn(grunt: IGrunt) {
                 return;
             }
         }
+    }
+
+    function processAllTemplates(targetCfg: ITargetOptions, targetOpt: ITaskOptions) {
+        targetCfg.out = processTemplate(targetCfg.out);
+        targetCfg.outDir = processTemplate(targetCfg.outDir);
+        targetCfg.reference = processTemplate(targetCfg.reference);
+        targetOpt.mapRoot = processTemplate(targetOpt.mapRoot);
+        targetOpt.sourceRoot = processTemplate(targetOpt.sourceRoot);
+    }
+    function processTemplate(template: string) {
+        if (template) {
+            return grunt.template.process(template, {});
+        }
+        return template;
     }
 
     function getVSSettings(rawTargetOptions: ITargetOptions) {
