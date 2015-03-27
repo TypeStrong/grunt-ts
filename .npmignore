@@ -5,6 +5,7 @@ npm-debug.log
 .gitattributes
 .npmignore
 
+/vsproj_test_config
 /test
 /customcompiler
 /.idea
