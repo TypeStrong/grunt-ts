@@ -140,6 +140,9 @@ function pluginFn(grunt) {
                 if (options.removeComments) {
                     options.comments = null;
                 }
+                else {
+                    options.comments = true;
+                }
                 options.sourceMap = utils.firstElementWithValue([vsProjectTypeScriptSettings.SourceMap, options.sourceMap]);
                 options.sourceRoot = utils.firstElementWithValue([vsProjectTypeScriptSettings.SourceRoot, options.sourceRoot]);
                 options.suppressImplicitAnyIndexErrors = utils.firstElementWithValue([vsProjectTypeScriptSettings.SuppressImplicitAnyIndexErrors, options.suppressImplicitAnyIndexErrors]);
