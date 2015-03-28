@@ -61,6 +61,16 @@ function getImports(currentFilePath: string, name: string, targetFiles: string[]
         }
     }
 
+    if (files.length === 0) {//No direct Match
+            var regExFiles = [];
+            _.each(targetFiles, function (fileName) { //Go through all fiels
+                if (fileName.match(new RegExp(name))) {//Convert Name to RegExp
+                    regExFiles.push(fileName);//Push to Array
+                }
+            })
+        regExFiles.sort(); // Sort needed to increase reliability of codegen between runs
+        files = files.concat(regExFiles);
+    }
     return files;
 }
 
