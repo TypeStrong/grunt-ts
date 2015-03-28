@@ -2,6 +2,13 @@
 
 ## Next
 
+## v4.0.1
+* FIX: Corrected an issue introduced in 4.0.0 where Grunt transforms were not running on `out`, `outDir`, `reference`, `mapRoot`, or `sourceRoot`.  (#220 - thanks to paulgambrell and JoeFirebaugh for the report.)
+* FIX: An empty compile step was getting called once per project file if `vs` was used; this has been corrected.
+* FIX: Ignored a dev-only directory for npm.
+* FIX: Comments will now be preserved when using `vs` unless RemoveComments is explicitly set in the Visual Studio project.
+* DOCS: Clarified that Compile on Save is not necessarily disabled if you follow the instructions to disable the Visual Studio TypeScript build (but it can be disabled if desired).
+
 ## v4.0.0
 * FEAT: Now supports parsing and compiling directly against the TypeScript files and configuration specified in a Visual Studio project file - .csproj or .vbproj.  Visual Studio *not* required and files list/config override-able, ignorable and extend-able.  (https://github.com/TypeStrong/grunt-ts/pull/215)
 * FEAT: Now includes a custom TypeScript targets file to easily disable the internal Visual Studio TypeScript build.
