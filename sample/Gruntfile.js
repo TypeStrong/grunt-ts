@@ -31,10 +31,10 @@ module.exports = function (grunt) {
                 watch: 'app',                  // If specified, watches this directory for changes, and re-runs the current target
                 // use to override the grunt-ts project options above for this target
                 options: {
-                    module: 'commonjs',
-                },
+                    module: 'commonjs'
+                }
             }
-        },
+        }
     });
     
     grunt.loadNpmTasks("grunt-ts");
