@@ -89,6 +89,7 @@ function pluginFn(grunt) {
             compiler: '',
             htmlModuleTemplate: '<%= filename %>',
             htmlVarTemplate: '<%= ext %>',
+            htmlTemplate: 'module <%= modulename %> { export var <%= varname %> =  \'<%= content %>\'; }',
             htmlOutDir: null,
             htmlOutDirFlatten: false,
             failOnTypeErrors: true,
@@ -175,6 +176,7 @@ function pluginFn(grunt) {
             }
             options.htmlModuleTemplate = rawTargetOptions.htmlModuleTemplate || rawTaskOptions.htmlModuleTemplate;
             options.htmlVarTemplate = rawTargetOptions.htmlVarTemplate || rawTaskOptions.htmlVarTemplate;
+            options.htmlTemplate = rawTargetOptions.htmlTemplate || rawTaskOptions.htmlTemplate;
             options.htmlOutDir = rawTargetConfig.htmlOutDir;
             options.htmlOutDirFlatten = rawTargetConfig.htmlOutDirFlatten;
             // fix the properly cased options to their appropriate values
@@ -316,7 +318,7 @@ function pluginFn(grunt) {
                             grunt.log.error('Error: Node was unable to run tsc.  Possibly it could not be found?'.red);
                             return false;
                         }
-                        // In TypeScript 1.3 and above, the result code corresponds to the ExitCode enum in 
+                        // In TypeScript 1.3 and above, the result code corresponds to the ExitCode enum in
                         //   TypeScript/src/compiler/sys.ts
                         var isError = (result.code !== 0);
                         // If the compilation errors contain only type errors, JS files are still
@@ -392,7 +394,7 @@ function pluginFn(grunt) {
                         return isSuccessfulBuild;
                     });
                 }
-                // Find out which files to compile, codegen etc. 
+                // Find out which files to compile, codegen etc.
                 // Then calls the appropriate functions + compile function on those files
                 function filterFilesAndCompile() {
                     var filesToCompile = [];
@@ -432,6 +434,7 @@ function pluginFn(grunt) {
                         var html2tsOptions = {
                             moduleFunction: _.template(options.htmlModuleTemplate),
                             varFunction: _.template(options.htmlVarTemplate),
+                            htmlTemplate: options.htmlTemplate,
                             htmlOutDir: options.htmlOutDir,
                             flatten: options.htmlOutDirFlatten
                         };
@@ -464,7 +467,7 @@ function pluginFn(grunt) {
                         }
                     }
                     ///// AMD loader
-                    // Create the amdLoader if specified 
+                    // Create the amdLoader if specified
                     if (!!amdloaderPath) {
                         var referenceOrder = amdLoaderModule.getReferencesInOrder(referenceFile, referencePath, generatedFiles);
                         amdLoaderModule.updateAmdLoader(referenceFile, referenceOrder, amdloaderFile, amdloaderPath, rawTargetConfig.outDir);

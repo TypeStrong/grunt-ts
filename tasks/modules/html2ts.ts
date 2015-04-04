@@ -26,11 +26,10 @@ function stripBOM(str) {
         : str;
 }
 
-var htmlTemplate = _.template('module <%= modulename %> { export var <%= varname %> =  \'<%= content %>\' } ');
-
 export interface IHtml2TSOptions {
     moduleFunction: Function;
     varFunction: Function;
+    htmlTemplate: string;
     htmlOutDir: string;
     flatten: boolean;
 }
@@ -48,6 +47,7 @@ export function compileHTML(filename: string, options: IHtml2TSOptions): string 
     var moduleName = options.moduleFunction({ ext: ext, filename: extFreename });
     var varName = options.varFunction({ ext: ext, filename: extFreename }).replace('.', '_');
 
+    var htmlTemplate = _.template(options.htmlTemplate);
     var fileContent = htmlTemplate({ modulename: moduleName, varname: varName, content: htmlContent });
 
     // Write the content to a file
