@@ -26,15 +26,19 @@ Specifically: http://stackoverflow.com/a/9867375/390330
 
 #### Control generated TypeScript module and variable names
 
-In the task options `htmlModuleTemplate` and `htmlVarTemplate` you can specify Underscore templates to be used in order to generate the module and variable names for the generated TypeScript.
+In the task options `htmlTemplate`, `htmlModuleTemplate` and `htmlVarTemplate` you can specify Underscore templates to be used in order to generate the module and variable names for the generated TypeScript.
 
 Those Underscore template receive the following parameters:
 
  * filename - The html file name without the extension ("test" if the file was named test.html)
  * ext - The html extension without the dot ("html" if the file was named test.html)
 
+Additionally the `htmlTemplate` receives:
+ * content - The html file content
+
 The default templates are:
 
+ * 'module <%= modulename %> { export var <%= varname %> =  \'<%= content %>\'; }'
  * "<%= filename %>" - for the module name. (This maintain existing behavior of older versions, and allow controlling the module name by simply renaming the file.)
  * "<%= ext %>" - for the variable name. (This maintain existing behavior of older versions, again allowing to control variable name by renaming the file.)
 
