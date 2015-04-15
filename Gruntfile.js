@@ -34,6 +34,9 @@ module.exports = function (grunt) {
             },
             source: {
                 src: ['tasks/**/*.ts']
+            },
+            transformedHtml: {
+                src: ['test/**/*.html.ts']
             }
         },
         'ts-internal': {
@@ -620,7 +623,7 @@ module.exports = function (grunt) {
 
     // Test
     grunt.registerTask('fail', ['continueOn', 'test_fail', 'continueOff']);
-    grunt.registerTask('test', ['test_all', 'fail', 'nodeunit', 'clean:testPost']);
+    grunt.registerTask('test', ['test_all', 'fail', 'nodeunit', 'tslint:transformedHtml', 'clean:testPost']);
 
     // Release
     grunt.registerTask('release', ['build', 'test']);

@@ -3,6 +3,9 @@
 import _ = require('lodash');
 import fs = require('fs');
 import path = require('path');
+import utils = require('./utils');
+
+var grunt = utils.grunt;
 
 /////////////////////////////////////////////////////////////////////
 // HTML -> TS
@@ -26,7 +29,10 @@ function stripBOM(str) {
         : str;
 }
 
-var htmlTemplate = _.template('module <%= modulename %> { export var <%= varname %> =  \'<%= content %>\' } ');
+var htmlTemplate = _.template('/* tslint:disable:max-line-length */' + utils.eol +
+    'module <%= modulename %> {' + utils.eol +
+    '  export var <%= varname %> = \'<%= content %>\';' + utils.eol +
+    '}' + utils.eol);
 
 export interface IHtml2TSOptions {
     moduleFunction: Function;
@@ -38,6 +44,9 @@ export interface IHtml2TSOptions {
 // Compile an HTML file to a TS file
 // Return the filename. This filename will be required by reference.ts
 export function compileHTML(filename: string, options: IHtml2TSOptions): string {
+
+    grunt.log.verbose.writeln('Compiling HTML: ' + filename);
+
     var htmlContent = escapeContent(fs.readFileSync(filename).toString());
     htmlContent = stripBOM(htmlContent);
     // TODO: place a minification pipeline here if you want.
