@@ -20,8 +20,8 @@
   "main": "grunt.js",
   "maintainers": [
     {
-      "name": "basarat",
-      "email": "basaratali@gmail.com"
+      "name": "nycdotnet",
+      "email": "steve.ognibene@outlook.com"
     },
     {
       "name": "jeffmay",
@@ -32,8 +32,8 @@
       "email": "bartvanderschoor@gmail.com"
     },
     {
-      "name": "nycdotnet",
-      "email": "steve.ognibene@outlook.com"
+      "name": "basarat",
+      "email": "basaratali@gmail.com"
     }
   ],
   "engines": {
