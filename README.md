@@ -82,6 +82,7 @@ For file ordering, look at [JavaScript Generation](#javascript-generation).
 |[fast](#fast)|option|`'watch'` (default), `'always'`, `'never'` - how to decide on a "fast" grunt-ts compile.|
 |[files](#files)|target|Sets of files to compile and optional output destination|
 |[html](#html)|target|`string` or `string[]` - glob to HTML templates|
+|[htmlTemplate](#htmltemplate)|option|`string` - HTML template .ts file content|
 |[htmlModuleTemplate](#htmlmoduletemplate)|option|`string` - HTML template namespace|
 |[htmlVarTemplate](#htmlvartemplate)|option|`string` - HTML property name|
 |[mapRoot](#maproot)|option|`string` - root for referencing `.js.map` files in JS|
@@ -175,7 +176,7 @@ grunt.initConfig({
 
 #### html
 
-Grunt-ts supports compilation of `.html` file content to TypeScript variables which is explained in detail [here](/docs/html2ts.md).  The `html` target property acts similarly to `src`, except that it searches for html files to convert to TypeScript variables.  See also [htmlModuleTemplate](#htmlmoduletemplate) and [htmlVarTemplate](#htmlvartemplate).
+Grunt-ts supports compilation of `.html` file content to TypeScript variables which is explained in detail [here](/docs/html2ts.md).  The `html` target property acts similarly to `src`, except that it searches for html files to convert to TypeScript variables.  See also [htmlModuleTemplate](#htmlmoduletemplate), [htmlModuleTemplate](#htmlmoduletemplate) and [htmlVarTemplate](#htmlvartemplate).
 
 ````javascript
 // How to use the html target property (incomplete example)
@@ -512,9 +513,27 @@ grunt.initConfig({
 });
 ````
 
+#### htmlTemplate
+
+Grunt-ts supports compilation of `.html` file content to TypeScript variables which is explained in detail [here](/docs/html2ts.md).  The `htmlModuleTemplate` target property allows the developer to define a namespace for the templates.  See also [html](#html), [htmlModuleTemplate](#htmlmoduletemplate) and [htmlVarTemplate](#htmlvartemplate).
+
+````javascript
+//Note: incomplete - combine with html
+grunt.initConfig({
+  ts: {
+    default: {
+      options: {
+        //MyTemplate.html.ts will export the html as string
+        htmlTemplate: 'export = \'<%= content %>\''
+      }
+    }
+  }
+});
+````
+
 #### htmlModuleTemplate
 
-Grunt-ts supports compilation of `.html` file content to TypeScript variables which is explained in detail [here](/docs/html2ts.md).  The `htmlModuleTemplate` target property allows the developer to define a namespace for the templates.  See also [html](#html) and [htmlVarTemplate](#htmlvartemplate).
+Grunt-ts supports compilation of `.html` file content to TypeScript variables which is explained in detail [here](/docs/html2ts.md).  The `htmlModuleTemplate` target property allows the developer to define a namespace for the templates.  See also [html](#html), [htmlTemplate](#htmltemplate) and [htmlVarTemplate](#htmlvartemplate).
 
 ````javascript
 //Note: incomplete - combine with html and htmlVarTemplate
@@ -532,7 +551,7 @@ grunt.initConfig({
 
 #### htmlVarTemplate
 
-Grunt-ts supports compilation of `.html` file content to TypeScript variables which is explained in detail [here](/docs/html2ts.md).  The `htmlVarTemplate` target property allows the developer to define a property name for the template contents.  See also [html](#html) and [htmlModuleTemplate](#htmlmoduletemplate).
+Grunt-ts supports compilation of `.html` file content to TypeScript variables which is explained in detail [here](/docs/html2ts.md).  The `htmlVarTemplate` target property allows the developer to define a property name for the template contents.  See also [html](#html), [htmlTemplate](#htmltemplate) and [htmlModuleTemplate](#htmlmoduletemplate).
 
 ````javascript
 //Note: incomplete - combine with html and htmlModuleTemplate
