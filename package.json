@@ -20,8 +20,8 @@
   "main": "grunt.js",
   "maintainers": [
     {
-      "name": "basarat",
-      "email": "basaratali@gmail.com"
+      "name": "nycdotnet",
+      "email": "steve.ognibene@outlook.com"
     },
     {
       "name": "jeffmay",
@@ -32,8 +32,8 @@
       "email": "bartvanderschoor@gmail.com"
     },
     {
-      "name": "nycdotnet",
-      "email": "steve.ognibene@outlook.com"
+      "name": "basarat",
+      "email": "basaratali@gmail.com"
     }
   ],
   "engines": {
@@ -43,7 +43,7 @@
     "test": "grunt test"
   },
   "dependencies": {
-    "chokidar": "0.12.5",
+    "chokidar": "~1.0.0",
     "csproj2ts": "0.0.2",
     "es6-promise": "~0.1.1",
     "lodash": "2.4.1",

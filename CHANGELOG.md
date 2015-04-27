@@ -2,6 +2,7 @@
 
 ## Next
 * FEAT: Now supports transforms with regular expressions (Starofall)
+* CHORE: Updated to latest chokidar (https://github.com/TypeStrong/grunt-ts/pull/232)
 
 ## v4.0.1
 * FIX: Corrected an issue introduced in 4.0.0 where Grunt transforms were not running on `out`, `outDir`, `reference`, `mapRoot`, or `sourceRoot`.  (#220 - thanks to paulgambrell and JoeFirebaugh for the report.)
