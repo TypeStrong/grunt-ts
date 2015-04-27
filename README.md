@@ -39,7 +39,7 @@ A more extensive sample `Gruntfile.js` is available [here](https://github.com/Ty
  * Supports [most switches](#support-for-tsc-switches) of the `tsc` TypeScript Compiler via options in the gruntfile `ts` task, and also supports switch overrides per-target.
  * Supports [Visual Studio Projects](#vs) as a compile target for identifying TypeScript files, setting up compile configuration, or both.
  * Provides a [transforms](#transforms) feature that eases code refactoring by taking the burden of relative path maintenance off the developer. If the paths to a set of files changes, grunt-ts will regenerate the relevant sections.  This feature supports:
-   * External module [import transforms](#import-transform) by file name, aliasing, directories, indexed directories, and re-exported imports.
+   * External module [import transforms](#import-transform) by file name, aliasing, directories, regular expressions, indexed directories, and re-exported imports.
    * Internal module [reference maintenance](#references)
    * Common [reference file](#reference) management
  * Allows [concatenation](#out) where supported by the TypeScript compiler's `--out` switch
@@ -833,6 +833,13 @@ import directoryName = require('../path/to/directoryName/index'); ///ts:import:g
 ```
 > See Exports for examples of how grunt-ts can generate an `index.ts` file for you
 
+Import files with a regular expression:
+```typescript
+///ts:import=/*.ts/
+import filename = require('../path/to/directoryName/filename'); ///ts:import:generated
+import anotherfile = require('../path/to/anotherDirectoryName/anotherfile'); ///ts:import:generated
+```
+
 #### Export Transform
 
 ```typescript
@@ -862,6 +869,14 @@ export import filename = require('../path/to/dirName/filename'); ///ts:export:ge
 export import anotherfile = require('../path/to/dirName/deeper/anotherfile'); ///ts:export:generated
 ...
 ```
+
+Export files with a regular expression:
+```typescript
+///ts:import=/*.ts/
+export import filename = require('../path/to/directoryName/filename'); ///ts:import:generated
+export import anotherfile = require('../path/to/anotherDirectoryName/anotherfile'); ///ts:import:generated
+```
+
 
 #### References
 

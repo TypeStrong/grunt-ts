@@ -19,12 +19,25 @@ var currentTargetDirs: string[];
 function getImports(currentFilePath: string, name: string, targetFiles: string[], targetDirs: string[], getIndexIfDir = true): string[] {
     var files = [];
 
+    // If we have a regular expression, use this before normale files
+    if (name.charAt(0) === '/' && name.charAt(name.length - 1) === '/') {
+        var regExFiles = [];
+        // Go through all fiels
+        _.each(targetFiles, function (fileName) {
+            // Convert Name to RegExp
+            if (fileName.match(new RegExp(name))) {
+                regExFiles.push(fileName);
+            }
+        });
+        regExFiles.sort(); // Sort needed to increase reliability of codegen between runs
+        return files.concat(regExFiles);
+    }
+
     // Test if any filename matches 
     var targetFile = _.find(targetFiles, (targetFile) => {
         return path.basename(targetFile) === name
             || path.basename(targetFile, '.d.ts') === name
             || path.basename(targetFile, '.ts') === name;
-
     });
     if (targetFile) {
         files.push(targetFile);
@@ -59,17 +72,6 @@ function getImports(currentFilePath: string, name: string, targetFiles: string[]
             filesInDir.sort(); // Sort needed to increase reliability of codegen between runs
             files = files.concat(filesInDir);
         }
-    }
-
-    if (files.length === 0) {//No direct Match
-            var regExFiles = [];
-            _.each(targetFiles, function (fileName) { //Go through all fiels
-                if (fileName.match(new RegExp(name))) {//Convert Name to RegExp
-                    regExFiles.push(fileName);//Push to Array
-                }
-            })
-        regExFiles.sort(); // Sort needed to increase reliability of codegen between runs
-        files = files.concat(regExFiles);
     }
     return files;
 }
@@ -280,7 +282,7 @@ export function transformFiles(
                     // The code gen directive line automatically qualifies
                     outputLines.push(line);
 
-                    // pass transform settings to transform (match[1] is the equals sign, ensure it exists but otherwise ignore it) 
+                    // pass transform settings to transform (match[1] is the equals sign, ensure it exists but otherwise ignore it)
                     outputLines.push.apply(outputLines, transformer.transform(fileToProcess, match[1] && match[2] && match[2].trim()));
                     return true;
                 }

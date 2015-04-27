@@ -21,6 +21,19 @@ var currentTargetDirs;
 function getImports(currentFilePath, name, targetFiles, targetDirs, getIndexIfDir) {
     if (getIndexIfDir === void 0) { getIndexIfDir = true; }
     var files = [];
+    // If we have a regular expression, use this before normale files
+    if (name.charAt(0) === '/' && name.charAt(name.length - 1) === '/') {
+        var regExFiles = [];
+        // Go through all fiels
+        _.each(targetFiles, function (fileName) {
+            // Convert Name to RegExp
+            if (fileName.match(new RegExp(name))) {
+                regExFiles.push(fileName);
+            }
+        });
+        regExFiles.sort(); // Sort needed to increase reliability of codegen between runs
+        return files.concat(regExFiles);
+    }
     // Test if any filename matches 
     var targetFile = _.find(targetFiles, function (targetFile) {
         return path.basename(targetFile) === name || path.basename(targetFile, '.d.ts') === name || path.basename(targetFile, '.ts') === name;
@@ -215,7 +228,7 @@ function transformFiles(changedFiles, targetFiles, target, task) {
                 if (match) {
                     // The code gen directive line automatically qualifies
                     outputLines.push(line);
-                    // pass transform settings to transform (match[1] is the equals sign, ensure it exists but otherwise ignore it) 
+                    // pass transform settings to transform (match[1] is the equals sign, ensure it exists but otherwise ignore it)
                     outputLines.push.apply(outputLines, transformer.transform(fileToProcess, match[1] && match[2] && match[2].trim()));
                     return true;
                 }
