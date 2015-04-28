@@ -61,6 +61,7 @@ export var typescript = {
     },
     html2ts: function (test) {
         testDirectory(test, 'html');
+        testDirectory(test, 'htmlTemplate');
         test.done();
     },
     index: function (test) {

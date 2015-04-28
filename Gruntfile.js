@@ -327,6 +327,17 @@ module.exports = function (grunt) {
                 reference: 'test/html/reference.ts',
                 out: 'test/html/out.js',
             },
+            htmltestWithTemplate: {
+                test: true,
+                src: ['test/htmlTemplate/**/*.ts'],
+                html: ['test/htmlTemplate/**/*.tpl.html'],
+                reference: 'test/htmlTemplate/reference.ts',
+                out: 'test/htmlTemplate/out.js',
+                options: {
+                    htmlModuleTemplate: '<%= filename %>_<%= ext %>_module',
+                    htmlVarTemplate: '<%= filename %>_<%= ext %>_variable'
+                },
+            },
             htmlWithHtmlOutDirTest: {
                 test: true,
                 src: ['test/htmlOutDir/reference.ts','test/htmlOutDir/src/bar.ts',
