@@ -872,9 +872,9 @@ export import anotherfile = require('../path/to/dirName/deeper/anotherfile'); //
 
 Export files with a regular expression:
 ```typescript
-///ts:import=/*.ts/
-export import filename = require('../path/to/directoryName/filename'); ///ts:import:generated
-export import anotherfile = require('../path/to/anotherDirectoryName/anotherfile'); ///ts:import:generated
+///ts:export=/*.ts/
+export import filename = require('../path/to/directoryName/filename'); ///ts:export:generated
+export import anotherfile = require('../path/to/anotherDirectoryName/anotherfile'); ///ts:export:generated
 ```
 
 
