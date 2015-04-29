@@ -1,6 +1,7 @@
 # Releases
 
 ## Next
+* FEAT: Now supports transforms with regular expressions (Starofall)
 * CHORE: Updated to latest chokidar (https://github.com/TypeStrong/grunt-ts/pull/232)
 
 ## v4.0.1
