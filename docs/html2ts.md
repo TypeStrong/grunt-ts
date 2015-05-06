@@ -42,3 +42,16 @@ Usage example is setting the module template to "MyModule.Templates" and the var
 ```typescript
 module MyModule.Templates { export var test = '<div Some content </div>' }
 ```
+
+#### Going further
+Primarily designed for html files, this feature can be used with any static file.
+
+For example a file called `license.txt`:
+```txt
+Licensed under the MIT License.
+```
+
+Will be compiled to a TypeScript file `license.txt.ts` containing:
+```typescript
+module test { export var html =  'Licensed under the MIT License.' }
+```
