@@ -22,7 +22,7 @@ export interface ICompileResult {
 function executeNode(args: string[]): Promise<ICompileResult> {
     return new Promise((resolve, reject) => {
         grunt.util.spawn({
-            cmd: 'node',
+            cmd: process.execPath,
             args: args
         }, (error, result, code) => {
                 var ret: ICompileResult = {
