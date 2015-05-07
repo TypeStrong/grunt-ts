@@ -1,6 +1,7 @@
 # Releases
 
 ## Next
+* FIX: The `html` feature now supports file names with periods (#237).  Thanks to @starstuffharvestingstarlight.
 * CHORE: Updated to latest chokidar in `package.json` (#232).  Thanks to @paulmillr.
 * CHORE: Cleaned up our sample Gruntfile (#228).  Thanks to @bennyn.
 * DOCS: Improved documentation for `html` feature (#234). Thanks to @ben8p.
