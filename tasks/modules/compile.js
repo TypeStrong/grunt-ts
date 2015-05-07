@@ -13,7 +13,7 @@ exports.grunt = require('grunt');
 function executeNode(args) {
     return new Promise(function (resolve, reject) {
         exports.grunt.util.spawn({
-            cmd: 'node',
+            cmd: process.execPath,
             args: args
         }, function (error, result, code) {
             var ret = {
