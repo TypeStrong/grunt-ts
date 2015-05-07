@@ -1,7 +1,9 @@
 # Releases
 
 ## Next
-* CHORE: Updated to latest chokidar (https://github.com/TypeStrong/grunt-ts/pull/232)
+* CHORE: Updated to latest chokidar in `package.json` (#232).  Thanks to @paulmillr.
+* CHORE: Cleaned up our sample Gruntfile (#228).  Thanks to @bennyn.
+* DOCS: Improved documentation for `html` feature (#234). Thanks to @ben8p.
 
 ## v4.0.1
 * FIX: Corrected an issue introduced in 4.0.0 where Grunt transforms were not running on `out`, `outDir`, `reference`, `mapRoot`, or `sourceRoot`.  (#220 - thanks to paulgambrell and JoeFirebaugh for the report.)
