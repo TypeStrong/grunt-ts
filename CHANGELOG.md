@@ -1,6 +1,7 @@
 # Releases
 
 ## Next
+* FIX: The `html` feature now emits TypeScript that passes tslint (#226).  Thank you for the suggestion and example code @BerndWessels.
 * FIX: The `html` feature now supports file names with periods (#237).  Thanks to @starstuffharvestingstarlight.
 * CHORE: Updated to latest chokidar in `package.json` (#232).  Thanks to @paulmillr.
 * CHORE: Cleaned up our sample Gruntfile (#228).  Thanks to @bennyn.
