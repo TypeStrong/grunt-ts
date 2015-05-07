@@ -1,6 +1,7 @@
 # Releases
 
 ## Next
+* FIX: Should work better in situations where `node` isn't the PATH of the current process (#236).  Thanks to @ryanthomas840310.
 * FIX: The `html` feature now emits TypeScript that passes tslint (#226).  Thank you for the suggestion and example code @BerndWessels.
 * FIX: The `html` feature now supports file names with periods (#237).  Thanks to @starstuffharvestingstarlight.
 * CHORE: Updated to latest chokidar in `package.json` (#232).  Thanks to @paulmillr.
