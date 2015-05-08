@@ -204,10 +204,6 @@ function pluginFn(grunt) {
                 // use default value
                 options.htmlCwd = '';
             }
-            if (!options.htmlUseQuotesForContent) {
-                // use default value
-                options.htmlUseQuotesForContent = true;
-            }
             if (!options.htmlModuleTemplate) {
                 // use default value
                 options.htmlModuleTemplate = '<%= filename %>';
