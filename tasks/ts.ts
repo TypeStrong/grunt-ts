@@ -306,6 +306,7 @@ function pluginFn(grunt: IGrunt) {
                 var referenceFile;
                 var referencePath;
                 if (!!reference) {
+                    reference = grunt.template.process(reference);
                     referenceFile = path.resolve(reference);
                     referencePath = path.dirname(referenceFile);
                 }
