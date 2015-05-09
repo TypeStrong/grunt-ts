@@ -402,7 +402,7 @@ function pluginFn(grunt: IGrunt) {
                             return false;
                         }
 
-                        // In TypeScript 1.3 and above, the result code corresponds to the ExitCode enum in 
+                        // In TypeScript 1.3 and above, the result code corresponds to the ExitCode enum in
                         //   TypeScript/src/compiler/sys.ts
 
                         var isError = (result.code !== 0);
@@ -495,7 +495,7 @@ function pluginFn(grunt: IGrunt) {
                     });
                 }
 
-                // Find out which files to compile, codegen etc. 
+                // Find out which files to compile, codegen etc.
                 // Then calls the appropriate functions + compile function on those files
                 function filterFilesAndCompile(): Promise<boolean> {
 
@@ -577,7 +577,7 @@ function pluginFn(grunt: IGrunt) {
                     }
 
                     ///// AMD loader
-                    // Create the amdLoader if specified 
+                    // Create the amdLoader if specified
                     if (!!amdloaderPath) {
                         var referenceOrder: amdLoaderModule.IReferences
                             = amdLoaderModule.getReferencesInOrder(referenceFile, referencePath, generatedFiles);
