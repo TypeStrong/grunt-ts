@@ -23,7 +23,7 @@ import templateCacheModule = require('./modules/templateCache');
 import transformers = require('./modules/transformers');
 
 // plain vanilla imports
-var Promise: typeof Promise = require('es6-promise').Promise;
+var Promise = require('es6-promise').Promise;
 
 /**
  * Time a function and print the result.
