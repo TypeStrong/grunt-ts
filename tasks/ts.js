@@ -232,7 +232,7 @@ function pluginFn(grunt) {
             // Run compiler
             asyncSeries(currenttask.files, function (target) {
                 // Create a reference file?
-                var reference = rawTargetConfig.reference;
+                var reference = processTemplate(rawTargetConfig.reference);
                 var referenceFile;
                 var referencePath;
                 if (!!reference) {

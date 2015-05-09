@@ -302,11 +302,10 @@ function pluginFn(grunt: IGrunt) {
             asyncSeries(currenttask.files, (target) => {
 
                 // Create a reference file?
-                var reference = rawTargetConfig.reference;
+                var reference = processTemplate(rawTargetConfig.reference);
                 var referenceFile;
                 var referencePath;
                 if (!!reference) {
-                    reference = grunt.template.process(reference);
                     referenceFile = path.resolve(reference);
                     referencePath = path.dirname(referenceFile);
                 }
