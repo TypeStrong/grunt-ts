@@ -1,7 +1,8 @@
 # Releases
 
 ## Next
-* FIX: Should work better in situations where `node` isn't the PATH of the current process (#236).  Thanks to @ryanthomas840310.
+* FIX: The `reference` property should properly work with Grunt transforms again (#235 + #245).  Thanks to @thorseye for the PR and @smfeest for independently reporting.
+* FIX: Should work better in situations where `node` isn't the PATH of the current process (#236).  Thanks to @ryanthomas840310 for the PR and @olegccc for the initial report.
 * FIX: The `html` feature now emits TypeScript that passes tslint (#226).  Thank you for the suggestion and example code @BerndWessels.
 * FIX: The `html` feature now supports file names with periods (#237).  Thanks to @starstuffharvestingstarlight.
 * CHORE: Updated to latest chokidar in `package.json` (#232).  Thanks to @paulmillr.
@@ -60,7 +61,7 @@
 * Error displayed when `/// ts:???` is detected but no transform exists for `???`
 
 ## v1.11.10
-* FIX: `///ts:import` and `///ts:ref` will now work with `d.ts` files as well. 
+* FIX: `///ts:import` and `///ts:ref` will now work with `d.ts` files as well.
 
 ## v1.11.9
 * DOCS: recommend `fast:always` with `grunt-contrib-watch` because `spawn:false` breaks under stress (i.e. `interrupt:true`)
