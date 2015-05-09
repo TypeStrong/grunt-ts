@@ -307,6 +307,17 @@ module.exports = function (grunt) {
                     sourceMap: false
                 }
             },
+            variablesReplacedInReference: {
+                test: true,
+                src: ['test/referenceReplaced/*.ts'],
+                reference: 'test/referenceReplaced/referenced-<%= pkg.name %>.ts',
+                options: {
+                    target: 'es5',
+                    declaration: false,
+                    sourceMap: false,
+                    noImplicitAny: true
+                }
+            },
             warnbothcomments: {
                 test: true,
                 src: ['test/abtest/**/*.ts'],

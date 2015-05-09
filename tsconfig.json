@@ -124,6 +124,9 @@
         "./test/nocompile/reference.ts",
         "./test/outdirtest/ts/source.ts",
         "./test/preserveConstEnums/test_preserveConstEnums.ts",
+        "./test/referenceReplaced/referenced-grunt-ts.ts",
+        "./test/referenceReplaced/referencing1.ts",
+        "./test/referenceReplaced/referencing2.ts",
         "./test/references-transform-library.d.ts",
         "./test/references-transform/references-transform.ts",
         "./test/simple/js/zoo.d.ts",
@@ -163,4 +166,3 @@
         "./test/work/work2.ts"
     ]
 }
-
