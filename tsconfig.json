@@ -162,6 +162,7 @@
         "./test/work/inside/tada.ts",
         "./test/work/inside/tada2.ts",
         "./test/work/inside/work3.ts",
+        "./test/work/out.d.ts",
         "./test/work/work.ts",
         "./test/work/work2.ts"
     ]
