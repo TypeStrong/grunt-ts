@@ -83,27 +83,19 @@ function updateAmdLoader(referenceFile, files, loaderFile, loaderPath, outDir) {
             grunt.warn('No files in reference file: ' + referenceFile);
         }
         if (files.before.length > 0) {
-            files.before = _.filter(files.before, function (file) {
-                return !utils.endsWith(file, '.d.ts');
-            });
+            files.before = _.filter(files.before, function (file) { return !utils.endsWith(file, '.d.ts'); });
             grunt.log.verbose.writeln('Before: ' + files.before.map(function (f) { return f.cyan; }).join(', '));
         }
         if (files.generated.length > 0) {
-            files.generated = _.filter(files.generated, function (file) {
-                return !utils.endsWith(file, '.d.ts');
-            });
+            files.generated = _.filter(files.generated, function (file) { return !utils.endsWith(file, '.d.ts'); });
             grunt.log.verbose.writeln('Generated: ' + files.generated.map(function (f) { return f.cyan; }).join(', '));
         }
         if (files.unordered.length > 0) {
-            files.unordered = _.filter(files.unordered, function (file) {
-                return !utils.endsWith(file, '.d.ts');
-            });
+            files.unordered = _.filter(files.unordered, function (file) { return !utils.endsWith(file, '.d.ts'); });
             grunt.log.verbose.writeln('Unordered: ' + files.unordered.map(function (f) { return f.cyan; }).join(', '));
         }
         if (files.after.length > 0) {
-            files.after = _.filter(files.after, function (file) {
-                return !utils.endsWith(file, '.d.ts');
-            });
+            files.after = _.filter(files.after, function (file) { return !utils.endsWith(file, '.d.ts'); });
             grunt.log.verbose.writeln('After: ' + files.after.map(function (f) { return f.cyan; }).join(', '));
         }
         // If target has outDir we need to make adjust the path
@@ -137,9 +129,13 @@ function updateAmdLoader(referenceFile, files, loaderFile, loaderPath, outDir) {
             files.generated = makeRelativeToOutDir(files.generated);
             files.unordered = makeRelativeToOutDir(files.unordered);
             files.after = makeRelativeToOutDir(files.after);
-            var mainTemplate = _.template('define(function (require) { ' + eol + '<%= body %>' + eol + '});');
+            var mainTemplate = _.template('define(function (require) { '
+                + eol + '<%= body %>'
+                + eol + '});');
             // The order in the before and after files is important
-            var singleRequireTemplate = _.template('\t require([<%= filename %>],function (){' + eol + '<%= subitem %>' + eol + '\t });');
+            var singleRequireTemplate = _.template('\t require([<%= filename %>],function (){'
+                + eol + '<%= subitem %>'
+                + eol + '\t });');
             // initial sub item
             var subitem = '';
             // Write out a binary file:

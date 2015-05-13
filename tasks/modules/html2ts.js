@@ -20,9 +20,14 @@ var escapeContent = function (content, quoteChar) {
 };
 // Remove bom when reading utf8 files
 function stripBOM(str) {
-    return 0xFEFF === str.charCodeAt(0) ? str.substring(1) : str;
+    return 0xFEFF === str.charCodeAt(0)
+        ? str.substring(1)
+        : str;
 }
-var htmlTemplate = _.template('/* tslint:disable:max-line-length */' + utils.eol + 'module <%= modulename %> {' + utils.eol + '  export var <%= varname %> = \'<%= content %>\';' + utils.eol + '}' + utils.eol);
+var htmlTemplate = _.template('/* tslint:disable:max-line-length */' + utils.eol +
+    'module <%= modulename %> {' + utils.eol +
+    '  export var <%= varname %> = \'<%= content %>\';' + utils.eol +
+    '}' + utils.eol);
 // Compile an HTML file to a TS file
 // Return the filename. This filename will be required by reference.ts
 function compileHTML(filename, options) {
@@ -66,6 +71,7 @@ function getPath(dir) {
     return dir;
 }
 function mkdirParent(dirPath, mode) {
+    // NOTE Call the standard fs.mkdirSync
     try {
         fs.mkdirSync(dirPath, mode);
     }
