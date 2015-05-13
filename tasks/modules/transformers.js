@@ -23,7 +23,9 @@ function getImports(currentFilePath, name, targetFiles, targetDirs, getIndexIfDi
     var files = [];
     // Test if any filename matches 
     var targetFile = _.find(targetFiles, function (targetFile) {
-        return path.basename(targetFile) === name || path.basename(targetFile, '.d.ts') === name || path.basename(targetFile, '.ts') === name;
+        return path.basename(targetFile) === name
+            || path.basename(targetFile, '.d.ts') === name
+            || path.basename(targetFile, '.ts') === name;
     });
     if (targetFile) {
         files.push(targetFile);
@@ -38,7 +40,9 @@ function getImports(currentFilePath, name, targetFiles, targetDirs, getIndexIfDi
         var possibleIndexFilePath = path.join(targetDir, 'index.ts');
         // If targetDir has an index file AND this is not that file then 
         // use index.ts instead of all the files in the directory
-        if (getIndexIfDir && fs.existsSync(possibleIndexFilePath) && path.relative(currentFilePath, possibleIndexFilePath) !== '') {
+        if (getIndexIfDir
+            && fs.existsSync(possibleIndexFilePath)
+            && path.relative(currentFilePath, possibleIndexFilePath) !== '') {
             files.push(path.join(targetDir, 'index.ts'));
         }
         else {
@@ -47,7 +51,9 @@ function getImports(currentFilePath, name, targetFiles, targetDirs, getIndexIfDi
                 if (path.relative(currentFilePath, filename) === '') {
                     return true;
                 }
-                return path.extname(filename) && (!_str.endsWith(filename, '.ts') || _str.endsWith(filename, '.d.ts')) && !fs.lstatSync(filename).isDirectory(); // for people that name directories with dots
+                return path.extname(filename) // must have extension : do not exclude directories                
+                    && (!_str.endsWith(filename, '.ts') || _str.endsWith(filename, '.d.ts'))
+                    && !fs.lstatSync(filename).isDirectory(); // for people that name directories with dots
             });
             filesInDir.sort(); // Sort needed to increase reliability of codegen between runs
             files = files.concat(filesInDir);
@@ -127,7 +133,9 @@ var BaseImportExportTransformer = (function (_super) {
                         filename = path.basename(path.dirname(completePathToFile));
                     }
                     var pathToFile = utils.makeRelativePath(sourceFileDirectory, _this.removeExtensionFromFilePath ? completePathToFile.replace(/(?:\.d)?\.ts$/, '') : completePathToFile, true);
-                    result.push(_this.template({ filename: filename, pathToFile: pathToFile, signatureGenerated: _this.signatureGenerated }) + ' ' + _this.signatureGenerated);
+                    result.push(_this.template({ filename: filename, pathToFile: pathToFile, signatureGenerated: _this.signatureGenerated })
+                        + ' '
+                        + _this.signatureGenerated);
                 });
             }
             else {
@@ -153,7 +161,10 @@ var ExportTransformer = (function (_super) {
     function ExportTransformer() {
         // This code is same as import transformer
         // One difference : we do not short circuit to `index.ts` if found
-        _super.call(this, 'export', '<fileOrDirectoryName>[,<variableName>]', _.template('import <%=filename%>_file = require(\'<%= pathToFile %>\'); <%= signatureGenerated %>' + utils.eol + 'export var <%=filename%> = <%=filename%>_file;'), false, true);
+        _super.call(this, 'export', '<fileOrDirectoryName>[,<variableName>]', 
+        // workaround for https://github.com/Microsoft/TypeScript/issues/512
+        _.template('import <%=filename%>_file = require(\'<%= pathToFile %>\'); <%= signatureGenerated %>' + utils.eol +
+            'export var <%=filename%> = <%=filename%>_file;'), false, true);
     }
     return ExportTransformer;
 })(BaseImportExportTransformer);

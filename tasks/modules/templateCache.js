@@ -17,7 +17,12 @@ function generateTemplateCache(src, dest, basePath) {
     var fileNames = _.map(src, function (anHtmlFile) { return path.basename(anHtmlFile); });
     var fileVarialbeName = function (anHtmlFile) { return anHtmlFile.split('.').join('_').split('-').join('_'); };
     var fileVariableNames = _.map(fileNames, fileVarialbeName);
-    var templateCacheTemplate = _.template('// You must have requirejs + text plugin loaded for this to work.' + eol + 'define([<%=relativePathSection%>],function(<%=fileNameVariableSection%>){' + eol + 'angular.module("ng").run(["$templateCache",function($templateCache) {' + eol + '<%=templateCachePut%>' + eol + '}]);' + eol + '});');
+    var templateCacheTemplate = _.template('// You must have requirejs + text plugin loaded for this to work.'
+        + eol + 'define([<%=relativePathSection%>],function(<%=fileNameVariableSection%>){'
+        + eol + 'angular.module("ng").run(["$templateCache",function($templateCache) {'
+        + eol + '<%=templateCachePut%>'
+        + eol + '}]);'
+        + eol + '});');
     var relativePathSection = '"' + relativePaths.join('",' + eol + '"') + '"';
     var fileNameVariableSection = fileVariableNames.join(',' + eol);
     var templateCachePutTemplate = _.template('$templateCache.put("<%= fileName %>", <%=fileVariableName%>);');
