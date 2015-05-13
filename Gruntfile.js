@@ -76,7 +76,7 @@ module.exports = function (grunt) {
                 sourcemap: true,
                 // Generate a declaration .d.ts file for each resulting js file (true | false  (default))
                 declaration: false,
-                // ??? (true | false (default))
+                // "skip automatic reference of lib.d.ts" (true | false (default))
                 nolib: false,
                 // Leave comments in compiled js code (true | false (default))
                 comments: false,
