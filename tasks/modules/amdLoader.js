@@ -7,12 +7,6 @@ var utils = require('./utils');
 var eol = utils.eol;
 var grunt = utils.grunt;
 var pathSeperator = path.sep;
-(function (ReferenceOrder) {
-    ReferenceOrder[ReferenceOrder["before"] = 0] = "before";
-    ReferenceOrder[ReferenceOrder["unordered"] = 1] = "unordered";
-    ReferenceOrder[ReferenceOrder["after"] = 2] = "after";
-})(exports.ReferenceOrder || (exports.ReferenceOrder = {}));
-var ReferenceOrder = exports.ReferenceOrder;
 function getReferencesInOrder(referenceFile, referencePath, generatedFiles) {
     var toreturn = {
         all: [],
