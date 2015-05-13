@@ -70,8 +70,9 @@ module.exports = function (grunt) {
             options: {
                 // 'es3' (default) | 'es5'
                 target: 'es3',
-                // Use amd for asynchonous loading or commonjs  'amd' (default) | 'commonjs'
-                module: 'commonjs',
+                // Use amd for asynchonous loading or commonjs  'amd' (default) | 'commonjs'.
+                // If null, grunt-ts will skip passing this parameter to tsc.
+                module: null,
                 // Generate a source map file for each result js file (true (default) | false)
                 sourcemap: true,
                 // Generate a declaration .d.ts file for each resulting js file (true | false  (default))
@@ -450,7 +451,8 @@ module.exports = function (grunt) {
                 src: ['test/transform/ts/**/*.ts'],
                 outDir: 'test/transform/js',
                 options: {
-                    fast: 'always'
+                    fast: 'always',
+                    module: 'commonjs'
                 }
             },
             refTransform: {
@@ -474,7 +476,8 @@ module.exports = function (grunt) {
                 src: ['test/failontypeerror/**/*.ts'],
                 outDir: 'test/failontypeerror/js',
                 options: {
-                    failOnTypeErrors: false
+                    failOnTypeErrors: false,
+                    module: 'commonjs'
                 }
             },
             hasEmitIfTypeErrorAnd_noEmitOnError_IsFalse: {
