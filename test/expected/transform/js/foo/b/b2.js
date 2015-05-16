@@ -10,9 +10,7 @@ var B2 = (function (_super) {
     function B2() {
         _super.apply(this, arguments);
     }
-    B2.prototype.b2 = function () {
-        return this.b1() + "b2";
-    };
+    B2.prototype.b2 = function () { return this.b1() + "b2"; };
     return B2;
 })(B1.B1);
 exports.B2 = B2;

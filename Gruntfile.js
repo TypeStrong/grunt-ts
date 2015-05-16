@@ -350,7 +350,8 @@ module.exports = function (grunt) {
                 out: 'test/htmlTemplate/out.js',
                 options: {
                     htmlModuleTemplate: '<%= filename %>_<%= ext %>_module',
-                    htmlVarTemplate: '<%= filename %>_<%= ext %>_variable'
+                    htmlVarTemplate: '<%= filename %>_<%= ext %>_variable',
+                    comments: false
                 },
             },
             htmlWithHtmlOutDirTest: {
@@ -425,7 +426,7 @@ module.exports = function (grunt) {
                 src: ['test/transform/ts/**/*.ts'],
                 outDir: 'test/transform/js',
                 options: {
-                    fast: 'always',
+                    fast: 'never',
                     module: 'commonjs'
                 }
             },
