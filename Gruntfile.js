@@ -602,7 +602,28 @@ module.exports = function (grunt) {
                 'export module <%= modulename %> {\n' +
                 '    export var <%= varname %> = \'<%= content %>\';\n' +
                 '}\n'
-            }
+            },
+            decoratorMetadataPassed: {
+                test: true,
+                src: 'test/decorator/decoratorTest.ts',
+                out: 'test/decorator/js/decoratorTest_metadata.js',
+                options: {
+                    fast: 'never',
+                    target: 'es6',
+                    emitDecoratorMetadata: true,
+                    sourceMap: false
+                }
+            },
+            decoratorMetadataNotPassed: {
+                test: true,
+                src: 'test/decorator/decoratorTest.ts',
+                out: 'test/decorator/js/decoratorTest_noMetadata.js',
+                options: {
+                    fast: 'never',
+                    target: 'es6',
+                    sourceMap: false
+                }
+            },
         }
     });
 

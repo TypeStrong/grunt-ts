@@ -80,6 +80,7 @@ For file ordering, look at [JavaScript Generation](#javascript-generation).
 |[compile](#compile)|option|`true` (default), `false` - compile TypeScript code.|
 |[compiler](#compiler)|option|`string` - path to custom compiler|
 |[declaration](#declaration)|option|`true`, `false` (default) - indicates that definition files should be emitted.|
+|[emitDecoratorMetadata](#emitdecoratormetadata)|option|`true`, `false` (default) - set to true to emit metadata for ES7 decorators|
 |[failOnTypeErrors](#failontypeerrors)|option|`true` (default), `false` - fail Grunt pipeline if there is a type error|
 |[fast](#fast)|option|`'watch'` (default), `'always'`, `'never'` - how to decide on a "fast" grunt-ts compile.|
 |[files](#files)|target|Sets of files to compile and optional output destination|

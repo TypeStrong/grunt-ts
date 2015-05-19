@@ -100,6 +100,7 @@ function pluginFn(grunt: IGrunt) {
             allowImportModule: false,
             compile: true,
             declaration: false,
+            emitDecoratorMetadata: false,
             mapRoot: '',
             module: null, // amd, commonjs
             noImplicitAny: false,
@@ -237,10 +238,15 @@ function pluginFn(grunt: IGrunt) {
             options.htmlOutDir = rawTargetConfig.htmlOutDir;
             options.htmlOutDirFlatten = rawTargetConfig.htmlOutDirFlatten;
 
-            // fix the properly cased options to their appropriate values
-            options.allowBool = 'allowbool' in options ? options['allowbool'] : options.allowBool;
-            options.allowImportModule = 'allowimportmodule' in options ? options['allowimportmodule'] : options.allowImportModule;
-            options.sourceMap = 'sourcemap' in options ? options['sourcemap'] : options.sourceMap;
+            // fix the improperly cased options to their appropriate values
+            options.allowBool = 'allowbool' in options ?
+              options['allowbool'] : options.allowBool;
+            options.allowImportModule = 'allowimportmodule' in options ?
+              options['allowimportmodule'] : options.allowImportModule;
+            options.sourceMap = 'sourcemap' in options ?
+              options['sourcemap'] : options.sourceMap;
+            options.emitDecoratorMetadata = 'emitdecoratormetadata' in options ?
+              options['emitdecoratormetadata'] : options.emitDecoratorMetadata;
 
             // Warn the user of invalid values
             if (options.fast !== 'watch' && options.fast !== 'always' && options.fast !== 'never') {

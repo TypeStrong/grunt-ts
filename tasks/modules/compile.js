@@ -128,6 +128,9 @@ function compileAllFiles(targetFiles, target, task, targetName, outFile) {
     if (task.sourceMap) {
         args.push('--sourcemap');
     }
+    if (task.emitDecoratorMetadata) {
+        args.push('--emitDecoratorMetadata');
+    }
     if (task.declaration) {
         args.push('--declaration');
     }

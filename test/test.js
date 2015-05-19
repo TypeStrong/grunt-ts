@@ -110,6 +110,10 @@ exports.typescript = {
         testDirectory(test, 'files_ObjectFormat');
         test.done();
     },
+    decoratorMetadataTests: function (test) {
+        testDirectory(test, 'decorator/js');
+        test.done();
+    },
     files_ArrayFormatJS: function (test) {
         testDirectory(test, 'multifile/files_testFilesUsedWithDestAsAJSFile');
         test.done();
