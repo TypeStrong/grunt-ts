@@ -564,7 +564,28 @@ module.exports = function (grunt) {
                 },
                 src: 'test/withwrongmodule/ts/*.ts',
                 outDir: 'test/withwrongmodule/js'
-            }
+            },
+            decoratorMetadataPassed: {
+                test: true,
+                src: 'test/decorator/decoratorTest.ts',
+                out: 'test/decorator/js/decoratorTest_metadata.js',
+                options: {
+                    fast: 'never',
+                    target: 'es6',
+                    emitDecoratorMetadata: true,
+                    sourceMap: false
+                }
+            },
+            decoratorMetadataNotPassed: {
+                test: true,
+                src: 'test/decorator/decoratorTest.ts',
+                out: 'test/decorator/js/decoratorTest_noMetadata.js',
+                options: {
+                    fast: 'never',
+                    target: 'es6',
+                    sourceMap: false
+                }
+            },
         }
     });
 

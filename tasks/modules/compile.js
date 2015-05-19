@@ -26,7 +26,7 @@ function executeNode(args) {
     });
 }
 /////////////////////////////////////////////////////////////////
-// Fast Compilation 
+// Fast Compilation
 /////////////////////////////////////////////////////////////////
 // Map to store if the cache was cleared after the gruntfile was parsed
 var cacheClearedOnce = {};
@@ -69,7 +69,7 @@ function compileAllFiles(targetFiles, target, task, targetName) {
     if (task.fast === 'watch') {
         // if this is the first time its running after this file was loaded
         if (cacheClearedOnce[exports.grunt.task.current.target] === undefined) {
-            // Then clear the cache for this target 
+            // Then clear the cache for this target
             clearCache(targetName);
         }
     }
@@ -124,6 +124,9 @@ function compileAllFiles(targetFiles, target, task, targetName) {
     // boolean options
     if (task.sourceMap) {
         args.push('--sourcemap');
+    }
+    if (task.emitDecoratorMetadata) {
+        args.push('--emitDecoratorMetadata');
     }
     if (task.declaration) {
         args.push('--declaration');

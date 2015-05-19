@@ -1,19 +1,19 @@
 
 interface ITargetOptions {
-    src: string[]; // input files  // Note : this is a getter and returns a new "live globbed" array 
+    src: string[]; // input files  // Note : this is a getter and returns a new "live globbed" array
     dest?: string;
     files: {
         src: string[];
         dest: string;
     }[];
     reference: string; // path to a reference.ts e.g. './approot/'
-    out: string; // if sepecified e.g. 'single.js' all output js files are merged into single.js using tsc --out command     
+    out: string; // if sepecified e.g. 'single.js' all output js files are merged into single.js using tsc --out command
     outDir: string; // if sepecified e.g. '/build/js' all output js files are put in this location
-    baseDir: string; // If specified. outDir files are made relative to this. 
+    baseDir: string; // If specified. outDir files are made relative to this.
     html: string[];  // if specified this is used to generate typescript files with a single variable which contains the content of the html
     htmlOutDir: string; // if specified with html, the generated typescript file will be produce in the directory
     htmlOutDirFlatten: boolean; // if specified with htmlOutDir, the files will be flat in the htmlOutDir
-    watch: string; // if specified watches all files in this directory for changes. 
+    watch: string; // if specified watches all files in this directory for changes.
     amdloader: string;  // if specified creates a js file to load all the generated typescript files in order using requirejs + order
     templateCache: {
         src: string[]; // if search through all the html files at this location
@@ -30,6 +30,7 @@ interface ITaskOptions {
     allowImportModule: boolean;
     /** Emit declarations*/
     declaration: boolean;
+    emitDecoratorMetadata: boolean;
     mapRoot: string;
     module: string; // amd, commonjs
     noImplicitAny: boolean;
@@ -46,7 +47,7 @@ interface ITaskOptions {
     /** Const enums will be kept as enums in the emitted JS. If false, the enum values will
      * look like magic numbers with a comment in the emitted JS. */
     preserveConstEnums: boolean;
-    /** Allows access to properties of an object by string indexer when --noImplicitAny is 
+    /** Allows access to properties of an object by string indexer when --noImplicitAny is
      * active, even if TypeScript doesn't know about them. */
     suppressImplicitAnyIndexErrors: boolean;
     verbose: boolean;
