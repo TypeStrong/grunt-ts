@@ -10,7 +10,8 @@ exports.grunt = require('grunt');
 ///////////////////////////
 // Helper
 ///////////////////////////
-var executeNode = function (args, optionalInfo) {
+var executeNode;
+var executeNodeDefault = function (args, optionalInfo) {
     return new Promise(function (resolve, reject) {
         exports.grunt.util.spawn({
             cmd: process.execPath,
@@ -229,6 +230,10 @@ function compileAllFiles(targetFiles, target, task, targetName) {
     // Switch implementation if a test version of executeNode exists.
     if (target.testExecute) {
         executeNode = target.testExecute;
+    }
+    else {
+        // this is the normal path.
+        executeNode = executeNodeDefault;
     }
     // Execute command
     return executeNode([tsc, '@' + tempfilename], { target: target, task: task }).then(function (result) {
