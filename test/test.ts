@@ -117,9 +117,5 @@ export var typescript = {
     vsproj_test_ignoreSettings: function (test) {
         testDirectory(test, 'vsproj/ignoreSettings');
         test.done();
-    },
-    decoratorMetadataTests: function (test) {
-        testDirectory(test, 'decorator/js');
-        test.done();
     }
 }

@@ -10,7 +10,7 @@ exports.grunt = require('grunt');
 ///////////////////////////
 // Helper
 ///////////////////////////
-function executeNode(args) {
+var executeNode = function (args, optionalInfo) {
     return new Promise(function (resolve, reject) {
         exports.grunt.util.spawn({
             cmd: process.execPath,
@@ -24,7 +24,7 @@ function executeNode(args) {
             resolve(ret);
         });
     });
-}
+};
 /////////////////////////////////////////////////////////////////
 // Fast Compilation
 /////////////////////////////////////////////////////////////////
@@ -226,8 +226,12 @@ function compileAllFiles(targetFiles, target, task, targetName) {
         throw (new Error('cannot create temp file'));
     }
     fs.writeFileSync(tempfilename, args.join(' '));
+    // Switch implementation if a test version of executeNode exists.
+    if (target.testExecute) {
+        executeNode = target.testExecute;
+    }
     // Execute command
-    return executeNode([tsc, '@' + tempfilename]).then(function (result) {
+    return executeNode([tsc, '@' + tempfilename], { target: target, task: task }).then(function (result) {
         if (task.fast !== 'never' && result.code === 0) {
             resetChangedFiles(newFiles, targetName);
         }

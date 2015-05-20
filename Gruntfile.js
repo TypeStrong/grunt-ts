@@ -1,3 +1,5 @@
+var commandLineAssertions = require('./test/commandLineAssertions');
+
 module.exports = function (grunt) {
     'use strict';
 
@@ -12,7 +14,8 @@ module.exports = function (grunt) {
                 '!test/test.js',
                 '!test/expected/**/*',
                 'test/htmlOutDir/generated/test',
-                'tscommand-*.txt'
+                'tscommand-*.txt',
+                '!test/commandLineAssertions.js'
             ],
             testPost: [
                 'src/a.js',
@@ -567,6 +570,7 @@ module.exports = function (grunt) {
             },
             decoratorMetadataPassed: {
                 test: true,
+                testExecute: commandLineAssertions.decoratorMetadataPassed,
                 src: 'test/decorator/decoratorTest.ts',
                 out: 'test/decorator/js/decoratorTest_metadata.js',
                 options: {
@@ -578,6 +582,7 @@ module.exports = function (grunt) {
             },
             decoratorMetadataNotPassed: {
                 test: true,
+                testExecute: commandLineAssertions.decoratorMetadataNotPassed,
                 src: 'test/decorator/decoratorTest.ts',
                 out: 'test/decorator/js/decoratorTest_noMetadata.js',
                 options: {

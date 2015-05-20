@@ -10,16 +10,10 @@ import cache = require('./cacheUtils');
 var Promise = require('es6-promise').Promise;
 export var grunt: IGrunt = require('grunt');
 
-export interface ICompileResult {
-    code: number;
-    output: string;
-    fileCount?: number;
-}
-
 ///////////////////////////
 // Helper
 ///////////////////////////
-function executeNode(args: string[]): Promise<ICompileResult> {
+var executeNode = function(args: string[], optionalInfo? : {target: ITargetOptions, task: ITaskOptions}): Promise<ICompileResult> {
     return new Promise((resolve, reject) => {
         grunt.util.spawn({
             cmd: process.execPath,
@@ -33,7 +27,7 @@ function executeNode(args: string[]): Promise<ICompileResult> {
                 resolve(ret);
             });
     });
-}
+};
 
 /////////////////////////////////////////////////////////////////
 // Fast Compilation
@@ -268,8 +262,13 @@ export function compileAllFiles(targetFiles: string[], target: ITargetOptions, t
 
     fs.writeFileSync(tempfilename, args.join(' '));
 
+    // Switch implementation if a test version of executeNode exists.
+    if (target.testExecute) {
+      executeNode = target.testExecute;
+    }
+
     // Execute command
-    return executeNode([tsc, '@' + tempfilename]).then((result: ICompileResult) => {
+    return executeNode([tsc, '@' + tempfilename], {target: target, task: task}).then((result: ICompileResult) => {
 
         if (task.fast !== 'never' && result.code === 0) {
             resetChangedFiles(newFiles, targetName);
@@ -283,7 +282,8 @@ export function compileAllFiles(targetFiles: string[], target: ITargetOptions, t
 
         return Promise.cast(result);
     }, (err) => {
-            fs.unlinkSync(tempfilename);
-            throw err;
-        });
+        fs.unlinkSync(tempfilename);
+        throw err;
+    });
+
 }

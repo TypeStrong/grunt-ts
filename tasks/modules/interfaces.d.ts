@@ -20,6 +20,7 @@ interface ITargetOptions {
         dest: string;
         baseUrl: string;
     };
+    testExecute?: (args: string[]) => Promise<ICompileResult>;
     vs?: string | IVisualStudioProjectSupport;
 }
 
@@ -65,4 +66,10 @@ interface IVisualStudioProjectSupport {
     config?: string;
     ignoreFiles?: boolean;
     ignoreSettings?: boolean;
+}
+
+interface ICompileResult {
+    code: number;
+    output: string;
+    fileCount?: number;
 }
