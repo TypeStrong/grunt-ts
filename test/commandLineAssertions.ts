@@ -21,3 +21,28 @@ export var decoratorMetadataNotPassed = (strings, options) => {
     throw "expected emitDecoratorMetadata === false";
   });
 };
+
+export var noEmitPassed = (strings, options) => {
+  return new Promise(function(resolve, reject) {
+    if (options.task.noEmit === true) {
+      resolve({
+        code: 0,
+        output: ""
+      });
+    }
+    throw "expected noEmit === true";
+  });
+};
+
+
+export var noEmitNotPassed = (strings, options) => {
+  return new Promise(function(resolve, reject) {
+    if (options.task.noEmit === false) {
+      resolve({
+        code: 0,
+        output: ""
+      });
+    }
+    throw "expected noEmit === false";
+  });
+};

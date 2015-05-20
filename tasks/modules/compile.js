@@ -150,6 +150,9 @@ function compileAllFiles(targetFiles, target, task, targetName) {
     if (task.suppressImplicitAnyIndexErrors) {
         args.push('--suppressImplicitAnyIndexErrors');
     }
+    if (task.noEmit) {
+        args.push('--noEmit');
+    }
     // string options
     args.push('--target', task.target.toUpperCase());
     // check the module compile option

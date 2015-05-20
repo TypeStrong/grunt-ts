@@ -87,6 +87,7 @@ For file ordering, look at [JavaScript Generation](#javascript-generation).
 |[htmlVarTemplate](#htmlvartemplate)|option|`string` - HTML property name|
 |[mapRoot](#maproot)|option|`string` - root for referencing `.js.map` files in JS|
 |[module](#module)|option|default to be nothing, If you want to set it you set it to either `'amd'` or `'commonjs'`|
+|[noEmit](#noemit)|option|`true`, `false` (default) - If passed as `true`, TypeScript will not emit even if it compiles cleanly|
 |[noImplicitAny](#noimplicitany)|option|`true`, `false` (default) - enable for stricter type checking|
 |[noResolve](#noresolve)|option|`true`, `false` (default) - for deprecated version of TypeScript|
 |[options](#grunt-ts-target-options)|target||
