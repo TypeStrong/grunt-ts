@@ -187,6 +187,10 @@ export function compileAllFiles(targetFiles: string[],
     if (task.suppressImplicitAnyIndexErrors) {
         args.push('--suppressImplicitAnyIndexErrors');
     }
+    if (task.noEmit) {
+        args.push('--noEmit');
+    }
+
 
     // string options
     args.push('--target', task.target.toUpperCase());

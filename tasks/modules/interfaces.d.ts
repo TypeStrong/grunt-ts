@@ -60,6 +60,7 @@ interface ITaskOptions {
     htmlVarTemplate: string;
     htmlOutDir: string;
     htmlOutDirFlatten: boolean;
+    noEmit: boolean;
 }
 
 interface IVisualStudioProjectSupport {

@@ -121,7 +121,8 @@ function pluginFn(grunt: IGrunt) {
             failOnTypeErrors: true,
             noEmitOnError: false,
             preserveConstEnums: false,
-            suppressImplicitAnyIndexErrors: false
+            suppressImplicitAnyIndexErrors: false,
+            noEmit: false
         });
 
         // get unprocessed templates from configuration
@@ -247,6 +248,8 @@ function pluginFn(grunt: IGrunt) {
               options['sourcemap'] : options.sourceMap;
             options.emitDecoratorMetadata = 'emitdecoratormetadata' in options ?
               options['emitdecoratormetadata'] : options.emitDecoratorMetadata;
+            options.noEmit = 'noemit' in options ?
+                options['noemit'] : options.noEmit;
 
             // Warn the user of invalid values
             if (options.fast !== 'watch' && options.fast !== 'always' && options.fast !== 'never') {

@@ -609,24 +609,37 @@ module.exports = function (grunt) {
             decoratorMetadataPassed: {
                 test: true,
                 testExecute: commandLineAssertions.decoratorMetadataPassed,
-                src: 'test/decorator/decoratorTest.ts',
-                out: 'test/decorator/js/decoratorTest_metadata.js',
+                src: 'test/simple/ts/zoo.ts',
                 options: {
                     fast: 'never',
                     target: 'es6',
                     emitDecoratorMetadata: true,
-                    sourceMap: false
                 }
             },
             decoratorMetadataNotPassed: {
                 test: true,
                 testExecute: commandLineAssertions.decoratorMetadataNotPassed,
-                src: 'test/decorator/decoratorTest.ts',
-                out: 'test/decorator/js/decoratorTest_noMetadata.js',
+                src: 'test/simple/ts/zoo.ts',
                 options: {
                     fast: 'never',
                     target: 'es6',
-                    sourceMap: false
+                }
+            },
+            noEmitPassed: {
+                test: true,
+                testExecute: commandLineAssertions.noEmitPassed,
+                src: 'test/simple/ts/zoo.ts',
+                options: {
+                    fast: 'never',
+                    noEmit: true
+                }
+            },
+            noEmitNotPassed: {
+                test: true,
+                testExecute: commandLineAssertions.noEmitNotPassed,
+                src: 'test/simple/ts/zoo.ts',
+                options: {
+                    fast: 'never'
                 }
             },
         }
