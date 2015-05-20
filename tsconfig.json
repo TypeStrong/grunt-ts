@@ -12,7 +12,8 @@
     },
     "filesGlob": [
         "./defs/**/*.ts",
-        "./tasks/**/*.ts"
+        "./tasks/**/*.ts",
+        "./test/*.ts"
     ],
     "files": [
         "./defs/csproj2ts/csproj2ts.d.ts",
@@ -32,7 +33,10 @@
         "./tasks/modules/transformers.ts",
         "./tasks/modules/utils.ts",
         "./tasks/scratch.ts",
-        "./tasks/ts.ts"
+        "./tasks/ts.ts",
         "./test/expected/htmlExternal/html.external.html.ts",
+        "./test/commandLineAssertions.ts",
+        "./test/references-transform-library.d.ts",
+        "./test/test.ts"
     ]
 }

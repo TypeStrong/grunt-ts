@@ -426,6 +426,9 @@ function pluginFn(grunt) {
                             grunt.log.error(('Error: tsc return code: ' + result.code).yellow);
                         }
                         return isSuccessfulBuild;
+                    }).catch(function (err) {
+                        grunt.log.writeln(('Error: ' + err).red);
+                        return false;
                     });
                 }
                 // Find out which files to compile, codegen etc.

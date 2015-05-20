@@ -105,13 +105,10 @@ exports.typescript = {
     vsproj_test_ignoreSettings: function (test) {
         testDirectory(test, 'vsproj/ignoreSettings');
         test.done();
-    },
     files_ObjectFormat: function (test) {
         testDirectory(test, 'files_ObjectFormat');
         test.done();
     },
-    decoratorMetadataTests: function (test) {
-        testDirectory(test, 'decorator/js');
         test.done();
     },
     files_ArrayFormatJS: function (test) {
@@ -128,7 +125,6 @@ exports.typescript = {
     },
     htmlExternal: function (test) {
         testDirectory(test, 'htmlExternal');
-        test.done();
     }
 };
 //# sourceMappingURL=test.js.map

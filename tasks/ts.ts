@@ -400,7 +400,7 @@ function pluginFn(grunt: IGrunt) {
 
                     // Compile the files
                     return compileModule.compileAllFiles(filesToCompile, target, options, currenttask.target, outFile)
-                        .then((result: compileModule.ICompileResult) => {
+                        .then((result: ICompileResult) => {
                         // End the timer
                         endtime = new Date().getTime();
 
@@ -509,6 +509,9 @@ function pluginFn(grunt: IGrunt) {
                         }
 
                         return isSuccessfulBuild;
+                    }).catch(function(err) {
+                      grunt.log.writeln(('Error: ' + err).red);
+                      return false;
                     });
                 }
 
