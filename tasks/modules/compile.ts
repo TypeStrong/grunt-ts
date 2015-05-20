@@ -13,7 +13,9 @@ export var grunt: IGrunt = require('grunt');
 ///////////////////////////
 // Helper
 ///////////////////////////
-var executeNode = function(args: string[], optionalInfo? : {target: ITargetOptions, task: ITaskOptions}): Promise<ICompileResult> {
+
+var executeNode: (args: string[], optionalInfo? : {target: ITargetOptions, task: ITaskOptions}) => Promise<ICompileResult>;
+var executeNodeDefault = function(args: string[], optionalInfo? : {target: ITargetOptions, task: ITaskOptions}): Promise<ICompileResult> {
     return new Promise((resolve, reject) => {
         grunt.util.spawn({
             cmd: process.execPath,
@@ -285,6 +287,9 @@ export function compileAllFiles(targetFiles: string[],
     // Switch implementation if a test version of executeNode exists.
     if (target.testExecute) {
       executeNode = target.testExecute;
+    } else {
+      // this is the normal path.
+      executeNode = executeNodeDefault;
     }
 
     // Execute command
