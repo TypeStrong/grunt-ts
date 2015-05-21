@@ -29,14 +29,20 @@ function stripBOM(str) {
         : str;
 }
 
-var htmlTemplate = _.template('/* tslint:disable:max-line-length */' + utils.eol +
+var htmlInternalTemplate = _.template('/* tslint:disable:max-line-length */' + utils.eol +
     'module <%= modulename %> {' + utils.eol +
+    '  export var <%= varname %> = \'<%= content %>\';' + utils.eol +
+    '}' + utils.eol);
+
+var htmlExternalTemplate = _.template('/* tslint:disable:max-line-length */' + utils.eol +
+    'export module <%= modulename %> {' + utils.eol +
     '  export var <%= varname %> = \'<%= content %>\';' + utils.eol +
     '}' + utils.eol);
 
 export interface IHtml2TSOptions {
     moduleFunction: Function;
     varFunction: Function;
+    htmlModuleFormat: string;
     htmlOutDir: string;
     flatten: boolean;
 }
@@ -57,7 +63,12 @@ export function compileHTML(filename: string, options: IHtml2TSOptions): string 
     var moduleName = options.moduleFunction({ ext: ext, filename: extFreename });
     var varName = options.varFunction({ ext: ext, filename: extFreename }).replace(/\./g, '_');
 
-    var fileContent = htmlTemplate({ modulename: moduleName, varname: varName, content: htmlContent });
+    var fileContent;
+    if (options.htmlModuleFormat && options.htmlModuleFormat === 'external') {
+        fileContent = htmlExternalTemplate({ modulename: moduleName, varname: varName, content: htmlContent });
+    } else {
+        fileContent = htmlInternalTemplate({ modulename: moduleName, varname: varName, content: htmlContent });
+    }
 
     // Write the content to a file
     var outputfile = getOutputFile(filename, options.htmlOutDir, options.flatten);

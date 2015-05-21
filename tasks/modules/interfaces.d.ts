@@ -53,6 +53,7 @@ interface ITaskOptions {
     compile: boolean;
     fast: string; // never | always | watch (default)
     compiler: string; // If you want, the path to a custom TypeScript compiler's main JS file
+    htmlModuleFormat: string; // internal (default) | external
     htmlModuleTemplate: string;
     htmlVarTemplate: string;
     htmlOutDir: string;

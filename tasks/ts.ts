@@ -112,6 +112,7 @@ function pluginFn(grunt: IGrunt) {
             verbose: false,
             fast: 'watch',
             compiler: '',
+            htmlModuleFormat: 'internal',
             htmlModuleTemplate: '<%= filename %>',
             htmlVarTemplate: '<%= ext %>',
             htmlOutDir: null,
@@ -540,6 +541,7 @@ function pluginFn(grunt: IGrunt) {
                         var html2tsOptions = {
                             moduleFunction: _.template(options.htmlModuleTemplate),
                             varFunction: _.template(options.htmlVarTemplate),
+                            htmlModuleFormat: options.htmlModuleFormat,
                             htmlOutDir: options.htmlOutDir,
                             flatten: options.htmlOutDirFlatten
                         };
