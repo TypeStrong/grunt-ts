@@ -121,7 +121,9 @@ function pluginFn(grunt: IGrunt) {
             noEmitOnError: false,
             preserveConstEnums: false,
             suppressImplicitAnyIndexErrors: false,
-            noEmit: false
+            noEmit: false,
+            inlineSources: false,
+            inlineSourceMap: false
         });
 
         // get unprocessed templates from configuration
@@ -130,6 +132,7 @@ function pluginFn(grunt: IGrunt) {
         var rawTargetOptions = <ITaskOptions>(grunt.config.getRaw(currenttask.name + '.' + currenttask.target + '.options') || {});
 
         var vs: IVisualStudioProjectSupport = getVSSettings(rawTargetConfig);
+
         if (vs) {
             csproj2ts.getTypeScriptSettings({
                 ProjectFileName: vs.project,
@@ -187,6 +190,7 @@ function pluginFn(grunt: IGrunt) {
 
                 options.sourceMap = utils.firstElementWithValue([vsProjectTypeScriptSettings.SourceMap,
                     options.sourceMap]);
+
                 options.sourceRoot = utils.firstElementWithValue([vsProjectTypeScriptSettings.SourceRoot,
                     options.sourceRoot]);
                 options.suppressImplicitAnyIndexErrors = utils.firstElementWithValue([vsProjectTypeScriptSettings.SuppressImplicitAnyIndexErrors,
@@ -247,7 +251,11 @@ function pluginFn(grunt: IGrunt) {
             options.emitDecoratorMetadata = 'emitdecoratormetadata' in options ?
               options['emitdecoratormetadata'] : options.emitDecoratorMetadata;
             options.noEmit = 'noemit' in options ?
-                options['noemit'] : options.noEmit;
+              options['noemit'] : options.noEmit;
+            options.inlineSources = 'inlinesources' in options ?
+              options['inlinesources'] : options.inlineSources;
+            options.inlineSourceMap = 'inlinesourcemap' in options ?
+              options['inlinesourcemap'] : options.inlineSourceMap;
 
             // Warn the user of invalid values
             if (options.fast !== 'watch' && options.fast !== 'always' && options.fast !== 'never') {

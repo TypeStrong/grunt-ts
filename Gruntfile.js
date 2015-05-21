@@ -52,7 +52,7 @@ module.exports = function (grunt) {
                 fast: 'always'
             },
             build: {
-                src: ['tasks/**/*.ts']
+                src: ['tasks/**/*.ts', 'test/commandLineAssertions.ts']
             },
             test: {
                 src: ['test/test.ts']
@@ -72,17 +72,6 @@ module.exports = function (grunt) {
             options: {
                 // 'es3' (default) | 'es5'
                 target: 'es3',
-                // Use amd for asynchonous loading or commonjs  'amd' (default) | 'commonjs'.
-                // If null, grunt-ts will skip passing this parameter to tsc.
-                module: null,
-                // Generate a source map file for each result js file (true (default) | false)
-                sourcemap: true,
-                // Generate a declaration .d.ts file for each resulting js file (true | false  (default))
-                declaration: false,
-                // "skip automatic reference of lib.d.ts" (true | false (default))
-                nolib: false,
-                // Leave comments in compiled js code (true | false (default))
-                comments: false,
                 // Print the tsc command (true | false (default))
                 verbose: true
             },
@@ -273,10 +262,12 @@ module.exports = function (grunt) {
             },
             vsproj_test: {
                 test: true,
+                testExecute: commandLineAssertions.vsproj_test,
                 vs: 'test/vsproj/testproject.csproj'
             },
             vsproj_test_config: {
                 test: true,
+                testExecute: commandLineAssertions.vsproj_test_config,
                 vs: {
                     project: 'test/vsproj/testproject.csproj',
                     config: 'Release'
@@ -307,8 +298,7 @@ module.exports = function (grunt) {
                 out: 'test/varreplacedtest/<%= pkg.name %>-test.js',
                 options: {
                     target: 'es5',
-                    declaration: false,
-                    sourceMap: false
+                    declaration: false
                 }
             },
             variablesReplacedInReference: {
@@ -410,6 +400,7 @@ module.exports = function (grunt) {
                 options: {
                     sourceRoot: 'js',
                     mapRoot: 'map',  // assuming we move all map files with some other grunt task
+                    sourceMap: true
                 },
             },
             templatecache: {
@@ -604,6 +595,25 @@ module.exports = function (grunt) {
                     fast: 'never'
                 }
             },
+            inlineSourcesPassed: {
+                test: true,
+                testExecute: commandLineAssertions.inlineSourcesPassed,
+                src: 'test/simple/ts/zoo.ts',
+                options: {
+                    fast: 'never',
+                    inlineSources: true,
+                    sourceMap: true
+                }
+            },
+            inlineSourcesNotPassed: {
+                test: true,
+                testExecute: commandLineAssertions.inlineSourcesNotPassed,
+                src: 'test/simple/ts/zoo.ts',
+                options: {
+                    fast: 'never',
+                    sourceMap: false
+                }
+            },
         }
     });
 
@@ -703,7 +713,7 @@ module.exports = function (grunt) {
     //
     // Modify tasksToTest based on what you are working on
 
-    var tasksToTest = ['ts:fail', 'nodeunit'];
+    var tasksToTest = ['ts:vsproj_test'];
 
     grunt.registerTask('dev', ['run', 'watch']);
 
