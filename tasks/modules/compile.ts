@@ -14,8 +14,8 @@ export var grunt: IGrunt = require('grunt');
 // Helper
 ///////////////////////////
 
-var executeNode: (args: string[], optionalInfo? : {target: ITargetOptions, task: ITaskOptions}) => Promise<ICompileResult>;
-var executeNodeDefault = function(args: string[], optionalInfo? : {target: ITargetOptions, task: ITaskOptions}): Promise<ICompileResult> {
+var executeNode: ICompilePromise;
+var executeNodeDefault : ICompilePromise = function(args, optionalInfo) {
     return new Promise((resolve, reject) => {
         grunt.util.spawn({
             cmd: process.execPath,
@@ -189,6 +189,12 @@ export function compileAllFiles(targetFiles: string[],
     }
     if (task.noEmit) {
         args.push('--noEmit');
+    }
+    if (task.inlineSources) {
+        args.push('--inlineSources');
+    }
+    if (task.inlineSourceMap) {
+        args.push('--inlineSourceMap');
     }
 
 

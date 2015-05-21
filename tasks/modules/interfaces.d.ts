@@ -61,6 +61,8 @@ interface ITaskOptions {
     htmlOutDir: string;
     htmlOutDirFlatten: boolean;
     noEmit: boolean;
+    inlineSourceMap: boolean;
+    inlineSources: boolean;
 }
 
 interface IVisualStudioProjectSupport {
@@ -74,4 +76,8 @@ interface ICompileResult {
     code: number;
     output: string;
     fileCount?: number;
+}
+
+interface ICompilePromise {
+  (args: string[], optionalInfo? : {target: ITargetOptions, task: ITaskOptions}) : Promise<ICompileResult>
 }

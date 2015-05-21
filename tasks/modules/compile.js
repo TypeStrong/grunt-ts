@@ -156,6 +156,12 @@ function compileAllFiles(targetFiles, target, task, targetName, outFile) {
     if (task.noEmit) {
         args.push('--noEmit');
     }
+    if (task.inlineSources) {
+        args.push('--inlineSources');
+    }
+    if (task.inlineSourceMap) {
+        args.push('--inlineSourceMap');
+    }
     // string options
     args.push('--target', task.target.toUpperCase());
     // check the module compile option

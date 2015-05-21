@@ -97,7 +97,9 @@ function pluginFn(grunt) {
             noEmitOnError: false,
             preserveConstEnums: false,
             suppressImplicitAnyIndexErrors: false,
-            noEmit: false
+            noEmit: false,
+            inlineSources: false,
+            inlineSourceMap: false
         });
         // get unprocessed templates from configuration
         var rawTaskOptions = (grunt.config.getRaw(currenttask.name + '.options') || {});
@@ -207,6 +209,10 @@ function pluginFn(grunt) {
                 options['emitdecoratormetadata'] : options.emitDecoratorMetadata;
             options.noEmit = 'noemit' in options ?
                 options['noemit'] : options.noEmit;
+            options.inlineSources = 'inlinesources' in options ?
+                options['inlinesources'] : options.inlineSources;
+            options.inlineSourceMap = 'inlinesourcemap' in options ?
+                options['inlinesourcemap'] : options.inlineSourceMap;
             // Warn the user of invalid values
             if (options.fast !== 'watch' && options.fast !== 'always' && options.fast !== 'never') {
                 console.warn(('"fast" needs to be one of : "watch" (default) | "always" | "never" but you provided: ' + options.fast).magenta);
