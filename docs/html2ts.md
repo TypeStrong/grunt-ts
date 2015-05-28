@@ -89,7 +89,7 @@ var templateString = myTemplate.markup.html
 
 If this appears as excessive object wrapping, the simplest form for htmlOutputTemplate is:
 ````javascript
-/* tslint:disable:max-line-length */' '\n' +
+/* tslint:disable:max-line-length */' + '\n' +
 export var <%= modulename %>='<%= content %>';
 ````
 
