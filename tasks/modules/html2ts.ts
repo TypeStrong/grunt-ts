@@ -81,7 +81,7 @@ function replaceNewLines(input: string) {
     var output, standardized;
 
     standardized = input.replace(/\r/g, '');
-    output = output.replace(/\n/g, utils.eol);
+    output = standardized.replace(/\n/g, utils.eol);
 
     return output;
 }
