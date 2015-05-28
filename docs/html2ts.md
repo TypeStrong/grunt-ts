@@ -63,10 +63,10 @@ grunt.initConfig({
         //HTML template objects will expose their content via a property called markup.
         htmlVarTemplate: 'markup',
         htmlModuleTemplate: 'html',
-        htmlOutputTemplate: '/* tslint:disable:max-line-length */' '\n' +
-          'export module <%= modulename %> {' + '\n' +
-          '  export var <%= varname %> = \'<%= content %>\';' + '\n' +
-          '}' + '\n'
+		htmlOutputTemplate: '/* tslint:disable:max-line-length */ \n\
+          export module <%= modulename %> {\n\
+              export var <%= varname %> = \'<%= content %>\';\n\
+          }\n'
       }
     }
   }

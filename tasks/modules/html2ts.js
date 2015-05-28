@@ -22,8 +22,7 @@ var escapeContent = function (content, quoteChar) {
 function stripBOM(str) {
     return 0xFEFF === str.charCodeAt(0) ? str.substring(1) : str;
 }
-var htmlInternalTemplate = _.template('/* tslint:disable:max-line-length */' + utils.eol + 'module <%= modulename %> {' + utils.eol + '  export var <%= varname %> = \'<%= content %>\';' + utils.eol + '}' + utils.eol);
-var htmlExternalTemplate = _.template('/* tslint:disable:max-line-length */' + utils.eol + 'export module <%= modulename %> {' + utils.eol + '  export var <%= varname %> = \'<%= content %>\';' + utils.eol + '}' + utils.eol);
+var htmlInternalTemplate = '/* tslint:disable:max-line-length */' + utils.eol + 'module <%= modulename %> {' + utils.eol + '  export var <%= varname %> = \'<%= content %>\';' + utils.eol + '}' + utils.eol;
 // Compile an HTML file to a TS file
 // Return the filename. This filename will be required by reference.ts
 function compileHTML(filename, options) {
@@ -36,11 +35,11 @@ function compileHTML(filename, options) {
     var moduleName = options.moduleFunction({ ext: ext, filename: extFreename });
     var varName = options.varFunction({ ext: ext, filename: extFreename }).replace(/\./g, '_');
     var fileContent;
-    if (options.htmlModuleFormat && options.htmlModuleFormat === 'external') {
-        fileContent = htmlExternalTemplate({ modulename: moduleName, varname: varName, content: htmlContent });
+    if (!options.htmlOutputTemplate) {
+        fileContent = _.template(htmlInternalTemplate)({ modulename: moduleName, varname: varName, content: htmlContent });
     }
     else {
-        fileContent = htmlInternalTemplate({ modulename: moduleName, varname: varName, content: htmlContent });
+        fileContent = _.template(replaceNewLines(options.htmlOutputTemplate))({ modulename: moduleName, varname: varName, content: htmlContent });
     }
     // Write the content to a file
     var outputfile = getOutputFile(filename, options.htmlOutDir, options.flatten);
@@ -49,6 +48,13 @@ function compileHTML(filename, options) {
     return outputfile;
 }
 exports.compileHTML = compileHTML;
+// Replace user-supplied templates newlines with newlines appropriate for the current OS
+function replaceNewLines(input) {
+    var output, standardized;
+    standardized = input.replace(/\r/g, '');
+    output = output.replace(/\n/g, utils.eol);
+    return output;
+}
 function getOutputFile(filename, htmlOutDir, flatten) {
     var outputfile = filename;
     // NOTE If an htmlOutDir was specified
