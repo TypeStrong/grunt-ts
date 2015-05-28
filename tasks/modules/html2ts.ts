@@ -29,20 +29,17 @@ function stripBOM(str) {
         : str;
 }
 
-var htmlInternalTemplate = _.template('/* tslint:disable:max-line-length */' + utils.eol +
+
+var htmlInternalTemplate = '/* tslint:disable:max-line-length */' + utils.eol +
     'module <%= modulename %> {' + utils.eol +
     '  export var <%= varname %> = \'<%= content %>\';' + utils.eol +
-    '}' + utils.eol);
+    '}' + utils.eol;
 
-var htmlExternalTemplate = _.template('/* tslint:disable:max-line-length */' + utils.eol +
-    'export module <%= modulename %> {' + utils.eol +
-    '  export var <%= varname %> = \'<%= content %>\';' + utils.eol +
-    '}' + utils.eol);
 
 export interface IHtml2TSOptions {
     moduleFunction: Function;
     varFunction: Function;
-    htmlModuleFormat: string;
+    htmlOutputTemplate: string;
     htmlOutDir: string;
     flatten: boolean;
 }
@@ -64,10 +61,10 @@ export function compileHTML(filename: string, options: IHtml2TSOptions): string 
     var varName = options.varFunction({ ext: ext, filename: extFreename }).replace(/\./g, '_');
 
     var fileContent;
-    if (options.htmlModuleFormat && options.htmlModuleFormat === 'external') {
-        fileContent = htmlExternalTemplate({ modulename: moduleName, varname: varName, content: htmlContent });
+    if (!options.htmlOutputTemplate) {
+        fileContent = _.template(htmlInternalTemplate)({ modulename: moduleName, varname: varName, content: htmlContent });
     } else {
-        fileContent = htmlInternalTemplate({ modulename: moduleName, varname: varName, content: htmlContent });
+        fileContent = _.template(replaceNewLines(options.htmlOutputTemplate))({ modulename: moduleName, varname: varName, content: htmlContent });
     }
 
     // Write the content to a file
@@ -77,6 +74,16 @@ export function compileHTML(filename: string, options: IHtml2TSOptions): string 
 
     fs.writeFileSync(outputfile, fileContent);
     return outputfile;
+}
+
+// Replace user-supplied templates newlines with newlines appropriate for the current OS
+function replaceNewLines(input: string) {
+    var output, standardized;
+
+    standardized = input.replace(/\r/g, '');
+    output = output.replace(/\n/g, utils.eol);
+
+    return output;
 }
 
 function getOutputFile(filename: string, htmlOutDir: string, flatten: boolean): string {

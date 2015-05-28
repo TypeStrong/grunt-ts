@@ -26,7 +26,7 @@ Specifically: http://stackoverflow.com/a/9867375/390330
 
 #### Control generated TypeScript module and variable names
 
-In the task options `htmlModuleTemplate` and `htmlVarTemplate` you can specify Underscore templates to be used in order to generate the module and variable names for the generated TypeScript.
+In the task options `htmlModuleTemplate` and `htmlVarTemplate` you can specify Underscore template variables to be used in order to generate the module and variable names for the generated TypeScript.
 
 Those Underscore template receive the following parameters:
 
@@ -42,6 +42,58 @@ Usage example is setting the module template to "MyModule.Templates" and the var
 ```typescript
 module MyModule.Templates { export var test = '<div Some content </div>' }
 ```
+
+#### Override predefined template and specify a custom output format
+
+Using the task option `htmlOutputTemplate` you can specify Underscore template strings to be used against interpolation with three variables:
+
+* "<%= modulename %>" - This variable will be interpolated with the value of the htmlModuleTemplate option
+* "<%= varname %>" - This variable will be interpolated with the value of the htmlVarTemplate option
+* "<%= content %>" - This variable will be interpolated with the content of the HTML file
+
+
+For example if we would like to specify a custom template that outputs an external module, we could use:
+
+````javascript
+//Note: Outputs an external module
+grunt.initConfig({
+  ts: {
+    default: {
+      options: {
+        //HTML template objects will expose their content via a property called markup.
+        htmlVarTemplate: 'markup',
+        htmlModuleTemplate: 'html',
+        htmlOutputTemplate: '/* tslint:disable:max-line-length */' '\n' +
+          'export module <%= modulename %> {' + '\n' +
+          '  export var <%= varname %> = \'<%= content %>\';' + '\n' +
+          '}' + '\n'
+      }
+    }
+  }
+});
+````
+
+we can then do the following in our .ts file:
+
+````typescript
+//import the external module
+import myTemplate = require('module');
+
+...
+
+//consume it
+var templateString = myTemplate.markup.html
+
+````
+
+
+If this appears as excessive object wrapping, the simplest form for htmlOutputTemplate is:
+````javascript
+/* tslint:disable:max-line-length */' '\n' +
+export var <%= modulename %>='<%= content %>';
+````
+
+export var %filename%='%content%';"
 
 #### Going further
 Primarily designed for html files, this feature can be used with any static file.

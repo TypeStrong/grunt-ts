@@ -550,6 +550,35 @@ grunt.initConfig({
 });
 ````
 
+#### htmlOutputTemplate
+
+Grunt-ts supports compilation of `.html` file content to TypeScript variables which is explained in detail [here](/docs/html2ts.md).  The `htmlOutputTemplate` target property allows the developer to override the internally defined output template to a custom one, useful if one would like to define the HTML output as an external modules, for example. 
+Three variables can be used in this template, namely:
+
+
+* "<%= modulename %>" - This variable will be interpolated with the value of the htmlModuleTemplate option
+* "<%= varname %>" - This variable will be interpolated with the value of the htmlVarTemplate option
+* "<%= content %>" - This variable will be interpolated with the content of the HTML file
+
+````javascript
+//Note: Outputs an external module
+grunt.initConfig({
+  ts: {
+    default: {
+      options: {
+        //HTML template objects will expose their content via a property called markup.
+        htmlVarTemplate: 'markup',
+        htmlModuleTemplate: 'html',
+        htmlOutputTemplate: '/* tslint:disable:max-line-length */' '\n' +
+          'export module <%= modulename %> {' + '\n' +
+          '  export var <%= varname %> = \'<%= content %>\';' + '\n' +
+          '}' + '\n'
+      }
+    }
+  }
+});
+````
+
 #### mapRoot
 
 Specifies the root for where `.js.map` sourcemap files should be referenced.  This is useful if you intend to move your `.js.map` files to a different location.  Leave this blank or omit entirely if the `.js.map` files will be deployed to the same folder as the corresponding `.js` files.  See also [sourceRoot](#sourceroot).
