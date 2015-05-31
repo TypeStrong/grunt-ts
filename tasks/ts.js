@@ -174,6 +174,7 @@ function pluginFn(grunt) {
                     }
                 }
             }
+            options.htmlOutputTemplate = rawTargetOptions.htmlOutputTemplate || rawTaskOptions.htmlOutputTemplate;
             options.htmlModuleTemplate = rawTargetOptions.htmlModuleTemplate || rawTaskOptions.htmlModuleTemplate;
             options.htmlVarTemplate = rawTargetOptions.htmlVarTemplate || rawTaskOptions.htmlVarTemplate;
             options.htmlOutDir = rawTargetConfig.htmlOutDir;
