@@ -78,13 +78,9 @@ export function compileHTML(filename: string, options: IHtml2TSOptions): string 
 
 // Replace user-supplied templates newlines with newlines appropriate for the current OS
 function replaceNewLines(input: string) {
-    var output, standardized;
-
-    standardized = input.replace(/\r/g, '');
-    output = standardized.replace(/\n/g, utils.eol);
-
-    return output;
+   return input.replace(/\r/g, '').replace(/\n/g, utils.eol);
 }
+
 
 function getOutputFile(filename: string, htmlOutDir: string, flatten: boolean): string {
     var outputfile = filename;

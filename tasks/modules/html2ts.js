@@ -50,10 +50,7 @@ function compileHTML(filename, options) {
 exports.compileHTML = compileHTML;
 // Replace user-supplied templates newlines with newlines appropriate for the current OS
 function replaceNewLines(input) {
-    var output, standardized;
-    standardized = input.replace(/\r/g, '');
-    output = output.replace(/\n/g, utils.eol);
-    return output;
+    return input.replace(/\r/g, '').replace(/\n/g, utils.eol);
 }
 function getOutputFile(filename, htmlOutDir, flatten) {
     var outputfile = filename;
