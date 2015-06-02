@@ -101,6 +101,10 @@ exports.typescript = {
     vsproj_test_ignoreSettings: function (test) {
         testDirectory(test, 'vsproj/ignoreSettings');
         test.done();
+    },
+    files_ObjectFormat: function (test) {
+        testDirectory(test, 'files_ObjectFormat');
+        test.done();
     }
 };
 //# sourceMappingURL=test.js.map

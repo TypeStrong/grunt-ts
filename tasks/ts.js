@@ -232,7 +232,7 @@ function pluginFn(grunt) {
             // Run compiler
             asyncSeries(currenttask.files, function (target) {
                 // Create a reference file?
-                var reference = processTemplate(rawTargetConfig.reference);
+                var reference = processIndividualTemplate(rawTargetConfig.reference);
                 var referenceFile;
                 var referencePath;
                 if (!!reference) {
@@ -257,6 +257,12 @@ function pluginFn(grunt) {
                                 targetout = target.dest;
                             }
                         }
+                        else if (target.files) {
+                            var filesKeys = _.keys(target.files);
+                            if (filesKeys.length > filesCompilationIndex && utils.isJavaScriptFile(filesKeys[filesCompilationIndex])) {
+                                targetout = filesKeys[filesCompilationIndex];
+                            }
+                        }
                     }
                     return targetout;
                 }
@@ -264,7 +270,7 @@ function pluginFn(grunt) {
                 var outFile = fetchTargetOutOrElseTryTargetDest(rawTargetConfig);
                 var outFile_d_ts;
                 if (!!outFile) {
-                    outFile = path.resolve(rawTargetConfig.out);
+                    outFile = path.resolve(outFile);
                     outFile_d_ts = outFile.replace('.js', '.d.ts');
                 }
                 function isOutFile(filename) {
@@ -288,7 +294,8 @@ function pluginFn(grunt) {
                     amdloaderFile = path.resolve(amdloader);
                     amdloaderPath = path.dirname(amdloaderFile);
                 }
-                processAllTemplates(rawTargetConfig, rawTargetOptions);
+                processAllTargetTemplates(rawTargetConfig, rawTargetOptions);
+                outFile = processIndividualTemplate(outFile);
                 // Compiles all the files
                 // Uses the blind tsc compile task
                 // logs errors
@@ -301,7 +308,7 @@ function pluginFn(grunt) {
                     var starttime = new Date().getTime();
                     var endtime;
                     // Compile the files
-                    return compileModule.compileAllFiles(filesToCompile, target, options, currenttask.target).then(function (result) {
+                    return compileModule.compileAllFiles(filesToCompile, target, options, currenttask.target, outFile).then(function (result) {
                         // End the timer
                         endtime = new Date().getTime();
                         grunt.log.writeln('');
@@ -410,7 +417,6 @@ function pluginFn(grunt) {
                     else {
                         if (_.isArray(currenttask.data.files)) {
                             filesToCompile = grunt.file.expand(currenttask.data.files[filesCompilationIndex].src);
-                            filesCompilationIndex += 1;
                         }
                         else if (currenttask.data.files[target.dest]) {
                             filesToCompile = grunt.file.expand(currenttask.data.files[target.dest]);
@@ -418,6 +424,7 @@ function pluginFn(grunt) {
                         else {
                             filesToCompile = grunt.file.expand([currenttask.data.files.src]);
                         }
+                        filesCompilationIndex += 1;
                     }
                     // ignore directories, and clear the files of output.d.ts and baseDirFile
                     filesToCompile = filesToCompile.filter(function (file) {
@@ -583,14 +590,14 @@ function pluginFn(grunt) {
             }
         }
     }
-    function processAllTemplates(targetCfg, targetOpt) {
-        targetCfg.out = processTemplate(targetCfg.out);
-        targetCfg.outDir = processTemplate(targetCfg.outDir);
-        targetCfg.reference = processTemplate(targetCfg.reference);
-        targetOpt.mapRoot = processTemplate(targetOpt.mapRoot);
-        targetOpt.sourceRoot = processTemplate(targetOpt.sourceRoot);
+    function processAllTargetTemplates(targetCfg, targetOpt) {
+        targetCfg.out = processIndividualTemplate(targetCfg.out);
+        targetCfg.outDir = processIndividualTemplate(targetCfg.outDir);
+        targetCfg.reference = processIndividualTemplate(targetCfg.reference);
+        targetOpt.mapRoot = processIndividualTemplate(targetOpt.mapRoot);
+        targetOpt.sourceRoot = processIndividualTemplate(targetOpt.sourceRoot);
     }
-    function processTemplate(template) {
+    function processIndividualTemplate(template) {
         if (template) {
             return grunt.template.process(template, {});
         }

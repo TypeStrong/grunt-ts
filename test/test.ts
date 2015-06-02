@@ -12,7 +12,7 @@ function testFile(test, path: string) {
     var actual = grunt.file.read(actualFileName);
     var expected = grunt.file.read(expectedFileName);
     test.equal(expected, actual, 'Actual did not match expected:' + grunt.util.linefeed +
-        actualFileName + grunt.util.linefeed + 
+        actualFileName + grunt.util.linefeed +
         expectedFileName);
 }
 
@@ -116,6 +116,10 @@ export var typescript = {
     },
     vsproj_test_ignoreSettings: function (test) {
         testDirectory(test, 'vsproj/ignoreSettings');
+        test.done();
+    },
+    files_ObjectFormat: function (test) {
+        testDirectory(test, 'files_ObjectFormat');
         test.done();
     }
 }
