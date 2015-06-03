@@ -2,6 +2,9 @@
 
 ## Next
 
+## v4.1.1
+* FIX: Support for the Grunt `files` feature had a regression and was not working correctly.  (#251).  Thanks to @Linowitch for the report.  We've built in some assertions to ensure this doesn't happen again.
+
 ## v4.1.0
 * FIX: The `reference` property should properly work with Grunt transforms again (#235 + #245).  Thanks to @thorseye for the PR and @smfeest for independently reporting.
 * FIX: Should work better in situations where `node` isn't the PATH of the current process (#236).  Thanks to @ryanthomas840310 for the PR and @olegccc for the initial report.
