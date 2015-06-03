@@ -26,7 +26,7 @@ function executeNode(args) {
     });
 }
 /////////////////////////////////////////////////////////////////
-// Fast Compilation 
+// Fast Compilation
 /////////////////////////////////////////////////////////////////
 // Map to store if the cache was cleared after the gruntfile was parsed
 var cacheClearedOnce = {};
@@ -62,14 +62,14 @@ function getTsc(binPath) {
     exports.grunt.log.writeln('Using tsc v' + pkg.version);
     return path.join(binPath, 'tsc');
 }
-function compileAllFiles(targetFiles, target, task, targetName) {
+function compileAllFiles(targetFiles, target, task, targetName, outFile) {
     // Make a local copy so we can modify files without having external side effects
     var files = _.map(targetFiles, function (file) { return file; });
     var newFiles = files;
     if (task.fast === 'watch') {
         // if this is the first time its running after this file was loaded
         if (cacheClearedOnce[exports.grunt.task.current.target] === undefined) {
-            // Then clear the cache for this target 
+            // Then clear the cache for this target
             clearCache(targetName);
         }
     }
@@ -159,7 +159,15 @@ function compileAllFiles(targetFiles, target, task, targetName) {
         }
     }
     // Target options:
-    if (target.out) {
+    if (outFile) {
+        if (utils.isJavaScriptFile(outFile)) {
+            args.push('--out', outFile);
+        }
+        else {
+            args.push('--outDir', outFile);
+        }
+    }
+    else if (target.out) {
         args.push('--out', target.out);
     }
     if (target.outDir) {
@@ -174,13 +182,18 @@ function compileAllFiles(targetFiles, target, task, targetName) {
         }
         else {
             if (target.dest === 'src') {
-                console.warn(('WARNING: Destination for target "' + targetName + '" is "src", which is the default.  If you have' + ' forgotten to specify a "dest" parameter, please add it.  If this is correct, you may wish' + ' to change the "dest" parameter to "src/" or just ignore this warning.').magenta);
+                console.warn(('WARNING: Destination for target "' + targetName + '" is "src", which is the default.  If you have' +
+                    ' forgotten to specify a "dest" parameter, please add it.  If this is correct, you may wish' +
+                    ' to change the "dest" parameter to "src/" or just ignore this warning.').magenta);
             }
             if (Array.isArray(target.dest)) {
                 if (target.dest.length === 0) {
                 }
                 else if (target.dest.length > 0) {
-                    console.warn((('WARNING: "dest" for target "' + targetName + '" is an array.  This is not supported by the' + ' TypeScript compiler or grunt-ts.' + ((target.dest.length > 1) ? '  Only the first "dest" will be used.  The' + ' remaining items will be truncated.' : ''))).magenta);
+                    console.warn((('WARNING: "dest" for target "' + targetName + '" is an array.  This is not supported by the' +
+                        ' TypeScript compiler or grunt-ts.' +
+                        ((target.dest.length > 1) ? '  Only the first "dest" will be used.  The' +
+                            ' remaining items will be truncated.' : ''))).magenta);
                     args.push('--outDir', target.dest[0]);
                 }
             }
@@ -233,4 +246,3 @@ function compileAllFiles(targetFiles, target, task, targetName) {
     });
 }
 exports.compileAllFiles = compileAllFiles;
-//# sourceMappingURL=compile.js.map

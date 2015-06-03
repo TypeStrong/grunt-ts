@@ -80,7 +80,7 @@ export function isJavaScriptFile(filePath: string): boolean {
     return false;
 }
 
-/** function for formatting strings 
+/** function for formatting strings
  * ('{0} says {1}','la','ba' ) => 'la says ba'
  */
 export function format(str: string, ...args: any[]) {
@@ -136,7 +136,7 @@ export function getTempFile(prefix?: string, dir: string = '', extension = '.tmp
  * Get all files from a directory and all its subdirectories.
  * @param {String} dirPath A path to a directory
  * @param {RegExp|Function} exclude Defines which files should be excluded.
-     Can be a RegExp (whole filepath is tested) or a Function which will get the filepath 
+     Can be a RegExp (whole filepath is tested) or a Function which will get the filepath
      as an argument and should return true (exclude file) or false (do not exclude).
  * @returns {Array} An array of files
  */
@@ -147,8 +147,8 @@ export function getFiles(dirPath, exclude?: (filename: string) => boolean): stri
 /**
  * Get all directories from a directory and all its subdirectories.
  * @param {String} dirPath A path to a directory
- * @param {RegExp|Function} exclude Defines which directories should be excluded. 
-    Can be a RegExp (whole dirpath is tested) or a Function which will get the dirpath 
+ * @param {RegExp|Function} exclude Defines which directories should be excluded.
+    Can be a RegExp (whole dirpath is tested) or a Function which will get the dirpath
     as an argument and should return true (exclude dir) or false (do not exclude).
  * @returns {Array} An array of directories
  */
@@ -159,8 +159,8 @@ export function getDirs(dirPath, exclude?: (filename: string) => boolean): strin
 /**
  * Get all files or directories from a directory and all its subdirectories.
  * @param {String} dirPath A path to a directory
- * @param {RegExp|Function} exclude Defines which files or directories should be excluded. 
-    Can be a RegExp (whole path is tested) or a Function which will get the path 
+ * @param {RegExp|Function} exclude Defines which files or directories should be excluded.
+    Can be a RegExp (whole path is tested) or a Function which will get the path
     as an argument and should return true (exclude) or false (do not exclude).
  * @param {Boolean} getFiles Whether to get files (true) or directories (false).
  * @returns {Array} An array of files or directories
@@ -251,4 +251,14 @@ export function firstElementWithValue<T>(elements: T[], defaultResult: T = null)
         }
     });
     return result;
+}
+
+export function getOrGetFirst(getFrom: string | string[]) : string {
+  if (_.isArray(getFrom)) {
+    if (getFrom.length > 0) {
+        return getFrom[0];
+    }
+    return '';
+  }
+  return <string>getFrom;
 }

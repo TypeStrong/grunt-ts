@@ -178,14 +178,20 @@ module.exports = function (grunt) {
             },
             files_testFilesUsedWithDestAsAJSFile: {
                 test: true,
-                files: [{ src: ['test/multifile/a/**/*.ts'], dest: 'test/multifile/a/testDest.js' }],
+                files: [
+                    { src: ['test/multifile/a/**/*.ts'],
+                      dest: 'test/multifile/files_testFilesUsedWithDestAsAJSFile/testDest.js' }
+                ],
                 options: {
                     fast: 'never'
                 }
             },
             files_testFilesUsedWithDestAsAFolder: {
                 test: true,
-                files: [{ src: ['test/multifile/a/**/*.ts'], dest: 'test/multifile/a' }],
+                files: [
+                    { src: ['test/multifile/a/**/*.ts'],
+                      dest: 'test/multifile/files_testFilesUsedWithDestAsAJSFolder' }
+                ],
                 options: {
                     fast: 'never'
                 }
@@ -198,6 +204,7 @@ module.exports = function (grunt) {
                 }
             },
             files_testWarnIfFilesHasDestArray: {
+                // TODO: This test is currently broken.  grunt-ts does not warn.
                 test: true,
                 files: [{ src: ['test/multifile/a/**/*.ts'], dest: ['test/multifile/a', 'test/multifile/b'] }],
                 options: {
@@ -214,8 +221,8 @@ module.exports = function (grunt) {
             files_testFilesObjectFormatWorks: {
                 test: true,
                 files: {
-                    'test/multifile/a.js': ['test/multifile/a/**/*.ts'],
-                    'test/multifile/b.js': ['test/multifile/b/**/*.ts']
+                    'test/files_ObjectFormat/a.js': ['test/multifile/a/**/*.ts'],
+                    'test/files_ObjectFormat/b.js': ['test/multifile/b/**/*.ts', 'test/simple/ts/**/*.ts']
                 },
                 options: {
                     fast: 'never'

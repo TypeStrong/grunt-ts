@@ -7,7 +7,7 @@ import _ = require('lodash');
 import utils = require('./utils');
 import cache = require('./cacheUtils');
 
-var Promise: typeof Promise = require('es6-promise').Promise;
+var Promise = require('es6-promise').Promise;
 export var grunt: IGrunt = require('grunt');
 
 export interface ICompileResult {
@@ -36,7 +36,7 @@ function executeNode(args: string[]): Promise<ICompileResult> {
 }
 
 /////////////////////////////////////////////////////////////////
-// Fast Compilation 
+// Fast Compilation
 /////////////////////////////////////////////////////////////////
 
 // Map to store if the cache was cleared after the gruntfile was parsed
@@ -85,7 +85,11 @@ function getTsc(binPath: string): string {
     return path.join(binPath, 'tsc');
 }
 
-export function compileAllFiles(targetFiles: string[], target: ITargetOptions, task: ITaskOptions, targetName: string): Promise<ICompileResult> {
+export function compileAllFiles(targetFiles: string[],
+                                target: ITargetOptions,
+                                task: ITaskOptions,
+                                targetName: string,
+                                outFile: string): Promise<ICompileResult> {
 
     // Make a local copy so we can modify files without having external side effects
     var files = _.map(targetFiles, (file) => file);
@@ -96,7 +100,7 @@ export function compileAllFiles(targetFiles: string[], target: ITargetOptions, t
         // if this is the first time its running after this file was loaded
         if (cacheClearedOnce[grunt.task.current.target] === undefined) {
 
-            // Then clear the cache for this target 
+            // Then clear the cache for this target
             clearCache(targetName);
         }
     }
@@ -196,7 +200,13 @@ export function compileAllFiles(targetFiles: string[], target: ITargetOptions, t
     }
 
     // Target options:
-    if (target.out) {
+    if (outFile) {
+      if (utils.isJavaScriptFile(outFile)) {
+        args.push('--out', outFile);
+      } else {
+        args.push('--outDir', outFile);
+      }
+    } else if (target.out) {
         args.push('--out', target.out);
     }
 
