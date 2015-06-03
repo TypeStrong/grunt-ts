@@ -246,21 +246,17 @@ function pluginFn(grunt) {
                     var targetout = target.out;
                     if (!targetout) {
                         if (target.dest) {
-                            if (Array.isArray(target.dest)) {
-                                if (target.dest.length > 0) {
-                                    // A dest array is meaningless in TypeScript, so just take
-                                    // the first one.
-                                    targetout = target.dest[0];
-                                }
-                            }
-                            else if (utils.isJavaScriptFile(target.dest)) {
-                                targetout = target.dest;
-                            }
+                            // A dest array is meaningless in TypeScript, so just take
+                            // the first one.
+                            targetout = utils.getOrGetFirst(target.dest);
                         }
                         else if (target.files) {
                             var filesKeys = _.keys(target.files);
                             if (filesKeys.length > filesCompilationIndex && utils.isJavaScriptFile(filesKeys[filesCompilationIndex])) {
                                 targetout = filesKeys[filesCompilationIndex];
+                            }
+                            else if (filesKeys.length > filesCompilationIndex && target.files[filesKeys[filesCompilationIndex]].dest) {
+                                targetout = utils.getOrGetFirst(target.files[filesKeys[filesCompilationIndex]].dest);
                             }
                         }
                     }

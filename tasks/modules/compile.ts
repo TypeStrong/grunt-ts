@@ -7,7 +7,7 @@ import _ = require('lodash');
 import utils = require('./utils');
 import cache = require('./cacheUtils');
 
-var Promise: typeof Promise = require('es6-promise').Promise;
+var Promise = require('es6-promise').Promise;
 export var grunt: IGrunt = require('grunt');
 
 export interface ICompileResult {
@@ -201,7 +201,11 @@ export function compileAllFiles(targetFiles: string[],
 
     // Target options:
     if (outFile) {
-      args.push('--out', outFile);
+      if (utils.isJavaScriptFile(outFile)) {
+        args.push('--out', outFile);
+      } else {
+        args.push('--outDir', outFile);
+      }
     } else if (target.out) {
         args.push('--out', target.out);
     }

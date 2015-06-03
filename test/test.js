@@ -105,6 +105,14 @@ exports.typescript = {
     files_ObjectFormat: function (test) {
         testDirectory(test, 'files_ObjectFormat');
         test.done();
+    },
+    files_ArrayFormatJS: function (test) {
+        testDirectory(test, 'multifile/files_testFilesUsedWithDestAsAJSFile');
+        test.done();
+    },
+    files_ArrayFormatFolder: function (test) {
+        testDirectory(test, 'multifile/files_testFilesUsedWithDestAsAJSFolder');
+        test.done();
     }
 };
 //# sourceMappingURL=test.js.map

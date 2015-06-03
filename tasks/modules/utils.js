@@ -237,4 +237,14 @@ function firstElementWithValue(elements, defaultResult) {
     return result;
 }
 exports.firstElementWithValue = firstElementWithValue;
+function getOrGetFirst(getFrom) {
+    if (_.isArray(getFrom)) {
+        if (getFrom.length > 0) {
+            return getFrom[0];
+        }
+        return '';
+    }
+    return getFrom;
+}
+exports.getOrGetFirst = getOrGetFirst;
 //# sourceMappingURL=utils.js.map

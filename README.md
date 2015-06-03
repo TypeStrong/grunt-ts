@@ -968,6 +968,17 @@ The easiest/fastest way to work on grunt-ts is to modify `tasksToTest` toward th
 
 Without using `tasksToTest` while working on grunt-ts, the old grunt-ts remains in memory for successive tasks on the same run.  This means you might have to run your grunt commands twice; once to compile grunt-ts and once to see how the new grunt-ts works with your code.
 
+### Quickstart for debugging Grunt plugins with Node Inspector
+
+Install [Node Inspector](https://github.com/node-inspector/node-inspector) via npm:
+
+`npm install -g node-inspector`
+
+Example command-line to debug a grunt-ts task on Windows:
+
+`node-debug --debug-brk %appdata%\npm\node_modules\grunt-cli\bin\grunt ts:files_testFilesUsedWithDestAsAJSFile`
+
+Set breakpoints in the Chrome dev tools, or use `debugger;` where needed.
 
 ### Additional commands
 Update the current `grunt-ts` to be the last known good version (dogfood). Commit message should be `Update LKG`.
