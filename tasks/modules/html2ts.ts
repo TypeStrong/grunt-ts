@@ -29,14 +29,17 @@ function stripBOM(str) {
         : str;
 }
 
-var htmlTemplate = _.template('/* tslint:disable:max-line-length */' + utils.eol +
+
+var htmlInternalTemplate = '/* tslint:disable:max-line-length */' + utils.eol +
     'module <%= modulename %> {' + utils.eol +
     '  export var <%= varname %> = \'<%= content %>\';' + utils.eol +
-    '}' + utils.eol);
+    '}' + utils.eol;
+
 
 export interface IHtml2TSOptions {
     moduleFunction: Function;
     varFunction: Function;
+    htmlOutputTemplate: string;
     htmlOutDir: string;
     flatten: boolean;
 }
@@ -57,7 +60,12 @@ export function compileHTML(filename: string, options: IHtml2TSOptions): string 
     var moduleName = options.moduleFunction({ ext: ext, filename: extFreename });
     var varName = options.varFunction({ ext: ext, filename: extFreename }).replace(/\./g, '_');
 
-    var fileContent = htmlTemplate({ modulename: moduleName, varname: varName, content: htmlContent });
+    var fileContent;
+    if (!options.htmlOutputTemplate) {
+        fileContent = _.template(htmlInternalTemplate)({ modulename: moduleName, varname: varName, content: htmlContent });
+    } else {
+        fileContent = _.template(replaceNewLines(options.htmlOutputTemplate))({ modulename: moduleName, varname: varName, content: htmlContent });
+    }
 
     // Write the content to a file
     var outputfile = getOutputFile(filename, options.htmlOutDir, options.flatten);
@@ -67,6 +75,12 @@ export function compileHTML(filename: string, options: IHtml2TSOptions): string 
     fs.writeFileSync(outputfile, fileContent);
     return outputfile;
 }
+
+// Replace user-supplied templates newlines with newlines appropriate for the current OS
+function replaceNewLines(input: string) {
+   return input.replace(/\r/g, '').replace(/\n/g, utils.eol);
+}
+
 
 function getOutputFile(filename: string, htmlOutDir: string, flatten: boolean): string {
     var outputfile = filename;

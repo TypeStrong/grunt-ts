@@ -112,6 +112,7 @@ function pluginFn(grunt: IGrunt) {
             verbose: false,
             fast: 'watch',
             compiler: '',
+            htmlOutputTemplate: null,
             htmlModuleTemplate: '<%= filename %>',
             htmlVarTemplate: '<%= ext %>',
             htmlOutDir: null,
@@ -230,6 +231,7 @@ function pluginFn(grunt: IGrunt) {
                 }
             }
 
+            options.htmlOutputTemplate = rawTargetOptions.htmlOutputTemplate || rawTaskOptions.htmlOutputTemplate;
             options.htmlModuleTemplate = rawTargetOptions.htmlModuleTemplate || rawTaskOptions.htmlModuleTemplate;
             options.htmlVarTemplate = rawTargetOptions.htmlVarTemplate || rawTaskOptions.htmlVarTemplate;
             options.htmlOutDir = rawTargetConfig.htmlOutDir;
@@ -549,6 +551,7 @@ function pluginFn(grunt: IGrunt) {
                         var html2tsOptions = {
                             moduleFunction: _.template(options.htmlModuleTemplate),
                             varFunction: _.template(options.htmlVarTemplate),
+                            htmlOutputTemplate: options.htmlOutputTemplate,
                             htmlOutDir: options.htmlOutDir,
                             flatten: options.htmlOutDirFlatten
                         };
