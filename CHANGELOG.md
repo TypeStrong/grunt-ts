@@ -2,6 +2,9 @@
 
 ## Next
 
+## v4.1.2
+* FIX: Regression with `out` and `outDir` for paths with spaces (Also reported on #251).  Thanks to @seanmailander for the report.
+
 ## v4.1.1
 * FIX: Support for the Grunt `files` feature had a regression and was not working correctly.  (#251).  Thanks to @Linowitch for the report.  We've built in some assertions to ensure this doesn't happen again.
 
