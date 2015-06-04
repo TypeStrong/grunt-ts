@@ -133,5 +133,9 @@ export var typescript = {
     out_and_outdir_with_spaces: function (test) {
         testDirectory(test, 'out with spaces');
         test.done();
+    },
+    htmlExternal: function (test) {
+        testDirectory(test, 'htmlExternal');
+        test.done();
     }
 }

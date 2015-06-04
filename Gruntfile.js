@@ -12,6 +12,7 @@ module.exports = function (grunt) {
                 '!test/test.js',
                 '!test/expected/**/*',
                 'test/htmlOutDir/generated/test',
+                'test/htmlExternal/html.external.html.ts',
                 'tscommand-*.txt'
             ],
             testPost: [
@@ -585,6 +586,18 @@ module.exports = function (grunt) {
                 },
                 src: 'test/withwrongmodule/ts/*.ts',
                 outDir: 'test/withwrongmodule/js'
+            },
+            test_htmlOutputTemplate: {
+                test: true,
+                options: {},
+                html: 'test/htmlExternal/**/*.html',
+                src: 'test/htmlExternal/**/*.ts',
+                htmlVarTemplate: 'markup',
+                htmlModuleTemplate: 'html',
+                htmlOutputTemplate: '/* tslint:disable:max-line-length */ \n' +
+                'export module <%= modulename %> {\n' +
+                '    export var <%= varname %> = \'<%= content %>\';\n' +
+                '}\n'
             }
         }
     });

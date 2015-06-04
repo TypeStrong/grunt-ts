@@ -11,6 +11,7 @@ test/work/reference.ts
 *.map
 test/**/*.js
 test/**/*.html.ts
+!test/expected/htmlExternal/*.ts
 test/html/reference.ts
 
 test/definitelytypedtest/reference.ts
