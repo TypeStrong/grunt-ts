@@ -87,6 +87,8 @@ function pluginFn(grunt) {
             verbose: false,
             fast: 'watch',
             compiler: '',
+            htmlCwd: '',
+            htmlUseQuotesForContent: true,
             htmlModuleTemplate: '<%= filename %>',
             htmlVarTemplate: '<%= ext %>',
             htmlOutDir: null,
@@ -173,6 +175,8 @@ function pluginFn(grunt) {
                     }
                 }
             }
+            options.htmlCwd = rawTargetOptions.htmlCwd || rawTaskOptions.htmlCwd;
+            options.htmlUseQuotesForContent = rawTargetOptions.htmlUseQuotesForContent || rawTaskOptions.htmlUseQuotesForContent;
             options.htmlModuleTemplate = rawTargetOptions.htmlModuleTemplate || rawTaskOptions.htmlModuleTemplate;
             options.htmlVarTemplate = rawTargetOptions.htmlVarTemplate || rawTaskOptions.htmlVarTemplate;
             options.htmlOutDir = rawTargetConfig.htmlOutDir;
@@ -196,6 +200,10 @@ function pluginFn(grunt) {
                 options.fast = 'never';
             }
             logBadConfigWithFiles(rawTargetConfig, currenttask, rawTargetOptions);
+            if (!options.htmlCwd) {
+                // use default value
+                options.htmlCwd = '';
+            }
             if (!options.htmlModuleTemplate) {
                 // use default value
                 options.htmlModuleTemplate = '<%= filename %>';
@@ -433,6 +441,8 @@ function pluginFn(grunt) {
                     var generatedFiles = [];
                     if (currenttask.data.html) {
                         var html2tsOptions = {
+                            cwd: options.htmlCwd,
+                            useQuotes: options.htmlUseQuotesForContent,
                             moduleFunction: _.template(options.htmlModuleTemplate),
                             varFunction: _.template(options.htmlVarTemplate),
                             htmlOutDir: options.htmlOutDir,

@@ -23,6 +23,7 @@ function stripBOM(str) {
     return 0xFEFF === str.charCodeAt(0) ? str.substring(1) : str;
 }
 var htmlTemplate = _.template('/* tslint:disable:max-line-length */' + utils.eol + 'module <%= modulename %> {' + utils.eol + '  export var <%= varname %> = \'<%= content %>\';' + utils.eol + '}' + utils.eol);
+var htmlTemplateWithoutQuotes = _.template('/* tslint:disable:max-line-length */' + utils.eol + 'module <%= modulename %> {' + utils.eol + '  export var <%= varname %> = <%= content %>;' + utils.eol + '}' + utils.eol);
 // Compile an HTML file to a TS file
 // Return the filename. This filename will be required by reference.ts
 function compileHTML(filename, options) {
@@ -32,9 +33,17 @@ function compileHTML(filename, options) {
     // TODO: place a minification pipeline here if you want.
     var ext = path.extname(filename).replace('.', '');
     var extFreename = path.basename(filename, '.' + ext);
+    extFreename = path.dirname(filename).replace(/\//g, '.') + '.' + extFreename;
+    if (options.cwd) {
+        extFreename = extFreename.replace(options.cwd.replace(/\//g, '.'), '');
+    }
     var moduleName = options.moduleFunction({ ext: ext, filename: extFreename });
     var varName = options.varFunction({ ext: ext, filename: extFreename }).replace(/\./g, '_');
-    var fileContent = htmlTemplate({ modulename: moduleName, varname: varName, content: htmlContent });
+    if (options.useQuotes) {
+        var fileContent = htmlTemplate({ modulename: moduleName, varname: varName, content: htmlContent });
+    } else {
+        var fileContent = htmlTemplateWithoutQuotes({ modulename: moduleName, varname: varName, content: htmlContent });
+    }
     // Write the content to a file
     var outputfile = getOutputFile(filename, options.htmlOutDir, options.flatten);
     mkdirParent(path.dirname(outputfile));
