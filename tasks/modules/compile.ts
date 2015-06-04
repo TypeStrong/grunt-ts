@@ -156,7 +156,10 @@ export function compileAllFiles(targetFiles: string[],
     }
 
     // Quote the files to compile. Needed for command line parsing by tsc
-    files = _.map(files, (item) => '"' + path.resolve(item) + '"');
+    files = _.map(files, (item) => `"${path.resolve(item)}"`);
+    if (outFile) {
+      outFile = `"${path.resolve(outFile)}"`;
+    }
 
     var args: string[] = files.slice(0);
 
@@ -199,23 +202,30 @@ export function compileAllFiles(targetFiles: string[],
     	}
     }
 
+    var theOutDir : string = null;
+    if (target.outDir) {
+        if (target.out) {
+            console.warn('WARNING: Option "out" and "outDir" should not be used together'.magenta);
+        }
+
+        theOutDir = `"${path.resolve(target.outDir)}"`;
+        args.push('--outDir', theOutDir);
+    }
+
     // Target options:
     if (outFile) {
       if (utils.isJavaScriptFile(outFile)) {
         args.push('--out', outFile);
       } else {
-        args.push('--outDir', outFile);
+        if (!theOutDir) {
+          args.push('--outDir', outFile);
+        }
       }
     } else if (target.out) {
         args.push('--out', target.out);
     }
 
-    if (target.outDir) {
-        if (target.out) {
-            console.warn('WARNING: Option "out" and "outDir" should not be used together'.magenta);
-        }
-        args.push('--outDir', target.outDir);
-    }
+
 
     if (target.dest && (!target.out) && (!target.outDir)) {
         if (utils.isJavaScriptFile(target.dest)) {

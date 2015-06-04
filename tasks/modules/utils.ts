@@ -73,9 +73,21 @@ export function endsWith(str: string, suffix: string): boolean {
     return str.indexOf(suffix, str.length - suffix.length) !== -1;
 }
 
+export function stripQuotesIfQuoted(possiblyQuotedString: string) {
+    if (!possiblyQuotedString.length || possiblyQuotedString.length < 2) {
+      return possiblyQuotedString;
+    }
+    if (possiblyQuotedString.charAt(0) === '"' &&
+       possiblyQuotedString.charAt(possiblyQuotedString.length - 1) === '"') {
+         return possiblyQuotedString.substr(1, possiblyQuotedString.length - 2);
+    }
+    return possiblyQuotedString;
+}
+
 export function isJavaScriptFile(filePath: string): boolean {
     if (filePath.toLowerCase) {
-        return this.endsWith(filePath.toLowerCase(), '.js');
+        var normalizedFile = path.resolve(stripQuotesIfQuoted(filePath)).toLowerCase();
+        return endsWith(normalizedFile, '.js');
     }
     return false;
 }

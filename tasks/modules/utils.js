@@ -64,9 +64,20 @@ function endsWith(str, suffix) {
     return str.indexOf(suffix, str.length - suffix.length) !== -1;
 }
 exports.endsWith = endsWith;
+function stripQuotesIfQuoted(possiblyQuotedString) {
+    if (!possiblyQuotedString.length || possiblyQuotedString.length < 2) {
+        return possiblyQuotedString;
+    }
+    if (possiblyQuotedString.charAt(0) === '"' && possiblyQuotedString.charAt(possiblyQuotedString.length - 1) === '"') {
+        return possiblyQuotedString.substr(1, possiblyQuotedString.length - 2);
+    }
+    return possiblyQuotedString;
+}
+exports.stripQuotesIfQuoted = stripQuotesIfQuoted;
 function isJavaScriptFile(filePath) {
     if (filePath.toLowerCase) {
-        return this.endsWith(filePath.toLowerCase(), '.js');
+        var normalizedFile = path.resolve(stripQuotesIfQuoted(filePath)).toLowerCase();
+        return endsWith(normalizedFile, '.js');
     }
     return false;
 }

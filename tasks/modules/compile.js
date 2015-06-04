@@ -119,7 +119,10 @@ function compileAllFiles(targetFiles, target, task, targetName, outFile) {
         files = [referenceFile];
     }
     // Quote the files to compile. Needed for command line parsing by tsc
-    files = _.map(files, function (item) { return '"' + path.resolve(item) + '"'; });
+    files = _.map(files, function (item) { return ("\"" + path.resolve(item) + "\""); });
+    if (outFile) {
+        outFile = "\"" + path.resolve(outFile) + "\"";
+    }
     var args = files.slice(0);
     // boolean options
     if (task.sourceMap) {
@@ -158,23 +161,27 @@ function compileAllFiles(targetFiles, target, task, targetName, outFile) {
             console.warn('WARNING: Option "module" does only support "amd" | "commonjs"'.magenta);
         }
     }
+    var theOutDir = null;
+    if (target.outDir) {
+        if (target.out) {
+            console.warn('WARNING: Option "out" and "outDir" should not be used together'.magenta);
+        }
+        theOutDir = "\"" + path.resolve(target.outDir) + "\"";
+        args.push('--outDir', theOutDir);
+    }
     // Target options:
     if (outFile) {
         if (utils.isJavaScriptFile(outFile)) {
             args.push('--out', outFile);
         }
         else {
-            args.push('--outDir', outFile);
+            if (!theOutDir) {
+                args.push('--outDir', outFile);
+            }
         }
     }
     else if (target.out) {
         args.push('--out', target.out);
-    }
-    if (target.outDir) {
-        if (target.out) {
-            console.warn('WARNING: Option "out" and "outDir" should not be used together'.magenta);
-        }
-        args.push('--outDir', target.outDir);
     }
     if (target.dest && (!target.out) && (!target.outDir)) {
         if (utils.isJavaScriptFile(target.dest)) {
@@ -182,18 +189,13 @@ function compileAllFiles(targetFiles, target, task, targetName, outFile) {
         }
         else {
             if (target.dest === 'src') {
-                console.warn(('WARNING: Destination for target "' + targetName + '" is "src", which is the default.  If you have' +
-                    ' forgotten to specify a "dest" parameter, please add it.  If this is correct, you may wish' +
-                    ' to change the "dest" parameter to "src/" or just ignore this warning.').magenta);
+                console.warn(('WARNING: Destination for target "' + targetName + '" is "src", which is the default.  If you have' + ' forgotten to specify a "dest" parameter, please add it.  If this is correct, you may wish' + ' to change the "dest" parameter to "src/" or just ignore this warning.').magenta);
             }
             if (Array.isArray(target.dest)) {
                 if (target.dest.length === 0) {
                 }
                 else if (target.dest.length > 0) {
-                    console.warn((('WARNING: "dest" for target "' + targetName + '" is an array.  This is not supported by the' +
-                        ' TypeScript compiler or grunt-ts.' +
-                        ((target.dest.length > 1) ? '  Only the first "dest" will be used.  The' +
-                            ' remaining items will be truncated.' : ''))).magenta);
+                    console.warn((('WARNING: "dest" for target "' + targetName + '" is an array.  This is not supported by the' + ' TypeScript compiler or grunt-ts.' + ((target.dest.length > 1) ? '  Only the first "dest" will be used.  The' + ' remaining items will be truncated.' : ''))).magenta);
                     args.push('--outDir', target.dest[0]);
                 }
             }
@@ -246,3 +248,4 @@ function compileAllFiles(targetFiles, target, task, targetName, outFile) {
     });
 }
 exports.compileAllFiles = compileAllFiles;
+//# sourceMappingURL=compile.js.map

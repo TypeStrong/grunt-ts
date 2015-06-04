@@ -113,6 +113,10 @@ exports.typescript = {
     files_ArrayFormatFolder: function (test) {
         testDirectory(test, 'multifile/files_testFilesUsedWithDestAsAJSFolder');
         test.done();
+    },
+    out_and_outdir_with_spaces: function (test) {
+        testDirectory(test, 'out with spaces');
+        test.done();
     }
 };
 //# sourceMappingURL=test.js.map

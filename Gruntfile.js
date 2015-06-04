@@ -103,6 +103,24 @@ module.exports = function (grunt) {
                 src: ['test/simple/ts/zoo.ts'],
                 outDir: 'test/simple/js/',
             },
+            out_with_spaces: {
+                test: true,
+                options: {
+                    fast: 'never',
+                    sourcemap: false
+                },
+                src: ['test/simple/ts/zoo.ts'],
+                out: 'test/out with spaces/out with spaces.js'
+            },
+            outDir_with_spaces: {
+                test: true,
+                options: {
+                    fast: 'never',
+                    sourcemap: false
+                },
+                src: ['test/simple/ts/zoo.ts'],
+                outDir: 'test/out with spaces'
+            },
             multifiletest: {
                 test: true,
                 files: [{ src: ['test/multifile/a/**/*.ts'], dest: 'test/multifile/a/out.js' },
