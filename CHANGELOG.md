@@ -1,6 +1,7 @@
 # Releases
 
 ## Next
+* FEAT: Implemented support for arbitrary HTML transforms, such as to external modules (#249).  Thanks to @sethx for the Pull Request.
 
 ## v4.1.2
 * FIX: Regression with `out` and `outDir` for paths with spaces (Also reported on #251).  Thanks to @seanmailander for the report.
