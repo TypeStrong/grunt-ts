@@ -6,7 +6,26 @@ import util = require('util');
 import _ = require('lodash');
 
 export var grunt: IGrunt = require('grunt');
-export var eol: string = grunt.util.linefeed;
+export const eol: string = grunt.util.linefeed;
+
+export function newLineIsRedundant(newLineParameter: string) {
+  return ((newLineParameter === 'CRLF' && grunt.util.linefeed === '\r\n') ||
+          (newLineParameter === 'LF' && grunt.util.linefeed === '\n'));
+}
+
+export function newLineActualAsParameter(actualNewLineChars: string) {
+  if (actualNewLineChars) {
+    return actualNewLineChars.replace(/\n/g, 'LF').replace(/\r/g, 'CR');
+  }
+  return '';
+}
+
+export function newLineParameterAsActual(parameterNewLineChars: string) {
+  if (parameterNewLineChars) {
+  return parameterNewLineChars.replace(/LF/g, '\n').replace(/CR/g, '\r');
+  }
+  return '';
+}
 
 // Converts "C:\boo" , "C:\boo\foo.ts" => "./foo.ts"; Works on unix as well.
 export function makeRelativePath(folderpath: string, filename: string, forceRelative = false) {

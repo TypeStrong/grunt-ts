@@ -9,6 +9,7 @@ var __extends = this.__extends || function (d, b) {
     __.prototype = b.prototype;
     d.prototype = new __();
 };
+/// <reference path="reference.ts"/>
 var B = (function (_super) {
     __extends(B, _super);
     function B() {
@@ -16,6 +17,10 @@ var B = (function (_super) {
     }
     return B;
 })(C);
+/// <reference path="c.ts" />
+/// <reference path="b.ts" />
+/// <reference path="a.ts" /> 
+/// <reference path="reference.ts"/>
 var A = (function (_super) {
     __extends(A, _super);
     function A() {

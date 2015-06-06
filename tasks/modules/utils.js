@@ -5,6 +5,25 @@ var util = require('util');
 var _ = require('lodash');
 exports.grunt = require('grunt');
 exports.eol = exports.grunt.util.linefeed;
+function newLineIsRedundant(newLineParameter) {
+    return ((newLineParameter === 'CRLF' && exports.grunt.util.linefeed === '\r\n') ||
+        (newLineParameter === 'LF' && exports.grunt.util.linefeed === '\n'));
+}
+exports.newLineIsRedundant = newLineIsRedundant;
+function newLineActualAsParameter(actualNewLineChars) {
+    if (actualNewLineChars) {
+        return actualNewLineChars.replace(/\n/g, 'LF').replace(/\r/g, 'CR');
+    }
+    return '';
+}
+exports.newLineActualAsParameter = newLineActualAsParameter;
+function newLineParameterAsActual(parameterNewLineChars) {
+    if (parameterNewLineChars) {
+        return parameterNewLineChars.replace(/LF/g, '\n').replace(/CR/g, '\r');
+    }
+    return '';
+}
+exports.newLineParameterAsActual = newLineParameterAsActual;
 // Converts "C:\boo" , "C:\boo\foo.ts" => "./foo.ts"; Works on unix as well.
 function makeRelativePath(folderpath, filename, forceRelative) {
     if (forceRelative === void 0) { forceRelative = false; }
@@ -68,7 +87,8 @@ function stripQuotesIfQuoted(possiblyQuotedString) {
     if (!possiblyQuotedString.length || possiblyQuotedString.length < 2) {
         return possiblyQuotedString;
     }
-    if (possiblyQuotedString.charAt(0) === '"' && possiblyQuotedString.charAt(possiblyQuotedString.length - 1) === '"') {
+    if (possiblyQuotedString.charAt(0) === '"' &&
+        possiblyQuotedString.charAt(possiblyQuotedString.length - 1) === '"') {
         return possiblyQuotedString.substr(1, possiblyQuotedString.length - 2);
     }
     return possiblyQuotedString;

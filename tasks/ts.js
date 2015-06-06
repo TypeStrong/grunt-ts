@@ -99,7 +99,8 @@ function pluginFn(grunt) {
             suppressImplicitAnyIndexErrors: false,
             noEmit: false,
             inlineSources: false,
-            inlineSourceMap: false
+            inlineSourceMap: false,
+            newLine: utils.eol
         });
         // get unprocessed templates from configuration
         var rawTaskOptions = (grunt.config.getRaw(currenttask.name + '.options') || {});
@@ -194,6 +195,11 @@ function pluginFn(grunt) {
                 }
             }
             options.htmlOutputTemplate = rawTargetOptions.htmlOutputTemplate || rawTaskOptions.htmlOutputTemplate;
+            var lineEndingToUse = utils.newLineParameterAsActual(rawTargetOptions.newLine) ||
+                utils.newLineParameterAsActual(rawTaskOptions.newLine) ||
+                utils.eol;
+            options.newLine = rawTargetOptions.newLine || rawTaskOptions.newLine ||
+                utils.newLineActualAsParameter(utils.eol);
             options.htmlModuleTemplate = rawTargetOptions.htmlModuleTemplate || rawTaskOptions.htmlModuleTemplate;
             options.htmlVarTemplate = rawTargetOptions.htmlVarTemplate || rawTaskOptions.htmlVarTemplate;
             options.htmlOutDir = rawTargetConfig.htmlOutDir;
@@ -286,11 +292,16 @@ function pluginFn(grunt) {
                         }
                         else if (target.files) {
                             var filesKeys = _.keys(target.files);
-                            if (filesKeys.length > filesCompilationIndex && utils.isJavaScriptFile(filesKeys[filesCompilationIndex])) {
+                            if (filesKeys.length > filesCompilationIndex &&
+                                utils.isJavaScriptFile(filesKeys[filesCompilationIndex])) {
                                 targetout = filesKeys[filesCompilationIndex];
                             }
-                            else if (filesKeys.length > filesCompilationIndex && target.files[filesKeys[filesCompilationIndex]].dest) {
-                                targetout = utils.getOrGetFirst(target.files[filesKeys[filesCompilationIndex]].dest);
+                            else if (filesKeys.length > filesCompilationIndex &&
+                                target.files[filesKeys[filesCompilationIndex]].dest) {
+                                targetout = utils.getOrGetFirst(
+                                // A dest array is meaningless in TypeScript, so just take
+                                // the first one.
+                                target.files[filesKeys[filesCompilationIndex]].dest);
                             }
                         }
                     }
@@ -338,7 +349,8 @@ function pluginFn(grunt) {
                     var starttime = new Date().getTime();
                     var endtime;
                     // Compile the files
-                    return compileModule.compileAllFiles(filesToCompile, target, options, currenttask.target, outFile).then(function (result) {
+                    return compileModule.compileAllFiles(filesToCompile, target, options, currenttask.target, outFile)
+                        .then(function (result) {
                         // End the timer
                         endtime = new Date().getTime();
                         grunt.log.writeln('');
@@ -482,7 +494,8 @@ function pluginFn(grunt) {
                             varFunction: _.template(options.htmlVarTemplate),
                             htmlOutputTemplate: options.htmlOutputTemplate,
                             htmlOutDir: options.htmlOutDir,
-                            flatten: options.htmlOutDirFlatten
+                            flatten: options.htmlOutDirFlatten,
+                            eol: lineEndingToUse
                         };
                         var htmlFiles = grunt.file.expand(currenttask.data.html);
                         generatedFiles = _.map(htmlFiles, function (filename) { return html2tsModule.compileHTML(filename, html2tsOptions); });
@@ -498,7 +511,7 @@ function pluginFn(grunt) {
                             var templateCacheSrc = grunt.file.expand(currenttask.data.templateCache.src); // manual reinterpolation
                             var templateCacheDest = path.resolve(rawTargetConfig.templateCache.dest);
                             var templateCacheBasePath = path.resolve(rawTargetConfig.templateCache.baseUrl);
-                            templateCacheModule.generateTemplateCache(templateCacheSrc, templateCacheDest, templateCacheBasePath);
+                            templateCacheModule.generateTemplateCache(templateCacheSrc, templateCacheDest, templateCacheBasePath, lineEndingToUse);
                         }
                     }
                     ///// Reference File
@@ -506,7 +519,7 @@ function pluginFn(grunt) {
                     // Create a reference file if specified
                     if (!!referencePath) {
                         var result = timeIt(function () {
-                            return referenceModule.updateReferenceFile(filesToCompile.filter(function (f) { return !isReferenceFile(f); }), generatedFiles, referenceFile, referencePath);
+                            return referenceModule.updateReferenceFile(filesToCompile.filter(function (f) { return !isReferenceFile(f); }), generatedFiles, referenceFile, referencePath, lineEndingToUse);
                         });
                         if (result.it === true) {
                             grunt.log.writeln(('Updated reference file (' + result.time + 'ms).').green);
@@ -519,7 +532,7 @@ function pluginFn(grunt) {
                         amdLoaderModule.updateAmdLoader(referenceFile, referenceOrder, amdloaderFile, amdloaderPath, rawTargetConfig.outDir);
                     }
                     // Transform files as needed. Currently all of this logic in is one module
-                    transformers.transformFiles(filesToCompile /*TODO: only unchanged files*/, filesToCompile, rawTargetConfig, options);
+                    transformers.transformFiles(filesToCompile /*TODO: only unchanged files*/, filesToCompile, rawTargetConfig, options, lineEndingToUse);
                     // Return promise to compliation
                     if (options.compile) {
                         // Compile, if there are any files to compile!

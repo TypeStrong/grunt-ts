@@ -3,12 +3,11 @@ var _ = require('lodash');
 var fs = require('fs');
 var path = require('path');
 var utils = require('./utils');
-var eol = utils.eol;
 /////////////////////////////////////////////////////////////////////
 // AngularJS templateCache
 ////////////////////////////////////////////////////////////////////
 // templateCache processing function
-function generateTemplateCache(src, dest, basePath) {
+function generateTemplateCache(src, dest, basePath, eol) {
     if (!src.length) {
         return;
     }

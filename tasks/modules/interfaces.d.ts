@@ -63,6 +63,7 @@ interface ITaskOptions {
     noEmit: boolean;
     inlineSourceMap: boolean;
     inlineSources: boolean;
+    newLine: string;
 }
 
 interface IVisualStudioProjectSupport {

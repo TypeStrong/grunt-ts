@@ -124,7 +124,8 @@ function pluginFn(grunt: IGrunt) {
             suppressImplicitAnyIndexErrors: false,
             noEmit: false,
             inlineSources: false,
-            inlineSourceMap: false
+            inlineSourceMap: false,
+            newLine: utils.eol
         });
 
         // get unprocessed templates from configuration
@@ -238,6 +239,13 @@ function pluginFn(grunt: IGrunt) {
             }
 
             options.htmlOutputTemplate = rawTargetOptions.htmlOutputTemplate || rawTaskOptions.htmlOutputTemplate;
+            var lineEndingToUse = utils.newLineParameterAsActual(rawTargetOptions.newLine) ||
+              utils.newLineParameterAsActual(rawTaskOptions.newLine) ||
+              utils.eol;
+
+            options.newLine = rawTargetOptions.newLine || rawTaskOptions.newLine ||
+              utils.newLineActualAsParameter(utils.eol);
+
             options.htmlModuleTemplate = rawTargetOptions.htmlModuleTemplate || rawTaskOptions.htmlModuleTemplate;
             options.htmlVarTemplate = rawTargetOptions.htmlVarTemplate || rawTaskOptions.htmlVarTemplate;
             options.htmlOutDir = rawTargetConfig.htmlOutDir;
@@ -510,7 +518,7 @@ function pluginFn(grunt: IGrunt) {
 
                         if (isSuccessfulBuild) {
                             // Report successful build.
-                            var time = (endtime - starttime) / 1000;
+                            let time = (endtime - starttime) / 1000;
                             grunt.log.writeln('');
                             grunt.log.writeln(('TypeScript compilation complete: ' + time.toFixed(2) +
                                 's for ' + result.fileCount + ' typescript files').green);
@@ -568,15 +576,16 @@ function pluginFn(grunt: IGrunt) {
                     //    compile html files must be before reference file creation
                     var generatedFiles = [];
                     if (currenttask.data.html) {
-                        var html2tsOptions = {
+                        let html2tsOptions : html2tsModule.IHtml2TSOptions = {
                             moduleFunction: _.template(options.htmlModuleTemplate),
                             varFunction: _.template(options.htmlVarTemplate),
                             htmlOutputTemplate: options.htmlOutputTemplate,
                             htmlOutDir: options.htmlOutDir,
-                            flatten: options.htmlOutDirFlatten
+                            flatten: options.htmlOutDirFlatten,
+                            eol: lineEndingToUse
                         };
 
-                        var htmlFiles = grunt.file.expand(currenttask.data.html);
+                        let htmlFiles = grunt.file.expand(currenttask.data.html);
                         generatedFiles = _.map(htmlFiles, (filename) => html2tsModule.compileHTML(filename, html2tsOptions));
                     }
 
@@ -588,10 +597,10 @@ function pluginFn(grunt: IGrunt) {
                             grunt.log.writeln('templateCache : src, dest, baseUrl must be specified if templateCache option is used'.red);
                         }
                         else {
-                            var templateCacheSrc = grunt.file.expand(currenttask.data.templateCache.src); // manual reinterpolation
-                            var templateCacheDest = path.resolve(rawTargetConfig.templateCache.dest);
-                            var templateCacheBasePath = path.resolve(rawTargetConfig.templateCache.baseUrl);
-                            templateCacheModule.generateTemplateCache(templateCacheSrc, templateCacheDest, templateCacheBasePath);
+                            let templateCacheSrc = grunt.file.expand(currenttask.data.templateCache.src); // manual reinterpolation
+                            let templateCacheDest = path.resolve(rawTargetConfig.templateCache.dest);
+                            let templateCacheBasePath = path.resolve(rawTargetConfig.templateCache.baseUrl);
+                            templateCacheModule.generateTemplateCache(templateCacheSrc, templateCacheDest, templateCacheBasePath, lineEndingToUse);
                         }
                     }
 
@@ -601,7 +610,7 @@ function pluginFn(grunt: IGrunt) {
                     if (!!referencePath) {
                         var result = timeIt(() => {
                             return referenceModule.updateReferenceFile(
-                                filesToCompile.filter(f => !isReferenceFile(f)), generatedFiles, referenceFile, referencePath);
+                                filesToCompile.filter(f => !isReferenceFile(f)), generatedFiles, referenceFile, referencePath, lineEndingToUse);
                         });
                         if (result.it === true) {
                             grunt.log.writeln(('Updated reference file (' + result.time + 'ms).').green);
@@ -617,7 +626,8 @@ function pluginFn(grunt: IGrunt) {
                     }
 
                     // Transform files as needed. Currently all of this logic in is one module
-                    transformers.transformFiles(filesToCompile/*TODO: only unchanged files*/, filesToCompile, rawTargetConfig, options);
+                    transformers.transformFiles(filesToCompile /*TODO: only unchanged files*/,
+                      filesToCompile, rawTargetConfig, options, lineEndingToUse);
 
                     // Return promise to compliation
                     if (options.compile) {

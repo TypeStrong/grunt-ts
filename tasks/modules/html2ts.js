@@ -24,10 +24,13 @@ function stripBOM(str) {
         ? str.substring(1)
         : str;
 }
-var htmlTemplate = _.template('/* tslint:disable:max-line-length */' + utils.eol +
-    'module <%= modulename %> {' + utils.eol +
-    '  export var <%= varname %> = \'<%= content %>\';' + utils.eol +
-    '}' + utils.eol);
+function htmlInternalTemplate(lineEnding) {
+    return '/* tslint:disable:max-line-length */' + lineEnding +
+        'module <%= modulename %> {' + lineEnding +
+        '  export var <%= varname %> = \'<%= content %>\';' + lineEnding +
+        '}' + lineEnding;
+}
+;
 // Compile an HTML file to a TS file
 // Return the filename. This filename will be required by reference.ts
 function compileHTML(filename, options) {
@@ -41,10 +44,10 @@ function compileHTML(filename, options) {
     var varName = options.varFunction({ ext: ext, filename: extFreename }).replace(/\./g, '_');
     var fileContent;
     if (!options.htmlOutputTemplate) {
-        fileContent = _.template(htmlInternalTemplate)({ modulename: moduleName, varname: varName, content: htmlContent });
+        fileContent = _.template(htmlInternalTemplate(options.eol))({ modulename: moduleName, varname: varName, content: htmlContent });
     }
     else {
-        fileContent = _.template(replaceNewLines(options.htmlOutputTemplate))({ modulename: moduleName, varname: varName, content: htmlContent });
+        fileContent = _.template(replaceNewLines(options.htmlOutputTemplate, options.eol))({ modulename: moduleName, varname: varName, content: htmlContent });
     }
     // Write the content to a file
     var outputfile = getOutputFile(filename, options.htmlOutDir, options.flatten);
@@ -54,8 +57,8 @@ function compileHTML(filename, options) {
 }
 exports.compileHTML = compileHTML;
 // Replace user-supplied templates newlines with newlines appropriate for the current OS
-function replaceNewLines(input) {
-    return input.replace(/\r/g, '').replace(/\n/g, utils.eol);
+function replaceNewLines(input, newLines) {
+    return input.replace(/\r/g, '').replace(/\n/g, newLines);
 }
 function getOutputFile(filename, htmlOutDir, flatten) {
     var outputfile = filename;

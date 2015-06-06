@@ -6,9 +6,9 @@ var grunt = require('grunt');
 var utils = require('./utils');
 /////////////////////////////////////////////////////////////////////
 // Reference file logic
-////////////////////////////////////////////////////////////////////    
+////////////////////////////////////////////////////////////////////
 // Updates the reference file
-function updateReferenceFile(files, generatedFiles, referenceFile, referencePath) {
+function updateReferenceFile(files, generatedFiles, referenceFile, referencePath, eol) {
     var referenceIntro = '/// <reference path="';
     var referenceEnd = '" />';
     var referenceMatch = /\/\/\/ <reference path=\"(.*?)\"/;
@@ -75,7 +75,7 @@ function updateReferenceFile(files, generatedFiles, referenceFile, referencePath
     });
     contents.push(ourSignatureEnd);
     var updatedFileLines = utils.insertArrayAt(origFileLines, signatureSectionPosition, contents);
-    var updatedFileContents = updatedFileLines.join(utils.eol);
+    var updatedFileContents = updatedFileLines.join(eol);
     // Modify the orig contents to put in our contents only if changed
     // Also Return whether the file was changed
     if (updatedFileContents !== referenceContents) {

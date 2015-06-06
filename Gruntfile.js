@@ -190,6 +190,7 @@ module.exports = function (grunt) {
             },
             files_testFilesUsedWithDestAsAJSFile: {
                 test: true,
+                testExecute: commandLineAssertions.files_testFilesUsedWithDestAsAFile,
                 files: [
                     { src: ['test/multifile/a/**/*.ts'],
                       dest: 'test/multifile/files_testFilesUsedWithDestAsAJSFile/testDest.js' }
@@ -200,6 +201,7 @@ module.exports = function (grunt) {
             },
             files_testFilesUsedWithDestAsAFolder: {
                 test: true,
+                testExecute: commandLineAssertions.files_testFilesUsedWithDestAsAFolder,
                 files: [
                     { src: ['test/multifile/a/**/*.ts'],
                       dest: 'test/multifile/files_testFilesUsedWithDestAsAJSFolder' }
@@ -650,6 +652,24 @@ module.exports = function (grunt) {
                 options: {
                     fast: 'never',
                     sourceMap: false
+                }
+            },
+            param_newLine_CRLF: {
+                test: true,
+                testExecute: commandLineAssertions.param_newLine_CRLF,
+                src: 'test/simple/ts/zoo.ts',
+                options: {
+                    fast: 'never',
+                    newLine: 'CRLF'
+                }
+            },
+            param_newLine_LF: {
+                test: true,
+                testExecute: commandLineAssertions.param_newLine_LF,
+                src: 'test/simple/ts/zoo.ts',
+                options: {
+                    fast: 'never',
+                    newLine: 'LF'
                 }
             },
         }

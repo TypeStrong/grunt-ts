@@ -196,7 +196,9 @@ export function compileAllFiles(targetFiles: string[],
     if (task.inlineSourceMap) {
         args.push('--inlineSourceMap');
     }
-
+    if (task.newLine && !utils.newLineIsRedundant(task.newLine)) {
+        args.push('--newLine', task.newLine);
+    }
 
     // string options
     args.push('--target', task.target.toUpperCase());

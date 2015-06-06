@@ -101,4 +101,54 @@ exports.vsproj_test_config = function (strings, options) {
                 options.task.removeComments, options.target.outDir]);
     });
 };
+exports.param_newLine_CRLF = function (strings, options) {
+    return new Promise(function (resolve, reject) {
+        if (options.task.newLine === "CRLF") {
+            resolve({
+                code: 0,
+                output: ""
+            });
+        }
+        throw "expected newLine=CRLF.  Was " +
+            JSON.stringify([options.task.newLine]);
+    });
+};
+exports.param_newLine_LF = function (strings, options) {
+    return new Promise(function (resolve, reject) {
+        if (options.task.newLine === "LF") {
+            resolve({
+                code: 0,
+                output: ""
+            });
+        }
+        throw "expected newLine=LF.  Was " +
+            JSON.stringify([options.task.newLine]);
+    });
+};
+exports.files_testFilesUsedWithDestAsAFolder = function (strings, options) {
+    return new Promise(function (resolve, reject) {
+        if (options.target.outDir === "test/multifile/files_testFilesUsedWithDestAsAJSFolder" &&
+            options.target.out || "not specified" === "not specified") {
+            resolve({
+                code: 0,
+                output: ""
+            });
+        }
+        throw "expected --out not specified and outDir=test/multifile/files_testFilesUsedWithDestAsAJSFolder.  Was " +
+            JSON.stringify([options.target.outDir]);
+    });
+};
+exports.files_testFilesUsedWithDestAsAFile = function (strings, options) {
+    return new Promise(function (resolve, reject) {
+        if (options.target.out === "test/multifile/files_testFilesUsedWithDestAsAJSFile/testDest.js" &&
+            options.target.outDir || "not specified" === "not specified") {
+            resolve({
+                code: 0,
+                output: ""
+            });
+        }
+        throw "expected --outDir not specified and out=test/multifile/files_testFilesUsedWithDestAsAJSFile/testDest.js.  Was " +
+            JSON.stringify([options.target.outDir]);
+    });
+};
 //# sourceMappingURL=commandLineAssertions.js.map
