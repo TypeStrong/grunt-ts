@@ -34,7 +34,6 @@
         "./tasks/modules/utils.ts",
         "./tasks/scratch.ts",
         "./tasks/ts.ts",
-        "./test/expected/htmlExternal/html.external.html.ts",
         "./test/commandLineAssertions.ts",
         "./test/references-transform-library.d.ts",
         "./test/test.ts"

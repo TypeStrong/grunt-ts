@@ -108,18 +108,9 @@ exports.typescript = {
     vsproj_test_ignoreSettings: function (test) {
         testDirectory(test, 'vsproj/ignoreSettings');
         test.done();
+    },
     files_ObjectFormat: function (test) {
-        testDirectory(test, 'files_ObjectFormat');
-        test.done();
-    },
-        test.done();
-    },
-    files_ArrayFormatJS: function (test) {
-        testDirectory(test, 'multifile/files_testFilesUsedWithDestAsAJSFile');
-        test.done();
-    },
-    files_ArrayFormatFolder: function (test) {
-        testDirectory(test, 'multifile/files_testFilesUsedWithDestAsAJSFolder');
+        testDirectory(test, 'files_ObjectFormat', true);
         test.done();
     },
     out_and_outdir_with_spaces: function (test) {
@@ -128,5 +119,7 @@ exports.typescript = {
     },
     htmlExternal: function (test) {
         testDirectory(test, 'htmlExternal');
+        test.done();
     }
 };
+//# sourceMappingURL=test.js.map

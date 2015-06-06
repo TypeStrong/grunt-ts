@@ -124,15 +124,7 @@ export var typescript = {
         test.done();
     },
     files_ObjectFormat: function (test) {
-        testDirectory(test, 'files_ObjectFormat');
-        test.done();
-    },
-    files_ArrayFormatJS: function (test) {
-        testDirectory(test, 'multifile/files_testFilesUsedWithDestAsAJSFile');
-        test.done();
-    },
-    files_ArrayFormatFolder: function (test) {
-        testDirectory(test, 'multifile/files_testFilesUsedWithDestAsAJSFolder');
+        testDirectory(test, 'files_ObjectFormat', true);
         test.done();
     },
     out_and_outdir_with_spaces: function (test) {
