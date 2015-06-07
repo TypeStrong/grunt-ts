@@ -3,6 +3,8 @@ var commandLineAssertions = require('./test/commandLineAssertions');
 module.exports = function (grunt) {
     'use strict';
 
+    var gruntStartedTimestamp = new Date().getTime(); // for report-time-elapsed task
+
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
         clean: {
@@ -699,6 +701,33 @@ module.exports = function (grunt) {
                     module: 'umd'
                 }
             },
+            test_isolatedModules: {
+                test: true,
+                testExecute: commandLineAssertions.test_isolatedModules,
+                src: 'test/simple/ts/zoo.ts',
+                options: {
+                    fast: 'never',
+                    isolatedModules: true
+                }
+            },
+            test_noEmitHelpers: {
+                test: true,
+                testExecute: commandLineAssertions.test_noEmitHelpers,
+                src: 'test/simple/ts/zoo.ts',
+                options: {
+                    fast: 'never',
+                    noEmitHelpers: true
+                }
+            },
+            test_additionalFlags: {
+                test: true,
+                testExecute: commandLineAssertions.test_additionalFlags,
+                src: 'test/simple/ts/zoo.ts',
+                options: {
+                    fast: 'never',
+                    additionalFlags: '--version'
+                }
+            },
         }
     });
 
@@ -786,7 +815,7 @@ module.exports = function (grunt) {
     grunt.registerTask('test', ['test_all', 'fail', 'nodeunit', 'tslint:transformedHtml', 'clean:testPost']);
 
     // Release
-    grunt.registerTask('release', ['build', 'test']);
+    grunt.registerTask('release', ['build', 'test', 'report-time-elapsed']);
     grunt.registerTask('default', ['release']);
 
     //////////////////////////////////////////////
@@ -850,6 +879,9 @@ module.exports = function (grunt) {
 
     });
 
-    //////////////////////////////////////////////
-
+    grunt.registerTask('report-time-elapsed','Reports the time elapsed since gruntStartedTimestamp', function() {
+        var seconds = ((new Date().getTime()) - gruntStartedTimestamp) / 1000;
+        console.log(('Your "Grunt work" took ' + seconds.toFixed(2) + ' seconds.').green);
+        return true;
+    });
 };

@@ -175,3 +175,37 @@ exports.test_umd = function (strings, options) {
             JSON.stringify([options.task.module]);
     });
 };
+exports.test_isolatedModules = function (strings, options) {
+    return new Promise(function (resolve, reject) {
+        if (options.task.isolatedModules === true) {
+            resolve({
+                code: 0,
+                output: ""
+            });
+        }
+        throw "expected --isolatedModules.  Got " + JSON.stringify(options);
+    });
+};
+exports.test_noEmitHelpers = function (strings, options) {
+    return new Promise(function (resolve, reject) {
+        if (options.task.noEmitHelpers === true) {
+            resolve({
+                code: 0,
+                output: ""
+            });
+        }
+        throw "expected --noEmitHelpers.  Got " + JSON.stringify(options);
+    });
+};
+exports.test_additionalFlags = function (strings, options) {
+    return new Promise(function (resolve, reject) {
+        if (options.task.additionalFlags === '--version') {
+            resolve({
+                code: 0,
+                output: ""
+            });
+        }
+        throw "expected --version.  Got " + JSON.stringify(options);
+    });
+};
+//# sourceMappingURL=commandLineAssertions.js.map

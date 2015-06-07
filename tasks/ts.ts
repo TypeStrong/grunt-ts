@@ -125,7 +125,10 @@ function pluginFn(grunt: IGrunt) {
             noEmit: false,
             inlineSources: false,
             inlineSourceMap: false,
-            newLine: utils.eol
+            newLine: utils.eol,
+            isolatedModules: false,
+            noEmitHelpers: false,
+            additionalFlags: ''
         });
 
         // get unprocessed templates from configuration
@@ -251,6 +254,10 @@ function pluginFn(grunt: IGrunt) {
             options.htmlOutDir = rawTargetConfig.htmlOutDir;
             options.htmlOutDirFlatten = rawTargetConfig.htmlOutDirFlatten;
 
+            options.isolatedModules = rawTargetOptions.isolatedModules || rawTaskOptions.isolatedModules;
+            options.noEmitHelpers = rawTargetOptions.noEmitHelpers || rawTaskOptions.noEmitHelpers;
+            options.additionalFlags = utils.firstElementWithValue([rawTargetOptions.additionalFlags, rawTaskOptions.additionalFlags]);
+
             // fix the improperly cased options to their appropriate values
             options.allowBool = 'allowbool' in options ?
               options['allowbool'] : options.allowBool;
@@ -266,6 +273,13 @@ function pluginFn(grunt: IGrunt) {
               options['inlinesources'] : options.inlineSources;
             options.inlineSourceMap = 'inlinesourcemap' in options ?
               options['inlinesourcemap'] : options.inlineSourceMap;
+            options.isolatedModules = 'isolatedmodules' in options ?
+              options['isolatedmodules'] : options.isolatedModules;
+            options.noEmitHelpers = 'noemithelpers' in options ?
+              options['noemithelpers'] : options.noEmitHelpers;
+            options.additionalFlags = 'additionalflags' in options ?
+              options['additionalflags'] : options.additionalFlags;
+
 
             // Warn the user of invalid values
             if (options.fast !== 'watch' && options.fast !== 'always' && options.fast !== 'never') {

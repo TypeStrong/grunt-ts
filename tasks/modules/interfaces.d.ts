@@ -66,7 +66,14 @@ interface ITaskOptions {
     noEmit: boolean;
     inlineSourceMap: boolean;
     inlineSources: boolean;
+    /** Specifies the end of line sequence to be used when emitting files: 'CRLF' (dos) or 'LF' (unix). */
     newLine: string;
+    /** Makes cases that break single-file transpilation an error. */
+    isolatedModules: boolean;
+    /** If true, will not generate custom helper functions like  __extends in compiled output. */
+    noEmitHelpers: boolean;
+    /** Represents a string literal to pass to compiler */
+    additionalFlags: string;
 }
 
 interface IVisualStudioProjectSupport {

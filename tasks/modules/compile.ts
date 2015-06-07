@@ -199,6 +199,12 @@ export function compileAllFiles(targetFiles: string[],
     if (task.newLine && !utils.newLineIsRedundant(task.newLine)) {
         args.push('--newLine', task.newLine);
     }
+    if (task.isolatedModules) {
+        args.push('--isolatedModules');
+    }
+    if (task.noEmitHelpers) {
+        args.push('--noEmitHelpers');
+    }
 
     // string options
     args.push('--target', task.target.toUpperCase());
@@ -272,6 +278,10 @@ export function compileAllFiles(targetFiles: string[],
     }
     if (task.mapRoot) {
         args.push('--mapRoot', task.mapRoot);
+    }
+
+    if (task.additionalFlags) {
+        args.push(task.additionalFlags);
     }
 
     // Locate a compiler

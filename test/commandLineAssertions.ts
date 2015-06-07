@@ -192,3 +192,39 @@ export var test_umd: ICompilePromise = (strings, options) => {
         JSON.stringify([options.task.module]);
   });
 };
+
+export var test_isolatedModules: ICompilePromise = (strings, options) => {
+  return new Promise(function(resolve, reject) {
+    if (options.task.isolatedModules === true) {
+      resolve({
+        code: 0,
+        output: ""
+      });
+    }
+    throw `expected --isolatedModules.  Got ${JSON.stringify(options)}`;
+  });
+};
+
+export var test_noEmitHelpers: ICompilePromise = (strings, options) => {
+  return new Promise(function(resolve, reject) {
+    if (options.task.noEmitHelpers === true) {
+      resolve({
+        code: 0,
+        output: ""
+      });
+    }
+    throw `expected --noEmitHelpers.  Got ${JSON.stringify(options)}`;
+  });
+};
+
+export var test_additionalFlags: ICompilePromise = (strings, options) => {
+  return new Promise(function(resolve, reject) {
+    if (options.task.additionalFlags === '--version') {
+      resolve({
+        code: 0,
+        output: ""
+      });
+    }
+    throw `expected --version.  Got ${JSON.stringify(options)}`;
+  });
+};
