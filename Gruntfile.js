@@ -587,6 +587,15 @@ module.exports = function (grunt) {
                 src: 'test/withwrongmodule/ts/*.ts',
                 outDir: 'test/withwrongmodule/js'
             },
+            usingOutWithExternalModules: {
+                //expecting a warning here for using --out along with external modules (#257).
+                test: true,
+                options: {
+                    module: 'amd'
+                },
+                src: 'test/withwrongmodule/ts/*.ts',
+                out: 'test/usingOutWithExternalModules/result.js'
+            },
             test_htmlOutputTemplate: {
                 test: true,
                 options: {},

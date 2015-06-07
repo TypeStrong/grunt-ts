@@ -225,6 +225,11 @@ function compileAllFiles(targetFiles, target, task, targetName, outFile) {
             }
         }
     }
+    if (args.indexOf('--out') > -1 && args.indexOf('--module') > -1) {
+        console.warn(('WARNING: TypeScript does not allow external modules to be concatenated with' +
+            ' --out. Any exported code may be truncated.  See TypeScript issue #1544 for' +
+            ' more details.').magenta);
+    }
     if (task.sourceRoot) {
         args.push('--sourceRoot', task.sourceRoot);
     }

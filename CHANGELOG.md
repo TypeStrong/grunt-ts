@@ -2,6 +2,7 @@
 
 ## Next
 * FEAT: Implemented support for arbitrary HTML transforms, such as to external modules (#249).  Thanks to @sethx for the Pull Request.
+* FIX: Now grunt-ts provides a warning if someone uses --out with an external module system (#257).  Thanks to @dbeckwith for the report.
 
 ## v4.1.2
 * FIX: Regression with `out` and `outDir` for paths with spaces (Also reported on #251).  Thanks to @seanmailander for the report.

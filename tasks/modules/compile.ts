@@ -236,8 +236,6 @@ export function compileAllFiles(targetFiles: string[],
         args.push('--out', target.out);
     }
 
-
-
     if (target.dest && (!target.out) && (!target.outDir)) {
         if (utils.isJavaScriptFile(target.dest)) {
             args.push('--out', target.dest);
@@ -261,6 +259,12 @@ export function compileAllFiles(targetFiles: string[],
                 args.push('--outDir', target.dest);
             }
         }
+    }
+
+    if (args.indexOf('--out') > -1 && args.indexOf('--module') > -1) {
+        console.warn(('WARNING: TypeScript does not allow external modules to be concatenated with' +
+        ' --out. Any exported code may be truncated.  See TypeScript issue #1544 for' +
+        ' more details.').magenta);
     }
 
     if (task.sourceRoot) {
