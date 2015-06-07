@@ -33,11 +33,14 @@ interface ITaskOptions {
     declaration: boolean;
     emitDecoratorMetadata: boolean;
     mapRoot: string;
-    module: string; // amd, commonjs
+    /** amd | commonjs | umd | system  */
+    module: string;
     noImplicitAny: boolean;
     noResolve: boolean;
-    comments: boolean; // false to remove comments
-    removeComments: boolean; // true to remove comments
+    /** false to remove comments */
+    comments: boolean;
+    /** true to remove comments */
+    removeComments: boolean;
     sourceMap: boolean;
     sourceRoot: string;
     /** es3, es5, es6 */
@@ -80,5 +83,5 @@ interface ICompileResult {
 }
 
 interface ICompilePromise {
-  (args: string[], optionalInfo? : {target: ITargetOptions, task: ITaskOptions}) : Promise<ICompileResult>
+  (args: string[], optionalInfo? : {target: ITargetOptions, task: ITaskOptions}) : Promise<ICompileResult>;
 }

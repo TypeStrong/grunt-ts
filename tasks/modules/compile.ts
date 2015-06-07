@@ -205,15 +205,15 @@ export function compileAllFiles(targetFiles: string[],
 
     // check the module compile option
     if (task.module) {
-   	    var moduleOptionString: string = task.module.toLowerCase();
-    	if (moduleOptionString === 'amd' || moduleOptionString === 'commonjs') {
+   	  let moduleOptionString: string = ('' + task.module).toLowerCase();
+    	if ('amd|commonjs|system|umd'.indexOf(moduleOptionString) > -1) {
             args.push('--module', moduleOptionString);
     	} else {
-	        console.warn('WARNING: Option "module" does only support "amd" | "commonjs"'.magenta);
+	        console.warn('WARNING: Option "module" only supports "amd" | "commonjs" | "system" | "umd" '.magenta);
     	}
     }
 
-    var theOutDir : string = null;
+    let theOutDir : string = null;
     if (target.outDir) {
         if (target.out) {
             console.warn('WARNING: Option "out" and "outDir" should not be used together'.magenta);
@@ -275,7 +275,7 @@ export function compileAllFiles(targetFiles: string[],
     }
 
     // Locate a compiler
-    var tsc: string;
+    let tsc: string;
     if (task.compiler) { // Custom compiler (task.compiler)
         grunt.log.writeln('Using the custom compiler : ' + task.compiler);
         tsc = task.compiler;
@@ -293,7 +293,7 @@ export function compileAllFiles(targetFiles: string[],
 
     // Create a temp last command file and use that to guide tsc.
     // Reason: passing all the files on the command line causes TSC to go in an infinite loop.
-    var tempfilename = utils.getTempFile('tscommand');
+    let tempfilename = utils.getTempFile('tscommand');
     if (!tempfilename) {
         throw (new Error('cannot create temp file'));
     }

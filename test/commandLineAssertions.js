@@ -151,4 +151,27 @@ exports.files_testFilesUsedWithDestAsAFile = function (strings, options) {
             JSON.stringify([options.target.outDir]);
     });
 };
-//# sourceMappingURL=commandLineAssertions.js.map
+exports.test_systemJS = function (strings, options) {
+    return new Promise(function (resolve, reject) {
+        if (options.task.module === "system") {
+            resolve({
+                code: 0,
+                output: ""
+            });
+        }
+        throw "expected system.  Was " +
+            JSON.stringify([options.task.module]);
+    });
+};
+exports.test_umd = function (strings, options) {
+    return new Promise(function (resolve, reject) {
+        if (options.task.module === "umd") {
+            resolve({
+                code: 0,
+                output: ""
+            });
+        }
+        throw "expected umd.  Was " +
+            JSON.stringify([options.task.module]);
+    });
+};

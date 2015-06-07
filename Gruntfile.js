@@ -681,6 +681,24 @@ module.exports = function (grunt) {
                     newLine: 'LF'
                 }
             },
+            test_systemJS: {
+                test: true,
+                testExecute: commandLineAssertions.test_systemJS,
+                src: 'test/withwrongmodule/ts/*.ts',
+                options: {
+                    fast: 'never',
+                    module: 'system'
+                }
+            },
+            test_umd: {
+                test: true,
+                testExecute: commandLineAssertions.test_umd,
+                src: 'test/withwrongmodule/ts/*.ts',
+                options: {
+                    fast: 'never',
+                    module: 'umd'
+                }
+            },
         }
     });
 

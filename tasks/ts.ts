@@ -102,7 +102,7 @@ function pluginFn(grunt: IGrunt) {
             declaration: false,
             emitDecoratorMetadata: false,
             mapRoot: '',
-            module: null, // amd, commonjs
+            module: null,
             noImplicitAny: false,
             noResolve: false,
             comments: null, // false to remove comments

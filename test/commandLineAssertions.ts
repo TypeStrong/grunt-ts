@@ -166,3 +166,29 @@ export var files_testFilesUsedWithDestAsAFile: ICompilePromise = (strings, optio
         JSON.stringify([options.target.outDir]);
   });
 };
+
+export var test_systemJS: ICompilePromise = (strings, options) => {
+  return new Promise(function(resolve, reject) {
+    if (options.task.module === "system") {
+      resolve({
+        code: 0,
+        output: ""
+      });
+    }
+    throw "expected system.  Was " +
+        JSON.stringify([options.task.module]);
+  });
+};
+
+export var test_umd: ICompilePromise = (strings, options) => {
+  return new Promise(function(resolve, reject) {
+    if (options.task.module === "umd") {
+      resolve({
+        code: 0,
+        output: ""
+      });
+    }
+    throw "expected umd.  Was " +
+        JSON.stringify([options.task.module]);
+  });
+};
