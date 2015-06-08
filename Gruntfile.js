@@ -653,7 +653,6 @@ module.exports = function (grunt) {
                 options: {
                     fast: 'never',
                     inlineSources: true,
-                    sourceMap: true
                 }
             },
             inlineSourcesNotPassed: {

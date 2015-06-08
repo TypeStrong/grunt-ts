@@ -278,6 +278,12 @@ function pluginFn(grunt) {
                 }
             }
             options.removeComments = !!options.removeComments;
+            if (options.inlineSources) {
+                options.inlineSourceMap = true;
+            }
+            if (options.inlineSourceMap) {
+                options.sourceMap = true;
+            }
             if (currenttask.files.length === 0 && rawTargetOptions.compile) {
                 grunt.log.writeln('Zero files found to compile in target "' + currenttask.target + '". Compilation will be skipped.');
             }
