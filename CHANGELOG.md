@@ -2,7 +2,7 @@
 
 ## Next
 
-## v4.2.0
+## v4.2.0-beta.1 (2015-06-07)
 * FEAT: TypeScript 1.5 beta support.
   * Added support for new TS 1.5 switches: newLine, noEmit, emitDecoratorMetadata, isolatedModules, noEmitHelpers, inlineSourceMap, inlineSources.
   * Added support for SystemJS ('system') and UMD ('umd') on `module` option.
