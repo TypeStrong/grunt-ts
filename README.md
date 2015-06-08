@@ -704,26 +704,6 @@ grunt.initConfig({
 });
 ````
 
-#### module
-
-````javascript
-"amd" (default) | "commonjs" | ""
-````
-
-Specifies if TypeScript should emit AMD or CommonJS-style external modules.  Has no effect if internal modules are used.
-
-````javascript
-grunt.initConfig({
-  ts: {
-    default: {
-      options: {
-        module: "amd"
-      }
-    }
-  }
-});
-````
-
 #### newLine
 
 ````javascript
