@@ -1,3 +1,7 @@
+<blink>Are you here for Angular 2 or TypeScript 1.5 beta support?!??!</blink>
+
+If so, please look at our working [update-to-typescript-1.5.0-beta](https://github.com/TypeStrong/grunt-ts/tree/update-to-typescript-1.5.0-beta) branch and use `v4.2.0-beta.1` on npm.
+
 # grunt-ts
 
 [![Build Status](https://secure.travis-ci.org/TypeStrong/grunt-ts.svg?branch=master)](http://travis-ci.org/TypeStrong/grunt-ts) [![NPM version](https://badge.fury.io/js/grunt-ts.svg)](http://badge.fury.io/js/grunt-ts)
