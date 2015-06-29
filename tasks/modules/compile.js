@@ -143,6 +143,9 @@ function compileAllFiles(targetFiles, target, task, targetName, outFile) {
     if (task.noEmitOnError) {
         args.push('--noEmitOnError');
     }
+    if (task.emitDecoratorMetadata) {
+        args.push('--emitDecoratorMetadata');
+    }
     if (task.preserveConstEnums) {
         args.push('--preserveConstEnums');
     }
