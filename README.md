@@ -72,6 +72,7 @@ Grunt-ts supports most `tsc` switches.  Click the link to cross-reference to the
 |--sourceMap|[sourceMap](#sourcemap)|Generates corresponding `.map` file|
 |--sourceRoot LOCATION|[sourceRoot](#sourceroot)|Specifies the location where debugger should locate TypeScript files instead of source locations.|
 |--suppressImplicitAnyIndexErrors|[suppressImplicitAnyIndexErrors](#suppressimplicitanyindexerrors)|Specifies the location where debugger should locate TypeScript files instead of source locations.|
+|--emitDecoratorMetadata|[emitDecoratorMetadata](#emitDecoratorMetadata)|Emit metadata for type/parameter decorators.|
 |--target VERSION|[target](#target)|Specify ECMAScript target version: `'es3'`, `'es5'`, or `'es6'`|
 
 
@@ -751,6 +752,16 @@ var p : person = { name: "Test" };
 p["age"] = 101;  //property age does not exist on interface person.
 console.log(p["age"]);
 ````
+
+#### emitDecoratorMetadata
+
+````javascript
+true | false (default)
+````
+
+Set to true to pass `--emitDecoratorMetadata` to the compiler.  If set to true, TypeScript will emit type information about type and parameter decorators, so it's available at runtime.
+
+Used by tools like [Angular](https://angular.io/). You will probably need to import the [reflect-metadata](https://www.npmjs.com/package/reflect-metadata) package in your app when using this feature.
 
 #### target
 
