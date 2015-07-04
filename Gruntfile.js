@@ -1,5 +1,9 @@
+var commandLineAssertions = require('./test/commandLineAssertions');
+
 module.exports = function (grunt) {
     'use strict';
+
+    var gruntStartedTimestamp = new Date().getTime(); // for report-time-elapsed task
 
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
@@ -13,7 +17,8 @@ module.exports = function (grunt) {
                 '!test/expected/**/*',
                 'test/htmlOutDir/generated/test',
                 'test/htmlExternal/html.external.html.ts',
-                'tscommand-*.txt'
+                'tscommand-*.txt',
+                '!test/commandLineAssertions.js'
             ],
             testPost: [
                 'src/a.js',
@@ -50,7 +55,7 @@ module.exports = function (grunt) {
                 fast: 'always'
             },
             build: {
-                src: ['tasks/**/*.ts']
+                src: ['tasks/**/*.ts', 'test/commandLineAssertions.ts']
             },
             test: {
                 src: ['test/test.ts']
@@ -70,16 +75,6 @@ module.exports = function (grunt) {
             options: {
                 // 'es3' (default) | 'es5'
                 target: 'es3',
-                // Use amd for asynchonous loading or commonjs  'amd' (default) | 'commonjs'
-                module: 'commonjs',
-                // Generate a source map file for each result js file (true (default) | false)
-                sourcemap: true,
-                // Generate a declaration .d.ts file for each resulting js file (true | false  (default))
-                declaration: false,
-                // ??? (true | false (default))
-                nolib: false,
-                // Leave comments in compiled js code (true | false (default))
-                comments: false,
                 // Print the tsc command (true | false (default))
                 verbose: true
             },
@@ -197,6 +192,7 @@ module.exports = function (grunt) {
             },
             files_testFilesUsedWithDestAsAJSFile: {
                 test: true,
+                testExecute: commandLineAssertions.files_testFilesUsedWithDestAsAFile,
                 files: [
                     { src: ['test/multifile/a/**/*.ts'],
                       dest: 'test/multifile/files_testFilesUsedWithDestAsAJSFile/testDest.js' }
@@ -207,6 +203,7 @@ module.exports = function (grunt) {
             },
             files_testFilesUsedWithDestAsAFolder: {
                 test: true,
+                testExecute: commandLineAssertions.files_testFilesUsedWithDestAsAFolder,
                 files: [
                     { src: ['test/multifile/a/**/*.ts'],
                       dest: 'test/multifile/files_testFilesUsedWithDestAsAJSFolder' }
@@ -295,10 +292,12 @@ module.exports = function (grunt) {
             },
             vsproj_test: {
                 test: true,
+                testExecute: commandLineAssertions.vsproj_test,
                 vs: 'test/vsproj/testproject.csproj'
             },
             vsproj_test_config: {
                 test: true,
+                testExecute: commandLineAssertions.vsproj_test_config,
                 vs: {
                     project: 'test/vsproj/testproject.csproj',
                     config: 'Release'
@@ -329,8 +328,7 @@ module.exports = function (grunt) {
                 out: 'test/varreplacedtest/<%= pkg.name %>-test.js',
                 options: {
                     target: 'es5',
-                    declaration: false,
-                    sourceMap: false
+                    declaration: false
                 }
             },
             variablesReplacedInReference: {
@@ -375,7 +373,8 @@ module.exports = function (grunt) {
                 out: 'test/htmlTemplate/out.js',
                 options: {
                     htmlModuleTemplate: '<%= filename %>_<%= ext %>_module',
-                    htmlVarTemplate: '<%= filename %>_<%= ext %>_variable'
+                    htmlVarTemplate: '<%= filename %>_<%= ext %>_variable',
+                    comments: false
                 },
             },
             htmlWithHtmlOutDirTest: {
@@ -431,6 +430,7 @@ module.exports = function (grunt) {
                 options: {
                     sourceRoot: 'js',
                     mapRoot: 'map',  // assuming we move all map files with some other grunt task
+                    sourceMap: true
                 },
             },
             templatecache: {
@@ -450,7 +450,8 @@ module.exports = function (grunt) {
                 src: ['test/transform/ts/**/*.ts'],
                 outDir: 'test/transform/js',
                 options: {
-                    fast: 'always'
+                    fast: 'never',
+                    module: 'commonjs'
                 }
             },
             refTransform: {
@@ -474,7 +475,8 @@ module.exports = function (grunt) {
                 src: ['test/failontypeerror/**/*.ts'],
                 outDir: 'test/failontypeerror/js',
                 options: {
-                    failOnTypeErrors: false
+                    failOnTypeErrors: false,
+                    module: 'commonjs'
                 }
             },
             hasEmitIfTypeErrorAnd_noEmitOnError_IsFalse: {
@@ -587,6 +589,15 @@ module.exports = function (grunt) {
                 src: 'test/withwrongmodule/ts/*.ts',
                 outDir: 'test/withwrongmodule/js'
             },
+            usingOutWithExternalModules: {
+                //expecting a warning here for using --out along with external modules (#257).
+                test: true,
+                options: {
+                    module: 'amd'
+                },
+                src: 'test/withwrongmodule/ts/*.ts',
+                out: 'test/usingOutWithExternalModules/result.js'
+            },
             test_htmlOutputTemplate: {
                 test: true,
                 options: {},
@@ -598,7 +609,124 @@ module.exports = function (grunt) {
                 'export module <%= modulename %> {\n' +
                 '    export var <%= varname %> = \'<%= content %>\';\n' +
                 '}\n'
-            }
+            },
+            decoratorMetadataPassed: {
+                test: true,
+                testExecute: commandLineAssertions.decoratorMetadataPassed,
+                src: 'test/simple/ts/zoo.ts',
+                options: {
+                    fast: 'never',
+                    target: 'es6',
+                    emitDecoratorMetadata: true,
+                }
+            },
+            decoratorMetadataNotPassed: {
+                test: true,
+                testExecute: commandLineAssertions.decoratorMetadataNotPassed,
+                src: 'test/simple/ts/zoo.ts',
+                options: {
+                    fast: 'never',
+                    target: 'es6',
+                }
+            },
+            noEmitPassed: {
+                test: true,
+                testExecute: commandLineAssertions.noEmitPassed,
+                src: 'test/simple/ts/zoo.ts',
+                options: {
+                    fast: 'never',
+                    noEmit: true
+                }
+            },
+            noEmitNotPassed: {
+                test: true,
+                testExecute: commandLineAssertions.noEmitNotPassed,
+                src: 'test/simple/ts/zoo.ts',
+                options: {
+                    fast: 'never'
+                }
+            },
+            inlineSourcesPassed: {
+                test: true,
+                testExecute: commandLineAssertions.inlineSourcesPassed,
+                src: 'test/simple/ts/zoo.ts',
+                options: {
+                    fast: 'never',
+                    inlineSources: true,
+                }
+            },
+            inlineSourcesNotPassed: {
+                test: true,
+                testExecute: commandLineAssertions.inlineSourcesNotPassed,
+                src: 'test/simple/ts/zoo.ts',
+                options: {
+                    fast: 'never',
+                    sourceMap: false
+                }
+            },
+            param_newLine_CRLF: {
+                test: true,
+                testExecute: commandLineAssertions.param_newLine_CRLF,
+                src: 'test/simple/ts/zoo.ts',
+                options: {
+                    fast: 'never',
+                    newLine: 'CRLF'
+                }
+            },
+            param_newLine_LF: {
+                test: true,
+                testExecute: commandLineAssertions.param_newLine_LF,
+                src: 'test/simple/ts/zoo.ts',
+                options: {
+                    fast: 'never',
+                    newLine: 'LF'
+                }
+            },
+            test_systemJS: {
+                test: true,
+                testExecute: commandLineAssertions.test_systemJS,
+                src: 'test/withwrongmodule/ts/*.ts',
+                options: {
+                    fast: 'never',
+                    module: 'system'
+                }
+            },
+            test_umd: {
+                test: true,
+                testExecute: commandLineAssertions.test_umd,
+                src: 'test/withwrongmodule/ts/*.ts',
+                options: {
+                    fast: 'never',
+                    module: 'umd'
+                }
+            },
+            test_isolatedModules: {
+                test: true,
+                testExecute: commandLineAssertions.test_isolatedModules,
+                src: 'test/simple/ts/zoo.ts',
+                options: {
+                    fast: 'never',
+                    isolatedModules: true
+                }
+            },
+            test_noEmitHelpers: {
+                test: true,
+                testExecute: commandLineAssertions.test_noEmitHelpers,
+                src: 'test/simple/ts/zoo.ts',
+                options: {
+                    fast: 'never',
+                    noEmitHelpers: true
+                }
+            },
+            test_additionalFlags: {
+                test: true,
+                testExecute: commandLineAssertions.test_additionalFlags,
+                src: 'test/simple/ts/zoo.ts',
+                options: {
+                    fast: 'never',
+                    additionalFlags: '--version'
+                }
+            },
         }
     });
 
@@ -686,7 +814,7 @@ module.exports = function (grunt) {
     grunt.registerTask('test', ['test_all', 'fail', 'nodeunit', 'tslint:transformedHtml', 'clean:testPost']);
 
     // Release
-    grunt.registerTask('release', ['build', 'test']);
+    grunt.registerTask('release', ['build', 'test', 'report-time-elapsed']);
     grunt.registerTask('default', ['release']);
 
     //////////////////////////////////////////////
@@ -698,7 +826,7 @@ module.exports = function (grunt) {
     //
     // Modify tasksToTest based on what you are working on
 
-    var tasksToTest = ['ts:fail', 'nodeunit'];
+    var tasksToTest = ['ts:vsproj_test'];
 
     grunt.registerTask('dev', ['run', 'watch']);
 
@@ -750,6 +878,9 @@ module.exports = function (grunt) {
 
     });
 
-    //////////////////////////////////////////////
-
+    grunt.registerTask('report-time-elapsed','Reports the time elapsed since gruntStartedTimestamp', function() {
+        var seconds = ((new Date().getTime()) - gruntStartedTimestamp) / 1000;
+        console.log(('Your "Grunt work" took ' + seconds.toFixed(2) + ' seconds.').green);
+        return true;
+    });
 };

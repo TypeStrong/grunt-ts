@@ -75,6 +75,7 @@ function pluginFn(grunt) {
             allowImportModule: false,
             compile: true,
             declaration: false,
+            emitDecoratorMetadata: false,
             mapRoot: '',
             module: null,
             noImplicitAny: false,
@@ -95,7 +96,14 @@ function pluginFn(grunt) {
             failOnTypeErrors: true,
             noEmitOnError: false,
             preserveConstEnums: false,
-            suppressImplicitAnyIndexErrors: false
+            suppressImplicitAnyIndexErrors: false,
+            noEmit: false,
+            inlineSources: false,
+            inlineSourceMap: false,
+            newLine: utils.eol,
+            isolatedModules: false,
+            noEmitHelpers: false,
+            additionalFlags: ''
         });
         // get unprocessed templates from configuration
         var rawTaskOptions = (grunt.config.getRaw(currenttask.name + '.options') || {});
@@ -125,29 +133,43 @@ function pluginFn(grunt) {
         }
         function proceed(vsProjectTypeScriptSettings) {
             if (vsProjectTypeScriptSettings && !vs.ignoreSettings) {
-                options.declaration = utils.firstElementWithValue([vsProjectTypeScriptSettings.GeneratesDeclarations, options.declaration]);
-                options.mapRoot = utils.firstElementWithValue([vsProjectTypeScriptSettings.MapRoot, options.mapRoot]);
-                options.module = utils.firstElementWithValue([vsProjectTypeScriptSettings.ModuleKind, options.module]);
+                options.declaration = utils.firstElementWithValue([vsProjectTypeScriptSettings.GeneratesDeclarations,
+                    options.declaration]);
+                options.mapRoot = utils.firstElementWithValue([vsProjectTypeScriptSettings.MapRoot,
+                    options.mapRoot]);
+                options.module = utils.firstElementWithValue([vsProjectTypeScriptSettings.ModuleKind,
+                    options.module]);
                 if (options.module === 'none') {
                     options.module = null;
                 }
-                options.noEmitOnError = utils.firstElementWithValue([vsProjectTypeScriptSettings.NoEmitOnError, options.noEmitOnError]);
-                options.noImplicitAny = utils.firstElementWithValue([vsProjectTypeScriptSettings.NoImplicitAny, options.noImplicitAny]);
-                options.noResolve = utils.firstElementWithValue([vsProjectTypeScriptSettings.NoResolve, options.noResolve]);
-                rawTargetConfig.outDir = utils.firstElementWithValue([vsProjectTypeScriptSettings.OutDir, rawTargetConfig.outDir]);
-                rawTargetConfig.out = utils.firstElementWithValue([vsProjectTypeScriptSettings.OutFile, rawTargetConfig.out]);
-                options.preserveConstEnums = utils.firstElementWithValue([vsProjectTypeScriptSettings.PreserveConstEnums, options.preserveConstEnums]);
-                options.removeComments = utils.firstElementWithValue([vsProjectTypeScriptSettings.RemoveComments, options.removeComments]);
+                options.noEmitOnError = utils.firstElementWithValue([vsProjectTypeScriptSettings.NoEmitOnError,
+                    options.noEmitOnError]);
+                options.noImplicitAny = utils.firstElementWithValue([vsProjectTypeScriptSettings.NoImplicitAny,
+                    options.noImplicitAny]);
+                options.noResolve = utils.firstElementWithValue([vsProjectTypeScriptSettings.NoResolve,
+                    options.noResolve]);
+                rawTargetConfig.outDir = utils.firstElementWithValue([vsProjectTypeScriptSettings.OutDir,
+                    rawTargetConfig.outDir]);
+                rawTargetConfig.out = utils.firstElementWithValue([vsProjectTypeScriptSettings.OutFile,
+                    rawTargetConfig.out]);
+                options.preserveConstEnums = utils.firstElementWithValue([vsProjectTypeScriptSettings.PreserveConstEnums,
+                    options.preserveConstEnums]);
+                options.removeComments = utils.firstElementWithValue([vsProjectTypeScriptSettings.RemoveComments,
+                    options.removeComments]);
                 if (options.removeComments) {
                     options.comments = null;
                 }
                 else {
                     options.comments = true;
                 }
-                options.sourceMap = utils.firstElementWithValue([vsProjectTypeScriptSettings.SourceMap, options.sourceMap]);
-                options.sourceRoot = utils.firstElementWithValue([vsProjectTypeScriptSettings.SourceRoot, options.sourceRoot]);
-                options.suppressImplicitAnyIndexErrors = utils.firstElementWithValue([vsProjectTypeScriptSettings.SuppressImplicitAnyIndexErrors, options.suppressImplicitAnyIndexErrors]);
-                options.target = utils.firstElementWithValue([vsProjectTypeScriptSettings.Target, options.target]);
+                options.sourceMap = utils.firstElementWithValue([vsProjectTypeScriptSettings.SourceMap,
+                    options.sourceMap]);
+                options.sourceRoot = utils.firstElementWithValue([vsProjectTypeScriptSettings.SourceRoot,
+                    options.sourceRoot]);
+                options.suppressImplicitAnyIndexErrors = utils.firstElementWithValue([vsProjectTypeScriptSettings.SuppressImplicitAnyIndexErrors,
+                    options.suppressImplicitAnyIndexErrors]);
+                options.target = utils.firstElementWithValue([vsProjectTypeScriptSettings.Target,
+                    options.target]);
             }
             var srcFromVS_RelativePathsFromGruntFile = [];
             if (vsProjectTypeScriptSettings) {
@@ -157,7 +179,8 @@ function pluginFn(grunt) {
                     _.map(_.uniq(vsProjectTypeScriptSettings.files), function (file) {
                         var absolutePathToFile = path.normalize(path.join(absolutePathToVSProjectFolder, file));
                         var relativePathToFile = path.relative(path.resolve('.'), absolutePathToFile).replace(new RegExp('\\' + path.sep, 'g'), '/');
-                        if (srcFromVS_RelativePathsFromGruntFile.indexOf(relativePathToFile) === -1 && currenttask.filesSrc.indexOf(relativePathToFile) === -1) {
+                        if (srcFromVS_RelativePathsFromGruntFile.indexOf(relativePathToFile) === -1 &&
+                            currenttask.filesSrc.indexOf(relativePathToFile) === -1) {
                             srcFromVS_RelativePathsFromGruntFile.push(relativePathToFile);
                         }
                     });
@@ -175,14 +198,39 @@ function pluginFn(grunt) {
                 }
             }
             options.htmlOutputTemplate = rawTargetOptions.htmlOutputTemplate || rawTaskOptions.htmlOutputTemplate;
+            var lineEndingToUse = utils.newLineParameterAsActual(rawTargetOptions.newLine) ||
+                utils.newLineParameterAsActual(rawTaskOptions.newLine) ||
+                utils.eol;
+            options.newLine = rawTargetOptions.newLine || rawTaskOptions.newLine ||
+                utils.newLineActualAsParameter(utils.eol);
             options.htmlModuleTemplate = rawTargetOptions.htmlModuleTemplate || rawTaskOptions.htmlModuleTemplate;
             options.htmlVarTemplate = rawTargetOptions.htmlVarTemplate || rawTaskOptions.htmlVarTemplate;
             options.htmlOutDir = rawTargetConfig.htmlOutDir;
             options.htmlOutDirFlatten = rawTargetConfig.htmlOutDirFlatten;
-            // fix the properly cased options to their appropriate values
-            options.allowBool = 'allowbool' in options ? options['allowbool'] : options.allowBool;
-            options.allowImportModule = 'allowimportmodule' in options ? options['allowimportmodule'] : options.allowImportModule;
-            options.sourceMap = 'sourcemap' in options ? options['sourcemap'] : options.sourceMap;
+            options.isolatedModules = rawTargetOptions.isolatedModules || rawTaskOptions.isolatedModules;
+            options.noEmitHelpers = rawTargetOptions.noEmitHelpers || rawTaskOptions.noEmitHelpers;
+            options.additionalFlags = utils.firstElementWithValue([rawTargetOptions.additionalFlags, rawTaskOptions.additionalFlags]);
+            // fix the improperly cased options to their appropriate values
+            options.allowBool = 'allowbool' in options ?
+                options['allowbool'] : options.allowBool;
+            options.allowImportModule = 'allowimportmodule' in options ?
+                options['allowimportmodule'] : options.allowImportModule;
+            options.sourceMap = 'sourcemap' in options ?
+                options['sourcemap'] : options.sourceMap;
+            options.emitDecoratorMetadata = 'emitdecoratormetadata' in options ?
+                options['emitdecoratormetadata'] : options.emitDecoratorMetadata;
+            options.noEmit = 'noemit' in options ?
+                options['noemit'] : options.noEmit;
+            options.inlineSources = 'inlinesources' in options ?
+                options['inlinesources'] : options.inlineSources;
+            options.inlineSourceMap = 'inlinesourcemap' in options ?
+                options['inlinesourcemap'] : options.inlineSourceMap;
+            options.isolatedModules = 'isolatedmodules' in options ?
+                options['isolatedmodules'] : options.isolatedModules;
+            options.noEmitHelpers = 'noemithelpers' in options ?
+                options['noemithelpers'] : options.noEmitHelpers;
+            options.additionalFlags = 'additionalflags' in options ?
+                options['additionalflags'] : options.additionalFlags;
             // Warn the user of invalid values
             if (options.fast !== 'watch' && options.fast !== 'always' && options.fast !== 'never') {
                 console.warn(('"fast" needs to be one of : "watch" (default) | "always" | "never" but you provided: ' + options.fast).magenta);
@@ -194,7 +242,8 @@ function pluginFn(grunt) {
                 }
             }
             if ((options.fast === 'watch' || options.fast === 'always') && rawTargetConfig.files) {
-                grunt.log.writeln(('Warning: Task "' + currenttask.target + '" is attempting to use fast compilation with "files".  This is not currently supported.  Setting "fast" to "never".').magenta);
+                grunt.log.writeln(('Warning: Task "' + currenttask.target +
+                    '" is attempting to use fast compilation with "files".  This is not currently supported.  Setting "fast" to "never".').magenta);
                 options.fast = 'never';
             }
             logBadConfigWithFiles(rawTargetConfig, currenttask, rawTargetOptions);
@@ -224,10 +273,17 @@ function pluginFn(grunt) {
                     console.warn('Either option will suffice (and removing the other will have no effect).'.magenta);
                 }
                 else {
-                    console.warn(('The --removeComments value of "' + options.removeComments + '" ' + 'supercedes the --comments value of "' + options.comments + '"').magenta);
+                    console.warn(('The --removeComments value of "' + options.removeComments + '" ' +
+                        'supercedes the --comments value of "' + options.comments + '"').magenta);
                 }
             }
             options.removeComments = !!options.removeComments;
+            if (options.inlineSources) {
+                options.inlineSourceMap = true;
+            }
+            if (options.inlineSourceMap) {
+                options.sourceMap = true;
+            }
             if (currenttask.files.length === 0 && rawTargetOptions.compile) {
                 grunt.log.writeln('Zero files found to compile in target "' + currenttask.target + '". Compilation will be skipped.');
             }
@@ -254,11 +310,16 @@ function pluginFn(grunt) {
                         }
                         else if (target.files) {
                             var filesKeys = _.keys(target.files);
-                            if (filesKeys.length > filesCompilationIndex && utils.isJavaScriptFile(filesKeys[filesCompilationIndex])) {
+                            if (filesKeys.length > filesCompilationIndex &&
+                                utils.isJavaScriptFile(filesKeys[filesCompilationIndex])) {
                                 targetout = filesKeys[filesCompilationIndex];
                             }
-                            else if (filesKeys.length > filesCompilationIndex && target.files[filesKeys[filesCompilationIndex]].dest) {
-                                targetout = utils.getOrGetFirst(target.files[filesKeys[filesCompilationIndex]].dest);
+                            else if (filesKeys.length > filesCompilationIndex &&
+                                target.files[filesKeys[filesCompilationIndex]].dest) {
+                                targetout = utils.getOrGetFirst(
+                                // A dest array is meaningless in TypeScript, so just take
+                                // the first one.
+                                target.files[filesKeys[filesCompilationIndex]].dest);
                             }
                         }
                     }
@@ -306,7 +367,8 @@ function pluginFn(grunt) {
                     var starttime = new Date().getTime();
                     var endtime;
                     // Compile the files
-                    return compileModule.compileAllFiles(filesToCompile, target, options, currenttask.target, outFile).then(function (result) {
+                    return compileModule.compileAllFiles(filesToCompile, target, options, currenttask.target, outFile)
+                        .then(function (result) {
                         // End the timer
                         endtime = new Date().getTime();
                         grunt.log.writeln('');
@@ -356,7 +418,9 @@ function pluginFn(grunt) {
                         //   assume that emitted JS in spite of error codes implies type-only errors.
                         var isOnlyTypeErrors = !hasPreventEmitErrors;
                         if (hasTS7017Error) {
-                            grunt.log.writeln(('Note:  You may wish to enable the suppressImplicitAnyIndexErrors' + ' grunt-ts option to allow dynamic property access by index.  This will' + ' suppress TypeScript error TS7017.').magenta);
+                            grunt.log.writeln(('Note:  You may wish to enable the suppressImplicitAnyIndexErrors' +
+                                ' grunt-ts option to allow dynamic property access by index.  This will' +
+                                ' suppress TypeScript error TS7017.').magenta);
                         }
                         // Log error summary
                         if (level1ErrorCount + level5ErrorCount + nonEmitPreventingWarningCount > 0) {
@@ -367,13 +431,17 @@ function pluginFn(grunt) {
                                 grunt.log.write(('>> ').green);
                             }
                             if (level5ErrorCount > 0) {
-                                grunt.log.write(level5ErrorCount.toString() + ' compiler flag error' + (level5ErrorCount === 1 ? '' : 's') + '  ');
+                                grunt.log.write(level5ErrorCount.toString() + ' compiler flag error' +
+                                    (level5ErrorCount === 1 ? '' : 's') + '  ');
                             }
                             if (level1ErrorCount > 0) {
-                                grunt.log.write(level1ErrorCount.toString() + ' syntax error' + (level1ErrorCount === 1 ? '' : 's') + '  ');
+                                grunt.log.write(level1ErrorCount.toString() + ' syntax error' +
+                                    (level1ErrorCount === 1 ? '' : 's') + '  ');
                             }
                             if (nonEmitPreventingWarningCount > 0) {
-                                grunt.log.write(nonEmitPreventingWarningCount.toString() + ' non-emit-preventing type warning' + (nonEmitPreventingWarningCount === 1 ? '' : 's') + '  ');
+                                grunt.log.write(nonEmitPreventingWarningCount.toString() +
+                                    ' non-emit-preventing type warning' +
+                                    (nonEmitPreventingWarningCount === 1 ? '' : 's') + '  ');
                             }
                             grunt.log.writeln('');
                             if (isOnlyTypeErrors && !options.failOnTypeErrors) {
@@ -383,18 +451,23 @@ function pluginFn(grunt) {
                         }
                         // !!! To do: To really be confident that the build was actually successful,
                         //   we have to check timestamps of the generated files in the destination.
-                        var isSuccessfulBuild = (!isError || (isError && isOnlyTypeErrors && !options.failOnTypeErrors));
+                        var isSuccessfulBuild = (!isError ||
+                            (isError && isOnlyTypeErrors && !options.failOnTypeErrors));
                         if (isSuccessfulBuild) {
                             // Report successful build.
                             var time = (endtime - starttime) / 1000;
                             grunt.log.writeln('');
-                            grunt.log.writeln(('TypeScript compilation complete: ' + time.toFixed(2) + 's for ' + result.fileCount + ' typescript files').green);
+                            grunt.log.writeln(('TypeScript compilation complete: ' + time.toFixed(2) +
+                                's for ' + result.fileCount + ' typescript files').green);
                         }
                         else {
                             // Report unsuccessful build.
                             grunt.log.error(('Error: tsc return code: ' + result.code).yellow);
                         }
                         return isSuccessfulBuild;
+                    }).catch(function (err) {
+                        grunt.log.writeln(('Error: ' + err).red);
+                        return false;
                     });
                 }
                 // Find out which files to compile, codegen etc.
@@ -439,7 +512,8 @@ function pluginFn(grunt) {
                             varFunction: _.template(options.htmlVarTemplate),
                             htmlOutputTemplate: options.htmlOutputTemplate,
                             htmlOutDir: options.htmlOutDir,
-                            flatten: options.htmlOutDirFlatten
+                            flatten: options.htmlOutDirFlatten,
+                            eol: lineEndingToUse
                         };
                         var htmlFiles = grunt.file.expand(currenttask.data.html);
                         generatedFiles = _.map(htmlFiles, function (filename) { return html2tsModule.compileHTML(filename, html2tsOptions); });
@@ -455,7 +529,7 @@ function pluginFn(grunt) {
                             var templateCacheSrc = grunt.file.expand(currenttask.data.templateCache.src); // manual reinterpolation
                             var templateCacheDest = path.resolve(rawTargetConfig.templateCache.dest);
                             var templateCacheBasePath = path.resolve(rawTargetConfig.templateCache.baseUrl);
-                            templateCacheModule.generateTemplateCache(templateCacheSrc, templateCacheDest, templateCacheBasePath);
+                            templateCacheModule.generateTemplateCache(templateCacheSrc, templateCacheDest, templateCacheBasePath, lineEndingToUse);
                         }
                     }
                     ///// Reference File
@@ -463,7 +537,7 @@ function pluginFn(grunt) {
                     // Create a reference file if specified
                     if (!!referencePath) {
                         var result = timeIt(function () {
-                            return referenceModule.updateReferenceFile(filesToCompile.filter(function (f) { return !isReferenceFile(f); }), generatedFiles, referenceFile, referencePath);
+                            return referenceModule.updateReferenceFile(filesToCompile.filter(function (f) { return !isReferenceFile(f); }), generatedFiles, referenceFile, referencePath, lineEndingToUse);
                         });
                         if (result.it === true) {
                             grunt.log.writeln(('Updated reference file (' + result.time + 'ms).').green);
@@ -476,7 +550,7 @@ function pluginFn(grunt) {
                         amdLoaderModule.updateAmdLoader(referenceFile, referenceOrder, amdloaderFile, amdloaderPath, rawTargetConfig.outDir);
                     }
                     // Transform files as needed. Currently all of this logic in is one module
-                    transformers.transformFiles(filesToCompile, filesToCompile, rawTargetConfig, options);
+                    transformers.transformFiles(filesToCompile /*TODO: only unchanged files*/, filesToCompile, rawTargetConfig, options, lineEndingToUse);
                     // Return promise to compliation
                     if (options.compile) {
                         // Compile, if there are any files to compile!
@@ -497,7 +571,9 @@ function pluginFn(grunt) {
                 // Time (in ms) when last compile took place
                 var lastCompile = 0;
                 if (rawTargetConfig.files && rawTargetConfig.watch) {
-                    grunt.log.writeln(('WARNING: Use of "files" with "watch" in target ' + currenttask.target + ' is not supported in grunt-ts.  The "watch" will be ignored.  Use "src", or use grunt-contrib-watch' + ' if you really do need to use "files".').magenta);
+                    grunt.log.writeln(('WARNING: Use of "files" with "watch" in target ' + currenttask.target +
+                        ' is not supported in grunt-ts.  The "watch" will be ignored.  Use "src", or use grunt-contrib-watch' +
+                        ' if you really do need to use "files".').magenta);
                 }
                 // Watch a folder?
                 watch = rawTargetConfig.watch;
@@ -528,19 +604,23 @@ function pluginFn(grunt) {
                     // Log what we are doing
                     grunt.log.writeln(('Watching all TypeScript / Html files under : ' + watchpath).cyan);
                     // A file has been added/changed/deleted has occurred
-                    watcher.on('add', function (path) {
+                    watcher
+                        .on('add', function (path) {
                         handleFileEvent(path, '+++ added   ', true);
                         // Reset the time for last compile call
                         lastCompile = new Date().getTime();
-                    }).on('change', function (path) {
+                    })
+                        .on('change', function (path) {
                         handleFileEvent(path, '### changed ', true);
                         // Reset the time for last compile call
                         lastCompile = new Date().getTime();
-                    }).on('unlink', function (path) {
+                    })
+                        .on('unlink', function (path) {
                         handleFileEvent(path, '--- removed ');
                         // Reset the time for last compile call
                         lastCompile = new Date().getTime();
-                    }).on('error', function (error) {
+                    })
+                        .on('error', function (error) {
                         console.error('Error happened in chokidar: ', error);
                     });
                 }
@@ -566,25 +646,30 @@ function pluginFn(grunt) {
     function logBadConfigWithFiles(config, task, targetOpt) {
         if (config.files) {
             if (config.vs) {
-                grunt.log.writeln(('Warning: In task "' + task.target + '", either "files" or "vs" should be used - not both.').magenta);
+                grunt.log.writeln(('Warning: In task "' + task.target +
+                    '", either "files" or "vs" should be used - not both.').magenta);
                 return;
             }
             if (config.src) {
-                grunt.log.writeln(('Warning: In task "' + task.target + '", either "files" or "src" should be used - not both.').magenta);
+                grunt.log.writeln(('Warning: In task "' + task.target +
+                    '", either "files" or "src" should be used - not both.').magenta);
                 return;
             }
             if (config.out) {
-                grunt.log.writeln(('Warning: In task "' + task.target + '", either "files" or "out" should be used - not both.').magenta);
+                grunt.log.writeln(('Warning: In task "' + task.target +
+                    '", either "files" or "out" should be used - not both.').magenta);
                 return;
             }
             if (config.outDir) {
-                grunt.log.writeln(('Warning: In task "' + task.target + '", either "files" or "outDir" should be used - not both.').magenta);
+                grunt.log.writeln(('Warning: In task "' + task.target +
+                    '", either "files" or "outDir" should be used - not both.').magenta);
                 return;
             }
         }
         else {
             if (!config.src && !config.vs && targetOpt.compile) {
-                grunt.log.writeln(('Warning: In task "' + task.target + '", neither "files" nor "src" nor "vs" is specified.  Nothing will be compiled.').magenta);
+                grunt.log.writeln(('Warning: In task "' + task.target +
+                    '", neither "files" nor "src" nor "vs" is specified.  Nothing will be compiled.').magenta);
                 return;
             }
         }

@@ -60,15 +60,22 @@ A more extensive sample `Gruntfile.js` is available [here](https://github.com/Ty
 
 ## Support for tsc Switches
 
-Grunt-ts supports most `tsc` switches.  Click the link to cross-reference to the grunt-ts option.
+Grunt-ts provides explicit support for most `tsc` switches.  Any arbitrary switches can be passed to `tsc` via the [additionalFlags](#additionalflags) feature.
 
-|`tsc` switch|grunt-ts analogue|description|
+|`tsc` switch|name in grunt-ts|description|
 |:----:|:----:|:-----|
-| --declaration|[declaration](#declaration)|Generates a `.d.ts` definitions file for compiled TypeScript files|
+|--declaration|[declaration](#declaration)|Generates a `.d.ts` definitions file for compiled TypeScript files|
+|--emitDecoratorMetadata|[emitDecoratorMetadata](#emitdecoratormetadata)|Emit design-type metadata for decorated declarations in source|
+|--inlineSourceMap|[inlineSourceMap](#inlinesourcemap)|Emit a single file that includes source maps instead of emitting a separate `.js.map` file.|
+|--inlineSources|[inlineSources](#inlinesources)|Emit the TypeScript source alongside the sourcemaps within a single file; requires `--inlineSourceMap` to be set.|
+|--isolatedModules|[isolatedModules](#isolatedmodules)|Ensures that the output is safe to only emit single files by making cases that break single-file transpilation an error|
 |--mapRoot LOCATION|[mapRoot](#maproot)|Specifies the location where debugger should locate map files instead of generated locations.|
 |--module KIND|[module](#module)|Specify module style for code generation|
+|--newLine|[newLine](#newline)|Explicitly specify newline character (`CRLF` or `LF`); if omitted, uses OS default.|
+|--noEmit|[noEmit](#noemit)|Check, but do not emit JS, even in the absence of errors.|
+|--noEmitHelpers|[noEmitHelpers](#noemithelpers)|Do not generate custom helper functions like `__extends` in compiled output.|
 |--noImplicitAny|[noImplicitAny](#noimplicitany)|Warn on expressions and declarations with an implied `any` type.|
-|--noResolve|[noResolve](#noresolve)|Skip resolution and preprocessing (deprecated)|
+|--noResolve|[noResolve](#noresolve)|Do not add triple-slash references or module import targets to the compilation context.|
 |--out FILE|[out](#out)|Concatenate and emit output to a single file.|
 |--outDir DIRECTORY|[outDir](#outdir)|Redirect output structure to the directory.|
 |--preserveConstEnums|[preserveConstEnums](#preserveconstenums)|Const enums will be kept as enums in the emitted JS.|
@@ -85,18 +92,26 @@ For file ordering, look at [JavaScript Generation](#javascript-generation).
 
 |property|where to define|description|
 |:----|:----|:-----|
+|[additionalFlags](#additionalflags)|option|`string` - allows passing arbitrary strings to the compiler.  This is intended to enable compatibility with features not supported directly by grunt-ts.|
 |[comments](#comments)|option|`true`, `false` (default) - include comments in emitted JS.|
 |[compile](#compile)|option|`true` (default), `false` - compile TypeScript code.|
 |[compiler](#compiler)|option|`string` - path to custom compiler|
 |[declaration](#declaration)|option|`true`, `false` (default) - indicates that definition files should be emitted.|
+|[emitDecoratorMetadata](#emitdecoratormetadata)|option|`true`, `false` (default) - set to true to emit metadata for ES7 decorators|
 |[failOnTypeErrors](#failontypeerrors)|option|`true` (default), `false` - fail Grunt pipeline if there is a type error|
 |[fast](#fast)|option|`'watch'` (default), `'always'`, `'never'` - how to decide on a "fast" grunt-ts compile.|
 |[files](#files)|target|Sets of files to compile and optional output destination|
 |[html](#html)|target|`string` or `string[]` - glob to HTML templates|
 |[htmlModuleTemplate](#htmlmoduletemplate)|option|`string` - HTML template namespace|
 |[htmlVarTemplate](#htmlvartemplate)|option|`string` - HTML property name|
+|[inlineSourceMap](#inlinesourcemap)|option|`true`, `false` (default) Emit a single file that includes source maps instead of emitting a separate `.js.map` file; If enabled, will automatically enable `sourceMap`.|
+|[inlineSources](#inlinesources)|option|`true`, `false` (default) Emit the TypeScript source alongside the sourcemaps within a single file; If enabled, will automatically enable `inlineSourceMap` and `sourceMap`.|
+|[isolatedModules](#isolatedmodules)|option|`true`, `false` (default) Ensures that the output is safe to only emit single files by making cases that break single-file transpilation an error.|
 |[mapRoot](#maproot)|option|`string` - root for referencing `.js.map` files in JS|
 |[module](#module)|option|default to be nothing, If you want to set it you set it to either `'amd'` or `'commonjs'`|
+|[newLine](#newline)|option|`CRLF`, `LF`, `` (default) - If passed with a value, TypeScript will use the specified line endings.  Also affects grunt-ts transforms.|
+|[noEmit](#noemit)|option|`true`, `false` (default) - If passed as `true`, TypeScript will not emit even if it compiles cleanly|
+|[noEmitHelpers](#noemithelpers)|option|`true`, `false` (default) - If passed as `true`, TypeScript will not generate custom helper functions like `__extends` in compiled output|
 |[noImplicitAny](#noimplicitany)|option|`true`, `false` (default) - enable for stricter type checking|
 |[noResolve](#noresolve)|option|`true`, `false` (default) - for deprecated version of TypeScript|
 |[options](#grunt-ts-target-options)|target||
@@ -232,6 +247,10 @@ Specify this option if you do not want the lib.d.ts to be loaded by the TypeScri
 
 Passes the --out switch to `tsc`.  This will cause the emitted JavaScript to be concatenated to a single file if your code allows for that.
 
+Note - the sequence of concatenation when using namespaces (formerly called internal modules) is usually significant.  You can assist TypeScript to order the emitted JavaScript correctly by changing the sequence in which files appear in your glob.  For example, if you have `a.ts`, `b.ts`, and `c.ts` and use the glob `'*.ts`, the default would be for TypeScript to concatenate the files in alphabetical order.  If you needed the content from `b.ts` to appear first, and then the rest in alphabetical order, you could specify the glob like this: `['b.ts','*.ts']`.
+
+Note - the `out` feature should not be used in combination with `module` because the TypeScript compiler does not support concatenation of external modules; consider using a module bundler like WebPack, Browserify, or Require's r.js to concatenate external modules.
+
 ````javascript
 grunt.initConfig({
   ts: {
@@ -359,6 +378,22 @@ grunt.initConfig({
 
 ### grunt-ts target options
 
+#### additionalFlags
+
+Allows passing arbitrary strings to the compiler.  This is intended to enable compatibility with features not supported directly by grunt-ts.  The parameters will be passed exactly as-is with a space separating them from the previous switches.  It is possible to pass more than one switch with `additionalFlags` by separating them with spaces.
+
+````javascript
+grunt.initConfig({
+  ts: {
+    default: {
+      options: {
+        additionalFlags: '--autoFixBugs --gruntTs "is awesome!"'
+      }
+    }
+  }
+});
+````
+
 #### compile
 
 ````javascript
@@ -415,15 +450,6 @@ The `package.json` would look something like this for a legacy project:
 Note: It is safest to pin the exact TypeScript version (do not use `~` or `>`).
 
 
-
-#### noResolve
-
-````javascript
-true | false (default)
-````
-
-*Deprecated:* Grunt-ts supports passing this parameter to legacy versions of `tsc`.  It will pass `--noResolve` on the command line.
-
 #### comments
 
 ````javascript
@@ -442,24 +468,6 @@ grunt.initConfig({
 });
 ````
 
-#### removeComments
-
-````javascript
-true (default)| false
-````
-
-Removes comments in the emitted JavaScript if set to `true`.  Preserves comments if set to `false`.  Note that if `comments` and `removeComments` are both used, the value of `removeComments` will win; regardless, please don't do this as it is just confusing to everyone.
-
-````javascript
-grunt.initConfig({
-  ts: {
-    options: {
-      removeComments: false //preserves comments in output.
-    }
-  }
-});
-````
-
 #### declaration
 
 ````javascript
@@ -473,6 +481,24 @@ grunt.initConfig({
   ts: {
     options: {
       declaration: true
+    }
+  }
+});
+````
+
+#### emitDecoratorMetadata
+
+````javascript
+true | false (default)
+````
+
+Emit design-type metadata for decorated declarations in source.  This is only available in TypeScript 1.5 and higher.
+
+````javascript
+grunt.initConfig({
+  ts: {
+    options: {
+      emitDecoratorMetadata: true
     }
   }
 });
@@ -589,6 +615,67 @@ grunt.initConfig({
 });
 ````
 
+#### inlineSourceMap
+
+````javascript
+true | false (default)
+````
+
+When true, TypeScript will emit source maps inline at the bottom of each JS file, instead of emitting a separate `.js.map` file.  Note: specifying this option will automatically enable `sourceMap`.
+
+````javascript
+grunt.initConfig({
+  ts: {
+    default: {
+      options: {
+        inlineSourceMap: true
+      }
+    }
+  }
+});
+````
+
+#### inlineSources
+
+````javascript
+true | false (default)
+````
+
+When true, TypeScript will emit the TypeScript sources at the bottom of each JS file along with an inline sourcemap, instead of emitting source maps that reference an external `.ts` file.  Note: specifying this option will automatically enable both `sourceMap` and `inlineSourceMap`.
+
+````javascript
+grunt.initConfig({
+  ts: {
+    default: {
+      options: {
+        inlineSources: true
+      }
+    }
+  }
+});
+````
+
+#### isolatedModules
+
+````javascript
+true | false (default)
+````
+
+When true, makes scenarios that break single-file transpilation into an error.  See https://github.com/Microsoft/TypeScript/issues/2499 for more details.  If you are using TypeScript 1.5, and fast compilation, it is ideal to use this to take advantage of future compilation optimizations.
+
+````javascript
+grunt.initConfig({
+  ts: {
+    default: {
+      options: {
+        isolatedModules: true
+      }
+    }
+  }
+});
+````
+
+
 #### mapRoot
 
 Specifies the root for where `.js.map` sourcemap files should be referenced.  This is useful if you intend to move your `.js.map` files to a different location.  Leave this blank or omit entirely if the `.js.map` files will be deployed to the same folder as the corresponding `.js` files.  See also [sourceRoot](#sourceroot).
@@ -609,10 +696,10 @@ grunt.initConfig({
 #### module
 
 ````javascript
-"amd" (default) | "commonjs" | ""
+"amd" (default) | "commonjs" | "system" | "umd" | ""
 ````
 
-Specifies if TypeScript should emit AMD or CommonJS-style external modules.  Has no effect if internal modules are used.
+Specifies if TypeScript should emit AMD, CommonJS, SystemJS, or UMD-style external modules.  Has no effect if internal modules are used.  Note - this should not be used in combination with `out` because the TypeScript compiler does not support concatenation of external modules; consider using a module bundler like WebPack, Browserify, or Require's r.js to concatenate external modules.
 
 ````javascript
 grunt.initConfig({
@@ -620,6 +707,66 @@ grunt.initConfig({
     default: {
       options: {
         module: "amd"
+      }
+    }
+  }
+});
+````
+
+#### newLine
+
+````javascript
+"CRLF" | "LF" | "" (default)
+````
+
+Will force TypeScript to use the specified newline sequence.  Grunt-ts will also use this newline sequence for transforms.  If not specified, TypeScript and grunt-ts use the OS default.
+
+````javascript
+grunt.initConfig({
+  ts: {
+    default: {
+      options: {
+        newLine: "CRLF"
+      }
+    }
+  }
+});
+````
+
+#### noEmit
+
+````javascript
+true | false (default)
+````
+
+Set to true to pass `--noEmit` to the compiler.  If set to true, TypeScript will not emit JavaScript regardless of if the compile succeeds or fails.
+
+````javascript
+grunt.initConfig({
+  ts: {
+    default: {
+      options: {
+        noEmit: true
+      }
+    }
+  }
+});
+````
+
+#### noEmitHelpers
+
+````javascript
+true | false (default)
+````
+
+Set to true to pass `--noEmitHelpers` to the compiler.  If set to true, TypeScript will not emit JavaScript helper functions such as `__extends`.  This is for very advanced users who wish to provide their own implementation of the TypeScript runtime helper functions.
+
+````javascript
+grunt.initConfig({
+  ts: {
+    default: {
+      options: {
+        noEmitHelpers: true
       }
     }
   }
@@ -666,6 +813,24 @@ grunt.initConfig({
 });
 ````
 
+#### noResolve
+
+````javascript
+true | false (default)
+````
+
+Do not add triple-slash references or module import targets to the list of compiled files.
+
+````javascript
+grunt.initConfig({
+  ts: {
+    options: {
+      noResolve: true
+    }
+  }
+});
+````
+
 #### preserveConstEnums
 
 ````javascript
@@ -681,6 +846,24 @@ grunt.initConfig({
       options: {
         preserveConstEnums: true
       }
+    }
+  }
+});
+````
+
+#### removeComments
+
+````javascript
+true (default)| false
+````
+
+Removes comments in the emitted JavaScript if set to `true`.  Preserves comments if set to `false`.  Note that if `comments` and `removeComments` are both used, the value of `removeComments` will win; regardless, please don't do this as it is just confusing to everyone.
+
+````javascript
+grunt.initConfig({
+  ts: {
+    options: {
+      removeComments: false //preserves comments in output.
     }
   }
 });

@@ -24,7 +24,7 @@ export interface IReferences {
     after: string[];
 }
 
-export enum ReferenceOrder {
+export const enum ReferenceOrder {
     before,
     unordered,
     after
