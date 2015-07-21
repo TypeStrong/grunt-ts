@@ -18,9 +18,8 @@ function testFile(test, path: string, whitespaceDifferencesOK = false) {
       expected = expected.replace(/\s/g,'');
     }
 
-    test.equal(expected, actual, 'Actual did not match expected:' + grunt.util.linefeed +
-        actualFileName + grunt.util.linefeed +
-        expectedFileName);
+    test.equal(expected, actual, `Actual did not match expected.  Run this to compare:` +
+      `${grunt.util.linefeed}kdiff3 "${actualFileName}" "${expectedFileName}"`);
 }
 
 function assertFileDoesNotExist(test, path: string) {
@@ -40,9 +39,8 @@ function testExpectedFile(test, path: string, whitespaceDifferencesOK = false) {
       expected = expected.replace(/\s/g,'');
     }
 
-    test.equal(expected, actual, 'Actual did not match expected:' + grunt.util.linefeed +
-        actualFileName + grunt.util.linefeed +
-        expectedFileName);
+    test.equal(expected, actual, `Actual did not match expected.  Run this to compare:` +
+      `${grunt.util.linefeed}kdiff3 "${actualFileName}" "${expectedFileName}"`);
 }
 
 

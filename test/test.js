@@ -11,9 +11,8 @@ function testFile(test, path, whitespaceDifferencesOK) {
         actual = actual.replace(/\s/g, '');
         expected = expected.replace(/\s/g, '');
     }
-    test.equal(expected, actual, 'Actual did not match expected:' + grunt.util.linefeed +
-        actualFileName + grunt.util.linefeed +
-        expectedFileName);
+    test.equal(expected, actual, "Actual did not match expected.  Run this to compare:" +
+        (grunt.util.linefeed + "kdiff3 \"" + actualFileName + "\" \"" + expectedFileName + "\""));
 }
 function assertFileDoesNotExist(test, path) {
     var exists = grunt.file.exists(path);
@@ -28,9 +27,8 @@ function testExpectedFile(test, path, whitespaceDifferencesOK) {
         actual = actual.replace(/\s/g, '');
         expected = expected.replace(/\s/g, '');
     }
-    test.equal(expected, actual, 'Actual did not match expected:' + grunt.util.linefeed +
-        actualFileName + grunt.util.linefeed +
-        expectedFileName);
+    test.equal(expected, actual, "Actual did not match expected.  Run this to compare:" +
+        (grunt.util.linefeed + "kdiff3 \"" + actualFileName + "\" \"" + expectedFileName + "\""));
 }
 function testDirectory(test, folder, whitespaceDifferencesOK) {
     if (whitespaceDifferencesOK === void 0) { whitespaceDifferencesOK = false; }
