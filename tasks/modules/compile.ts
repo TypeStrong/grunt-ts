@@ -314,8 +314,14 @@ export function compileAllFiles(targetFiles: string[],
     fs.writeFileSync(tempfilename, args.join(' '));
 
     // Switch implementation if a test version of executeNode exists.
-    if (target.testExecute) {
-      executeNode = target.testExecute;
+    if ('testExecute' in target) {
+        if (_.isFunction(target.testExecute)) {
+            executeNode = target.testExecute;
+        } else {
+            let invalidTestExecuteError = 'Invalid testExecute node present on target "' + targetName +
+                '".  Value of testExecute must be a function.';
+            throw (new Error(invalidTestExecuteError));
+        }
     } else {
       // this is the normal path.
       executeNode = executeNodeDefault;
