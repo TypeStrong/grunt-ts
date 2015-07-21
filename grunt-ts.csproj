@@ -93,6 +93,9 @@
   <ItemGroup>
     <Content Include="docs\DisableVisualStudioBuild.md" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="tsconfig.json" />
+  </ItemGroup>
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
     <TypeScriptTarget>ES3</TypeScriptTarget>
   </PropertyGroup>
