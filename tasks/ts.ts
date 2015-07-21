@@ -259,6 +259,13 @@ function pluginFn(grunt: IGrunt) {
             options.noEmitHelpers = rawTargetOptions.noEmitHelpers || rawTaskOptions.noEmitHelpers;
             options.additionalFlags = utils.firstElementWithValue([rawTargetOptions.additionalFlags, rawTaskOptions.additionalFlags]);
 
+            options.sourceMap = utils.firstElementWithValue([options.sourceMap,
+                rawTargetOptions.sourceMap, rawTaskOptions.sourceMap]);
+            options.inlineSources = utils.firstElementWithValue([options.inlineSources,
+                rawTargetOptions.inlineSources, rawTaskOptions.inlineSources]);
+            options.inlineSourceMap = utils.firstElementWithValue([options.inlineSourceMap,
+                rawTargetOptions.inlineSourceMap, rawTaskOptions.inlineSourceMap]);
+
             // fix the improperly cased options to their appropriate values
             options.allowBool = 'allowbool' in options ?
               options['allowbool'] : options.allowBool;
@@ -335,13 +342,17 @@ function pluginFn(grunt: IGrunt) {
             }
             options.removeComments = !!options.removeComments;
 
-            if (options.inlineSources) {
+            if (options.inlineSources && !(options.inlineSourceMap || options.sourceMap)) {
+                // Assume inline source maps, if inline sources is enabled and the other settings are off.
                 options.inlineSourceMap = true;
             }
-            if (options.inlineSourceMap) {
-                options.sourceMap = true;
-            }
 
+            if (options.sourceMap && options.inlineSourceMap) {
+                grunt.log.writeln('WARNING: Option "sourceMap" and "inlineSourceMap" may not be used together.'.magenta);
+                grunt.log.writeln('Using inlineSourceMap only.'.magenta);
+                options.sourceMap = false;
+                options.inlineSourceMap = true;
+            }
 
             if (currenttask.files.length === 0 && rawTargetOptions.compile) {
                 grunt.log.writeln('Zero files found to compile in target "' + currenttask.target + '". Compilation will be skipped.');

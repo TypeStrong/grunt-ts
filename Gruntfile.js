@@ -654,6 +654,17 @@ module.exports = function (grunt) {
                 options: {
                     fast: 'never',
                     inlineSources: true,
+                    sourceMap: false
+                }
+            },
+            inlineSourceMapPassedWithSourceMap: {
+                test: true,
+                testExecute: commandLineAssertions.inlineSourceMapPassedWithSourceMap,
+                src: 'test/simple/ts/zoo.ts',
+                options: {
+                    fast: 'never',
+                    inlineSourceMap: true,
+                    sourceMap: true
                 }
             },
             inlineSourcesNotPassed: {

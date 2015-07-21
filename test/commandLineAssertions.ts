@@ -55,14 +55,40 @@ export var noEmitNotPassed : ICompilePromise = (strings, options) => {
 
 export var inlineSourcesPassed : ICompilePromise = (strings, options) => {
   return new Promise(function(resolve, reject) {
-    if (options.task.inlineSources === true && options.task.sourceMap === true) {
+      if (options.task.inlineSources === true &&
+          options.task.sourceMap === false &&
+          options.task.inlineSourceMap === true) {
       resolve({
         code: 0,
         output: ""
       });
-    }
-    throw "expected inlineSourcesPassed and sourceMap true";
+      }
+      let result = JSON.stringify({
+          inlineSources: options.task.inlineSources,
+          sourceMap: options.task.inlineSources,
+          inlineSourceMap: options.task.inlineSourceMap
+      });
+      throw "expected inlineSources and inlineSourceMap, but not sourceMap.  Got " + result;
   });
+};
+
+export var inlineSourceMapPassedWithSourceMap: ICompilePromise = (strings, options) => {
+    return new Promise(function (resolve, reject) {
+        if (options.task.inlineSources === false &&
+            options.task.sourceMap === false &&
+            options.task.inlineSourceMap === true) {
+            resolve({
+                code: 0,
+                output: ""
+            });
+        }
+        let result = JSON.stringify({
+            inlineSources: options.task.inlineSources,
+            sourceMap: options.task.inlineSources,
+            inlineSourceMap: options.task.inlineSourceMap
+        });
+        throw "expected inlineSourceMap only.  Got " + result;
+    });
 };
 
 export var inlineSourcesNotPassed : ICompilePromise = (strings, options) => {
@@ -72,9 +98,13 @@ export var inlineSourcesNotPassed : ICompilePromise = (strings, options) => {
         code: 0,
         output: ""
       });
-    }
-    throw "expected inlineSourcesPassed and sourceMap false.  Was " +
-      JSON.stringify([options.task.inlineSources,options.task.sourceMap]);
+      }
+    let result = JSON.stringify({
+        inlineSources: options.task.inlineSources,
+        sourceMap: options.task.inlineSources,
+        inlineSourceMap: options.task.inlineSourceMap
+    });
+    throw "expected inlineSourcesPassed and sourceMap false.  Got " + result;
   });
 };
 
