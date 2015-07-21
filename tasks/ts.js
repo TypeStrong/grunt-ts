@@ -217,6 +217,10 @@ function pluginFn(grunt) {
                 rawTargetOptions.inlineSources, rawTaskOptions.inlineSources]);
             options.inlineSourceMap = utils.firstElementWithValue([options.inlineSourceMap,
                 rawTargetOptions.inlineSourceMap, rawTaskOptions.inlineSourceMap]);
+            options.experimentalDecorators = utils.firstElementWithValue([options.experimentalDecorators,
+                rawTargetOptions.experimentalDecorators, rawTaskOptions.experimentalDecorators]);
+            options.emitDecoratorMetadata = utils.firstElementWithValue([options.emitDecoratorMetadata,
+                rawTargetOptions.emitDecoratorMetadata, rawTaskOptions.emitDecoratorMetadata]);
             // fix the improperly cased options to their appropriate values
             options.allowBool = 'allowbool' in options ?
                 options['allowbool'] : options.allowBool;
@@ -294,6 +298,9 @@ function pluginFn(grunt) {
                 grunt.log.writeln('Using inlineSourceMap only.'.magenta);
                 options.sourceMap = false;
                 options.inlineSourceMap = true;
+            }
+            if (options.emitDecoratorMetadata && !options.experimentalDecorators) {
+                options.experimentalDecorators = true;
             }
             if (currenttask.files.length === 0 && rawTargetOptions.compile) {
                 grunt.log.writeln('Zero files found to compile in target "' + currenttask.target + '". Compilation will be skipped.');

@@ -265,6 +265,10 @@ function pluginFn(grunt: IGrunt) {
                 rawTargetOptions.inlineSources, rawTaskOptions.inlineSources]);
             options.inlineSourceMap = utils.firstElementWithValue([options.inlineSourceMap,
                 rawTargetOptions.inlineSourceMap, rawTaskOptions.inlineSourceMap]);
+            options.experimentalDecorators = utils.firstElementWithValue([options.experimentalDecorators,
+                rawTargetOptions.experimentalDecorators, rawTaskOptions.experimentalDecorators]);
+            options.emitDecoratorMetadata = utils.firstElementWithValue([options.emitDecoratorMetadata,
+                rawTargetOptions.emitDecoratorMetadata, rawTaskOptions.emitDecoratorMetadata]);
 
             // fix the improperly cased options to their appropriate values
             options.allowBool = 'allowbool' in options ?
@@ -352,6 +356,10 @@ function pluginFn(grunt: IGrunt) {
                 grunt.log.writeln('Using inlineSourceMap only.'.magenta);
                 options.sourceMap = false;
                 options.inlineSourceMap = true;
+            }
+
+            if (options.emitDecoratorMetadata && !options.experimentalDecorators) {
+                options.experimentalDecorators = true;
             }
 
             if (currenttask.files.length === 0 && rawTargetOptions.compile) {

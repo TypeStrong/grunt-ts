@@ -5,13 +5,14 @@
 
 export var decoratorMetadataPassed : ICompilePromise = (strings, options) => {
   return new Promise(function(resolve, reject) {
-    if (options.task.emitDecoratorMetadata === true) {
+      if (options.task.emitDecoratorMetadata === true &&
+        options.task.experimentalDecorators === true) {
       resolve({
         code: 0,
         output: ""
       });
     }
-    throw "expected emitDecoratorMetadata === true";
+    throw "expected emitDecoratorMetadata === true and experimentalDecorators === true";
   });
 };
 
@@ -25,6 +26,18 @@ export var decoratorMetadataNotPassed : ICompilePromise = (strings, options) => 
     }
     throw "expected emitDecoratorMetadata === false";
   });
+};
+
+export var experimentalDecoratorsPassed: ICompilePromise = (strings, options) => {
+    return new Promise((resolve, reject) => {
+        if (options.task.experimentalDecorators === true) {
+            resolve({
+                code: 0,
+                output: ""
+            });
+        }
+        throw "expected experimentalDecorators === true";
+    });
 };
 
 export var noEmitPassed : ICompilePromise = (strings, options) => {

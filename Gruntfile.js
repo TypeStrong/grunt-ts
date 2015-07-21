@@ -621,6 +621,16 @@ module.exports = function (grunt) {
                     emitDecoratorMetadata: true,
                 }
             },
+            experimentalDecoratorsPassed: {
+                test: true,
+                testExecute: commandLineAssertions.experimentalDecoratorsPassed,
+                src: 'test/simple/ts/zoo.ts',
+                options: {
+                    fast: 'never',
+                    target: 'es6',
+                    experimentalDecorators: true,
+                }
+            },
             decoratorMetadataNotPassed: {
                 test: true,
                 testExecute: commandLineAssertions.decoratorMetadataNotPassed,

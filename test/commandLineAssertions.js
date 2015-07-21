@@ -3,13 +3,14 @@
 /// <reference path="../defs/csproj2ts/csproj2ts.d.ts" />
 exports.decoratorMetadataPassed = function (strings, options) {
     return new Promise(function (resolve, reject) {
-        if (options.task.emitDecoratorMetadata === true) {
+        if (options.task.emitDecoratorMetadata === true &&
+            options.task.experimentalDecorators === true) {
             resolve({
                 code: 0,
                 output: ""
             });
         }
-        throw "expected emitDecoratorMetadata === true";
+        throw "expected emitDecoratorMetadata === true and experimentalDecorators === true";
     });
 };
 exports.decoratorMetadataNotPassed = function (strings, options) {
@@ -21,6 +22,17 @@ exports.decoratorMetadataNotPassed = function (strings, options) {
             });
         }
         throw "expected emitDecoratorMetadata === false";
+    });
+};
+exports.experimentalDecoratorsPassed = function (strings, options) {
+    return new Promise(function (resolve, reject) {
+        if (options.task.experimentalDecorators === true) {
+            resolve({
+                code: 0,
+                output: ""
+            });
+        }
+        throw "expected experimentalDecorators === true";
     });
 };
 exports.noEmitPassed = function (strings, options) {
