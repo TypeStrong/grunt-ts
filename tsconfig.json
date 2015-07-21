@@ -7,8 +7,9 @@
         "noImplicitAny": false,
         "removeComments": false,
         "noLib": false,
-        "preserveConstEnums": true,
-        "suppressImplicitAnyIndexErrors": true
+        "preserveConstEnums": false,
+        "suppressImplicitAnyIndexErrors": true,
+        "sourceMap": true
     },
     "filesGlob": [
         "./defs/**/*.ts",
