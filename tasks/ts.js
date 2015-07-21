@@ -76,6 +76,7 @@ function pluginFn(grunt) {
             compile: true,
             declaration: false,
             emitDecoratorMetadata: false,
+            experimentalDecorators: false,
             mapRoot: '',
             module: null,
             noImplicitAny: false,

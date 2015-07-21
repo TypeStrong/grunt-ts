@@ -171,6 +171,9 @@ function compileAllFiles(targetFiles, target, task, targetName, outFile) {
     if (task.noEmitHelpers) {
         args.push('--noEmitHelpers');
     }
+    if (task.experimentalDecorators) {
+        args.push('--experimentalDecorators');
+    }
     // string options
     args.push('--target', task.target.toUpperCase());
     // check the module compile option

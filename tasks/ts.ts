@@ -101,6 +101,7 @@ function pluginFn(grunt: IGrunt) {
             compile: true,
             declaration: false,
             emitDecoratorMetadata: false,
+            experimentalDecorators: false,
             mapRoot: '',
             module: null,
             noImplicitAny: false,

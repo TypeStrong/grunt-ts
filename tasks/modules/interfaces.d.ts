@@ -32,6 +32,7 @@ interface ITaskOptions {
     /** Emit declarations*/
     declaration: boolean;
     emitDecoratorMetadata: boolean;
+    experimentalDecorators: boolean;
     mapRoot: string;
     /** amd | commonjs | umd | system  */
     module: string;
