@@ -30,3 +30,4 @@ obj/
 *.suo
 .project
 .settings/
+/.vs
