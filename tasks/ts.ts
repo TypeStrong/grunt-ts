@@ -352,8 +352,9 @@ function pluginFn(grunt: IGrunt) {
             }
 
             if (options.sourceMap && options.inlineSourceMap) {
-                grunt.log.writeln('WARNING: Option "sourceMap" and "inlineSourceMap" may not be used together.'.magenta);
-                grunt.log.writeln('Using inlineSourceMap only.'.magenta);
+                // todo: If the parameter reading code is ever rewritten, we should be able to tell if sourceMap
+                //  is on only because of the grunt-ts defaults.  At that time we should pass a warning if they're
+                //  both affirmatively enabled instead of just silently fixing.
                 options.sourceMap = false;
                 options.inlineSourceMap = true;
             }
