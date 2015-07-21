@@ -7,9 +7,7 @@
 Grunt-ts is an npm package that handles TypeScript compilation work in GruntJS build scripts.  It provides a [Grunt-compatible wrapper](#support-for-tsc-switches) for the `tsc` command-line compiler, and provides some [additional functionality](#grunt-ts-gruntfilejs-options) that improves the TypeScript development workflow. Grunt-ts even supports compiling against a [Visual Studio project](#vs) directly.  Grunt-ts is itself written in [TypeScript](./tasks/ts.ts).
 
 ### Latest Changes
-Current major release is v4.1.2, which includes TypeScript 1.4.  This is the best release for coding with ES5 syntax only.
-
-Current beta release is v4.2.0-beta.1, which includes TypeScript 1.5-beta and supports all currently available functionality from that release.  This release is stable enough for us to use it for grunt-ts itself.  If you want to start using ES6 syntax today (while transpiling down to ES5), this is the correct release to use.  We will keep this up to date (but marked as beta), until TypeScript 1.5 is officially released (hopefully in the next week or two).
+Current major release is v5, which includes TypeScript 1.5.
 
 [Full changelog is here](CHANGELOG.md).
 
@@ -62,6 +60,7 @@ Grunt-ts provides explicit support for most `tsc` switches.  Any arbitrary switc
 |:----:|:----:|:-----|
 |--declaration|[declaration](#declaration)|Generates a `.d.ts` definitions file for compiled TypeScript files|
 |--emitDecoratorMetadata|[emitDecoratorMetadata](#emitdecoratormetadata)|Emit design-type metadata for decorated declarations in source|
+|--experimentalDecorators|[experimentalDecorators](#experimentaldecorators)|Enables experimental support for ES7 decorators|
 |--inlineSourceMap|[inlineSourceMap](#inlinesourcemap)|Emit a single file that includes source maps instead of emitting a separate `.js.map` file.|
 |--inlineSources|[inlineSources](#inlinesources)|Emit the TypeScript source alongside the sourcemaps within a single file; requires `--inlineSourceMap` to be set.|
 |--isolatedModules|[isolatedModules](#isolatedmodules)|Ensures that the output is safe to only emit single files by making cases that break single-file transpilation an error|
@@ -93,7 +92,8 @@ For file ordering, look at [JavaScript Generation](#javascript-generation).
 |[compile](#compile)|option|`true` (default), `false` - compile TypeScript code.|
 |[compiler](#compiler)|option|`string` - path to custom compiler|
 |[declaration](#declaration)|option|`true`, `false` (default) - indicates that definition files should be emitted.|
-|[emitDecoratorMetadata](#emitdecoratormetadata)|option|`true`, `false` (default) - set to true to emit metadata for ES7 decorators|
+|[emitDecoratorMetadata](#emitdecoratormetadata)|option|`true`, `false` (default) - set to true to emit metadata for ES7 decorators (will enable experimentalDecorators)|
+|[experimentalDecorators](#experimentaldecorators)|option|`true`, `false` (default) - set to true to enable support for ES7 decorators|
 |[failOnTypeErrors](#failontypeerrors)|option|`true` (default), `false` - fail Grunt pipeline if there is a type error|
 |[fast](#fast)|option|`'watch'` (default), `'always'`, `'never'` - how to decide on a "fast" grunt-ts compile.|
 |[files](#files)|target|Sets of files to compile and optional output destination|
@@ -488,13 +488,31 @@ grunt.initConfig({
 true | false (default)
 ````
 
-Emit design-type metadata for decorated declarations in source.  This is only available in TypeScript 1.5 and higher.
+Emit design-type metadata for decorated declarations in source.  This is only available in TypeScript 1.5 and higher.  Will automatically enable `experimentalDecorators`.
 
 ````javascript
 grunt.initConfig({
   ts: {
     options: {
       emitDecoratorMetadata: true
+    }
+  }
+});
+````
+
+#### experimentalDecorators
+
+````javascript
+true | false (default)
+````
+
+Enable support for experimental ES7 decorators.  This is only available in TypeScript 1.5 and higher.
+
+````javascript
+grunt.initConfig({
+  ts: {
+    options: {
+      experimentalDecorators: true
     }
   }
 });
@@ -617,7 +635,7 @@ grunt.initConfig({
 true | false (default)
 ````
 
-When true, TypeScript will emit source maps inline at the bottom of each JS file, instead of emitting a separate `.js.map` file.  Note: specifying this option will automatically enable `sourceMap`.
+When true, TypeScript will emit source maps inline at the bottom of each JS file, instead of emitting a separate `.js.map` file.  If this option is used with `sourceMap`, `inlineSourceMap` will win.
 
 ````javascript
 grunt.initConfig({
@@ -637,14 +655,15 @@ grunt.initConfig({
 true | false (default)
 ````
 
-When true, TypeScript will emit the TypeScript sources at the bottom of each JS file along with an inline sourcemap, instead of emitting source maps that reference an external `.ts` file.  Note: specifying this option will automatically enable both `sourceMap` and `inlineSourceMap`.
+When true, TypeScript will emit TypeScript sources "inline".  This *must* be used with either `inlineSourceMap` or `sourceMap`.  When used with `inlineSourceMap`, the TypeScript sources and the source map itself are included in a  Base64-encoded string in a comment at the end of the emitted JavaScript file.  When used with `sourceMap`, the escaped TypeScript sources are included in the .js.map file itself under a `sourcesContent` property.
 
 ````javascript
 grunt.initConfig({
   ts: {
     default: {
       options: {
-        inlineSources: true
+        inlineSources: true,
+        inlineSourceMap: true
       }
     }
   }
@@ -871,7 +890,7 @@ grunt.initConfig({
 true (default) | false
 ````
 
-If true, grunt-ts will instruct `tsc` to emit source maps (`.js.map` files).
+If true, grunt-ts will instruct `tsc` to emit source maps (`.js.map` files).  If this option is used with `inlineSourceMap`, `inlineSourceMap` will win.
 
 ````javascript
 grunt.initConfig({
