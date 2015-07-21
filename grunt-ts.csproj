@@ -70,6 +70,7 @@
     <TypeScriptCompile Include="tasks\modules\transformers.ts" />
     <TypeScriptCompile Include="tasks\modules\utils.ts" />
     <TypeScriptCompile Include="tasks\ts.ts" />
+    <TypeScriptCompile Include="test\commandLineAssertions.ts" />
     <TypeScriptCompile Include="test\test.ts" />
   </ItemGroup>
   <ItemGroup>
