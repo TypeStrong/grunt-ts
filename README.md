@@ -7,7 +7,7 @@
 Grunt-ts is an npm package that handles TypeScript compilation work in GruntJS build scripts.  It provides a [Grunt-compatible wrapper](#support-for-tsc-switches) for the `tsc` command-line compiler, and provides some [additional functionality](#grunt-ts-gruntfilejs-options) that improves the TypeScript development workflow. Grunt-ts even supports compiling against a [Visual Studio project](#vs) directly.  Grunt-ts is itself written in [TypeScript](./tasks/ts.ts).
 
 ### Latest Changes
-Current major release is v5, which includes TypeScript 1.5.
+Current major release is 4.2, which includes TypeScript 1.5.
 
 [Full changelog is here](CHANGELOG.md).
 
