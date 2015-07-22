@@ -10,16 +10,12 @@ import cache = require('./cacheUtils');
 var Promise = require('es6-promise').Promise;
 export var grunt: IGrunt = require('grunt');
 
-export interface ICompileResult {
-    code: number;
-    output: string;
-    fileCount?: number;
-}
-
 ///////////////////////////
 // Helper
 ///////////////////////////
-function executeNode(args: string[]): Promise<ICompileResult> {
+
+var executeNode: ICompilePromise;
+var executeNodeDefault : ICompilePromise = function(args, optionalInfo) {
     return new Promise((resolve, reject) => {
         grunt.util.spawn({
             cmd: process.execPath,
@@ -33,7 +29,7 @@ function executeNode(args: string[]): Promise<ICompileResult> {
                 resolve(ret);
             });
     });
-}
+};
 
 /////////////////////////////////////////////////////////////////
 // Fast Compilation
@@ -167,6 +163,9 @@ export function compileAllFiles(targetFiles: string[],
     if (task.sourceMap) {
         args.push('--sourcemap');
     }
+    if (task.emitDecoratorMetadata) {
+        args.push('--emitDecoratorMetadata');
+    }
     if (task.declaration) {
         args.push('--declaration');
     }
@@ -188,21 +187,42 @@ export function compileAllFiles(targetFiles: string[],
     if (task.suppressImplicitAnyIndexErrors) {
         args.push('--suppressImplicitAnyIndexErrors');
     }
+    if (task.noEmit) {
+        args.push('--noEmit');
+    }
+    if (task.inlineSources) {
+        args.push('--inlineSources');
+    }
+    if (task.inlineSourceMap) {
+        args.push('--inlineSourceMap');
+    }
+    if (task.newLine && !utils.newLineIsRedundant(task.newLine)) {
+        args.push('--newLine', task.newLine);
+    }
+    if (task.isolatedModules) {
+        args.push('--isolatedModules');
+    }
+    if (task.noEmitHelpers) {
+        args.push('--noEmitHelpers');
+    }
+    if (task.experimentalDecorators) {
+        args.push('--experimentalDecorators');
+    }
 
     // string options
     args.push('--target', task.target.toUpperCase());
 
     // check the module compile option
     if (task.module) {
-   	    var moduleOptionString: string = task.module.toLowerCase();
-    	if (moduleOptionString === 'amd' || moduleOptionString === 'commonjs') {
+   	  let moduleOptionString: string = ('' + task.module).toLowerCase();
+    	if ('amd|commonjs|system|umd'.indexOf(moduleOptionString) > -1) {
             args.push('--module', moduleOptionString);
     	} else {
-	        console.warn('WARNING: Option "module" does only support "amd" | "commonjs"'.magenta);
+	        console.warn('WARNING: Option "module" only supports "amd" | "commonjs" | "system" | "umd" '.magenta);
     	}
     }
 
-    var theOutDir : string = null;
+    let theOutDir : string = null;
     if (target.outDir) {
         if (target.out) {
             console.warn('WARNING: Option "out" and "outDir" should not be used together'.magenta);
@@ -224,8 +244,6 @@ export function compileAllFiles(targetFiles: string[],
     } else if (target.out) {
         args.push('--out', target.out);
     }
-
-
 
     if (target.dest && (!target.out) && (!target.outDir)) {
         if (utils.isJavaScriptFile(target.dest)) {
@@ -252,6 +270,12 @@ export function compileAllFiles(targetFiles: string[],
         }
     }
 
+    if (args.indexOf('--out') > -1 && args.indexOf('--module') > -1) {
+        console.warn(('WARNING: TypeScript does not allow external modules to be concatenated with' +
+        ' --out. Any exported code may be truncated.  See TypeScript issue #1544 for' +
+        ' more details.').magenta);
+    }
+
     if (task.sourceRoot) {
         args.push('--sourceRoot', task.sourceRoot);
     }
@@ -259,8 +283,12 @@ export function compileAllFiles(targetFiles: string[],
         args.push('--mapRoot', task.mapRoot);
     }
 
+    if (task.additionalFlags) {
+        args.push(task.additionalFlags);
+    }
+
     // Locate a compiler
-    var tsc: string;
+    let tsc: string;
     if (task.compiler) { // Custom compiler (task.compiler)
         grunt.log.writeln('Using the custom compiler : ' + task.compiler);
         tsc = task.compiler;
@@ -278,15 +306,29 @@ export function compileAllFiles(targetFiles: string[],
 
     // Create a temp last command file and use that to guide tsc.
     // Reason: passing all the files on the command line causes TSC to go in an infinite loop.
-    var tempfilename = utils.getTempFile('tscommand');
+    let tempfilename = utils.getTempFile('tscommand');
     if (!tempfilename) {
         throw (new Error('cannot create temp file'));
     }
 
     fs.writeFileSync(tempfilename, args.join(' '));
 
+    // Switch implementation if a test version of executeNode exists.
+    if ('testExecute' in target) {
+        if (_.isFunction(target.testExecute)) {
+            executeNode = target.testExecute;
+        } else {
+            let invalidTestExecuteError = 'Invalid testExecute node present on target "' + targetName +
+                '".  Value of testExecute must be a function.';
+            throw (new Error(invalidTestExecuteError));
+        }
+    } else {
+      // this is the normal path.
+      executeNode = executeNodeDefault;
+    }
+
     // Execute command
-    return executeNode([tsc, '@' + tempfilename]).then((result: ICompileResult) => {
+    return executeNode([tsc, '@' + tempfilename], {target: target, task: task}).then((result: ICompileResult) => {
 
         if (task.fast !== 'never' && result.code === 0) {
             resetChangedFiles(newFiles, targetName);
@@ -300,7 +342,8 @@ export function compileAllFiles(targetFiles: string[],
 
         return Promise.cast(result);
     }, (err) => {
-            fs.unlinkSync(tempfilename);
-            throw err;
-        });
+        fs.unlinkSync(tempfilename);
+        throw err;
+    });
+
 }

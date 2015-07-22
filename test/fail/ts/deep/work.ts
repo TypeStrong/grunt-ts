@@ -1,4 +1,4 @@
-﻿///ts:import=nonexistent
+///ts:import=nonexistent
 /// No file or directory matched name "nonexistent" ///ts:import:generated
 
 module Simple1 {

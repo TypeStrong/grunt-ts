@@ -10,7 +10,8 @@ exports.grunt = require('grunt');
 ///////////////////////////
 // Helper
 ///////////////////////////
-function executeNode(args) {
+var executeNode;
+var executeNodeDefault = function (args, optionalInfo) {
     return new Promise(function (resolve, reject) {
         exports.grunt.util.spawn({
             cmd: process.execPath,
@@ -24,7 +25,7 @@ function executeNode(args) {
             resolve(ret);
         });
     });
-}
+};
 /////////////////////////////////////////////////////////////////
 // Fast Compilation
 /////////////////////////////////////////////////////////////////
@@ -128,6 +129,9 @@ function compileAllFiles(targetFiles, target, task, targetName, outFile) {
     if (task.sourceMap) {
         args.push('--sourcemap');
     }
+    if (task.emitDecoratorMetadata) {
+        args.push('--emitDecoratorMetadata');
+    }
     if (task.declaration) {
         args.push('--declaration');
     }
@@ -149,16 +153,37 @@ function compileAllFiles(targetFiles, target, task, targetName, outFile) {
     if (task.suppressImplicitAnyIndexErrors) {
         args.push('--suppressImplicitAnyIndexErrors');
     }
+    if (task.noEmit) {
+        args.push('--noEmit');
+    }
+    if (task.inlineSources) {
+        args.push('--inlineSources');
+    }
+    if (task.inlineSourceMap) {
+        args.push('--inlineSourceMap');
+    }
+    if (task.newLine && !utils.newLineIsRedundant(task.newLine)) {
+        args.push('--newLine', task.newLine);
+    }
+    if (task.isolatedModules) {
+        args.push('--isolatedModules');
+    }
+    if (task.noEmitHelpers) {
+        args.push('--noEmitHelpers');
+    }
+    if (task.experimentalDecorators) {
+        args.push('--experimentalDecorators');
+    }
     // string options
     args.push('--target', task.target.toUpperCase());
     // check the module compile option
     if (task.module) {
-        var moduleOptionString = task.module.toLowerCase();
-        if (moduleOptionString === 'amd' || moduleOptionString === 'commonjs') {
+        var moduleOptionString = ('' + task.module).toLowerCase();
+        if ('amd|commonjs|system|umd'.indexOf(moduleOptionString) > -1) {
             args.push('--module', moduleOptionString);
         }
         else {
-            console.warn('WARNING: Option "module" does only support "amd" | "commonjs"'.magenta);
+            console.warn('WARNING: Option "module" only supports "amd" | "commonjs" | "system" | "umd" '.magenta);
         }
     }
     var theOutDir = null;
@@ -189,13 +214,18 @@ function compileAllFiles(targetFiles, target, task, targetName, outFile) {
         }
         else {
             if (target.dest === 'src') {
-                console.warn(('WARNING: Destination for target "' + targetName + '" is "src", which is the default.  If you have' + ' forgotten to specify a "dest" parameter, please add it.  If this is correct, you may wish' + ' to change the "dest" parameter to "src/" or just ignore this warning.').magenta);
+                console.warn(('WARNING: Destination for target "' + targetName + '" is "src", which is the default.  If you have' +
+                    ' forgotten to specify a "dest" parameter, please add it.  If this is correct, you may wish' +
+                    ' to change the "dest" parameter to "src/" or just ignore this warning.').magenta);
             }
             if (Array.isArray(target.dest)) {
                 if (target.dest.length === 0) {
                 }
                 else if (target.dest.length > 0) {
-                    console.warn((('WARNING: "dest" for target "' + targetName + '" is an array.  This is not supported by the' + ' TypeScript compiler or grunt-ts.' + ((target.dest.length > 1) ? '  Only the first "dest" will be used.  The' + ' remaining items will be truncated.' : ''))).magenta);
+                    console.warn((('WARNING: "dest" for target "' + targetName + '" is an array.  This is not supported by the' +
+                        ' TypeScript compiler or grunt-ts.' +
+                        ((target.dest.length > 1) ? '  Only the first "dest" will be used.  The' +
+                            ' remaining items will be truncated.' : ''))).magenta);
                     args.push('--outDir', target.dest[0]);
                 }
             }
@@ -204,11 +234,19 @@ function compileAllFiles(targetFiles, target, task, targetName, outFile) {
             }
         }
     }
+    if (args.indexOf('--out') > -1 && args.indexOf('--module') > -1) {
+        console.warn(('WARNING: TypeScript does not allow external modules to be concatenated with' +
+            ' --out. Any exported code may be truncated.  See TypeScript issue #1544 for' +
+            ' more details.').magenta);
+    }
     if (task.sourceRoot) {
         args.push('--sourceRoot', task.sourceRoot);
     }
     if (task.mapRoot) {
         args.push('--mapRoot', task.mapRoot);
+    }
+    if (task.additionalFlags) {
+        args.push(task.additionalFlags);
     }
     // Locate a compiler
     var tsc;
@@ -233,8 +271,23 @@ function compileAllFiles(targetFiles, target, task, targetName, outFile) {
         throw (new Error('cannot create temp file'));
     }
     fs.writeFileSync(tempfilename, args.join(' '));
+    // Switch implementation if a test version of executeNode exists.
+    if ('testExecute' in target) {
+        if (_.isFunction(target.testExecute)) {
+            executeNode = target.testExecute;
+        }
+        else {
+            var invalidTestExecuteError = 'Invalid testExecute node present on target "' + targetName +
+                '".  Value of testExecute must be a function.';
+            throw (new Error(invalidTestExecuteError));
+        }
+    }
+    else {
+        // this is the normal path.
+        executeNode = executeNodeDefault;
+    }
     // Execute command
-    return executeNode([tsc, '@' + tempfilename]).then(function (result) {
+    return executeNode([tsc, '@' + tempfilename], { target: target, task: task }).then(function (result) {
         if (task.fast !== 'never' && result.code === 0) {
             resetChangedFiles(newFiles, targetName);
         }

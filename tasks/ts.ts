@@ -100,8 +100,10 @@ function pluginFn(grunt: IGrunt) {
             allowImportModule: false,
             compile: true,
             declaration: false,
+            emitDecoratorMetadata: false,
+            experimentalDecorators: false,
             mapRoot: '',
-            module: null, // amd, commonjs
+            module: null,
             noImplicitAny: false,
             noResolve: false,
             comments: null, // false to remove comments
@@ -120,7 +122,14 @@ function pluginFn(grunt: IGrunt) {
             failOnTypeErrors: true,
             noEmitOnError: false,
             preserveConstEnums: false,
-            suppressImplicitAnyIndexErrors: false
+            suppressImplicitAnyIndexErrors: false,
+            noEmit: false,
+            inlineSources: false,
+            inlineSourceMap: false,
+            newLine: utils.eol,
+            isolatedModules: false,
+            noEmitHelpers: false,
+            additionalFlags: ''
         });
 
         // get unprocessed templates from configuration
@@ -129,6 +138,7 @@ function pluginFn(grunt: IGrunt) {
         var rawTargetOptions = <ITaskOptions>(grunt.config.getRaw(currenttask.name + '.' + currenttask.target + '.options') || {});
 
         var vs: IVisualStudioProjectSupport = getVSSettings(rawTargetConfig);
+
         if (vs) {
             csproj2ts.getTypeScriptSettings({
                 ProjectFileName: vs.project,
@@ -186,6 +196,7 @@ function pluginFn(grunt: IGrunt) {
 
                 options.sourceMap = utils.firstElementWithValue([vsProjectTypeScriptSettings.SourceMap,
                     options.sourceMap]);
+
                 options.sourceRoot = utils.firstElementWithValue([vsProjectTypeScriptSettings.SourceRoot,
                     options.sourceRoot]);
                 options.suppressImplicitAnyIndexErrors = utils.firstElementWithValue([vsProjectTypeScriptSettings.SuppressImplicitAnyIndexErrors,
@@ -232,15 +243,55 @@ function pluginFn(grunt: IGrunt) {
             }
 
             options.htmlOutputTemplate = rawTargetOptions.htmlOutputTemplate || rawTaskOptions.htmlOutputTemplate;
+            var lineEndingToUse = utils.newLineParameterAsActual(rawTargetOptions.newLine) ||
+              utils.newLineParameterAsActual(rawTaskOptions.newLine) ||
+              utils.eol;
+
+            options.newLine = rawTargetOptions.newLine || rawTaskOptions.newLine ||
+              utils.newLineActualAsParameter(utils.eol);
+
             options.htmlModuleTemplate = rawTargetOptions.htmlModuleTemplate || rawTaskOptions.htmlModuleTemplate;
             options.htmlVarTemplate = rawTargetOptions.htmlVarTemplate || rawTaskOptions.htmlVarTemplate;
             options.htmlOutDir = rawTargetConfig.htmlOutDir;
             options.htmlOutDirFlatten = rawTargetConfig.htmlOutDirFlatten;
 
-            // fix the properly cased options to their appropriate values
-            options.allowBool = 'allowbool' in options ? options['allowbool'] : options.allowBool;
-            options.allowImportModule = 'allowimportmodule' in options ? options['allowimportmodule'] : options.allowImportModule;
-            options.sourceMap = 'sourcemap' in options ? options['sourcemap'] : options.sourceMap;
+            options.isolatedModules = rawTargetOptions.isolatedModules || rawTaskOptions.isolatedModules;
+            options.noEmitHelpers = rawTargetOptions.noEmitHelpers || rawTaskOptions.noEmitHelpers;
+            options.additionalFlags = utils.firstElementWithValue([rawTargetOptions.additionalFlags, rawTaskOptions.additionalFlags]);
+
+            options.sourceMap = utils.firstElementWithValue([options.sourceMap,
+                rawTargetOptions.sourceMap, rawTaskOptions.sourceMap]);
+            options.inlineSources = utils.firstElementWithValue([options.inlineSources,
+                rawTargetOptions.inlineSources, rawTaskOptions.inlineSources]);
+            options.inlineSourceMap = utils.firstElementWithValue([options.inlineSourceMap,
+                rawTargetOptions.inlineSourceMap, rawTaskOptions.inlineSourceMap]);
+            options.experimentalDecorators = utils.firstElementWithValue([options.experimentalDecorators,
+                rawTargetOptions.experimentalDecorators, rawTaskOptions.experimentalDecorators]);
+            options.emitDecoratorMetadata = utils.firstElementWithValue([options.emitDecoratorMetadata,
+                rawTargetOptions.emitDecoratorMetadata, rawTaskOptions.emitDecoratorMetadata]);
+
+            // fix the improperly cased options to their appropriate values
+            options.allowBool = 'allowbool' in options ?
+              options['allowbool'] : options.allowBool;
+            options.allowImportModule = 'allowimportmodule' in options ?
+              options['allowimportmodule'] : options.allowImportModule;
+            options.sourceMap = 'sourcemap' in options ?
+              options['sourcemap'] : options.sourceMap;
+            options.emitDecoratorMetadata = 'emitdecoratormetadata' in options ?
+              options['emitdecoratormetadata'] : options.emitDecoratorMetadata;
+            options.noEmit = 'noemit' in options ?
+              options['noemit'] : options.noEmit;
+            options.inlineSources = 'inlinesources' in options ?
+              options['inlinesources'] : options.inlineSources;
+            options.inlineSourceMap = 'inlinesourcemap' in options ?
+              options['inlinesourcemap'] : options.inlineSourceMap;
+            options.isolatedModules = 'isolatedmodules' in options ?
+              options['isolatedmodules'] : options.isolatedModules;
+            options.noEmitHelpers = 'noemithelpers' in options ?
+              options['noemithelpers'] : options.noEmitHelpers;
+            options.additionalFlags = 'additionalflags' in options ?
+              options['additionalflags'] : options.additionalFlags;
+
 
             // Warn the user of invalid values
             if (options.fast !== 'watch' && options.fast !== 'always' && options.fast !== 'never') {
@@ -295,6 +346,22 @@ function pluginFn(grunt: IGrunt) {
             }
             options.removeComments = !!options.removeComments;
 
+            if (options.inlineSources && !(options.inlineSourceMap || options.sourceMap)) {
+                // Assume inline source maps, if inline sources is enabled and the other settings are off.
+                options.inlineSourceMap = true;
+            }
+
+            if (options.sourceMap && options.inlineSourceMap) {
+                // todo: If the parameter reading code is ever rewritten, we should be able to tell if sourceMap
+                //  is on only because of the grunt-ts defaults.  At that time we should pass a warning if they're
+                //  both affirmatively enabled instead of just silently fixing.
+                options.sourceMap = false;
+                options.inlineSourceMap = true;
+            }
+
+            if (options.emitDecoratorMetadata && !options.experimentalDecorators) {
+                options.experimentalDecorators = true;
+            }
 
             if (currenttask.files.length === 0 && rawTargetOptions.compile) {
                 grunt.log.writeln('Zero files found to compile in target "' + currenttask.target + '". Compilation will be skipped.');
@@ -394,7 +461,7 @@ function pluginFn(grunt: IGrunt) {
 
                     // Compile the files
                     return compileModule.compileAllFiles(filesToCompile, target, options, currenttask.target, outFile)
-                        .then((result: compileModule.ICompileResult) => {
+                        .then((result: ICompileResult) => {
                         // End the timer
                         endtime = new Date().getTime();
 
@@ -493,7 +560,7 @@ function pluginFn(grunt: IGrunt) {
 
                         if (isSuccessfulBuild) {
                             // Report successful build.
-                            var time = (endtime - starttime) / 1000;
+                            let time = (endtime - starttime) / 1000;
                             grunt.log.writeln('');
                             grunt.log.writeln(('TypeScript compilation complete: ' + time.toFixed(2) +
                                 's for ' + result.fileCount + ' typescript files').green);
@@ -503,6 +570,9 @@ function pluginFn(grunt: IGrunt) {
                         }
 
                         return isSuccessfulBuild;
+                    }).catch(function(err) {
+                      grunt.log.writeln(('Error: ' + err).red);
+                      return false;
                     });
                 }
 
@@ -548,15 +618,16 @@ function pluginFn(grunt: IGrunt) {
                     //    compile html files must be before reference file creation
                     var generatedFiles = [];
                     if (currenttask.data.html) {
-                        var html2tsOptions = {
+                        let html2tsOptions : html2tsModule.IHtml2TSOptions = {
                             moduleFunction: _.template(options.htmlModuleTemplate),
                             varFunction: _.template(options.htmlVarTemplate),
                             htmlOutputTemplate: options.htmlOutputTemplate,
                             htmlOutDir: options.htmlOutDir,
-                            flatten: options.htmlOutDirFlatten
+                            flatten: options.htmlOutDirFlatten,
+                            eol: lineEndingToUse
                         };
 
-                        var htmlFiles = grunt.file.expand(currenttask.data.html);
+                        let htmlFiles = grunt.file.expand(currenttask.data.html);
                         generatedFiles = _.map(htmlFiles, (filename) => html2tsModule.compileHTML(filename, html2tsOptions));
                     }
 
@@ -568,10 +639,10 @@ function pluginFn(grunt: IGrunt) {
                             grunt.log.writeln('templateCache : src, dest, baseUrl must be specified if templateCache option is used'.red);
                         }
                         else {
-                            var templateCacheSrc = grunt.file.expand(currenttask.data.templateCache.src); // manual reinterpolation
-                            var templateCacheDest = path.resolve(rawTargetConfig.templateCache.dest);
-                            var templateCacheBasePath = path.resolve(rawTargetConfig.templateCache.baseUrl);
-                            templateCacheModule.generateTemplateCache(templateCacheSrc, templateCacheDest, templateCacheBasePath);
+                            let templateCacheSrc = grunt.file.expand(currenttask.data.templateCache.src); // manual reinterpolation
+                            let templateCacheDest = path.resolve(rawTargetConfig.templateCache.dest);
+                            let templateCacheBasePath = path.resolve(rawTargetConfig.templateCache.baseUrl);
+                            templateCacheModule.generateTemplateCache(templateCacheSrc, templateCacheDest, templateCacheBasePath, lineEndingToUse);
                         }
                     }
 
@@ -581,7 +652,7 @@ function pluginFn(grunt: IGrunt) {
                     if (!!referencePath) {
                         var result = timeIt(() => {
                             return referenceModule.updateReferenceFile(
-                                filesToCompile.filter(f => !isReferenceFile(f)), generatedFiles, referenceFile, referencePath);
+                                filesToCompile.filter(f => !isReferenceFile(f)), generatedFiles, referenceFile, referencePath, lineEndingToUse);
                         });
                         if (result.it === true) {
                             grunt.log.writeln(('Updated reference file (' + result.time + 'ms).').green);
@@ -597,7 +668,8 @@ function pluginFn(grunt: IGrunt) {
                     }
 
                     // Transform files as needed. Currently all of this logic in is one module
-                    transformers.transformFiles(filesToCompile/*TODO: only unchanged files*/, filesToCompile, rawTargetConfig, options);
+                    transformers.transformFiles(filesToCompile /*TODO: only unchanged files*/,
+                      filesToCompile, rawTargetConfig, options, lineEndingToUse);
 
                     // Return promise to compliation
                     if (options.compile) {

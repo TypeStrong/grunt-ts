@@ -70,6 +70,7 @@
     <TypeScriptCompile Include="tasks\modules\transformers.ts" />
     <TypeScriptCompile Include="tasks\modules\utils.ts" />
     <TypeScriptCompile Include="tasks\ts.ts" />
+    <TypeScriptCompile Include="test\commandLineAssertions.ts" />
     <TypeScriptCompile Include="test\test.ts" />
   </ItemGroup>
   <ItemGroup>
@@ -92,6 +93,9 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="docs\DisableVisualStudioBuild.md" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="tsconfig.json" />
   </ItemGroup>
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
     <TypeScriptTarget>ES3</TypeScriptTarget>

@@ -30,10 +30,12 @@ function stripBOM(str) {
 }
 
 
-var htmlInternalTemplate = '/* tslint:disable:max-line-length */' + utils.eol +
-    'module <%= modulename %> {' + utils.eol +
-    '  export var <%= varname %> = \'<%= content %>\';' + utils.eol +
-    '}' + utils.eol;
+function htmlInternalTemplate(lineEnding: string) {
+  return '/* tslint:disable:max-line-length */' + lineEnding +
+    'module <%= modulename %> {' + lineEnding +
+    '  export var <%= varname %> = \'<%= content %>\';' + lineEnding +
+    '}' + lineEnding;
+  };
 
 
 export interface IHtml2TSOptions {
@@ -42,6 +44,7 @@ export interface IHtml2TSOptions {
     htmlOutputTemplate: string;
     htmlOutDir: string;
     flatten: boolean;
+    eol: string;
 }
 
 // Compile an HTML file to a TS file
@@ -62,9 +65,13 @@ export function compileHTML(filename: string, options: IHtml2TSOptions): string 
 
     var fileContent;
     if (!options.htmlOutputTemplate) {
-        fileContent = _.template(htmlInternalTemplate)({ modulename: moduleName, varname: varName, content: htmlContent });
+        fileContent = _.template(
+          htmlInternalTemplate(options.eol)
+          )({ modulename: moduleName, varname: varName, content: htmlContent });
     } else {
-        fileContent = _.template(replaceNewLines(options.htmlOutputTemplate))({ modulename: moduleName, varname: varName, content: htmlContent });
+        fileContent = _.template(
+          replaceNewLines(options.htmlOutputTemplate, options.eol)
+          )({ modulename: moduleName, varname: varName, content: htmlContent });
     }
 
     // Write the content to a file
@@ -77,8 +84,8 @@ export function compileHTML(filename: string, options: IHtml2TSOptions): string 
 }
 
 // Replace user-supplied templates newlines with newlines appropriate for the current OS
-function replaceNewLines(input: string) {
-   return input.replace(/\r/g, '').replace(/\n/g, utils.eol);
+function replaceNewLines(input: string, newLines: string) {
+   return input.replace(/\r/g, '').replace(/\n/g, newLines);
 }
 
 

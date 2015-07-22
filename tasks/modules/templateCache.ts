@@ -6,16 +6,13 @@ import path = require('path');
 
 import utils = require('./utils');
 
-var eol = utils.eol;
-
-
 /////////////////////////////////////////////////////////////////////
 // AngularJS templateCache
 ////////////////////////////////////////////////////////////////////
 
 // templateCache processing function
 
-export function generateTemplateCache(src: string[], dest: string, basePath: string) {
+export function generateTemplateCache(src: string[], dest: string, basePath: string, eol: string) {
     if (!src.length) {
         return;
     }
