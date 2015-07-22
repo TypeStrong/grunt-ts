@@ -59,7 +59,7 @@ Grunt-ts provides explicit support for most `tsc` switches.  Any arbitrary switc
 |`tsc` switch|name in grunt-ts|description|
 |:----:|:----:|:-----|
 |--declaration|[declaration](#declaration)|Generates a `.d.ts` definitions file for compiled TypeScript files|
-|--emitDecoratorMetadata|[emitDecoratorMetadata](#emitdecoratormetadata)|Emit design-type metadata for decorated declarations in source|
+|--emitDecoratorMetadata|[emitDecoratorMetadata](#emitdecoratormetadata)|Emit metadata for type/parameter decorators.|
 |--experimentalDecorators|[experimentalDecorators](#experimentaldecorators)|Enables experimental support for ES7 decorators|
 |--inlineSourceMap|[inlineSourceMap](#inlinesourcemap)|Emit a single file that includes source maps instead of emitting a separate `.js.map` file.|
 |--inlineSources|[inlineSources](#inlinesources)|Emit the TypeScript source alongside the sourcemaps within a single file; requires `--inlineSourceMap` to be set.|
@@ -78,7 +78,6 @@ Grunt-ts provides explicit support for most `tsc` switches.  Any arbitrary switc
 |--sourceMap|[sourceMap](#sourcemap)|Generates corresponding `.map` file|
 |--sourceRoot LOCATION|[sourceRoot](#sourceroot)|Specifies the location where debugger should locate TypeScript files instead of source locations.|
 |--suppressImplicitAnyIndexErrors|[suppressImplicitAnyIndexErrors](#suppressimplicitanyindexerrors)|Specifies the location where debugger should locate TypeScript files instead of source locations.|
-|--emitDecoratorMetadata|[emitDecoratorMetadata](#emitDecoratorMetadata)|Emit metadata for type/parameter decorators.|
 |--target VERSION|[target](#target)|Specify ECMAScript target version: `'es3'`, `'es5'`, or `'es6'`|
 
 
@@ -489,7 +488,11 @@ grunt.initConfig({
 true | false (default)
 ````
 
-Emit design-type metadata for decorated declarations in source.  This is only available in TypeScript 1.5 and higher.  Will automatically enable `experimentalDecorators`.
+Set to true to pass `--emitDecoratorMetadata` to the compiler.  If set to true, TypeScript will emit type information about type and parameter decorators, so it's available at runtime.
+
+Used by tools like [Angular](https://angular.io/). You will probably need to import the [reflect-metadata](https://www.npmjs.com/package/reflect-metadata) package in your app when using this feature.
+
+This is only available in TypeScript 1.5 and higher.  If enabled, will automatically enable `experimentalDecorators`
 
 ````javascript
 grunt.initConfig({
