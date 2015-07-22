@@ -2,6 +2,13 @@
 
 ## Next
 
+## v4.2.0 (2015-07-21)
+* FEAT: TypeScript 1.5.3 support (TypeScript 1.5 "RTM").
+  * In addition to features added in 4.2.0-beta.1, added experimentalDecorators flag.
+  * If emitDecoratorMetadata is specified, experimentalDecorators will now be enabled automatically.
+  * If both inlineSources and inlineSourceMap are specified, sourceMap will now be disabled automatically.
+* DOCS: Updated for the above.  Thanks to @hdeshev for the PR.
+
 ## v4.2.0-beta.1 (2015-06-07)
 * FEAT: TypeScript 1.5 beta support.
   * Added support for new TS 1.5 switches: newLine, noEmit, emitDecoratorMetadata, isolatedModules, noEmitHelpers, inlineSourceMap, inlineSources.
