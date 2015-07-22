@@ -4,6 +4,7 @@
 
 ## v4.2.0 (2015-07-21)
 * FEAT: TypeScript 1.5.3 support (TypeScript 1.5 "RTM").
+  * While still compatible with older versions, grunt-ts now depends on TypeScript 1.5.3 by default (via package.json).
   * In addition to features added in 4.2.0-beta.1, added experimentalDecorators flag.
   * If emitDecoratorMetadata is specified, experimentalDecorators will now be enabled automatically.
   * If both inlineSources and inlineSourceMap are specified, sourceMap will now be disabled automatically.
