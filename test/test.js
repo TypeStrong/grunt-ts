@@ -37,7 +37,13 @@ function testDirectory(test, folder, whitespaceDifferencesOK) {
         testExpectedFile(test, expected, whitespaceDifferencesOK);
     });
 }
-exports.typescript = {
+exports.tests = {
+    setUp: function (callback) {
+        callback();
+    },
+    tearDown: function (callback) {
+        callback();
+    },
     simple: function (test) {
         testFile(test, 'simple/js/zoo.js', true);
         testFile(test, 'simple/js/zoo.d.ts');

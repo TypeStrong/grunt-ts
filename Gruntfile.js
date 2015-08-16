@@ -63,7 +63,8 @@ module.exports = function (grunt) {
             }
         },
         nodeunit: {
-            tests: ['test/test.js']
+            slow: ['test/test.js'],
+            fast: ['test/optionsResolverTests.js']
         },
         watch: {
             dev: {
@@ -843,7 +844,7 @@ module.exports = function (grunt) {
 
     // Test
     grunt.registerTask('fail', ['continueOn', 'test_fail', 'continueOff']);
-    grunt.registerTask('test', ['test_all', 'fail', 'nodeunit', 'tslint:transformedHtml', 'clean:testPost']);
+    grunt.registerTask('test', ['test_all', 'fail', 'nodeunit:fast', 'nodeunit:slow', 'tslint:transformedHtml', 'clean:testPost']);
 
     // Release
     grunt.registerTask('release', ['build', 'test', 'report-time-elapsed']);
