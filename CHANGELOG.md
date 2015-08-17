@@ -1,6 +1,7 @@
 # Releases
 
 ## Next
+* FIX: amdloader will now work for [`.tsx` extension as well](https://github.com/TypeStrong/grunt-ts/pull/274)
 
 ## v4.2.0 (2015-07-21)
 * FEAT: TypeScript 1.5.3 support (TypeScript 1.5 "RTM").
