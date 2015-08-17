@@ -2,6 +2,7 @@
 
 import * as nodeunit from 'nodeunit';
 import * as or from '../tasks/modules/optionsResolver';
+
 let grunt: IGrunt = require('grunt');
 
 const config : {[name: string]: grunt.task.IMultiTask<ITargetOptions>} = {
@@ -79,6 +80,18 @@ export var tests : nodeunit.ITestGroup = {
         const result = or.resolve(config["has outDir set to ./built"], config["minimalist"]);
         test.strictEqual((config["minimalist"] as any).outDir, undefined);
         test.strictEqual(result.options.outDir, './built');
+        test.done();
+    },
+    "Target name is set if specified": (test: nodeunit.Test) => {
+        test.expect(1);
+        const result = or.resolve(null, config["minimalist"], "MyTarget");
+        test.strictEqual(result.options.targetName, "MyTarget");
+        test.done();
+    },
+    "Target name is default if not specified": (test: nodeunit.Test) => {
+        test.expect(1);
+        const result = or.resolve(null, config["minimalist"]);
+        test.strictEqual(result.options.targetName, '');
         test.done();
     },
     "Task options should override grunt-ts defaults if not specified in the target options": (test: nodeunit.Test) => {

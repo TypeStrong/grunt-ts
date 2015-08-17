@@ -37,12 +37,14 @@ export const TypeScriptDefaults: IGruntTSOptions = {
     newLine: utils.eol,
     isolatedModules: false,
     noEmitHelpers: false,
-    additionalFlags: ''
+    additionalFlags: '',
+    templateCache: null,
+    targetName: ''
 };
 
 export const GruntTSDefaults = applyGruntTSDefaults(TypeScriptDefaults);
 
-function applyGruntTSDefaults(options : IGruntTSOptions) {
+function applyGruntTSDefaults(options: IGruntTSOptions) {
   options.sourceMap = true;
   options.target = 'es5';
   options.htmlModuleTemplate = '<%= filename %>';

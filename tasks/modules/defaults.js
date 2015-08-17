@@ -36,7 +36,9 @@ exports.TypeScriptDefaults = {
     newLine: utils.eol,
     isolatedModules: false,
     noEmitHelpers: false,
-    additionalFlags: ''
+    additionalFlags: '',
+    templateCache: null,
+    targetName: ''
 };
 exports.GruntTSDefaults = applyGruntTSDefaults(exports.TypeScriptDefaults);
 function applyGruntTSDefaults(options) {

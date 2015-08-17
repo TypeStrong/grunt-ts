@@ -63,28 +63,29 @@ function getTsc(binPath) {
     exports.grunt.log.writeln('Using tsc v' + pkg.version);
     return path.join(binPath, 'tsc');
 }
-function compileAllFiles(targetFiles, target, task, targetName, outFile) {
+function compileAllFiles(options) {
+    var targetFiles;
     // Make a local copy so we can modify files without having external side effects
     var files = _.map(targetFiles, function (file) { return file; });
     var newFiles = files;
-    if (task.fast === 'watch') {
+    if (options.fast === 'watch') {
         // if this is the first time its running after this file was loaded
         if (cacheClearedOnce[exports.grunt.task.current.target] === undefined) {
             // Then clear the cache for this target
-            clearCache(targetName);
+            clearCache(options.targetName);
         }
     }
-    if (task.fast !== 'never') {
-        if (target.out) {
+    if (options.fast !== 'never') {
+        if (options.out) {
             exports.grunt.log.writeln('Fast compile will not work when --out is specified. Ignoring fast compilation'.cyan);
         }
         else {
-            newFiles = getChangedFiles(files, targetName);
+            newFiles = getChangedFiles(files, options.targetName);
             if (newFiles.length !== 0) {
                 files = newFiles;
                 // If outDir is specified but no baseDir is specified we need to determine one
-                if (target.outDir && !target.baseDir) {
-                    target.baseDir = utils.findCommonPath(files, '/');
+                if (options.outDir && !options.baseDir) {
+                    options.baseDir = utils.findCommonPath(files, '/');
                 }
             }
             else {
@@ -106,8 +107,8 @@ function compileAllFiles(targetFiles, target, task, targetName, outFile) {
     // see https://github.com/grunt-ts/grunt-ts/issues/77
     var baseDirFile = '.baseDir.ts';
     var baseDirFilePath;
-    if (target.outDir && target.baseDir && files.length > 0) {
-        baseDirFilePath = path.join(target.baseDir, baseDirFile);
+    if (options.outDir && options.baseDir && files.length > 0) {
+        baseDirFilePath = path.join(options.baseDir, baseDirFile);
         if (!fs.existsSync(baseDirFilePath)) {
             exports.grunt.file.write(baseDirFilePath, '// Ignore this file. See https://github.com/grunt-ts/grunt-ts/issues/77');
         }
@@ -115,70 +116,70 @@ function compileAllFiles(targetFiles, target, task, targetName, outFile) {
     }
     // If reference and out are both specified.
     // Then only compile the updated reference file as that contains the correct order
-    if (target.reference && target.out) {
-        var referenceFile = path.resolve(target.reference);
+    if (options.reference && options.out) {
+        var referenceFile = path.resolve(options.reference);
         files = [referenceFile];
     }
     // Quote the files to compile. Needed for command line parsing by tsc
     files = _.map(files, function (item) { return ("\"" + path.resolve(item) + "\""); });
-    if (outFile) {
-        outFile = "\"" + path.resolve(outFile) + "\"";
-    }
+    // if (outFile) {
+    //   outFile = `"${path.resolve(outFile)}"`;
+    // }
     var args = files.slice(0);
     // boolean options
-    if (task.sourceMap) {
+    if (options.sourceMap) {
         args.push('--sourcemap');
     }
-    if (task.emitDecoratorMetadata) {
+    if (options.emitDecoratorMetadata) {
         args.push('--emitDecoratorMetadata');
     }
-    if (task.declaration) {
+    if (options.declaration) {
         args.push('--declaration');
     }
-    if (task.removeComments) {
+    if (options.removeComments) {
         args.push('--removeComments');
     }
-    if (task.noImplicitAny) {
+    if (options.noImplicitAny) {
         args.push('--noImplicitAny');
     }
-    if (task.noResolve) {
+    if (options.noResolve) {
         args.push('--noResolve');
     }
-    if (task.noEmitOnError) {
+    if (options.noEmitOnError) {
         args.push('--noEmitOnError');
     }
-    if (task.preserveConstEnums) {
+    if (options.preserveConstEnums) {
         args.push('--preserveConstEnums');
     }
-    if (task.suppressImplicitAnyIndexErrors) {
+    if (options.suppressImplicitAnyIndexErrors) {
         args.push('--suppressImplicitAnyIndexErrors');
     }
-    if (task.noEmit) {
+    if (options.noEmit) {
         args.push('--noEmit');
     }
-    if (task.inlineSources) {
+    if (options.inlineSources) {
         args.push('--inlineSources');
     }
-    if (task.inlineSourceMap) {
+    if (options.inlineSourceMap) {
         args.push('--inlineSourceMap');
     }
-    if (task.newLine && !utils.newLineIsRedundant(task.newLine)) {
-        args.push('--newLine', task.newLine);
+    if (options.newLine && !utils.newLineIsRedundant(options.newLine)) {
+        args.push('--newLine', options.newLine);
     }
-    if (task.isolatedModules) {
+    if (options.isolatedModules) {
         args.push('--isolatedModules');
     }
-    if (task.noEmitHelpers) {
+    if (options.noEmitHelpers) {
         args.push('--noEmitHelpers');
     }
-    if (task.experimentalDecorators) {
+    if (options.experimentalDecorators) {
         args.push('--experimentalDecorators');
     }
     // string options
-    args.push('--target', task.target.toUpperCase());
+    args.push('--target', options.target.toUpperCase());
     // check the module compile option
-    if (task.module) {
-        var moduleOptionString = ('' + task.module).toLowerCase();
+    if (options.module) {
+        var moduleOptionString = ('' + options.module).toLowerCase();
         if ('amd|commonjs|system|umd'.indexOf(moduleOptionString) > -1) {
             args.push('--module', moduleOptionString);
         }
@@ -187,50 +188,49 @@ function compileAllFiles(targetFiles, target, task, targetName, outFile) {
         }
     }
     var theOutDir = null;
-    if (target.outDir) {
-        if (target.out) {
+    if (options.outDir) {
+        if (options.out) {
             console.warn('WARNING: Option "out" and "outDir" should not be used together'.magenta);
         }
-        theOutDir = "\"" + path.resolve(target.outDir) + "\"";
+        theOutDir = "\"" + path.resolve(options.outDir) + "\"";
         args.push('--outDir', theOutDir);
     }
     // Target options:
-    if (outFile) {
-        if (utils.isJavaScriptFile(outFile)) {
-            args.push('--out', outFile);
+    // if (outFile) {
+    //   if (utils.isJavaScriptFile(outFile)) {
+    //     args.push('--out', outFile);
+    //   } else {
+    //     if (!theOutDir) {
+    //       args.push('--outDir', outFile);
+    //     }
+    //   }
+    // } else
+    if (options.out) {
+        args.push('--out', options.out);
+    }
+    if (options.dest && (!options.out) && (!options.outDir)) {
+        if (utils.isJavaScriptFile(options.dest)) {
+            args.push('--out', options.dest);
         }
         else {
-            if (!theOutDir) {
-                args.push('--outDir', outFile);
-            }
-        }
-    }
-    else if (target.out) {
-        args.push('--out', target.out);
-    }
-    if (target.dest && (!target.out) && (!target.outDir)) {
-        if (utils.isJavaScriptFile(target.dest)) {
-            args.push('--out', target.dest);
-        }
-        else {
-            if (target.dest === 'src') {
-                console.warn(('WARNING: Destination for target "' + targetName + '" is "src", which is the default.  If you have' +
+            if (options.dest === 'src') {
+                console.warn(('WARNING: Destination for target "' + options.targetName + '" is "src", which is the default.  If you have' +
                     ' forgotten to specify a "dest" parameter, please add it.  If this is correct, you may wish' +
                     ' to change the "dest" parameter to "src/" or just ignore this warning.').magenta);
             }
-            if (Array.isArray(target.dest)) {
-                if (target.dest.length === 0) {
+            if (Array.isArray(options.dest)) {
+                if (options.dest.length === 0) {
                 }
-                else if (target.dest.length > 0) {
-                    console.warn((('WARNING: "dest" for target "' + targetName + '" is an array.  This is not supported by the' +
+                else if (options.dest.length > 0) {
+                    console.warn((('WARNING: "dest" for target "' + options.targetName + '" is an array.  This is not supported by the' +
                         ' TypeScript compiler or grunt-ts.' +
-                        ((target.dest.length > 1) ? '  Only the first "dest" will be used.  The' +
+                        ((options.dest.length > 1) ? '  Only the first "dest" will be used.  The' +
                             ' remaining items will be truncated.' : ''))).magenta);
-                    args.push('--outDir', target.dest[0]);
+                    args.push('--outDir', options.dest[0]);
                 }
             }
             else {
-                args.push('--outDir', target.dest);
+                args.push('--outDir', options.dest);
             }
         }
     }
@@ -239,26 +239,26 @@ function compileAllFiles(targetFiles, target, task, targetName, outFile) {
             ' --out. Any exported code may be truncated.  See TypeScript issue #1544 for' +
             ' more details.').magenta);
     }
-    if (task.sourceRoot) {
-        args.push('--sourceRoot', task.sourceRoot);
+    if (options.sourceRoot) {
+        args.push('--sourceRoot', options.sourceRoot);
     }
-    if (task.mapRoot) {
-        args.push('--mapRoot', task.mapRoot);
+    if (options.mapRoot) {
+        args.push('--mapRoot', options.mapRoot);
     }
-    if (task.additionalFlags) {
-        args.push(task.additionalFlags);
+    if (options.additionalFlags) {
+        args.push(options.additionalFlags);
     }
     // Locate a compiler
     var tsc;
-    if (task.compiler) {
-        exports.grunt.log.writeln('Using the custom compiler : ' + task.compiler);
-        tsc = task.compiler;
+    if (options.compiler) {
+        exports.grunt.log.writeln('Using the custom compiler : ' + options.compiler);
+        tsc = options.compiler;
     }
     else {
         tsc = getTsc(resolveTypeScriptBinPath());
     }
     // To debug the tsc command
-    if (task.verbose) {
+    if (options.verbose) {
         console.log(args.join(' ').yellow);
     }
     else {
@@ -272,13 +272,13 @@ function compileAllFiles(targetFiles, target, task, targetName, outFile) {
     }
     fs.writeFileSync(tempfilename, args.join(' '));
     // Switch implementation if a test version of executeNode exists.
-    if ('testExecute' in target) {
-        if (_.isFunction(target.testExecute)) {
-            executeNode = target.testExecute;
+    if ('testExecute' in options) {
+        if (_.isFunction(options.testExecute)) {
+            executeNode = options.testExecute;
         }
         else {
-            var invalidTestExecuteError = 'Invalid testExecute node present on target "' + targetName +
-                '".  Value of testExecute must be a function.';
+            var invalidTestExecuteError = 'Invalid testExecute node present on target "' +
+                options.targetName + '".  Value of testExecute must be a function.';
             throw (new Error(invalidTestExecuteError));
         }
     }
@@ -287,9 +287,9 @@ function compileAllFiles(targetFiles, target, task, targetName, outFile) {
         executeNode = executeNodeDefault;
     }
     // Execute command
-    return executeNode([tsc, '@' + tempfilename], { target: target, task: task }).then(function (result) {
-        if (task.fast !== 'never' && result.code === 0) {
-            resetChangedFiles(newFiles, targetName);
+    return executeNode([tsc, '@' + tempfilename], options).then(function (result) {
+        if (options.fast !== 'never' && result.code === 0) {
+            resetChangedFiles(newFiles, options.targetName);
         }
         result.fileCount = files.length;
         fs.unlinkSync(tempfilename);

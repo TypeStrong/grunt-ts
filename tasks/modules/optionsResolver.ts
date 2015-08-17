@@ -1,27 +1,34 @@
 /// <reference path="../../defs/tsd.d.ts"/>
 /// <reference path="./interfaces.d.ts"/>
 
-import {TypeScriptDefaults, GruntTSDefaults} from './defaults';
+import {GruntTSDefaults} from './defaults';
 
-const propertiesOnTarget = ['files','html','out','outDir','reference','src','tsconfig','vs','watch'],
-      propertiesOnTargetOptions = ['additionalFlags','comments','compile','compiler','declaration','emitDecoratorMetadata',
-      'experimentalDecorators','failOnTypeErrors','fast','htmlModuleTemplate','htmlVarTemplate','inlineSourceMap',
-      'inlineSources','isolatedModules','mapRoot','module','newLine','noEmit','noEmitHelpers','noImplicitAny',
-      'noResolve','preserveConstEnums','removeComments','sourceRoot','sourceMap','suppressImplicitAnyIndexErrors',
-      'target','verbose'];
+const propertiesOnTarget = ['files', 'html', 'out', 'outDir', 'reference', 'src', 'testExecute', 'tsconfig', 'templateCache',
+        'vs', 'watch'],
+      propertiesOnTargetOptions = ['additionalFlags', 'comments', 'compile', 'compiler', 'declaration',
+        'emitDecoratorMetadata', 'experimentalDecorators', 'failOnTypeErrors', 'fast', 'htmlModuleTemplate',
+        'htmlVarTemplate', 'inlineSourceMap', 'inlineSources', 'isolatedModules', 'mapRoot', 'module', 'newLine', 'noEmit',
+        'noEmitHelpers', 'noImplicitAny', 'noResolve', 'preserveConstEnums', 'removeComments', 'sourceRoot', 'sourceMap',
+        'suppressImplicitAnyIndexErrors', 'target', 'verbose'];
 
-interface optionsResolveResult {
-  options: IGruntTSOptions,
-  warnings: string[],
-  errors: string[]
+interface OptionsResolveResult {
+  options: IGruntTSOptions;
+  warnings: string[];
+  errors: string[];
 }
 
 export function resolve(rawTaskOptions: grunt.task.IMultiTask<ITargetOptions>,
-                        rawTargetOptions: grunt.task.IMultiTask<ITargetOptions>) {
+                        rawTargetOptions: grunt.task.IMultiTask<ITargetOptions>,
+                        targetName = '') {
 
   let result = applyGruntOptions(null, rawTaskOptions);
   result = applyGruntOptions(result, rawTargetOptions);
-  result = applyGruntTSDefaults(result)
+  result = applyGruntTSDefaults(result);
+
+  if (result.options.targetName === undefined ||
+      (!result.options.targetName && targetName)) {
+    result.options.targetName = targetName;
+  }
 
   return result;
 }
@@ -34,9 +41,9 @@ function emptyOptionsResolveResult() {
   };
 }
 
-function applyGruntOptions(applyTo: optionsResolveResult, gruntOptions: grunt.task.IMultiTask<ITargetOptions>) {
+function applyGruntOptions(applyTo: OptionsResolveResult, gruntOptions: grunt.task.IMultiTask<ITargetOptions>) {
 
-  const result : optionsResolveResult = applyTo || emptyOptionsResolveResult();
+  const result : OptionsResolveResult = applyTo || emptyOptionsResolveResult();
 
   if (gruntOptions) {
     for (let propertyName of propertiesOnTarget) {
@@ -56,17 +63,17 @@ function applyGruntOptions(applyTo: optionsResolveResult, gruntOptions: grunt.ta
   return result;
 }
 
-function applyGruntTSDefaults(options: optionsResolveResult) {
+function applyGruntTSDefaults(options: OptionsResolveResult) {
   let o = options.options;
-  if (!("sourceMap" in o) && !("inlineSourceMap" in o)) {
+  if (!('sourceMap' in o) && !('inlineSourceMap' in o)) {
     o.sourceMap = GruntTSDefaults.sourceMap;
   }
 
-  if (!("target" in o)) {
+  if (!('target' in o)) {
     o.target = GruntTSDefaults.target;
   }
 
-  if (!("fast" in o)) {
+  if (!('fast' in o)) {
     o.fast = 'watch';
   }
 

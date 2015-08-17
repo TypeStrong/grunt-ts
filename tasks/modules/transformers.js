@@ -194,13 +194,13 @@ var UnknownTransformer = (function (_super) {
 // This code fixes the line encoding to be per os.
 // I think it is the best option available at the moment.
 // I am open for suggestions
-function transformFiles(changedFiles, targetFiles, target, task, eol) {
+function transformFiles(changedFiles, targetFiles, options) {
     currentTargetDirs = getTargetFolders(targetFiles);
     currentTargetFiles = targetFiles;
     ///////////////////////////////////// transformation
     var transformers = [
         new ImportTransformer(),
-        new ExportTransformer(eol),
+        new ExportTransformer(options.newLine),
         new ReferenceTransformer(),
         new UnknownTransformer()
     ];

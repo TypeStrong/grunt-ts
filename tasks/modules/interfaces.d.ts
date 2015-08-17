@@ -22,6 +22,7 @@ interface ITargetOptions {
     };
     testExecute?: (args: string[]) => Promise<ICompileResult>;
     vs?: string | IVisualStudioProjectSupport;
+    targetName?: string;
 }
 
 interface ITaskOptions {
@@ -89,7 +90,7 @@ interface ICompileResult {
 }
 
 interface ICompilePromise {
-  (args: string[], optionalInfo? : {target: ITargetOptions, task: ITaskOptions}) : Promise<ICompileResult>;
+  (args: string[], options? : IGruntTSOptions) : Promise<ICompileResult>;
 }
 
 interface IGruntTSOptions extends ITaskOptions, ITargetOptions {

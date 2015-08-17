@@ -1,15 +1,21 @@
 /// <reference path="../../defs/tsd.d.ts"/>
 /// <reference path="./interfaces.d.ts"/>
 var defaults_1 = require('./defaults');
-var propertiesOnTarget = ['files', 'html', 'out', 'outDir', 'reference', 'src', 'tsconfig', 'vs', 'watch'], propertiesOnTargetOptions = ['additionalFlags', 'comments', 'compile', 'compiler', 'declaration', 'emitDecoratorMetadata',
-    'experimentalDecorators', 'failOnTypeErrors', 'fast', 'htmlModuleTemplate', 'htmlVarTemplate', 'inlineSourceMap',
-    'inlineSources', 'isolatedModules', 'mapRoot', 'module', 'newLine', 'noEmit', 'noEmitHelpers', 'noImplicitAny',
-    'noResolve', 'preserveConstEnums', 'removeComments', 'sourceRoot', 'sourceMap', 'suppressImplicitAnyIndexErrors',
-    'target', 'verbose'];
-function resolve(rawTaskOptions, rawTargetOptions) {
+var propertiesOnTarget = ['files', 'html', 'out', 'outDir', 'reference', 'src', 'testExecute', 'tsconfig', 'templateCache',
+    'vs', 'watch'], propertiesOnTargetOptions = ['additionalFlags', 'comments', 'compile', 'compiler', 'declaration',
+    'emitDecoratorMetadata', 'experimentalDecorators', 'failOnTypeErrors', 'fast', 'htmlModuleTemplate',
+    'htmlVarTemplate', 'inlineSourceMap', 'inlineSources', 'isolatedModules', 'mapRoot', 'module', 'newLine', 'noEmit',
+    'noEmitHelpers', 'noImplicitAny', 'noResolve', 'preserveConstEnums', 'removeComments', 'sourceRoot', 'sourceMap',
+    'suppressImplicitAnyIndexErrors', 'target', 'verbose'];
+function resolve(rawTaskOptions, rawTargetOptions, targetName) {
+    if (targetName === void 0) { targetName = ''; }
     var result = applyGruntOptions(null, rawTaskOptions);
     result = applyGruntOptions(result, rawTargetOptions);
     result = applyGruntTSDefaults(result);
+    if (result.options.targetName === undefined ||
+        (!result.options.targetName && targetName)) {
+        result.options.targetName = targetName;
+    }
     return result;
 }
 exports.resolve = resolve;
@@ -42,13 +48,13 @@ function applyGruntOptions(applyTo, gruntOptions) {
 }
 function applyGruntTSDefaults(options) {
     var o = options.options;
-    if (!("sourceMap" in o) && !("inlineSourceMap" in o)) {
+    if (!('sourceMap' in o) && !('inlineSourceMap' in o)) {
         o.sourceMap = defaults_1.GruntTSDefaults.sourceMap;
     }
-    if (!("target" in o)) {
+    if (!('target' in o)) {
         o.target = defaults_1.GruntTSDefaults.target;
     }
-    if (!("fast" in o)) {
+    if (!('fast' in o)) {
         o.fast = 'watch';
     }
     return options;

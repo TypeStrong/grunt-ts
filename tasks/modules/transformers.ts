@@ -128,7 +128,7 @@ class BaseTransformer {
 // This is a separate class from BaseTransformer to make it easier to add non import/export transforms in the future
 class BaseImportExportTransformer extends BaseTransformer implements ITransformer {
 
-    private template: (data?: { filename: string; pathToFile: string }) => string;
+    private template: (data?: { filename: string; pathToFile: string; signatureGenerated?: string }) => string;
     private getIndexIfDir: boolean;
     private removeExtensionFromFilePath: boolean;
 
@@ -224,9 +224,7 @@ class UnknownTransformer extends BaseTransformer implements ITransformer {
 export function transformFiles(
     changedFiles: string[],
     targetFiles: string[],
-    target: ITargetOptions,
-    task: ITaskOptions,
-    eol: string) {
+    options: IGruntTSOptions) {
 
     currentTargetDirs = getTargetFolders(targetFiles);
     currentTargetFiles = targetFiles;
@@ -235,7 +233,7 @@ export function transformFiles(
 
     var transformers: ITransformer[] = [
         new ImportTransformer(),
-        new ExportTransformer(eol),
+        new ExportTransformer(options.newLine),
         new ReferenceTransformer(),
         new UnknownTransformer()
     ];
