@@ -332,7 +332,7 @@ function pluginFn(grunt) {
                     // Create a reference file if specified
                     if (!!referencePath) {
                         var result = timeIt(function () {
-                            return referenceModule.updateReferenceFile(filesToCompile.filter(function (f) { return !isReferenceFile(f); }), generatedFiles, referenceFile, referencePath, options.newLine);
+                            return referenceModule.updateReferenceFile(filesToCompile.filter(function (f) { return !isReferenceFile(f); }), generatedFiles, referenceFile, referencePath, (options.newLine || utils.eol));
                         });
                         if (result.it === true) {
                             grunt.log.writeln(('Updated reference file (' + result.time + 'ms).').green);

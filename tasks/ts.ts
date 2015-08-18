@@ -406,7 +406,11 @@ function pluginFn(grunt: IGrunt) {
                     if (!!referencePath) {
                         var result = timeIt(() => {
                             return referenceModule.updateReferenceFile(
-                                filesToCompile.filter(f => !isReferenceFile(f)), generatedFiles, referenceFile, referencePath, options.newLine);
+                                filesToCompile.filter(f => !isReferenceFile(f)),
+                                generatedFiles,
+                                referenceFile,
+                                referencePath,
+                                (options.newLine || utils.eol));
                         });
                         if (result.it === true) {
                             grunt.log.writeln(('Updated reference file (' + result.time + 'ms).').green);
