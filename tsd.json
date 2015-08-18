@@ -6,7 +6,7 @@
   "bundle": "defs/tsd.d.ts",
   "installed": {
     "node/node.d.ts": {
-      "commit": "1c1c12eaea0040c2c4493319c286f7d8e8968827"
+      "commit": "832c51db815c766fa42a2e995a7b3136ec6d15c2"
     },
     "underscore.string/underscore.string.d.ts": {
       "commit": "1c1c12eaea0040c2c4493319c286f7d8e8968827"
