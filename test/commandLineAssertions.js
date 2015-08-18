@@ -141,14 +141,14 @@ exports.vsproj_test = function (strings, options) {
         throw "expected sourceMap === true, removeComments===" +
             "false, module===commonjs, outDir===vsproj_test.  Was " +
             JSON.stringify([options.sourceMap,
-                options.removeComments, options.module, options.outDir]);
+                options.removeComments, options.module, options.CompilationTasks[0].outDir]);
     });
 };
 exports.vsproj_test_config = function (strings, options) {
     return new Promise(function (resolve, reject) {
         if (options.sourceMap === false &&
             options.removeComments === true &&
-            options.outDir.indexOf('vsproj_test_config') >= 0) {
+            options.CompilationTasks[0].outDir.indexOf('vsproj_test_config') >= 0) {
             resolve({
                 code: 0,
                 output: ""
@@ -157,7 +157,7 @@ exports.vsproj_test_config = function (strings, options) {
         throw "expected sourceMap === false, removeComments===" +
             "true, outDir contains vsproj_test_config.  Was " +
             JSON.stringify([options.sourceMap,
-                options.removeComments, options.outDir]);
+                options.removeComments, options.CompilationTasks[0].outDir]);
     });
 };
 exports.param_newLine_CRLF = function (strings, options) {
@@ -186,28 +186,28 @@ exports.param_newLine_LF = function (strings, options) {
 };
 exports.files_testFilesUsedWithDestAsAFolder = function (strings, options) {
     return new Promise(function (resolve, reject) {
-        if (options.outDir === "test/multifile/files_testFilesUsedWithDestAsAJSFolder" &&
-            options.out || "not specified" === "not specified") {
+        if (options.CompilationTasks[0].outDir === "test/multifile/files_testFilesUsedWithDestAsAJSFolder" &&
+            (options.CompilationTasks[0].out || "not specified") === "not specified") {
             resolve({
                 code: 0,
                 output: ""
             });
         }
         throw "expected --out not specified and outDir=test/multifile/files_testFilesUsedWithDestAsAJSFolder.  Was " +
-            JSON.stringify([options.outDir]);
+            JSON.stringify([options.CompilationTasks[0].outDir]);
     });
 };
 exports.files_testFilesUsedWithDestAsAFile = function (strings, options) {
     return new Promise(function (resolve, reject) {
-        if (options.out === "test/multifile/files_testFilesUsedWithDestAsAJSFile/testDest.js" &&
-            options.outDir || "not specified" === "not specified") {
+        if (options.CompilationTasks[0].out === "test/multifile/files_testFilesUsedWithDestAsAJSFile/testDest.js" &&
+            (options.CompilationTasks[0].outDir || "not specified") === "not specified") {
             resolve({
                 code: 0,
                 output: ""
             });
         }
         throw "expected --outDir not specified and out=test/multifile/files_testFilesUsedWithDestAsAJSFile/testDest.js.  Was " +
-            JSON.stringify([options.outDir]);
+            JSON.stringify([options.CompilationTasks[0].outDir]);
     });
 };
 exports.test_systemJS = function (strings, options) {

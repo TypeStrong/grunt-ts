@@ -2,10 +2,11 @@
 /// <reference path="./interfaces.d.ts"/>
 
 import {GruntTSDefaults} from './defaults';
+import * as utils from './utils';
+import _ = require('lodash');
 
-const propertiesOnTarget = ['files', 'html', 'out', 'outDir', 'reference', 'src', 'testExecute', 'tsconfig', 'templateCache',
-        'vs', 'watch'],
-      propertiesOnTargetOptions = ['additionalFlags', 'comments', 'compile', 'compiler', 'declaration',
+const propertiesFromTarget = ['html', 'reference', 'testExecute', 'tsconfig', 'templateCache', 'vs', 'watch'],
+      propertiesFromTargetOptions = ['additionalFlags', 'comments', 'compile', 'compiler', 'declaration',
         'emitDecoratorMetadata', 'experimentalDecorators', 'failOnTypeErrors', 'fast', 'htmlModuleTemplate',
         'htmlVarTemplate', 'inlineSourceMap', 'inlineSources', 'isolatedModules', 'mapRoot', 'module', 'newLine', 'noEmit',
         'noEmitHelpers', 'noImplicitAny', 'noResolve', 'preserveConstEnums', 'removeComments', 'sourceRoot', 'sourceMap',
@@ -19,11 +20,14 @@ interface OptionsResolveResult {
 
 export function resolve(rawTaskOptions: grunt.task.IMultiTask<ITargetOptions>,
                         rawTargetOptions: grunt.task.IMultiTask<ITargetOptions>,
-                        targetName = '') {
+                        targetName = '',
+                        files: IGruntTSCompilationInfo[] = []) {
 
   let result = applyGruntOptions(null, rawTaskOptions);
   result = applyGruntOptions(result, rawTargetOptions);
+  result = copyCompilationTasks(result, files);
   result = applyGruntTSDefaults(result);
+
 
   if (result.options.targetName === undefined ||
       (!result.options.targetName && targetName)) {
@@ -46,13 +50,13 @@ function applyGruntOptions(applyTo: OptionsResolveResult, gruntOptions: grunt.ta
   const result : OptionsResolveResult = applyTo || emptyOptionsResolveResult();
 
   if (gruntOptions) {
-    for (let propertyName of propertiesOnTarget) {
+    for (let propertyName of propertiesFromTarget) {
       if (propertyName in gruntOptions) {
         result.options[propertyName] = gruntOptions[propertyName];
       }
     }
     if (gruntOptions.options) {
-      for (let propertyName of propertiesOnTargetOptions) {
+      for (let propertyName of propertiesFromTargetOptions) {
         if (propertyName in gruntOptions.options) {
           result.options[propertyName] = gruntOptions.options[propertyName];
         }
@@ -61,6 +65,29 @@ function applyGruntOptions(applyTo: OptionsResolveResult, gruntOptions: grunt.ta
   }
 
   return result;
+}
+
+function copyCompilationTasks(options: OptionsResolveResult, files: IGruntTSCompilationInfo[]) {
+  let o = options.options;
+  if (o.CompilationTasks === null || o.CompilationTasks === undefined) {
+    o.CompilationTasks = [];
+  }
+  for (let i = 0; i < files.length; i += 1) {
+    let compilationSet = {
+      src: _.map(files[i].src, (fileName) => escapePathIfRequired(fileName)),
+      out: escapePathIfRequired(files[i].out),
+      outDir: escapePathIfRequired(files[i].outDir)
+    };
+    if ('dest' in files[i]) {
+      if (utils.isJavaScriptFile(files[i].dest)) {
+        compilationSet.out = files[i].dest;
+      } else {
+        compilationSet.outDir = files[i].dest;
+      }
+    }
+    o.CompilationTasks.push(compilationSet);
+  }
+  return options;
 }
 
 function applyGruntTSDefaults(options: OptionsResolveResult) {
@@ -82,5 +109,20 @@ function applyGruntTSDefaults(options: OptionsResolveResult) {
   }
 
   return options;
+}
 
+export function escapePathIfRequired(path: string): string {
+  if (!path || !path.indexOf) {
+    return path;
+  }
+  if (path.indexOf(' ') === -1) {
+      return path;
+  } else {
+    const newPath = path.trim();
+    if (newPath.indexOf('"') === 0 && newPath.lastIndexOf('"') === newPath.length - 1) {
+      return newPath;
+    } else {
+      return '"' + newPath + '"';
+    }
+  }
 }

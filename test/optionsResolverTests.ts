@@ -36,6 +36,24 @@ const config : {[name: string]: grunt.task.IMultiTask<ITargetOptions>} = {
   },
   "has outDir set to undefined": <any>{
     outDir: undefined
+  },
+  "out has spaces": <any>{
+    out: "my folder/out has spaces.js"
+  },
+  "outDir has spaces": <any>{
+    outDir: "./my folder"
+  },
+  "reference set to ref1.ts": <any>{
+    reference: "ref1.ts"
+  },
+  "reference set to ref2.ts": <any>{
+    reference: "ref2.ts"
+  },
+  "reference set to null": <any>{
+    reference: null
+  },
+  "reference set to undefined": <any>{
+    reference: undefined
   }
 };
 
@@ -66,6 +84,42 @@ export var tests : nodeunit.ITestGroup = {
 
   },
 
+  "Special processing Tests": {
+    "path with spaces gets enclosed in double-quotes": (test: nodeunit.Test) => {
+        test.expect(1);
+        const result = or.escapePathIfRequired("this is a path/path.txt");
+        test.strictEqual(result, "\"this is a path/path.txt\"");
+        test.done();
+    },
+    "path that is already enclosed in double-quotes is unchanged": (test: nodeunit.Test) => {
+      test.expect(1);
+      const result = or.escapePathIfRequired("\"this is a path/path.txt\"");
+      test.strictEqual(result, "\"this is a path/path.txt\"");
+      test.done();
+    },
+    "path without spaces is unchanged": (test: nodeunit.Test) => {
+      test.expect(1);
+      const result = or.escapePathIfRequired("thisIsAPath/path.txt");
+      test.strictEqual(result, "thisIsAPath/path.txt");
+      test.done();
+    },
+    "out with spaces gets escaped with double-quotes": (test: nodeunit.Test) => {
+        test.expect(1);
+        const files = [config["out has spaces"]];
+        const result = or.resolve(null, config["out has spaces"], null, files);
+        test.strictEqual(result.options.CompilationTasks[0].out, "\"my folder/out has spaces.js\"");
+        test.done();
+    },
+    "outDir with spaces gets escaped with double-quotes": (test: nodeunit.Test) => {
+        test.expect(1);
+        const files = [config["outDir has spaces"]];
+        const result = or.resolve(null, config["outDir has spaces"], null, files);
+        test.strictEqual(result.options.CompilationTasks[0].outDir, "\"./my folder\"");
+        test.done();
+    }
+  },
+
+
 
   "Precedence and defaults override Tests": {
     "The grunt-ts defaults come through when not specified": (test: nodeunit.Test) => {
@@ -77,9 +131,9 @@ export var tests : nodeunit.ITestGroup = {
     },
     "Task properties should override grunt-ts defaults if not specified on the target": (test: nodeunit.Test) => {
         test.expect(2);
-        const result = or.resolve(config["has outDir set to ./built"], config["minimalist"]);
+        const result = or.resolve(config["reference set to ref1.ts"], config["minimalist"]);
         test.strictEqual((config["minimalist"] as any).outDir, undefined);
-        test.strictEqual(result.options.outDir, './built');
+        test.strictEqual(result.options.reference, 'ref1.ts');
         test.done();
     },
     "Target name is set if specified": (test: nodeunit.Test) => {
@@ -103,20 +157,21 @@ export var tests : nodeunit.ITestGroup = {
     },
     "Properties specified on the target should override anything specified in the task and the grunt-ts defaults": (test: nodeunit.Test) => {
         test.expect(1);
-        const result = or.resolve(config["has outDir set to ./built"], config["has outDir set to ./myOutDir"]);
-        test.strictEqual(result.options.outDir, "./myOutDir");
+        const result = or.resolve(config["reference set to ref1.ts"], config["reference set to ref2.ts"]);
+        test.strictEqual(result.options.reference, "ref2.ts");
         test.done();
     },
     "Explicit null specified on the target should override anything specified in the task and the grunt-ts defaults": (test: nodeunit.Test) => {
         test.expect(1);
-        const result = or.resolve(config["has outDir set to ./built"], config["has outDir set to null"]);
-        test.strictEqual(result.options.outDir, null);
+        const result = or.resolve(config["reference set to ref1.ts"], config["reference set to null"], null, []);
+        test.strictEqual(result.options.reference, null);
         test.done();
     },
     "Explicit undefined specified on the target should override anything specified in the task and the grunt-ts defaults": (test: nodeunit.Test) => {
         test.expect(1);
-        const result = or.resolve(config["has outDir set to ./built"], config["has outDir set to undefined"]);
-        test.strictEqual(result.options.outDir, undefined);
+        const files = [config["has outDir set to undefined"]];
+        const result = or.resolve(config["reference set to ref1.ts"], config["reference set to undefined"], null, []);
+        test.strictEqual(result.options.reference, undefined);
         test.done();
     },
     "Properties on target `options` should override the task options `options` object and the grunt-ts defaults": (test: nodeunit.Test) => {

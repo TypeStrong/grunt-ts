@@ -81,9 +81,9 @@ function getTsc(binPath: string): string {
     return path.join(binPath, 'tsc');
 }
 
-export function compileAllFiles(options: IGruntTSOptions): Promise<ICompileResult> {
+export function compileAllFiles(options: IGruntTSOptions, compilationInfo: IGruntTSCompilationInfo): Promise<ICompileResult> {
 
-    let targetFiles: string[] = options.src;
+    let targetFiles: string[] = compilationInfo.src;
 
     // Make a local copy so we can modify files without having external side effects
     let files = _.map(targetFiles, (file) => file);
@@ -99,7 +99,7 @@ export function compileAllFiles(options: IGruntTSOptions): Promise<ICompileResul
         }
     }
     if (options.fast !== 'never') {
-        if (options.out) {
+        if (compilationInfo.out) {
             grunt.log.writeln('Fast compile will not work when --out is specified. Ignoring fast compilation'.cyan);
         }
         else {
@@ -109,7 +109,7 @@ export function compileAllFiles(options: IGruntTSOptions): Promise<ICompileResul
                 files = newFiles;
 
                 // If outDir is specified but no baseDir is specified we need to determine one
-                if (options.outDir && !options.baseDir) {
+                if (compilationInfo.outDir && !options.baseDir) {
                     options.baseDir = utils.findCommonPath(files, '/');
                 }
             }
@@ -134,7 +134,7 @@ export function compileAllFiles(options: IGruntTSOptions): Promise<ICompileResul
     // see https://github.com/grunt-ts/grunt-ts/issues/77
     var baseDirFile: string = '.baseDir.ts';
     var baseDirFilePath: string;
-    if (options.outDir && options.baseDir && files.length > 0) {
+    if (compilationInfo.outDir && options.baseDir && files.length > 0) {
         baseDirFilePath = path.join(options.baseDir, baseDirFile);
         if (!fs.existsSync(baseDirFilePath)) {
             grunt.file.write(baseDirFilePath, '// Ignore this file. See https://github.com/grunt-ts/grunt-ts/issues/77');
@@ -144,7 +144,7 @@ export function compileAllFiles(options: IGruntTSOptions): Promise<ICompileResul
 
     // If reference and out are both specified.
     // Then only compile the updated reference file as that contains the correct order
-    if (options.reference && options.out) {
+    if (options.reference && compilationInfo.out) {
         var referenceFile = path.resolve(options.reference);
         files = [referenceFile];
     }
@@ -221,14 +221,12 @@ export function compileAllFiles(options: IGruntTSOptions): Promise<ICompileResul
     	}
     }
 
-    let theOutDir : string = null;
-    if (options.outDir) {
-        if (options.out) {
+    if (compilationInfo.outDir) {
+        if (compilationInfo.out) {
             console.warn('WARNING: Option "out" and "outDir" should not be used together'.magenta);
         }
 
-        theOutDir = `"${path.resolve(options.outDir)}"`;
-        args.push('--outDir', theOutDir);
+        args.push('--outDir', compilationInfo.outDir);
     }
 
     // Target options:
@@ -241,31 +239,31 @@ export function compileAllFiles(options: IGruntTSOptions): Promise<ICompileResul
     //     }
     //   }
     // } else
-    if (options.out) {
-        args.push('--out', options.out);
+    if (compilationInfo.out) {
+        args.push('--out', compilationInfo.out);
     }
 
-    if (options.dest && (!options.out) && (!options.outDir)) {
-        if (utils.isJavaScriptFile(options.dest)) {
-            args.push('--out', options.dest);
+    if (compilationInfo.dest && (!compilationInfo.out) && (!compilationInfo.outDir)) {
+        if (utils.isJavaScriptFile(compilationInfo.dest)) {
+            args.push('--out', compilationInfo.dest);
         } else {
-            if (options.dest === 'src') {
+            if (compilationInfo.dest === 'src') {
                 console.warn(('WARNING: Destination for target "' + options.targetName + '" is "src", which is the default.  If you have' +
                     ' forgotten to specify a "dest" parameter, please add it.  If this is correct, you may wish' +
                     ' to change the "dest" parameter to "src/" or just ignore this warning.').magenta);
             }
-            if (Array.isArray(options.dest)) {
-                if ((<string[]><any>options.dest).length === 0) {
+            if (Array.isArray(compilationInfo.dest)) {
+                if ((<string[]><any>compilationInfo.dest).length === 0) {
                     // ignore it and do nothing.
-                } else if ((<string[]><any>options.dest).length > 0) {
+                } else if ((<string[]><any>compilationInfo.dest).length > 0) {
                     console.warn((('WARNING: "dest" for target "' + options.targetName + '" is an array.  This is not supported by the' +
                         ' TypeScript compiler or grunt-ts.' +
-                        (((<string[]><any>options.dest).length > 1) ? '  Only the first "dest" will be used.  The' +
+                        (((<string[]><any>compilationInfo.dest).length > 1) ? '  Only the first "dest" will be used.  The' +
                         ' remaining items will be truncated.' : ''))).magenta);
-                    args.push('--outDir', (<string[]><any>options.dest)[0]);
+                    args.push('--outDir', (<string[]><any>compilationInfo.dest)[0]);
                 }
             } else {
-                args.push('--outDir', options.dest);
+                args.push('--outDir', compilationInfo.dest);
             }
         }
     }

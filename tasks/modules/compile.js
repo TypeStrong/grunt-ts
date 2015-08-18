@@ -63,8 +63,8 @@ function getTsc(binPath) {
     exports.grunt.log.writeln('Using tsc v' + pkg.version);
     return path.join(binPath, 'tsc');
 }
-function compileAllFiles(options) {
-    var targetFiles = options.src;
+function compileAllFiles(options, compilationInfo) {
+    var targetFiles = compilationInfo.src;
     // Make a local copy so we can modify files without having external side effects
     var files = _.map(targetFiles, function (file) { return file; });
     var newFiles = files;
@@ -76,7 +76,7 @@ function compileAllFiles(options) {
         }
     }
     if (options.fast !== 'never') {
-        if (options.out) {
+        if (compilationInfo.out) {
             exports.grunt.log.writeln('Fast compile will not work when --out is specified. Ignoring fast compilation'.cyan);
         }
         else {
@@ -84,7 +84,7 @@ function compileAllFiles(options) {
             if (newFiles.length !== 0) {
                 files = newFiles;
                 // If outDir is specified but no baseDir is specified we need to determine one
-                if (options.outDir && !options.baseDir) {
+                if (compilationInfo.outDir && !options.baseDir) {
                     options.baseDir = utils.findCommonPath(files, '/');
                 }
             }
@@ -107,7 +107,7 @@ function compileAllFiles(options) {
     // see https://github.com/grunt-ts/grunt-ts/issues/77
     var baseDirFile = '.baseDir.ts';
     var baseDirFilePath;
-    if (options.outDir && options.baseDir && files.length > 0) {
+    if (compilationInfo.outDir && options.baseDir && files.length > 0) {
         baseDirFilePath = path.join(options.baseDir, baseDirFile);
         if (!fs.existsSync(baseDirFilePath)) {
             exports.grunt.file.write(baseDirFilePath, '// Ignore this file. See https://github.com/grunt-ts/grunt-ts/issues/77');
@@ -116,7 +116,7 @@ function compileAllFiles(options) {
     }
     // If reference and out are both specified.
     // Then only compile the updated reference file as that contains the correct order
-    if (options.reference && options.out) {
+    if (options.reference && compilationInfo.out) {
         var referenceFile = path.resolve(options.reference);
         files = [referenceFile];
     }
@@ -187,13 +187,11 @@ function compileAllFiles(options) {
             console.warn('WARNING: Option "module" only supports "amd" | "commonjs" | "system" | "umd" '.magenta);
         }
     }
-    var theOutDir = null;
-    if (options.outDir) {
-        if (options.out) {
+    if (compilationInfo.outDir) {
+        if (compilationInfo.out) {
             console.warn('WARNING: Option "out" and "outDir" should not be used together'.magenta);
         }
-        theOutDir = "\"" + path.resolve(options.outDir) + "\"";
-        args.push('--outDir', theOutDir);
+        args.push('--outDir', compilationInfo.outDir);
     }
     // Target options:
     // if (outFile) {
@@ -205,32 +203,32 @@ function compileAllFiles(options) {
     //     }
     //   }
     // } else
-    if (options.out) {
-        args.push('--out', options.out);
+    if (compilationInfo.out) {
+        args.push('--out', compilationInfo.out);
     }
-    if (options.dest && (!options.out) && (!options.outDir)) {
-        if (utils.isJavaScriptFile(options.dest)) {
-            args.push('--out', options.dest);
+    if (compilationInfo.dest && (!compilationInfo.out) && (!compilationInfo.outDir)) {
+        if (utils.isJavaScriptFile(compilationInfo.dest)) {
+            args.push('--out', compilationInfo.dest);
         }
         else {
-            if (options.dest === 'src') {
+            if (compilationInfo.dest === 'src') {
                 console.warn(('WARNING: Destination for target "' + options.targetName + '" is "src", which is the default.  If you have' +
                     ' forgotten to specify a "dest" parameter, please add it.  If this is correct, you may wish' +
                     ' to change the "dest" parameter to "src/" or just ignore this warning.').magenta);
             }
-            if (Array.isArray(options.dest)) {
-                if (options.dest.length === 0) {
+            if (Array.isArray(compilationInfo.dest)) {
+                if (compilationInfo.dest.length === 0) {
                 }
-                else if (options.dest.length > 0) {
+                else if (compilationInfo.dest.length > 0) {
                     console.warn((('WARNING: "dest" for target "' + options.targetName + '" is an array.  This is not supported by the' +
                         ' TypeScript compiler or grunt-ts.' +
-                        ((options.dest.length > 1) ? '  Only the first "dest" will be used.  The' +
+                        ((compilationInfo.dest.length > 1) ? '  Only the first "dest" will be used.  The' +
                             ' remaining items will be truncated.' : ''))).magenta);
-                    args.push('--outDir', options.dest[0]);
+                    args.push('--outDir', compilationInfo.dest[0]);
                 }
             }
             else {
-                args.push('--outDir', options.dest);
+                args.push('--outDir', compilationInfo.dest);
             }
         }
     }
