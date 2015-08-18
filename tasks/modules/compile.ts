@@ -83,7 +83,7 @@ function getTsc(binPath: string): string {
 
 export function compileAllFiles(options: IGruntTSOptions): Promise<ICompileResult> {
 
-    let targetFiles: string[];
+    let targetFiles: string[] = options.src;
 
     // Make a local copy so we can modify files without having external side effects
     let files = _.map(targetFiles, (file) => file);

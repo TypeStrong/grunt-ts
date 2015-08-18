@@ -57,6 +57,9 @@ function applyGruntTSDefaults(options) {
     if (!('fast' in o)) {
         o.fast = 'watch';
     }
+    if (!('compile' in o)) {
+        o.compile = true;
+    }
     return options;
 }
 //# sourceMappingURL=optionsResolver.js.map

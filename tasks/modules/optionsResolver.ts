@@ -77,6 +77,10 @@ function applyGruntTSDefaults(options: OptionsResolveResult) {
     o.fast = 'watch';
   }
 
+  if (!('compile' in o)) {
+    o.compile = true;
+  }
+
   return options;
 
 }

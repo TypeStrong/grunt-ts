@@ -64,7 +64,7 @@ function getTsc(binPath) {
     return path.join(binPath, 'tsc');
 }
 function compileAllFiles(options) {
-    var targetFiles;
+    var targetFiles = options.src;
     // Make a local copy so we can modify files without having external side effects
     var files = _.map(targetFiles, function (file) { return file; });
     var newFiles = files;
