@@ -3,7 +3,8 @@
 var defaults_1 = require('./defaults');
 var utils = require('./utils');
 var _ = require('lodash');
-var propertiesFromTarget = ['html', 'reference', 'testExecute', 'tsconfig', 'templateCache', 'vs', 'watch'], propertiesFromTargetOptions = ['additionalFlags', 'comments', 'compile', 'compiler', 'declaration',
+var propertiesFromTarget = ['html', 'htmlOutDir', 'htmlOutDirFlatten', 'reference', 'testExecute', 'tsconfig',
+    'templateCache', 'vs', 'watch'], propertiesFromTargetOptions = ['additionalFlags', 'comments', 'compile', 'compiler', 'declaration',
     'emitDecoratorMetadata', 'experimentalDecorators', 'failOnTypeErrors', 'fast', 'htmlModuleTemplate',
     'htmlVarTemplate', 'inlineSourceMap', 'inlineSources', 'isolatedModules', 'mapRoot', 'module', 'newLine', 'noEmit',
     'noEmitHelpers', 'noImplicitAny', 'noResolve', 'preserveConstEnums', 'removeComments', 'sourceRoot', 'sourceMap',
@@ -85,6 +86,18 @@ function applyGruntTSDefaults(options) {
     }
     if (!('compile' in o)) {
         o.compile = true;
+    }
+    if (!('htmlOutDir' in o)) {
+        o.htmlOutDir = null;
+    }
+    if (!('htmlOutDirFlatten' in o)) {
+        o.htmlOutDirFlatten = false;
+    }
+    if (!('htmlModuleTemplate' in o)) {
+        o.htmlModuleTemplate = '<%= filename %>';
+    }
+    if (!('htmlVarTemplate' in o)) {
+        o.htmlVarTemplate = '<%= ext %>';
     }
     return options;
 }

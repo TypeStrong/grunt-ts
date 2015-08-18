@@ -5,7 +5,8 @@ import {GruntTSDefaults} from './defaults';
 import * as utils from './utils';
 import _ = require('lodash');
 
-const propertiesFromTarget = ['html', 'reference', 'testExecute', 'tsconfig', 'templateCache', 'vs', 'watch'],
+const propertiesFromTarget = ['html', 'htmlOutDir', 'htmlOutDirFlatten', 'reference', 'testExecute', 'tsconfig',
+        'templateCache', 'vs', 'watch'],
       propertiesFromTargetOptions = ['additionalFlags', 'comments', 'compile', 'compiler', 'declaration',
         'emitDecoratorMetadata', 'experimentalDecorators', 'failOnTypeErrors', 'fast', 'htmlModuleTemplate',
         'htmlVarTemplate', 'inlineSourceMap', 'inlineSources', 'isolatedModules', 'mapRoot', 'module', 'newLine', 'noEmit',
@@ -92,6 +93,7 @@ function copyCompilationTasks(options: OptionsResolveResult, files: IGruntTSComp
 
 function applyGruntTSDefaults(options: OptionsResolveResult) {
   let o = options.options;
+
   if (!('sourceMap' in o) && !('inlineSourceMap' in o)) {
     o.sourceMap = GruntTSDefaults.sourceMap;
   }
@@ -108,6 +110,21 @@ function applyGruntTSDefaults(options: OptionsResolveResult) {
     o.compile = true;
   }
 
+  if (!('htmlOutDir' in o)) {
+    o.htmlOutDir = null;
+  }
+
+  if (!('htmlOutDirFlatten' in o)) {
+    o.htmlOutDirFlatten = false;
+  }
+
+  if (!('htmlModuleTemplate' in o)) {
+    o.htmlModuleTemplate = '<%= filename %>';
+  }
+
+  if (!('htmlVarTemplate' in o)) {
+    o.htmlVarTemplate = '<%= ext %>';
+  }
   return options;
 }
 
