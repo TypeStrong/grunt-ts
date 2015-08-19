@@ -18,13 +18,13 @@ export var decoratorMetadataPassed : ICompilePromise = (strings, options) => {
 
 export var decoratorMetadataNotPassed : ICompilePromise = (strings, options) => {
   return new Promise(function(resolve, reject) {
-    if (options.emitDecoratorMetadata === false) {
+    if (options.emitDecoratorMetadata === undefined) {
       resolve({
         code: 0,
         output: ""
       });
     }
-    throw "expected emitDecoratorMetadata === false";
+    throw "expected emitDecoratorMetadata === false, was " + options.emitDecoratorMetadata;
   });
 };
 
@@ -55,13 +55,13 @@ export var noEmitPassed : ICompilePromise = (strings, options) => {
 
 export var noEmitNotPassed : ICompilePromise = (strings, options) => {
   return new Promise(function(resolve, reject) {
-    if (options.noEmit === false) {
+    if (options.noEmit === undefined) {
       resolve({
         code: 0,
         output: ""
       });
     }
-    throw "expected noEmit === false";
+    throw "expected noEmit === false, was " + options.noEmit;
   });
 };
 
@@ -78,7 +78,7 @@ export var inlineSourcesPassed : ICompilePromise = (strings, options) => {
       }
       let result = JSON.stringify({
           inlineSources: options.inlineSources,
-          sourceMap: options.inlineSources,
+          sourceMap: options.sourceMap,
           inlineSourceMap: options.inlineSourceMap
       });
       throw "expected inlineSources and inlineSourceMap, but not sourceMap.  Got " + result;
@@ -97,7 +97,7 @@ export var inlineSourcesAndInlineSourceMapPassed: ICompilePromise = (strings, op
         }
         let result = JSON.stringify({
             inlineSources: options.inlineSources,
-            sourceMap: options.inlineSources,
+            sourceMap: options.sourceMap,
             inlineSourceMap: options.inlineSourceMap
         });
         throw "expected inlineSources and inlineSourceMap, but not sourceMap.  Got " + result;
@@ -106,7 +106,7 @@ export var inlineSourcesAndInlineSourceMapPassed: ICompilePromise = (strings, op
 
 export var inlineSourceMapPassedWithSourceMap: ICompilePromise = (strings, options) => {
     return new Promise(function (resolve, reject) {
-        if (options.inlineSources === false &&
+        if (options.inlineSources === undefined &&
             options.sourceMap === false &&
             options.inlineSourceMap === true) {
             resolve({
@@ -116,7 +116,7 @@ export var inlineSourceMapPassedWithSourceMap: ICompilePromise = (strings, optio
         }
         let result = JSON.stringify({
             inlineSources: options.inlineSources,
-            sourceMap: options.inlineSources,
+            sourceMap: options.sourceMap,
             inlineSourceMap: options.inlineSourceMap
         });
         throw "expected inlineSourceMap only.  Got " + result;
@@ -125,7 +125,7 @@ export var inlineSourceMapPassedWithSourceMap: ICompilePromise = (strings, optio
 
 export var inlineSourcesNotPassed : ICompilePromise = (strings, options) => {
   return new Promise(function(resolve, reject) {
-    if (options.inlineSources === false && options.sourceMap === false) {
+    if (options.inlineSources === undefined && options.sourceMap === false) {
       resolve({
         code: 0,
         output: ""
@@ -133,10 +133,10 @@ export var inlineSourcesNotPassed : ICompilePromise = (strings, options) => {
       }
     let result = JSON.stringify({
         inlineSources: options.inlineSources,
-        sourceMap: options.inlineSources,
+        sourceMap: options.sourceMap,
         inlineSourceMap: options.inlineSourceMap
     });
-    throw "expected inlineSourcesPassed and sourceMap false.  Got " + result;
+    throw "expected inlineSourcesPassed === undefined and sourceMap false.  Got " + result;
   });
 };
 

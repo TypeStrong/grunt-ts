@@ -132,7 +132,7 @@ export var tests : nodeunit.ITestGroup = {
     "Task properties should override grunt-ts defaults if not specified on the target": (test: nodeunit.Test) => {
         test.expect(2);
         const result = or.resolve(config["reference set to ref1.ts"], config["minimalist"]);
-        test.strictEqual((config["minimalist"] as any).outDir, undefined);
+        test.strictEqual((<any>config["minimalist"]).outDir, undefined);
         test.strictEqual(result.options.reference, 'ref1.ts');
         test.done();
     },

@@ -15,13 +15,13 @@ exports.decoratorMetadataPassed = function (strings, options) {
 };
 exports.decoratorMetadataNotPassed = function (strings, options) {
     return new Promise(function (resolve, reject) {
-        if (options.emitDecoratorMetadata === false) {
+        if (options.emitDecoratorMetadata === undefined) {
             resolve({
                 code: 0,
                 output: ""
             });
         }
-        throw "expected emitDecoratorMetadata === false";
+        throw "expected emitDecoratorMetadata === false, was " + options.emitDecoratorMetadata;
     });
 };
 exports.experimentalDecoratorsPassed = function (strings, options) {
@@ -48,13 +48,13 @@ exports.noEmitPassed = function (strings, options) {
 };
 exports.noEmitNotPassed = function (strings, options) {
     return new Promise(function (resolve, reject) {
-        if (options.noEmit === false) {
+        if (options.noEmit === undefined) {
             resolve({
                 code: 0,
                 output: ""
             });
         }
-        throw "expected noEmit === false";
+        throw "expected noEmit === false, was " + options.noEmit;
     });
 };
 exports.inlineSourcesPassed = function (strings, options) {
@@ -69,7 +69,7 @@ exports.inlineSourcesPassed = function (strings, options) {
         }
         var result = JSON.stringify({
             inlineSources: options.inlineSources,
-            sourceMap: options.inlineSources,
+            sourceMap: options.sourceMap,
             inlineSourceMap: options.inlineSourceMap
         });
         throw "expected inlineSources and inlineSourceMap, but not sourceMap.  Got " + result;
@@ -87,7 +87,7 @@ exports.inlineSourcesAndInlineSourceMapPassed = function (strings, options) {
         }
         var result = JSON.stringify({
             inlineSources: options.inlineSources,
-            sourceMap: options.inlineSources,
+            sourceMap: options.sourceMap,
             inlineSourceMap: options.inlineSourceMap
         });
         throw "expected inlineSources and inlineSourceMap, but not sourceMap.  Got " + result;
@@ -95,7 +95,7 @@ exports.inlineSourcesAndInlineSourceMapPassed = function (strings, options) {
 };
 exports.inlineSourceMapPassedWithSourceMap = function (strings, options) {
     return new Promise(function (resolve, reject) {
-        if (options.inlineSources === false &&
+        if (options.inlineSources === undefined &&
             options.sourceMap === false &&
             options.inlineSourceMap === true) {
             resolve({
@@ -105,7 +105,7 @@ exports.inlineSourceMapPassedWithSourceMap = function (strings, options) {
         }
         var result = JSON.stringify({
             inlineSources: options.inlineSources,
-            sourceMap: options.inlineSources,
+            sourceMap: options.sourceMap,
             inlineSourceMap: options.inlineSourceMap
         });
         throw "expected inlineSourceMap only.  Got " + result;
@@ -113,7 +113,7 @@ exports.inlineSourceMapPassedWithSourceMap = function (strings, options) {
 };
 exports.inlineSourcesNotPassed = function (strings, options) {
     return new Promise(function (resolve, reject) {
-        if (options.inlineSources === false && options.sourceMap === false) {
+        if (options.inlineSources === undefined && options.sourceMap === false) {
             resolve({
                 code: 0,
                 output: ""
@@ -121,10 +121,10 @@ exports.inlineSourcesNotPassed = function (strings, options) {
         }
         var result = JSON.stringify({
             inlineSources: options.inlineSources,
-            sourceMap: options.inlineSources,
+            sourceMap: options.sourceMap,
             inlineSourceMap: options.inlineSourceMap
         });
-        throw "expected inlineSourcesPassed and sourceMap false.  Got " + result;
+        throw "expected inlineSourcesPassed === undefined and sourceMap false.  Got " + result;
     });
 };
 exports.vsproj_test = function (strings, options) {
