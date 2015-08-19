@@ -16,7 +16,7 @@ var compileModule = require('./modules/compile');
 var referenceModule = require('./modules/reference');
 var amdLoaderModule = require('./modules/amdLoader');
 var html2tsModule = require('./modules/html2ts');
-// import templateCacheModule = require('./modules/templateCache');
+var templateCacheModule = require('./modules/templateCache');
 var transformers = require('./modules/transformers');
 var optionsResolver = require('../tasks/modules/optionsResolver');
 // plain vanilla imports
@@ -316,17 +316,17 @@ function pluginFn(grunt) {
                     ///// Template cache
                     // Note: The template cache files do not go into generated files.
                     // Note: You are free to generate a `ts OR js` file for template cache, both should just work
-                    // if (options.templateCache) {
-                    //     if (!options.templateCache.src || !options.templateCache.dest || !options.templateCache.baseUrl) {
-                    //         grunt.log.writeln('templateCache : src, dest, baseUrl must be specified if templateCache option is used'.red);
-                    //     }
-                    //     else {
-                    //         let templateCacheSrc = grunt.file.expand(currenttask.data.templateCache.src); // manual reinterpolation
-                    //         let templateCacheDest = path.resolve(rawTargetConfig.templateCache.dest);
-                    //         let templateCacheBasePath = path.resolve(rawTargetConfig.templateCache.baseUrl);
-                    //         templateCacheModule.generateTemplateCache(templateCacheSrc, templateCacheDest, templateCacheBasePath, lineEndingToUse);
-                    //     }
-                    // }
+                    if (options.templateCache) {
+                        if (!options.templateCache.src || !options.templateCache.dest || !options.templateCache.baseUrl) {
+                            grunt.log.writeln('templateCache : src, dest, baseUrl must be specified if templateCache option is used'.red);
+                        }
+                        else {
+                            var templateCacheSrc = grunt.file.expand(options.templateCache.src); // manual reinterpolation
+                            var templateCacheDest = path.resolve(options.templateCache.dest);
+                            var templateCacheBasePath = path.resolve(options.templateCache.baseUrl);
+                            templateCacheModule.generateTemplateCache(templateCacheSrc, templateCacheDest, templateCacheBasePath, (options.newLine || utils.eol));
+                        }
+                    }
                     ///// Reference File
                     // Generate the reference file
                     // Create a reference file if specified

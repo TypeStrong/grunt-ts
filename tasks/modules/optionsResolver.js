@@ -15,6 +15,7 @@ function resolve(rawTaskOptions, rawTargetOptions, targetName, files) {
     var result = applyGruntOptions(null, rawTaskOptions);
     result = applyGruntOptions(result, rawTargetOptions);
     result = copyCompilationTasks(result, files);
+    result = applyAssociatedOptionsAndResolveConflicts(result);
     result = applyGruntTSDefaults(result);
     if (result.options.targetName === undefined ||
         (!result.options.targetName && targetName)) {
@@ -70,6 +71,25 @@ function copyCompilationTasks(options, files) {
             }
         }
         o.CompilationTasks.push(compilationSet);
+    }
+    return options;
+}
+function applyAssociatedOptionsAndResolveConflicts(options) {
+    var o = options.options;
+    if (o.emitDecoratorMetadata) {
+        o.experimentalDecorators = true;
+    }
+    if (o.inlineSourceMap && o.sourceMap) {
+        options.warnings.push('TypeScript cannot use inlineSourceMap and sourceMap together.  Ignoring sourceMap.');
+        o.sourceMap = false;
+    }
+    if (o.inlineSources && o.sourceMap) {
+        options.errors.push('It is not permitted to use inlineSources and sourceMap together.  Use one or the other.');
+    }
+    if (o.inlineSources && !o.sourceMap) {
+        o.inlineSources = true;
+        o.inlineSourceMap = true;
+        o.sourceMap = false;
     }
     return options;
 }

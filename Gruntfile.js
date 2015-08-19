@@ -56,10 +56,10 @@ module.exports = function (grunt) {
                 fast: 'always'
             },
             build: {
-                src: ['tasks/**/*.ts', 'test/commandLineAssertions.ts']
+                src: ['tasks/**/*.ts']
             },
             test: {
-                src: ['test/test.ts']
+                src: ['test/test.ts', 'test/commandLineAssertions.ts', 'test/optionsResolverTests.ts']
             }
         },
         nodeunit: {
@@ -615,7 +615,7 @@ module.exports = function (grunt) {
             decoratorMetadataPassed: {
                 test: true,
                 testExecute: commandLineAssertions.decoratorMetadataPassed,
-                src: 'test/simple/ts/zoo.ts',
+                src: 'test/simple/ts/z*o.ts',
                 options: {
                     fast: 'never',
                     target: 'es6',
@@ -844,7 +844,8 @@ module.exports = function (grunt) {
 
     // Test
     grunt.registerTask('fail', ['continueOn', 'test_fail', 'continueOff']);
-    grunt.registerTask('test', ['test_all', 'fail', 'nodeunit:fast', 'nodeunit:slow', 'tslint:transformedHtml', 'clean:testPost']);
+    grunt.registerTask('test', ['test_all', 'fail', 'nodeunit:fast', 'nodeunit:slow',
+      'tslint:transformedHtml', 'clean:testPost']);
 
     // Release
     grunt.registerTask('release', ['build', 'test', 'report-time-elapsed']);

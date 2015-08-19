@@ -43,6 +43,7 @@ A more extensive sample `Gruntfile.js` is available [here](https://github.com/Ty
  * Allows the developer to [select a custom TypeScript compiler version](#compiler) for their project, or even use a custom (in-house) version.
  * Supports [most switches](#support-for-tsc-switches) of the `tsc` TypeScript Compiler via options in the gruntfile `ts` task, and also supports switch overrides per-target.
  * Supports [Visual Studio Projects](#vs) as a compile target for identifying TypeScript files, setting up compile configuration, or both.
+ * Supports TypeScript Projects via [tsconfig.json](#tsconfig) when used with TypeScript 1.5 or higher.
  * Provides a [transforms](#transforms) feature that eases code refactoring by taking the burden of relative path maintenance off the developer. If the paths to a set of files changes, grunt-ts will regenerate the relevant sections.  This feature supports:
    * External module [import transforms](#import-transform) by file name, aliasing, directories, indexed directories, and re-exported imports.
    * Internal module [reference maintenance](#references)
@@ -1228,6 +1229,11 @@ Install [Node Inspector](https://github.com/node-inspector/node-inspector) via n
 Example command-line to debug a grunt-ts task on Windows:
 
 `node-debug --debug-brk %appdata%\npm\node_modules\grunt-cli\bin\grunt ts:files_testFilesUsedWithDestAsAJSFile`
+
+Example command-line to debug a particular nodeunit test on Windows:
+
+`node-debug --debug-brk node_modules\grunt-contrib-nodeunit\node_modules\nodeunit\bin\nodeunit test\optionsResolverTests.js -t "out with spaces gets escaped with double-quotes"`
+
 
 Set breakpoints in the Chrome dev tools, or use `debugger;` where needed.
 
