@@ -233,7 +233,7 @@ export function transformFiles(
 
     var transformers: ITransformer[] = [
         new ImportTransformer(),
-        new ExportTransformer(options.newLine),
+        new ExportTransformer((options.newLine || utils.eol)),
         new ReferenceTransformer(),
         new UnknownTransformer()
     ];

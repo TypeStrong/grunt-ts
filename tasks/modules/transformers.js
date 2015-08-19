@@ -200,7 +200,7 @@ function transformFiles(changedFiles, targetFiles, options) {
     ///////////////////////////////////// transformation
     var transformers = [
         new ImportTransformer(),
-        new ExportTransformer(options.newLine),
+        new ExportTransformer((options.newLine || utils.eol)),
         new ReferenceTransformer(),
         new UnknownTransformer()
     ];
