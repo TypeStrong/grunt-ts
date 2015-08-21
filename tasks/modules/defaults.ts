@@ -39,7 +39,9 @@ export const TypeScriptDefaults: IGruntTSOptions = {
     noEmitHelpers: false,
     additionalFlags: '',
     templateCache: null,
-    targetName: ''
+    targetName: '',
+    warnings: [],
+    errors: []
 };
 
 export const GruntTSDefaults = applyGruntTSDefaults(TypeScriptDefaults);

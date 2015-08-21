@@ -88,9 +88,7 @@ function pluginFn(grunt: IGrunt) {
     grunt.registerMultiTask('ts', 'Compile TypeScript files', function () {
 
         let done: grunt.task.AsyncResultCatcher,
-          options: IGruntTSOptions,
-          configWarnings: string[],
-          configErrors: string[];
+          options: IGruntTSOptions;
 
         {
           const currentTask: grunt.task.IMultiTask<ITargetOptions> = this;
@@ -104,10 +102,11 @@ function pluginFn(grunt: IGrunt) {
           let rawTargetConfig =
             <grunt.task.IMultiTask<ITargetOptions>>(grunt.config.getRaw(currentTask.name + '.' + currentTask.target) || {});
 
-          let resolved = optionsResolver.resolve(rawTaskConfig, rawTargetConfig, currentTask.target, files);
-          options = resolved.options;
-          configWarnings = resolved.warnings;
-          configErrors = resolved.errors;
+          options = optionsResolver.resolve(rawTaskConfig, rawTargetConfig, currentTask.target, files);
+
+          options.warnings.forEach((warning) => {
+            grunt.log.writeln(warning.magenta);
+          });
 
         }
 

@@ -64,7 +64,7 @@ function pluginFn(grunt) {
     // Note: this function is called once for each target
     // so task + target options are a bit blurred inside this function
     grunt.registerMultiTask('ts', 'Compile TypeScript files', function () {
-        var done, options, configWarnings, configErrors;
+        var done, options;
         {
             var currentTask = this;
             var files = currentTask.files;
@@ -73,10 +73,10 @@ function pluginFn(grunt) {
             // get unprocessed templates from configuration
             var rawTaskConfig = (grunt.config.getRaw(currentTask.name) || {});
             var rawTargetConfig = (grunt.config.getRaw(currentTask.name + '.' + currentTask.target) || {});
-            var resolved = optionsResolver.resolve(rawTaskConfig, rawTargetConfig, currentTask.target, files);
-            options = resolved.options;
-            configWarnings = resolved.warnings;
-            configErrors = resolved.errors;
+            options = optionsResolver.resolve(rawTaskConfig, rawTargetConfig, currentTask.target, files);
+            options.warnings.forEach(function (warning) {
+                grunt.log.writeln(warning.magenta);
+            });
         }
         var watch;
         // tracks which index in the task "files" property is next for processing

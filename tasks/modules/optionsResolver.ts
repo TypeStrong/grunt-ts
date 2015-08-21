@@ -13,53 +13,128 @@ const propertiesFromTarget = ['html', 'htmlOutDir', 'htmlOutDirFlatten', 'refere
         'noEmitHelpers', 'noImplicitAny', 'noResolve', 'preserveConstEnums', 'removeComments', 'sourceRoot', 'sourceMap',
         'suppressImplicitAnyIndexErrors', 'target', 'verbose'];
 
-interface OptionsResolveResult {
-  options: IGruntTSOptions;
-  warnings: string[];
-  errors: string[];
-}
-
 export function resolve(rawTaskOptions: grunt.task.IMultiTask<ITargetOptions>,
                         rawTargetOptions: grunt.task.IMultiTask<ITargetOptions>,
                         targetName = '',
                         files: IGruntTSCompilationInfo[] = []) {
 
-  let result = applyGruntOptions(null, rawTaskOptions);
+  let {errors, warnings} = resolveAndWarnOnCapitalizationErrors(rawTaskOptions, rawTargetOptions, targetName);
+
+  let result = emptyOptionsResolveResult();
+  result.errors.push(...errors);
+  result.warnings.push(...warnings);
+  result = applyGruntOptions(result, rawTaskOptions);
   result = applyGruntOptions(result, rawTargetOptions);
   result = copyCompilationTasks(result, files);
   result = applyAssociatedOptionsAndResolveConflicts(result);
   result = applyGruntTSDefaults(result);
 
-  if (result.options.targetName === undefined ||
-      (!result.options.targetName && targetName)) {
-    result.options.targetName = targetName;
+  if (result.targetName === undefined ||
+      (!result.targetName && targetName)) {
+    result.targetName = targetName;
   }
 
   return result;
 }
 
 function emptyOptionsResolveResult() {
-  return {
-    options: <IGruntTSOptions><any>{},
+  return <IGruntTSOptions><any>{
     warnings: [],
     errors: []
   };
 }
 
-function applyGruntOptions(applyTo: OptionsResolveResult, gruntOptions: grunt.task.IMultiTask<ITargetOptions>) {
 
-  const result : OptionsResolveResult = applyTo || emptyOptionsResolveResult();
+function resolveAndWarnOnCapitalizationErrors(task: grunt.task.IMultiTask<ITargetOptions>,
+  target: grunt.task.IMultiTask<ITargetOptions>, targetName: string) {
+
+    let errors : string[] = [], warnings: string[] = [];
+    const lowercaseTargetProps = _.map(propertiesFromTarget, (prop) => prop.toLocaleLowerCase());
+    const lowercaseTargetOptionsProps = _.map(propertiesFromTargetOptions, (prop) => prop.toLocaleLowerCase());
+
+    checkFixableCaseIssues(task, 'ts task');
+    checkFixableCaseIssues(target, `target "${targetName}"`);
+    checkLocations(task, 'ts task');
+    checkLocations(target, `target "${targetName}"`);
+
+    return {errors, warnings};
+
+    function checkLocations(task: grunt.task.IMultiTask<ITargetOptions>, configName: string) {
+      if (task) {
+        for (let propertyName in task) {
+          if (propertiesFromTarget.indexOf(propertyName) === -1 && propertyName !== 'options') {
+            if (propertiesFromTargetOptions.indexOf(propertyName) > -1) {
+              let warningText = `Property "${propertyName}" in ${configName} is possibly in the wrong place and will be ignored.  ` +
+                `It is expected on the options object.`;
+              warnings.push(warningText);
+            } else if (lowercaseTargetProps.indexOf(propertyName.toLocaleLowerCase()) === -1
+              && lowercaseTargetOptionsProps.indexOf(propertyName.toLocaleLowerCase()) > -1) {
+              let index = lowercaseTargetOptionsProps.indexOf(propertyName.toLocaleLowerCase());
+              let correctPropertyName = propertiesFromTargetOptions[index];
+
+              let warningText = `Property "${propertyName}" in ${configName} is possibly in the wrong place and will be ignored.  ` +
+                `It is expected on the options object.  It is also the wrong case and should be ${correctPropertyName}.`;
+              warnings.push(warningText);
+            }
+          }
+        }
+      }
+    }
+
+    function checkFixableCaseIssues(task: grunt.task.IMultiTask<ITargetOptions>, configName: string) {
+      if (task) {
+        for (let propertyName in task) {
+          if ((propertiesFromTarget.indexOf(propertyName) === -1)
+            && (lowercaseTargetProps.indexOf(propertyName.toLocaleLowerCase()) > -1)
+            && (propertiesFromTargetOptions.indexOf(propertyName) === -1)) {
+            let index = lowercaseTargetProps.indexOf(propertyName.toLocaleLowerCase());
+            let correctPropertyName = propertiesFromTarget[index];
+
+            let warningText = `Property "${propertyName}" in ${configName} is incorrectly cased; it should ` +
+              `be "${correctPropertyName}".  Fixing it for you and proceeding.`;
+
+            warnings.push(warningText);
+            task[correctPropertyName] = task[propertyName];
+            delete task[propertyName];
+          }
+        }
+
+        for (let propertyName in task.options) {
+          if ((propertiesFromTargetOptions.indexOf(propertyName) === -1)
+            && (lowercaseTargetOptionsProps.indexOf(propertyName.toLocaleLowerCase()) > -1)
+            && (propertiesFromTarget.indexOf(propertyName) === -1)) {
+            let index = lowercaseTargetOptionsProps.indexOf(propertyName.toLocaleLowerCase());
+            let correctPropertyName = propertiesFromTargetOptions[index];
+
+            let warningText = `Property "${propertyName}" in ${configName} options is incorrectly cased; it should ` +
+              `be "${correctPropertyName}".  Fixing it for you and proceeding.`;
+
+            warnings.push(warningText);
+            task.options[correctPropertyName] = task.options[propertyName];
+            delete task.options[propertyName];
+          }
+        }
+
+      }
+    }
+}
+
+
+
+function applyGruntOptions(applyTo: IGruntTSOptions, gruntOptions: grunt.task.IMultiTask<ITargetOptions>) {
+
+  const result = applyTo;
 
   if (gruntOptions) {
-    for (let propertyName of propertiesFromTarget) {
+    for (const propertyName of propertiesFromTarget) {
       if (propertyName in gruntOptions) {
-        result.options[propertyName] = gruntOptions[propertyName];
+        result[propertyName] = gruntOptions[propertyName];
       }
     }
     if (gruntOptions.options) {
-      for (let propertyName of propertiesFromTargetOptions) {
+      for (const propertyName of propertiesFromTargetOptions) {
         if (propertyName in gruntOptions.options) {
-          result.options[propertyName] = gruntOptions.options[propertyName];
+          result[propertyName] = gruntOptions.options[propertyName];
         }
       }
     }
@@ -68,10 +143,10 @@ function applyGruntOptions(applyTo: OptionsResolveResult, gruntOptions: grunt.ta
   return result;
 }
 
-function copyCompilationTasks(options: OptionsResolveResult, files: IGruntTSCompilationInfo[]) {
-  let o = options.options;
-  if (o.CompilationTasks === null || o.CompilationTasks === undefined) {
-    o.CompilationTasks = [];
+function copyCompilationTasks(options: IGruntTSOptions, files: IGruntTSCompilationInfo[]) {
+
+  if (options.CompilationTasks === null || options.CompilationTasks === undefined) {
+    options.CompilationTasks = [];
   }
   for (let i = 0; i < files.length; i += 1) {
     let compilationSet = {
@@ -86,70 +161,67 @@ function copyCompilationTasks(options: OptionsResolveResult, files: IGruntTSComp
         compilationSet.outDir = files[i].dest;
       }
     }
-    o.CompilationTasks.push(compilationSet);
+    options.CompilationTasks.push(compilationSet);
   }
   return options;
 }
 
-function applyAssociatedOptionsAndResolveConflicts(options: OptionsResolveResult) {
-  let o = options.options;
+function applyAssociatedOptionsAndResolveConflicts(options: IGruntTSOptions) {
 
-  if (o.emitDecoratorMetadata) {
-    o.experimentalDecorators = true;
+  if (options.emitDecoratorMetadata) {
+    options.experimentalDecorators = true;
   }
 
-  if (o.inlineSourceMap && o.sourceMap) {
+  if (options.inlineSourceMap && options.sourceMap) {
     options.warnings.push('TypeScript cannot use inlineSourceMap and sourceMap together.  Ignoring sourceMap.');
-    o.sourceMap = false;
+    options.sourceMap = false;
   }
 
-  if (o.inlineSources && o.sourceMap) {
+  if (options.inlineSources && options.sourceMap) {
     options.errors.push('It is not permitted to use inlineSources and sourceMap together.  Use one or the other.');
   }
 
-  if (o.inlineSources && !o.sourceMap) {
-    o.inlineSources = true;
-    o.inlineSourceMap = true;
-    o.sourceMap = false;
+  if (options.inlineSources && !options.sourceMap) {
+    options.inlineSources = true;
+    options.inlineSourceMap = true;
+    options.sourceMap = false;
   }
 
   return options;
 }
 
+function applyGruntTSDefaults(options: IGruntTSOptions) {
 
-function applyGruntTSDefaults(options: OptionsResolveResult) {
-  let o = options.options;
-
-  if (!('sourceMap' in o) && !('inlineSourceMap' in o)) {
-    o.sourceMap = GruntTSDefaults.sourceMap;
+  if (!('sourceMap' in options) && !('inlineSourceMap' in options)) {
+    options.sourceMap = GruntTSDefaults.sourceMap;
   }
 
-  if (!('target' in o)) {
-    o.target = GruntTSDefaults.target;
+  if (!('target' in options)) {
+    options.target = GruntTSDefaults.target;
   }
 
-  if (!('fast' in o)) {
-    o.fast = 'watch';
+  if (!('fast' in options)) {
+    options.fast = 'watch';
   }
 
-  if (!('compile' in o)) {
-    o.compile = true;
+  if (!('compile' in options)) {
+    options.compile = true;
   }
 
-  if (!('htmlOutDir' in o)) {
-    o.htmlOutDir = null;
+  if (!('htmlOutDir' in options)) {
+    options.htmlOutDir = null;
   }
 
-  if (!('htmlOutDirFlatten' in o)) {
-    o.htmlOutDirFlatten = false;
+  if (!('htmlOutDirFlatten' in options)) {
+    options.htmlOutDirFlatten = false;
   }
 
-  if (!('htmlModuleTemplate' in o)) {
-    o.htmlModuleTemplate = '<%= filename %>';
+  if (!('htmlModuleTemplate' in options)) {
+    options.htmlModuleTemplate = '<%= filename %>';
   }
 
-  if (!('htmlVarTemplate' in o)) {
-    o.htmlVarTemplate = '<%= ext %>';
+  if (!('htmlVarTemplate' in options)) {
+    options.htmlVarTemplate = '<%= ext %>';
   }
   return options;
 }

@@ -15,6 +15,24 @@ const config : {[name: string]: grunt.task.IMultiTask<ITargetOptions>} = {
       sourceMap: true
     }
   },
+  "bad sourceMap capitalization": <any>{
+    options: {
+      target: 'es3',
+      sourcemap: true
+    }
+  },
+  "sourceMap in wrong place": <any>{
+    options: {
+      target: 'es3'
+    },
+    sourceMap: true
+  },
+  "bad sourceMap capitalization in wrong place": <any>{
+    options: {
+      target: 'es3'
+    },
+    sourcemap: true
+  },
   "has ES6 and no sourceMap": <any>{
     options: {
       target: 'es6',
@@ -81,8 +99,50 @@ export var tests : nodeunit.ITestGroup = {
   // },
 
   "Warnings and Errors Tests": {
-
+    "Bad capitalization detected and fixed": (test: nodeunit.Test) => {
+        test.expect(2);
+        const result = or.resolve(null, config["bad sourceMap capitalization"]);
+        let allWarnings = result.warnings.join('\n');
+        test.ok(allWarnings.indexOf('Property "sourcemap" in target "" options is incorrectly cased; it should be "sourceMap"') > -1);
+        test.strictEqual((<any>result).sourcemap, undefined);
+        test.done();
+    },
+    "Option in wrong place detected": (test: nodeunit.Test) => {
+        test.expect(1);
+        const result = or.resolve(null, config["sourceMap in wrong place"]);
+        let allWarnings = result.warnings.join('\n');
+        test.ok(allWarnings.indexOf('Property "sourceMap" in target "" is possibly in the wrong place and will be ignored.  It is expected on the options object.') > -1);
+        test.done();
+    },
+    "Option in wrong place and wrong case detected": (test: nodeunit.Test) => {
+        test.expect(2);
+        const result = or.resolve(null, config["bad sourceMap capitalization in wrong place"]);
+        let allWarnings = result.warnings.join('\n');
+        test.ok(allWarnings.indexOf('Property "sourcemap" in target "" is possibly in the wrong place and will be ignored.  It is expected on the options object.') > -1);
+        test.ok(allWarnings.indexOf('It is also the wrong case and should be sourceMap') > -1);
+        test.done();
+    }
   },
+
+
+  // "bad sourceMap capitalization": <any>{
+  //   options: {
+  //     target: 'es3',
+  //     sourcemap: true
+  //   }
+  // },
+  // "sourceMap in wrong place": <any>{
+  //   options: {
+  //     target: 'es3'
+  //   },
+  //   sourceMap: true
+  // },
+  // "bad sourceMap capitalization in wrong place": <any>{
+  //   options: {
+  //     target: 'es3'
+  //   },
+  //   sourcemap: true
+  // },
 
   "Special processing Tests": {
     "path with spaces gets enclosed in double-quotes": (test: nodeunit.Test) => {
@@ -107,14 +167,14 @@ export var tests : nodeunit.ITestGroup = {
         test.expect(1);
         const files = [config["out has spaces"]];
         const result = or.resolve(null, config["out has spaces"], null, files);
-        test.strictEqual(result.options.CompilationTasks[0].out, "\"my folder/out has spaces.js\"");
+        test.strictEqual(result.CompilationTasks[0].out, "\"my folder/out has spaces.js\"");
         test.done();
     },
     "outDir with spaces gets escaped with double-quotes": (test: nodeunit.Test) => {
         test.expect(1);
         const files = [config["outDir has spaces"]];
         const result = or.resolve(null, config["outDir has spaces"], null, files);
-        test.strictEqual(result.options.CompilationTasks[0].outDir, "\"./my folder\"");
+        test.strictEqual(result.CompilationTasks[0].outDir, "\"./my folder\"");
         test.done();
     }
   },
@@ -125,60 +185,60 @@ export var tests : nodeunit.ITestGroup = {
     "The grunt-ts defaults come through when not specified": (test: nodeunit.Test) => {
         test.expect(2);
         const result = or.resolve(null, config["minimalist"]);
-        test.strictEqual(result.options.target, "es5");
-        test.strictEqual(result.options.fast, "watch");
+        test.strictEqual(result.target, "es5");
+        test.strictEqual(result.fast, "watch");
         test.done();
     },
     "Task properties should override grunt-ts defaults if not specified on the target": (test: nodeunit.Test) => {
         test.expect(2);
         const result = or.resolve(config["reference set to ref1.ts"], config["minimalist"]);
         test.strictEqual((<any>config["minimalist"]).outDir, undefined);
-        test.strictEqual(result.options.reference, 'ref1.ts');
+        test.strictEqual(result.reference, 'ref1.ts');
         test.done();
     },
     "Target name is set if specified": (test: nodeunit.Test) => {
         test.expect(1);
         const result = or.resolve(null, config["minimalist"], "MyTarget");
-        test.strictEqual(result.options.targetName, "MyTarget");
+        test.strictEqual(result.targetName, "MyTarget");
         test.done();
     },
     "Target name is default if not specified": (test: nodeunit.Test) => {
         test.expect(1);
         const result = or.resolve(null, config["minimalist"]);
-        test.strictEqual(result.options.targetName, '');
+        test.strictEqual(result.targetName, '');
         test.done();
     },
     "Task options should override grunt-ts defaults if not specified in the target options": (test: nodeunit.Test) => {
         test.expect(2);
         const result = or.resolve(config["has ES6 and no sourceMap"], config["minimalist"]);
-        test.strictEqual(result.options.target, "es6");
-        test.strictEqual(result.options.sourceMap, false);
+        test.strictEqual(result.target, "es6");
+        test.strictEqual(result.sourceMap, false);
         test.done();
     },
     "Properties specified on the target should override anything specified in the task and the grunt-ts defaults": (test: nodeunit.Test) => {
         test.expect(1);
         const result = or.resolve(config["reference set to ref1.ts"], config["reference set to ref2.ts"]);
-        test.strictEqual(result.options.reference, "ref2.ts");
+        test.strictEqual(result.reference, "ref2.ts");
         test.done();
     },
     "Explicit null specified on the target should override anything specified in the task and the grunt-ts defaults": (test: nodeunit.Test) => {
         test.expect(1);
         const result = or.resolve(config["reference set to ref1.ts"], config["reference set to null"], null, []);
-        test.strictEqual(result.options.reference, null);
+        test.strictEqual(result.reference, null);
         test.done();
     },
     "Explicit undefined specified on the target should override anything specified in the task and the grunt-ts defaults": (test: nodeunit.Test) => {
         test.expect(1);
         const files = [config["has outDir set to undefined"]];
         const result = or.resolve(config["reference set to ref1.ts"], config["reference set to undefined"], null, []);
-        test.strictEqual(result.options.reference, undefined);
+        test.strictEqual(result.reference, undefined);
         test.done();
     },
     "Properties on target `options` should override the task options `options` object and the grunt-ts defaults": (test: nodeunit.Test) => {
         test.expect(2);
         const result = or.resolve(config["has ES6 and no sourceMap"], config["has ES3 and sourceMap"]);
-        test.strictEqual(result.options.target, "es3");
-        test.strictEqual(result.options.sourceMap, true);
+        test.strictEqual(result.target, "es3");
+        test.strictEqual(result.sourceMap, true);
         test.done();
     }
   },

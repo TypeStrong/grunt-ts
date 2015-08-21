@@ -267,4 +267,16 @@ exports.test_additionalFlags = function (strings, options) {
         throw "expected --version.  Got " + JSON.stringify(options);
     });
 };
+exports.bad_sourcemap_option = function (strings, options) {
+    return new Promise(function (resolve, reject) {
+        if (options.warnings.length > 0
+            && options.warnings[0].indexOf("sourceMap") > -1) {
+            resolve({
+                code: 0,
+                output: ""
+            });
+        }
+        throw "expected to see a warning for bad sourceMap option.";
+    });
+};
 //# sourceMappingURL=commandLineAssertions.js.map

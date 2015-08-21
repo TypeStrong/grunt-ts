@@ -290,3 +290,17 @@ export var test_additionalFlags: ICompilePromise = (strings, options) => {
     throw `expected --version.  Got ${JSON.stringify(options)}`;
   });
 };
+
+export var bad_sourcemap_option: ICompilePromise = (strings, options) => {
+  return new Promise(function(resolve, reject) {
+
+    if (options.warnings.length > 0
+        && options.warnings[0].indexOf("sourceMap") > -1) {
+      resolve({
+        code: 0,
+        output: ""
+      });
+    }
+    throw `expected to see a warning for bad sourceMap option.`;
+  });
+};

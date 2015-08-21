@@ -12,39 +12,104 @@ var propertiesFromTarget = ['html', 'htmlOutDir', 'htmlOutDirFlatten', 'referenc
 function resolve(rawTaskOptions, rawTargetOptions, targetName, files) {
     if (targetName === void 0) { targetName = ''; }
     if (files === void 0) { files = []; }
-    var result = applyGruntOptions(null, rawTaskOptions);
+    var _a = resolveAndWarnOnCapitalizationErrors(rawTaskOptions, rawTargetOptions, targetName), errors = _a.errors, warnings = _a.warnings;
+    var result = emptyOptionsResolveResult();
+    (_b = result.errors).push.apply(_b, errors);
+    (_c = result.warnings).push.apply(_c, warnings);
+    result = applyGruntOptions(result, rawTaskOptions);
     result = applyGruntOptions(result, rawTargetOptions);
     result = copyCompilationTasks(result, files);
     result = applyAssociatedOptionsAndResolveConflicts(result);
     result = applyGruntTSDefaults(result);
-    if (result.options.targetName === undefined ||
-        (!result.options.targetName && targetName)) {
-        result.options.targetName = targetName;
+    if (result.targetName === undefined ||
+        (!result.targetName && targetName)) {
+        result.targetName = targetName;
     }
     return result;
+    var _b, _c;
 }
 exports.resolve = resolve;
 function emptyOptionsResolveResult() {
     return {
-        options: {},
         warnings: [],
         errors: []
     };
 }
+function resolveAndWarnOnCapitalizationErrors(task, target, targetName) {
+    var errors = [], warnings = [];
+    var lowercaseTargetProps = _.map(propertiesFromTarget, function (prop) { return prop.toLocaleLowerCase(); });
+    var lowercaseTargetOptionsProps = _.map(propertiesFromTargetOptions, function (prop) { return prop.toLocaleLowerCase(); });
+    checkFixableCaseIssues(task, 'ts task');
+    checkFixableCaseIssues(target, "target \"" + targetName + "\"");
+    checkLocations(task, 'ts task');
+    checkLocations(target, "target \"" + targetName + "\"");
+    return { errors: errors, warnings: warnings };
+    function checkLocations(task, configName) {
+        if (task) {
+            for (var propertyName in task) {
+                if (propertiesFromTarget.indexOf(propertyName) === -1 && propertyName !== 'options') {
+                    if (propertiesFromTargetOptions.indexOf(propertyName) > -1) {
+                        var warningText = ("Property \"" + propertyName + "\" in " + configName + " is possibly in the wrong place and will be ignored.  ") +
+                            "It is expected on the options object.";
+                        warnings.push(warningText);
+                    }
+                    else if (lowercaseTargetProps.indexOf(propertyName.toLocaleLowerCase()) === -1
+                        && lowercaseTargetOptionsProps.indexOf(propertyName.toLocaleLowerCase()) > -1) {
+                        var index = lowercaseTargetOptionsProps.indexOf(propertyName.toLocaleLowerCase());
+                        var correctPropertyName = propertiesFromTargetOptions[index];
+                        var warningText = ("Property \"" + propertyName + "\" in " + configName + " is possibly in the wrong place and will be ignored.  ") +
+                            ("It is expected on the options object.  It is also the wrong case and should be " + correctPropertyName + ".");
+                        warnings.push(warningText);
+                    }
+                }
+            }
+        }
+    }
+    function checkFixableCaseIssues(task, configName) {
+        if (task) {
+            for (var propertyName in task) {
+                if ((propertiesFromTarget.indexOf(propertyName) === -1)
+                    && (lowercaseTargetProps.indexOf(propertyName.toLocaleLowerCase()) > -1)
+                    && (propertiesFromTargetOptions.indexOf(propertyName) === -1)) {
+                    var index = lowercaseTargetProps.indexOf(propertyName.toLocaleLowerCase());
+                    var correctPropertyName = propertiesFromTarget[index];
+                    var warningText = ("Property \"" + propertyName + "\" in " + configName + " is incorrectly cased; it should ") +
+                        ("be \"" + correctPropertyName + "\".  Fixing it for you and proceeding.");
+                    warnings.push(warningText);
+                    task[correctPropertyName] = task[propertyName];
+                    delete task[propertyName];
+                }
+            }
+            for (var propertyName in task.options) {
+                if ((propertiesFromTargetOptions.indexOf(propertyName) === -1)
+                    && (lowercaseTargetOptionsProps.indexOf(propertyName.toLocaleLowerCase()) > -1)
+                    && (propertiesFromTarget.indexOf(propertyName) === -1)) {
+                    var index = lowercaseTargetOptionsProps.indexOf(propertyName.toLocaleLowerCase());
+                    var correctPropertyName = propertiesFromTargetOptions[index];
+                    var warningText = ("Property \"" + propertyName + "\" in " + configName + " options is incorrectly cased; it should ") +
+                        ("be \"" + correctPropertyName + "\".  Fixing it for you and proceeding.");
+                    warnings.push(warningText);
+                    task.options[correctPropertyName] = task.options[propertyName];
+                    delete task.options[propertyName];
+                }
+            }
+        }
+    }
+}
 function applyGruntOptions(applyTo, gruntOptions) {
-    var result = applyTo || emptyOptionsResolveResult();
+    var result = applyTo;
     if (gruntOptions) {
         for (var _i = 0; _i < propertiesFromTarget.length; _i++) {
             var propertyName = propertiesFromTarget[_i];
             if (propertyName in gruntOptions) {
-                result.options[propertyName] = gruntOptions[propertyName];
+                result[propertyName] = gruntOptions[propertyName];
             }
         }
         if (gruntOptions.options) {
             for (var _a = 0; _a < propertiesFromTargetOptions.length; _a++) {
                 var propertyName = propertiesFromTargetOptions[_a];
                 if (propertyName in gruntOptions.options) {
-                    result.options[propertyName] = gruntOptions.options[propertyName];
+                    result[propertyName] = gruntOptions.options[propertyName];
                 }
             }
         }
@@ -52,9 +117,8 @@ function applyGruntOptions(applyTo, gruntOptions) {
     return result;
 }
 function copyCompilationTasks(options, files) {
-    var o = options.options;
-    if (o.CompilationTasks === null || o.CompilationTasks === undefined) {
-        o.CompilationTasks = [];
+    if (options.CompilationTasks === null || options.CompilationTasks === undefined) {
+        options.CompilationTasks = [];
     }
     for (var i = 0; i < files.length; i += 1) {
         var compilationSet = {
@@ -70,54 +134,52 @@ function copyCompilationTasks(options, files) {
                 compilationSet.outDir = files[i].dest;
             }
         }
-        o.CompilationTasks.push(compilationSet);
+        options.CompilationTasks.push(compilationSet);
     }
     return options;
 }
 function applyAssociatedOptionsAndResolveConflicts(options) {
-    var o = options.options;
-    if (o.emitDecoratorMetadata) {
-        o.experimentalDecorators = true;
+    if (options.emitDecoratorMetadata) {
+        options.experimentalDecorators = true;
     }
-    if (o.inlineSourceMap && o.sourceMap) {
+    if (options.inlineSourceMap && options.sourceMap) {
         options.warnings.push('TypeScript cannot use inlineSourceMap and sourceMap together.  Ignoring sourceMap.');
-        o.sourceMap = false;
+        options.sourceMap = false;
     }
-    if (o.inlineSources && o.sourceMap) {
+    if (options.inlineSources && options.sourceMap) {
         options.errors.push('It is not permitted to use inlineSources and sourceMap together.  Use one or the other.');
     }
-    if (o.inlineSources && !o.sourceMap) {
-        o.inlineSources = true;
-        o.inlineSourceMap = true;
-        o.sourceMap = false;
+    if (options.inlineSources && !options.sourceMap) {
+        options.inlineSources = true;
+        options.inlineSourceMap = true;
+        options.sourceMap = false;
     }
     return options;
 }
 function applyGruntTSDefaults(options) {
-    var o = options.options;
-    if (!('sourceMap' in o) && !('inlineSourceMap' in o)) {
-        o.sourceMap = defaults_1.GruntTSDefaults.sourceMap;
+    if (!('sourceMap' in options) && !('inlineSourceMap' in options)) {
+        options.sourceMap = defaults_1.GruntTSDefaults.sourceMap;
     }
-    if (!('target' in o)) {
-        o.target = defaults_1.GruntTSDefaults.target;
+    if (!('target' in options)) {
+        options.target = defaults_1.GruntTSDefaults.target;
     }
-    if (!('fast' in o)) {
-        o.fast = 'watch';
+    if (!('fast' in options)) {
+        options.fast = 'watch';
     }
-    if (!('compile' in o)) {
-        o.compile = true;
+    if (!('compile' in options)) {
+        options.compile = true;
     }
-    if (!('htmlOutDir' in o)) {
-        o.htmlOutDir = null;
+    if (!('htmlOutDir' in options)) {
+        options.htmlOutDir = null;
     }
-    if (!('htmlOutDirFlatten' in o)) {
-        o.htmlOutDirFlatten = false;
+    if (!('htmlOutDirFlatten' in options)) {
+        options.htmlOutDirFlatten = false;
     }
-    if (!('htmlModuleTemplate' in o)) {
-        o.htmlModuleTemplate = '<%= filename %>';
+    if (!('htmlModuleTemplate' in options)) {
+        options.htmlModuleTemplate = '<%= filename %>';
     }
-    if (!('htmlVarTemplate' in o)) {
-        o.htmlVarTemplate = '<%= ext %>';
+    if (!('htmlVarTemplate' in options)) {
+        options.htmlVarTemplate = '<%= ext %>';
     }
     return options;
 }

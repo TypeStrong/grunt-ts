@@ -51,7 +51,7 @@ module.exports = function (grunt) {
                 target: 'es5',
                 module: 'commonjs',
                 comments: true,
-                sourcemap: true,
+                sourceMap: true,
                 verbose: true,
                 fast: 'always'
             },
@@ -88,14 +88,14 @@ module.exports = function (grunt) {
                 out: 'test/work/out.js',
                 // Override the default options, see : http://gruntjs.com/configuring-tasks#options
                 options: {
-                    sourcemap: true,
+                    sourceMap: true,
                     declaration: true,
                 },
             },
             simple: {
                 test: true,
                 options: {
-                    sourcemap: true,
+                    sourceMap: true,
                     declaration: true
                 },
                 src: ['test/simple/ts/zoo.ts'],
@@ -105,16 +105,26 @@ module.exports = function (grunt) {
                 test: true,
                 options: {
                     fast: 'never',
-                    sourcemap: false
+                    sourceMap: false
                 },
                 src: ['test/simple/ts/zoo.ts'],
                 out: 'test/out with spaces/out with spaces.js'
+            },
+            bad_sourcemap_option: {
+                test: true,
+                testExecute: commandLineAssertions.bad_sourcemap_option,
+                options: {
+                    fast: 'never',
+                    sourcemap: true // should be sourceMap
+                },
+                src: ['test/simple/ts/zoo.ts'],
+                out: 'test/badSourceMap.js'
             },
             outDir_with_spaces: {
                 test: true,
                 options: {
                     fast: 'never',
-                    sourcemap: false
+                    sourceMap: false
                 },
                 src: ['test/simple/ts/zoo.ts'],
                 outDir: 'test/out with spaces'
@@ -435,7 +445,7 @@ module.exports = function (grunt) {
                     sourceMap: true
                 },
             },
-            templatecache: {
+            templatecache_test: {
                 test: true,
                 src: ['test/templatecache/**/*.ts'],
                 reference: 'test/templatecache/ts/reference.ts',
@@ -550,10 +560,10 @@ module.exports = function (grunt) {
                 baseDir: 'test/fail/ts',
                 // watch: 'test',
                 options: {                  // overide the main options for this target
-                    sourcemap: false
+                    sourceMap: false
                 }
             },
-            failOnTypeErrors: {
+            test_failOnTypeErrors: {
                 fail: true,
                 src: ['test/failontypeerror/**/*.ts'],
                 outDir: 'test/failontypeerror/js',
