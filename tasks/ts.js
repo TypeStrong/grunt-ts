@@ -144,8 +144,7 @@ function pluginFn(grunt) {
                 }
                 // Create an amd loader?
                 var amdloader = options.amdloader;
-                var amdloaderFile;
-                var amdloaderPath;
+                var amdloaderFile, amdloaderPath;
                 if (!!amdloader) {
                     amdloaderFile = path.resolve(amdloader);
                     amdloaderPath = path.dirname(amdloaderFile);

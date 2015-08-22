@@ -188,9 +188,8 @@ function pluginFn(grunt: IGrunt) {
                 }
 
                 // Create an amd loader?
-                var amdloader = options.amdloader;
-                var amdloaderFile;
-                var amdloaderPath;
+                let amdloader = options.amdloader;
+                let amdloaderFile: string, amdloaderPath: string;
                 if (!!amdloader) {
                     amdloaderFile = path.resolve(amdloader);
                     amdloaderPath = path.dirname(amdloaderFile);
