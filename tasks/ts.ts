@@ -136,32 +136,6 @@ function pluginFn(grunt: IGrunt) {
                     return path.resolve(filename) === referenceFile;
                 }
 
-                // function fetchTargetOutOrElseTryTargetDest(target: ITargetOptions) {
-                //     var targetout = target.out;
-                //     if (!targetout) {
-                //         if (target.dest) {
-                //           // A dest array is meaningless in TypeScript, so just take
-                //           // the first one.
-                //           targetout = utils.getOrGetFirst(target.dest);
-                //         }
-                //         else if (target.files) {
-                //             var filesKeys = _.keys(target.files);
-                //             if (filesKeys.length > filesCompilationIndex &&
-                //               utils.isJavaScriptFile(filesKeys[filesCompilationIndex])) {
-                //               targetout = filesKeys[filesCompilationIndex];
-                //             } else if (filesKeys.length > filesCompilationIndex &&
-                //               target.files[filesKeys[filesCompilationIndex]].dest) {
-                //                 targetout = utils.getOrGetFirst(
-                //                   // A dest array is meaningless in TypeScript, so just take
-                //                   // the first one.
-                //                   target.files[filesKeys[filesCompilationIndex]].dest
-                //                 );
-                //             }
-                //         }
-                //     }
-                //     return targetout;
-                // }
-
                 // Create an output file?
                 var outFile = currentFiles.out;
                 var outFile_d_ts: string;
@@ -199,11 +173,7 @@ function pluginFn(grunt: IGrunt) {
                 // Uses the blind tsc compile task
                 // logs errors
                 function runCompilation(options: IGruntTSOptions, compilationInfo: IGruntTSCompilationInfo): Promise<boolean> {
-                    // Don't run it yet
                     grunt.log.writeln('Compiling...'.yellow);
-
-                    // The files to compile
-                    // var filesToCompile = files;
 
                     // Time the compiler process
                     var starttime = new Date().getTime();
@@ -546,29 +516,6 @@ function pluginFn(grunt: IGrunt) {
         }
         return template;
     }
-
-    // function getVSSettings(rawTargetOptions: ITargetOptions) {
-    //     var vs: IVisualStudioProjectSupport = null;
-    //     if (rawTargetOptions.vs) {
-    //         var targetvs = rawTargetOptions.vs;
-    //         if (typeof targetvs === 'string') {
-    //             vs = {
-    //                 project: targetvs,
-    //                 config: '',
-    //                 ignoreFiles: false,
-    //                 ignoreSettings: false
-    //             };
-    //         } else {
-    //             vs = {
-    //                 project: targetvs.project || '',
-    //                 config: targetvs.config || '',
-    //                 ignoreFiles: targetvs.ignoreFiles || false,
-    //                 ignoreSettings: targetvs.ignoreSettings || false
-    //             };
-    //         }
-    //     }
-    //     return vs;
-    // }
 
 }
 export = pluginFn;
