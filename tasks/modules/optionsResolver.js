@@ -7,8 +7,8 @@ var propertiesFromTarget = ['amdloader', 'html', 'htmlOutDir', 'htmlOutDirFlatte
     'templateCache', 'vs', 'watch'], propertiesFromTargetOptions = ['additionalFlags', 'comments', 'compile', 'compiler', 'declaration',
     'emitDecoratorMetadata', 'experimentalDecorators', 'failOnTypeErrors', 'fast', 'htmlModuleTemplate',
     'htmlVarTemplate', 'inlineSourceMap', 'inlineSources', 'isolatedModules', 'mapRoot', 'module', 'newLine', 'noEmit',
-    'noEmitHelpers', 'noImplicitAny', 'noResolve', 'preserveConstEnums', 'removeComments', 'sourceRoot', 'sourceMap',
-    'suppressImplicitAnyIndexErrors', 'target', 'verbose'];
+    'noEmitHelpers', 'noEmitOnError', 'noImplicitAny', 'noResolve', 'preserveConstEnums', 'removeComments', 'sourceRoot',
+    'sourceMap', 'suppressImplicitAnyIndexErrors', 'target', 'verbose'];
 function resolve(rawTaskOptions, rawTargetOptions, targetName, files) {
     if (targetName === void 0) { targetName = ''; }
     if (files === void 0) { files = []; }

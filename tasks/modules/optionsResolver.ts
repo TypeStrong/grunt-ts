@@ -10,8 +10,8 @@ const propertiesFromTarget = ['amdloader', 'html', 'htmlOutDir', 'htmlOutDirFlat
       propertiesFromTargetOptions = ['additionalFlags', 'comments', 'compile', 'compiler', 'declaration',
         'emitDecoratorMetadata', 'experimentalDecorators', 'failOnTypeErrors', 'fast', 'htmlModuleTemplate',
         'htmlVarTemplate', 'inlineSourceMap', 'inlineSources', 'isolatedModules', 'mapRoot', 'module', 'newLine', 'noEmit',
-        'noEmitHelpers', 'noImplicitAny', 'noResolve', 'preserveConstEnums', 'removeComments', 'sourceRoot', 'sourceMap',
-        'suppressImplicitAnyIndexErrors', 'target', 'verbose'];
+        'noEmitHelpers', 'noEmitOnError', 'noImplicitAny', 'noResolve', 'preserveConstEnums', 'removeComments', 'sourceRoot',
+        'sourceMap', 'suppressImplicitAnyIndexErrors', 'target', 'verbose'];
 
 export function resolve(rawTaskOptions: grunt.task.IMultiTask<ITargetOptions>,
                         rawTargetOptions: grunt.task.IMultiTask<ITargetOptions>,

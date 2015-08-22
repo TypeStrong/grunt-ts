@@ -124,26 +124,6 @@ export var tests : nodeunit.ITestGroup = {
     }
   },
 
-
-  // "bad sourceMap capitalization": <any>{
-  //   options: {
-  //     target: 'es3',
-  //     sourcemap: true
-  //   }
-  // },
-  // "sourceMap in wrong place": <any>{
-  //   options: {
-  //     target: 'es3'
-  //   },
-  //   sourceMap: true
-  // },
-  // "bad sourceMap capitalization in wrong place": <any>{
-  //   options: {
-  //     target: 'es3'
-  //   },
-  //   sourcemap: true
-  // },
-
   "Special processing Tests": {
     "path with spaces gets enclosed in double-quotes": (test: nodeunit.Test) => {
         test.expect(1);
