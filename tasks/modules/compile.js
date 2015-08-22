@@ -193,16 +193,6 @@ function compileAllFiles(options, compilationInfo) {
         }
         args.push('--outDir', compilationInfo.outDir);
     }
-    // Target options:
-    // if (outFile) {
-    //   if (utils.isJavaScriptFile(outFile)) {
-    //     args.push('--out', outFile);
-    //   } else {
-    //     if (!theOutDir) {
-    //       args.push('--outDir', outFile);
-    //     }
-    //   }
-    // } else
     if (compilationInfo.out) {
         args.push('--out', compilationInfo.out);
     }
