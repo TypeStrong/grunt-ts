@@ -164,22 +164,25 @@ function applyGruntTSDefaults(options) {
         options.target = defaults_1.GruntTSDefaults.target;
     }
     if (!('fast' in options)) {
-        options.fast = 'watch';
+        options.fast = defaults_1.GruntTSDefaults.fast;
     }
     if (!('compile' in options)) {
-        options.compile = true;
+        options.compile = defaults_1.GruntTSDefaults.compile;
     }
     if (!('htmlOutDir' in options)) {
         options.htmlOutDir = null;
     }
     if (!('htmlOutDirFlatten' in options)) {
-        options.htmlOutDirFlatten = false;
+        options.htmlOutDirFlatten = defaults_1.GruntTSDefaults.htmlOutDirFlatten;
     }
     if (!('htmlModuleTemplate' in options)) {
-        options.htmlModuleTemplate = '<%= filename %>';
+        options.htmlModuleTemplate = defaults_1.GruntTSDefaults.htmlModuleTemplate;
     }
     if (!('htmlVarTemplate' in options)) {
-        options.htmlVarTemplate = '<%= ext %>';
+        options.htmlVarTemplate = defaults_1.GruntTSDefaults.htmlVarTemplate;
+    }
+    if (!('removeComments' in options) && !('comments' in options)) {
+        options.removeComments = defaults_1.GruntTSDefaults.removeComments;
     }
     return options;
 }

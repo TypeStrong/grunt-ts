@@ -201,11 +201,11 @@ function applyGruntTSDefaults(options: IGruntTSOptions) {
   }
 
   if (!('fast' in options)) {
-    options.fast = 'watch';
+    options.fast = GruntTSDefaults.fast;
   }
 
   if (!('compile' in options)) {
-    options.compile = true;
+    options.compile = GruntTSDefaults.compile;
   }
 
   if (!('htmlOutDir' in options)) {
@@ -213,16 +213,22 @@ function applyGruntTSDefaults(options: IGruntTSOptions) {
   }
 
   if (!('htmlOutDirFlatten' in options)) {
-    options.htmlOutDirFlatten = false;
+    options.htmlOutDirFlatten = GruntTSDefaults.htmlOutDirFlatten;
   }
 
   if (!('htmlModuleTemplate' in options)) {
-    options.htmlModuleTemplate = '<%= filename %>';
+    options.htmlModuleTemplate = GruntTSDefaults.htmlModuleTemplate;
   }
 
   if (!('htmlVarTemplate' in options)) {
-    options.htmlVarTemplate = '<%= ext %>';
+    options.htmlVarTemplate = GruntTSDefaults.htmlVarTemplate;
   }
+
+  if (!('removeComments' in options) && !('comments' in options)) {
+    options.removeComments = GruntTSDefaults.removeComments;
+  }
+
+
   return options;
 }
 

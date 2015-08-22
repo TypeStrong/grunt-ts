@@ -26,7 +26,7 @@ export const TypeScriptDefaults: IGruntTSOptions = {
     htmlVarTemplate: null,
     htmlOutputTemplate: null,
     htmlOutDir: null,
-    htmlOutDirFlatten: false,
+    htmlOutDirFlatten: null,
     failOnTypeErrors: true,
     noEmitOnError: false,
     preserveConstEnums: false,
@@ -51,6 +51,8 @@ function applyGruntTSDefaults(options: IGruntTSOptions) {
   options.target = 'es5';
   options.htmlModuleTemplate = '<%= filename %>';
   options.htmlVarTemplate = '<%= ext %>';
+  options.htmlOutDirFlatten = false;
   options.fast = 'watch';
+  options.removeComments = true;
   return options;
 }
