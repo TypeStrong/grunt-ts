@@ -5,7 +5,7 @@ import {GruntTSDefaults} from './defaults';
 import * as utils from './utils';
 import _ = require('lodash');
 
-const propertiesFromTarget = ['html', 'htmlOutDir', 'htmlOutDirFlatten', 'reference', 'testExecute', 'tsconfig',
+const propertiesFromTarget = ['amdloader', 'html', 'htmlOutDir', 'htmlOutDirFlatten', 'reference', 'testExecute', 'tsconfig',
         'templateCache', 'vs', 'watch'],
       propertiesFromTargetOptions = ['additionalFlags', 'comments', 'compile', 'compiler', 'declaration',
         'emitDecoratorMetadata', 'experimentalDecorators', 'failOnTypeErrors', 'fast', 'htmlModuleTemplate',
@@ -185,6 +185,14 @@ function applyAssociatedOptionsAndResolveConflicts(options: IGruntTSOptions) {
     options.inlineSources = true;
     options.inlineSourceMap = true;
     options.sourceMap = false;
+  }
+
+  if ('comments' in options && !('removeComments' in options)) {
+    options.comments = !!options.comments;
+    options.removeComments = !options.comments;
+  } else if (!('comments' in options) && ('removeComments' in options)) {
+    options.removeComments = !!options.removeComments;
+    options.comments = !options.removeComments;
   }
 
   return options;

@@ -3,7 +3,7 @@
 var defaults_1 = require('./defaults');
 var utils = require('./utils');
 var _ = require('lodash');
-var propertiesFromTarget = ['html', 'htmlOutDir', 'htmlOutDirFlatten', 'reference', 'testExecute', 'tsconfig',
+var propertiesFromTarget = ['amdloader', 'html', 'htmlOutDir', 'htmlOutDirFlatten', 'reference', 'testExecute', 'tsconfig',
     'templateCache', 'vs', 'watch'], propertiesFromTargetOptions = ['additionalFlags', 'comments', 'compile', 'compiler', 'declaration',
     'emitDecoratorMetadata', 'experimentalDecorators', 'failOnTypeErrors', 'fast', 'htmlModuleTemplate',
     'htmlVarTemplate', 'inlineSourceMap', 'inlineSources', 'isolatedModules', 'mapRoot', 'module', 'newLine', 'noEmit',
@@ -153,6 +153,14 @@ function applyAssociatedOptionsAndResolveConflicts(options) {
         options.inlineSources = true;
         options.inlineSourceMap = true;
         options.sourceMap = false;
+    }
+    if ('comments' in options && !('removeComments' in options)) {
+        options.comments = !!options.comments;
+        options.removeComments = !options.comments;
+    }
+    else if (!('comments' in options) && ('removeComments' in options)) {
+        options.removeComments = !!options.removeComments;
+        options.comments = !options.removeComments;
     }
     return options;
 }
