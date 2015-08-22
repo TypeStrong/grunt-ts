@@ -4,7 +4,6 @@ var _str = require('underscore.string');
 var path = require('path');
 var fs = require('fs');
 var utils = require('./utils');
-var eol = utils.eol;
 var grunt = utils.grunt;
 var pathSeperator = path.sep;
 function getReferencesInOrder(referenceFile, referencePath, generatedFiles) {
@@ -71,7 +70,8 @@ function getReferencesInOrder(referenceFile, referencePath, generatedFiles) {
 }
 exports.getReferencesInOrder = getReferencesInOrder;
 // It updates based on the order of reference files
-function updateAmdLoader(referenceFile, files, loaderFile, loaderPath, outDir) {
+function updateAmdLoader(referenceFile, files, loaderFile, loaderPath, outDir, newLine) {
+    if (newLine === void 0) { newLine = utils.eol; }
     // Read the original file if it exists
     if (fs.existsSync(referenceFile)) {
         grunt.log.verbose.writeln('Generating amdloader from reference file ' + referenceFile);
@@ -130,12 +130,12 @@ function updateAmdLoader(referenceFile, files, loaderFile, loaderPath, outDir) {
             files.unordered = makeRelativeToOutDir(files.unordered);
             files.after = makeRelativeToOutDir(files.after);
             var mainTemplate = _.template('define(function (require) { '
-                + eol + '<%= body %>'
-                + eol + '});');
+                + newLine + '<%= body %>'
+                + newLine + '});');
             // The order in the before and after files is important
             var singleRequireTemplate = _.template('\t require([<%= filename %>],function (){'
-                + eol + '<%= subitem %>'
-                + eol + '\t });');
+                + newLine + '<%= subitem %>'
+                + newLine + '\t });');
             // initial sub item
             var subitem = '';
             // Write out a binary file:
@@ -160,12 +160,12 @@ function updateAmdLoader(referenceFile, files, loaderFile, loaderPath, outDir) {
             // Next up add the unordered items:
             // For these we will use just one require call
             if (files.unordered.length > 0) {
-                var unorderFileNames = files.unordered.join('",' + eol + '\t\t  "');
+                var unorderFileNames = files.unordered.join('",' + newLine + '\t\t  "');
                 subitem = singleRequireTemplate({ filename: '"' + unorderFileNames + '"', subitem: subitem });
             }
             // Next the generated files
             // For these we will use just one require call
-            var generatedFileNames = files.generated.join('",' + eol + '\t\t  "');
+            var generatedFileNames = files.generated.join('",' + newLine + '\t\t  "');
             subitem = singleRequireTemplate({ filename: '"' + generatedFileNames + '"', subitem: subitem });
             // Build the subitem for ordered before items
             files.before = files.before.reverse();

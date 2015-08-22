@@ -7,7 +7,6 @@ import fs = require('fs');
 
 import utils = require('./utils');
 
-var eol = utils.eol;
 var grunt = utils.grunt;
 var pathSeperator = path.sep;
 
@@ -108,7 +107,8 @@ export function getReferencesInOrder(referenceFile: string, referencePath: strin
 }
 
 // It updates based on the order of reference files
-export function updateAmdLoader(referenceFile: string, files: IReferences, loaderFile: string, loaderPath: string, outDir: string) {
+export function updateAmdLoader(referenceFile: string, files: IReferences, loaderFile: string,
+      loaderPath: string, outDir: string, newLine = utils.eol) {
 
     // Read the original file if it exists
     if (fs.existsSync(referenceFile)) {
@@ -178,13 +178,13 @@ export function updateAmdLoader(referenceFile: string, files: IReferences, loade
             files.after = makeRelativeToOutDir(files.after);
 
             var mainTemplate = _.template('define(function (require) { '
-                + eol + '<%= body %>'
-                + eol + '});');
+                + newLine + '<%= body %>'
+                + newLine + '});');
 
             // The order in the before and after files is important
             var singleRequireTemplate = _.template('\t require([<%= filename %>],function (){'
-                + eol + '<%= subitem %>'
-                + eol + '\t });');
+                + newLine + '<%= subitem %>'
+                + newLine + '\t });');
 
 
             // initial sub item
@@ -216,13 +216,13 @@ export function updateAmdLoader(referenceFile: string, files: IReferences, loade
             // Next up add the unordered items:
             // For these we will use just one require call
             if (files.unordered.length > 0) {
-                var unorderFileNames = files.unordered.join('",' + eol + '\t\t  "');
+                var unorderFileNames = files.unordered.join('",' + newLine + '\t\t  "');
                 subitem = singleRequireTemplate({ filename: '"' + unorderFileNames + '"', subitem: subitem });
             }
 
             // Next the generated files
             // For these we will use just one require call
-            var generatedFileNames = files.generated.join('",' + eol + '\t\t  "');
+            var generatedFileNames = files.generated.join('",' + newLine + '\t\t  "');
             subitem = singleRequireTemplate({ filename: '"' + generatedFileNames + '"', subitem: subitem });
 
             // Build the subitem for ordered before items
