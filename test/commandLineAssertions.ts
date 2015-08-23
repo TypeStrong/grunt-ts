@@ -145,7 +145,7 @@ export var vsproj_test : ICompilePromise = (strings, options) => {
     if (options.sourceMap === true &&
         options.removeComments === false &&
         options.module === 'commonjs' &&
-        options.target.indexOf('vsproj_test') >= 0) {
+        options.CompilationTasks[0].outDir === 'vsproj_test') {
       resolve({
         code: 0,
         output: ""
