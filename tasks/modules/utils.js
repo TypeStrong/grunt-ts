@@ -3,6 +3,7 @@ var path = require('path');
 var fs = require('fs');
 var util = require('util');
 var _ = require('lodash');
+var es6_promise_1 = require('es6-promise');
 exports.grunt = require('grunt');
 exports.eol = exports.grunt.util.linefeed;
 function newLineIsRedundant(newLineParameter) {
@@ -323,13 +324,13 @@ function asyncSeries(items, callPerItem) {
     items = items.slice(0);
     var memo = [];
     // Run one at a time
-    return new Promise(function (resolve, reject) {
+    return new es6_promise_1.Promise(function (resolve, reject) {
         var next = function () {
             if (items.length === 0) {
                 resolve(memo);
                 return;
             }
-            Promise
+            es6_promise_1.Promise
                 .cast(callPerItem(items.shift()))
                 .then(function (result) {
                 memo.push(result);

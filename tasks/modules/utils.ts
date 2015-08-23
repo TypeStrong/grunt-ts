@@ -4,6 +4,7 @@ import path = require('path');
 import fs = require('fs');
 import util = require('util');
 import _ = require('lodash');
+import {Promise} from 'es6-promise';
 
 export var grunt: IGrunt = require('grunt');
 export const eol: string = grunt.util.linefeed;
