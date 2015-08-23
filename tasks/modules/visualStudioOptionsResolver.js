@@ -2,8 +2,10 @@
 var csproj2ts = require('csproj2ts');
 var path = require('path');
 var utils = require('./utils');
+var es6_promise_1 = require('es6-promise');
+var _ = require('lodash');
 function resolveVSOptionsAsync(applyTo, taskOptions, targetOptions) {
-    return new Promise(function (resolve, reject) {
+    return new es6_promise_1.Promise(function (resolve, reject) {
         {
             var vsTask = getVSSettings(taskOptions), vsTarget = getVSSettings(targetOptions);
             var vs = null;

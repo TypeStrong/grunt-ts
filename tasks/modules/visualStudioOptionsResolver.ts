@@ -3,7 +3,8 @@
 import * as csproj2ts from 'csproj2ts';
 import * as path from 'path';
 import * as utils from './utils';
-
+import {Promise} from 'es6-promise';
+import * as _ from 'lodash';
 
 export function resolveVSOptionsAsync(applyTo: IGruntTSOptions,
   taskOptions: grunt.task.IMultiTask<ITargetOptions>,
