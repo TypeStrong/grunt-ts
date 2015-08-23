@@ -26,6 +26,12 @@ function resolveAsync(rawTaskOptions, rawTargetOptions, targetName, files) {
         result = copyCompilationTasks(result, files);
         resolveVSOptionsAsync(result, rawTaskOptions, rawTargetOptions).then(function (result) {
             // apply `tsconfig` configuration here
+            if (result.CompilationTasks.length > 0 && result.vs) {
+                result.CompilationTasks.forEach(function (item) {
+                    item.out = rawTargetOptions.out || rawTaskOptions.out || item.out;
+                    item.outDir = rawTargetOptions.outDir || rawTaskOptions.outDir || item.outDir;
+                });
+            }
             result = applyAssociatedOptionsAndResolveConflicts(result);
             result = applyGruntTSDefaults(result);
             if (result.targetName === undefined ||
@@ -160,12 +166,10 @@ function resolveVSOptionsAsync(applyTo, taskOptions, targetOptions) {
                 ProjectFileName: applyTo.vs.project,
                 ActiveConfiguration: applyTo.vs.config || undefined
             }).then(function (vsConfig) {
-                debugger;
                 applyTo = applyVSOptions(applyTo, vsConfig);
                 resolve(applyTo);
                 return;
             }).catch(function (error) {
-                debugger;
                 if (error.errno === 34) {
                     applyTo.errors.push('In target "' + applyTo.targetName + '" - could not find VS project at "' + error.path + '".');
                 }

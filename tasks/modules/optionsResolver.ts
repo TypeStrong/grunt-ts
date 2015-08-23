@@ -38,6 +38,13 @@ export function resolveAsync(rawTaskOptions: grunt.task.IMultiTask<ITargetOption
 
       // apply `tsconfig` configuration here
 
+      if (result.CompilationTasks.length > 0 && result.vs) {
+        result.CompilationTasks.forEach((item) => {
+          item.out = (<any>rawTargetOptions).out || (<any>rawTaskOptions).out || item.out;
+          item.outDir = (<any>rawTargetOptions).outDir || (<any>rawTaskOptions).outDir || item.outDir;
+        });
+      }
+
       result = applyAssociatedOptionsAndResolveConflicts(result);
       result = applyGruntTSDefaults(result);
 
@@ -199,12 +206,10 @@ function resolveVSOptionsAsync(applyTo: IGruntTSOptions,
             ProjectFileName: (<IVisualStudioProjectSupport>applyTo.vs).project,
             ActiveConfiguration: (<IVisualStudioProjectSupport>applyTo.vs).config || undefined
         }).then((vsConfig) => {
-          debugger;
           applyTo = applyVSOptions(applyTo, vsConfig);
           resolve(applyTo);
           return;
         }).catch((error) => {
-            debugger;
             if (error.errno === 34) {
                 applyTo.errors.push('In target "' + applyTo.targetName + '" - could not find VS project at "' + error.path + '".');
             } else {

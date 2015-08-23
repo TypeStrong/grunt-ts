@@ -92,26 +92,29 @@ exports.tests = {
     "Warnings and Errors Tests": {
         "Bad capitalization detected and fixed": function (test) {
             test.expect(2);
-            var result = or.resolve(null, config["bad sourceMap capitalization"]);
-            var allWarnings = result.warnings.join('\n');
-            test.ok(allWarnings.indexOf('Property "sourcemap" in target "" options is incorrectly cased; it should be "sourceMap"') > -1);
-            test.strictEqual(result.sourcemap, undefined);
-            test.done();
+            var result = or.resolveAsync(null, config["bad sourceMap capitalization"]).then(function (result) {
+                var allWarnings = result.warnings.join('\n');
+                test.ok(allWarnings.indexOf('Property "sourcemap" in target "" options is incorrectly cased; it should be "sourceMap"') > -1);
+                test.strictEqual(result.sourcemap, undefined);
+                test.done();
+            }).catch(function (err) { test.ifError(err); test.done(); });
         },
         "Option in wrong place detected": function (test) {
             test.expect(1);
-            var result = or.resolve(null, config["sourceMap in wrong place"]);
-            var allWarnings = result.warnings.join('\n');
-            test.ok(allWarnings.indexOf('Property "sourceMap" in target "" is possibly in the wrong place and will be ignored.  It is expected on the options object.') > -1);
-            test.done();
+            var result = or.resolveAsync(null, config["sourceMap in wrong place"]).then(function (result) {
+                var allWarnings = result.warnings.join('\n');
+                test.ok(allWarnings.indexOf('Property "sourceMap" in target "" is possibly in the wrong place and will be ignored.  It is expected on the options object.') > -1);
+                test.done();
+            });
         },
         "Option in wrong place and wrong case detected": function (test) {
             test.expect(2);
-            var result = or.resolve(null, config["bad sourceMap capitalization in wrong place"]);
-            var allWarnings = result.warnings.join('\n');
-            test.ok(allWarnings.indexOf('Property "sourcemap" in target "" is possibly in the wrong place and will be ignored.  It is expected on the options object.') > -1);
-            test.ok(allWarnings.indexOf('It is also the wrong case and should be sourceMap') > -1);
-            test.done();
+            var result = or.resolveAsync(null, config["bad sourceMap capitalization in wrong place"]).then(function (result) {
+                var allWarnings = result.warnings.join('\n');
+                test.ok(allWarnings.indexOf('Property "sourcemap" in target "" is possibly in the wrong place and will be ignored.  It is expected on the options object.') > -1);
+                test.ok(allWarnings.indexOf('It is also the wrong case and should be sourceMap') > -1);
+                test.done();
+            });
         }
     },
     "Special processing Tests": {
@@ -136,77 +139,88 @@ exports.tests = {
         "out with spaces gets escaped with double-quotes": function (test) {
             test.expect(1);
             var files = [config["out has spaces"]];
-            var result = or.resolve(null, config["out has spaces"], null, files);
-            test.strictEqual(result.CompilationTasks[0].out, "\"my folder/out has spaces.js\"");
-            test.done();
+            var result = or.resolveAsync(null, config["out has spaces"], null, files).then(function (result) {
+                test.strictEqual(result.CompilationTasks[0].out, "\"my folder/out has spaces.js\"");
+                test.done();
+            });
         },
         "outDir with spaces gets escaped with double-quotes": function (test) {
             test.expect(1);
             var files = [config["outDir has spaces"]];
-            var result = or.resolve(null, config["outDir has spaces"], null, files);
-            test.strictEqual(result.CompilationTasks[0].outDir, "\"./my folder\"");
-            test.done();
+            var result = or.resolveAsync(null, config["outDir has spaces"], null, files).then(function (result) {
+                test.strictEqual(result.CompilationTasks[0].outDir, "\"./my folder\"");
+                test.done();
+            });
         }
     },
     "Precedence and defaults override Tests": {
         "The grunt-ts defaults come through when not specified": function (test) {
             test.expect(2);
-            var result = or.resolve(null, config["minimalist"]);
-            test.strictEqual(result.target, "es5");
-            test.strictEqual(result.fast, "watch");
-            test.done();
+            var result = or.resolveAsync(null, config["minimalist"]).then(function (result) {
+                test.strictEqual(result.target, "es5");
+                test.strictEqual(result.fast, "watch");
+                test.done();
+            });
         },
         "Task properties should override grunt-ts defaults if not specified on the target": function (test) {
             test.expect(2);
-            var result = or.resolve(config["reference set to ref1.ts"], config["minimalist"]);
-            test.strictEqual(config["minimalist"].outDir, undefined);
-            test.strictEqual(result.reference, 'ref1.ts');
-            test.done();
+            var result = or.resolveAsync(config["reference set to ref1.ts"], config["minimalist"]).then(function (result) {
+                test.strictEqual(config["minimalist"].outDir, undefined);
+                test.strictEqual(result.reference, 'ref1.ts');
+                test.done();
+            });
         },
         "Target name is set if specified": function (test) {
             test.expect(1);
-            var result = or.resolve(null, config["minimalist"], "MyTarget");
-            test.strictEqual(result.targetName, "MyTarget");
-            test.done();
+            var result = or.resolveAsync(null, config["minimalist"], "MyTarget").then(function (result) {
+                test.strictEqual(result.targetName, "MyTarget");
+                test.done();
+            });
         },
         "Target name is default if not specified": function (test) {
             test.expect(1);
-            var result = or.resolve(null, config["minimalist"]);
-            test.strictEqual(result.targetName, '');
-            test.done();
+            var result = or.resolveAsync(null, config["minimalist"]).then(function (result) {
+                test.strictEqual(result.targetName, '');
+                test.done();
+            });
         },
         "Task options should override grunt-ts defaults if not specified in the target options": function (test) {
             test.expect(2);
-            var result = or.resolve(config["has ES6 and no sourceMap"], config["minimalist"]);
-            test.strictEqual(result.target, "es6");
-            test.strictEqual(result.sourceMap, false);
-            test.done();
+            var result = or.resolveAsync(config["has ES6 and no sourceMap"], config["minimalist"]).then(function (result) {
+                test.strictEqual(result.target, "es6");
+                test.strictEqual(result.sourceMap, false);
+                test.done();
+            });
         },
         "Properties specified on the target should override anything specified in the task and the grunt-ts defaults": function (test) {
             test.expect(1);
-            var result = or.resolve(config["reference set to ref1.ts"], config["reference set to ref2.ts"]);
-            test.strictEqual(result.reference, "ref2.ts");
-            test.done();
+            var result = or.resolveAsync(config["reference set to ref1.ts"], config["reference set to ref2.ts"]).then(function (result) {
+                test.strictEqual(result.reference, "ref2.ts");
+                test.done();
+            });
         },
         "Explicit null specified on the target should override anything specified in the task and the grunt-ts defaults": function (test) {
             test.expect(1);
-            var result = or.resolve(config["reference set to ref1.ts"], config["reference set to null"], null, []);
-            test.strictEqual(result.reference, null);
-            test.done();
+            var result = or.resolveAsync(config["reference set to ref1.ts"], config["reference set to null"], null, []).then(function (result) {
+                test.strictEqual(result.reference, null);
+                test.done();
+            });
         },
         "Explicit undefined specified on the target should override anything specified in the task and the grunt-ts defaults": function (test) {
             test.expect(1);
             var files = [config["has outDir set to undefined"]];
-            var result = or.resolve(config["reference set to ref1.ts"], config["reference set to undefined"], null, []);
-            test.strictEqual(result.reference, undefined);
-            test.done();
+            var result = or.resolveAsync(config["reference set to ref1.ts"], config["reference set to undefined"], null, []).then(function (result) {
+                test.strictEqual(result.reference, undefined);
+                test.done();
+            });
         },
         "Properties on target `options` should override the task options `options` object and the grunt-ts defaults": function (test) {
             test.expect(2);
-            var result = or.resolve(config["has ES6 and no sourceMap"], config["has ES3 and sourceMap"]);
-            test.strictEqual(result.target, "es3");
-            test.strictEqual(result.sourceMap, true);
-            test.done();
+            var result = or.resolveAsync(config["has ES6 and no sourceMap"], config["has ES3 and sourceMap"]).then(function (result) {
+                test.strictEqual(result.target, "es3");
+                test.strictEqual(result.sourceMap, true);
+                test.done();
+            });
         }
     },
 };

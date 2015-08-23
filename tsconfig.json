@@ -18,7 +18,7 @@
     ],
     "files": [
         "./defs/csproj2ts/csproj2ts.d.ts",
-        "./defs/es6-promises/es6-promises.d.ts",
+        "./defs/es6-promise/es6-promise.d.ts",
         "./defs/gruntjs/gruntjs.d.ts",
         "./defs/lodash/lodash.d.ts",
         "./defs/node/node.d.ts",

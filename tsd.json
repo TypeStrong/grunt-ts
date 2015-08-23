@@ -14,11 +14,11 @@
     "gruntjs/gruntjs.d.ts": {
       "commit": "1c1c12eaea0040c2c4493319c286f7d8e8968827"
     },
-    "es6-promises/es6-promises.d.ts": {
-      "commit": "1c1c12eaea0040c2c4493319c286f7d8e8968827"
-    },
     "nodeunit/nodeunit.d.ts": {
       "commit": "da995655d8f810e5e860d908bf5422ee59ef8ab6"
+    },
+    "es6-promise/es6-promise.d.ts": {
+      "commit": "8f081073e6cb416f901b272810d8b04d6e01c9e0"
     }
   }
 }
