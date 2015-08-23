@@ -6,11 +6,10 @@
  * grunt-ts
  * Licensed under the MIT license.
  */
-// Typescript imports
 var _ = require('lodash');
 var path = require('path');
 var fs = require('fs');
-// Modules of grunt-ts
+var es6_promise_1 = require('es6-promise');
 var utils = require('./modules/utils');
 var compileModule = require('./modules/compile');
 var referenceModule = require('./modules/reference');
@@ -18,46 +17,8 @@ var amdLoaderModule = require('./modules/amdLoader');
 var html2tsModule = require('./modules/html2ts');
 var templateCacheModule = require('./modules/templateCache');
 var transformers = require('./modules/transformers');
-var es6_promise_1 = require('es6-promise');
 var optionsResolver = require('../tasks/modules/optionsResolver');
-/**
- * Time a function and print the result.
- *
- * @param makeIt the code to time
- * @returns the result of the block of code
- */
-function timeIt(makeIt) {
-    var starttime = new Date().getTime();
-    var it = makeIt();
-    var endtime = new Date().getTime();
-    return {
-        it: it,
-        time: endtime - starttime
-    };
-}
-/**
- * Run a map operation async in series (simplified)
- */
-function asyncSeries(items, callPerItem) {
-    items = items.slice(0);
-    var memo = [];
-    // Run one at a time
-    return new es6_promise_1.Promise(function (resolve, reject) {
-        var next = function () {
-            if (items.length === 0) {
-                resolve(memo);
-                return;
-            }
-            es6_promise_1.Promise
-                .cast(callPerItem(items.shift()))
-                .then(function (result) {
-                memo.push(result);
-                next();
-            }, reject);
-        };
-        next();
-    });
-}
+var asyncSeries = utils.asyncSeries, timeIt = utils.timeIt;
 function pluginFn(grunt) {
     /////////////////////////////////////////////////////////////////////
     // The grunt task

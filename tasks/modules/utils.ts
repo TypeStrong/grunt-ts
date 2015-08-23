@@ -296,3 +296,70 @@ export function getOrGetFirst(getFrom: string | string[]) : string {
   }
   return <string>getFrom;
 }
+
+export function escapePathIfRequired(path: string): string {
+  if (!path || !path.indexOf) {
+    return path;
+  }
+  if (path.indexOf(' ') === -1) {
+      return path;
+  } else {
+    const newPath = path.trim();
+    if (newPath.indexOf('"') === 0 && newPath.lastIndexOf('"') === newPath.length - 1) {
+      return newPath;
+    } else {
+      return '"' + newPath + '"';
+    }
+  }
+}
+
+/**
+ * Time a function and print the result.
+ *
+ * @param makeIt the code to time
+ * @returns the result of the block of code
+ */
+export function timeIt<R>(makeIt: () => R): {
+    /**
+     * The result of the computation
+     */
+    it: R;
+    /**
+     * Time in milliseconds.
+     */
+    time: number;
+} {
+    var starttime = new Date().getTime();
+    var it = makeIt();
+    var endtime = new Date().getTime();
+    return {
+        it: it,
+        time: endtime - starttime
+    };
+}
+
+/**
+ * Run a map operation async in series (simplified)
+ */
+export function asyncSeries<U, W>(items: U[], callPerItem: (item: U) => Promise<W>): Promise<W[]> {
+    items = items.slice(0);
+
+    const memo: W[] = [];
+
+    // Run one at a time
+    return new Promise((resolve, reject) => {
+        const next = () => {
+            if (items.length === 0) {
+                resolve(memo);
+                return;
+            }
+            (<any>Promise)
+              .cast(callPerItem(items.shift()))
+              .then((result: W) => {
+                memo.push(result);
+                next();
+            }, reject);
+        };
+        next();
+    });
+}

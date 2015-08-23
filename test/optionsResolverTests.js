@@ -1,5 +1,6 @@
 /// <reference path="../defs/tsd.d.ts" />
 var or = require('../tasks/modules/optionsResolver');
+var utils = require('../tasks/modules/utils');
 var grunt = require('grunt');
 var config = {
     "minimalist": {
@@ -120,19 +121,19 @@ exports.tests = {
     "Special processing Tests": {
         "path with spaces gets enclosed in double-quotes": function (test) {
             test.expect(1);
-            var result = or.escapePathIfRequired("this is a path/path.txt");
+            var result = utils.escapePathIfRequired("this is a path/path.txt");
             test.strictEqual(result, "\"this is a path/path.txt\"");
             test.done();
         },
         "path that is already enclosed in double-quotes is unchanged": function (test) {
             test.expect(1);
-            var result = or.escapePathIfRequired("\"this is a path/path.txt\"");
+            var result = utils.escapePathIfRequired("\"this is a path/path.txt\"");
             test.strictEqual(result, "\"this is a path/path.txt\"");
             test.done();
         },
         "path without spaces is unchanged": function (test) {
             test.expect(1);
-            var result = or.escapePathIfRequired("thisIsAPath/path.txt");
+            var result = utils.escapePathIfRequired("thisIsAPath/path.txt");
             test.strictEqual(result, "thisIsAPath/path.txt");
             test.done();
         },

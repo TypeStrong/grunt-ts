@@ -2,6 +2,8 @@
 
 import * as nodeunit from 'nodeunit';
 import * as or from '../tasks/modules/optionsResolver';
+import * as utils from '../tasks/modules/utils';
+
 
 let grunt: IGrunt = require('grunt');
 
@@ -131,19 +133,19 @@ export var tests : nodeunit.ITestGroup = {
   "Special processing Tests": {
     "path with spaces gets enclosed in double-quotes": (test: nodeunit.Test) => {
         test.expect(1);
-        const result = or.escapePathIfRequired("this is a path/path.txt");
+        const result = utils.escapePathIfRequired("this is a path/path.txt");
         test.strictEqual(result, "\"this is a path/path.txt\"");
         test.done();
     },
     "path that is already enclosed in double-quotes is unchanged": (test: nodeunit.Test) => {
       test.expect(1);
-      const result = or.escapePathIfRequired("\"this is a path/path.txt\"");
+      const result = utils.escapePathIfRequired("\"this is a path/path.txt\"");
       test.strictEqual(result, "\"this is a path/path.txt\"");
       test.done();
     },
     "path without spaces is unchanged": (test: nodeunit.Test) => {
       test.expect(1);
-      const result = or.escapePathIfRequired("thisIsAPath/path.txt");
+      const result = utils.escapePathIfRequired("thisIsAPath/path.txt");
       test.strictEqual(result, "thisIsAPath/path.txt");
       test.done();
     },

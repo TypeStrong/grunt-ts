@@ -9,73 +9,19 @@
  * Licensed under the MIT license.
  */
 
-// Typescript imports
-import _ = require('lodash');
-import path = require('path');
-import fs = require('fs');
-
-// Modules of grunt-ts
-import utils = require('./modules/utils');
-import compileModule = require('./modules/compile');
-import referenceModule = require('./modules/reference');
-import amdLoaderModule = require('./modules/amdLoader');
-import html2tsModule = require('./modules/html2ts');
-import templateCacheModule = require('./modules/templateCache');
-import transformers = require('./modules/transformers');
+import * as _ from 'lodash';
+import * as path from 'path';
+import * as fs from 'fs';
 import {Promise} from 'es6-promise';
-
+import * as utils from './modules/utils';
+import * as compileModule from './modules/compile';
+import * as referenceModule from './modules/reference';
+import * as amdLoaderModule from './modules/amdLoader';
+import * as html2tsModule from './modules/html2ts';
+import * as templateCacheModule from './modules/templateCache';
+import * as transformers from './modules/transformers';
 import * as optionsResolver from '../tasks/modules/optionsResolver';
-
-/**
- * Time a function and print the result.
- *
- * @param makeIt the code to time
- * @returns the result of the block of code
- */
-function timeIt<R>(makeIt: () => R): {
-    /**
-     * The result of the computation
-     */
-    it: R;
-    /**
-     * Time in milliseconds.
-     */
-    time: number;
-} {
-    var starttime = new Date().getTime();
-    var it = makeIt();
-    var endtime = new Date().getTime();
-    return {
-        it: it,
-        time: endtime - starttime
-    };
-}
-
-/**
- * Run a map operation async in series (simplified)
- */
-function asyncSeries<U, W>(items: U[], callPerItem: (item: U) => Promise<W>): Promise<W[]> {
-    items = items.slice(0);
-
-    const memo: W[] = [];
-
-    // Run one at a time
-    return new Promise((resolve, reject) => {
-        const next = () => {
-            if (items.length === 0) {
-                resolve(memo);
-                return;
-            }
-            (<any>Promise)
-              .cast(callPerItem(items.shift()))
-              .then((result: W) => {
-                memo.push(result);
-                next();
-            }, reject);
-        };
-        next();
-    });
-}
+const {asyncSeries, timeIt} = utils;
 
 function pluginFn(grunt: IGrunt) {
 

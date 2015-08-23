@@ -282,4 +282,62 @@ function getOrGetFirst(getFrom) {
     return getFrom;
 }
 exports.getOrGetFirst = getOrGetFirst;
+function escapePathIfRequired(path) {
+    if (!path || !path.indexOf) {
+        return path;
+    }
+    if (path.indexOf(' ') === -1) {
+        return path;
+    }
+    else {
+        var newPath = path.trim();
+        if (newPath.indexOf('"') === 0 && newPath.lastIndexOf('"') === newPath.length - 1) {
+            return newPath;
+        }
+        else {
+            return '"' + newPath + '"';
+        }
+    }
+}
+exports.escapePathIfRequired = escapePathIfRequired;
+/**
+ * Time a function and print the result.
+ *
+ * @param makeIt the code to time
+ * @returns the result of the block of code
+ */
+function timeIt(makeIt) {
+    var starttime = new Date().getTime();
+    var it = makeIt();
+    var endtime = new Date().getTime();
+    return {
+        it: it,
+        time: endtime - starttime
+    };
+}
+exports.timeIt = timeIt;
+/**
+ * Run a map operation async in series (simplified)
+ */
+function asyncSeries(items, callPerItem) {
+    items = items.slice(0);
+    var memo = [];
+    // Run one at a time
+    return new Promise(function (resolve, reject) {
+        var next = function () {
+            if (items.length === 0) {
+                resolve(memo);
+                return;
+            }
+            Promise
+                .cast(callPerItem(items.shift()))
+                .then(function (result) {
+                memo.push(result);
+                next();
+            }, reject);
+        };
+        next();
+    });
+}
+exports.asyncSeries = asyncSeries;
 //# sourceMappingURL=utils.js.map
