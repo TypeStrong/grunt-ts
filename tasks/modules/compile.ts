@@ -9,7 +9,7 @@ import _ = require('lodash');
 import utils = require('./utils');
 import cache = require('./cacheUtils');
 
-var Promise = require('es6-promise').Promise;
+import {Promise} from 'es6-promise';
 export var grunt: IGrunt = require('grunt');
 
 ///////////////////////////
@@ -330,7 +330,7 @@ export function compileAllFiles(options: IGruntTSOptions, compilationInfo: IGrun
 
         grunt.log.writeln(result.output);
 
-        return Promise.cast(result);
+        return (<any>Promise).cast(result);
     }, (err) => {
         fs.unlinkSync(tempfilename);
         throw err;

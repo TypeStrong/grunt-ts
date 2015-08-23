@@ -6,14 +6,14 @@ var fs = require('fs');
 var _ = require('lodash');
 var utils = require('./utils');
 var cache = require('./cacheUtils');
-var Promise = require('es6-promise').Promise;
+var es6_promise_1 = require('es6-promise');
 exports.grunt = require('grunt');
 ///////////////////////////
 // Helper
 ///////////////////////////
 var executeNode;
 var executeNodeDefault = function (args, optionalInfo) {
-    return new Promise(function (resolve, reject) {
+    return new es6_promise_1.Promise(function (resolve, reject) {
         exports.grunt.util.spawn({
             cmd: process.execPath,
             args: args
@@ -91,7 +91,7 @@ function compileAllFiles(options, compilationInfo) {
             }
             else {
                 exports.grunt.log.writeln('No file changes were detected. Skipping Compile'.green);
-                return new Promise(function (resolve) {
+                return new es6_promise_1.Promise(function (resolve) {
                     var ret = {
                         code: 0,
                         fileCount: 0,
@@ -283,7 +283,7 @@ function compileAllFiles(options, compilationInfo) {
         result.fileCount = files.length;
         fs.unlinkSync(tempfilename);
         exports.grunt.log.writeln(result.output);
-        return Promise.cast(result);
+        return es6_promise_1.Promise.cast(result);
     }, function (err) {
         fs.unlinkSync(tempfilename);
         throw err;
