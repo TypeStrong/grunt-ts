@@ -272,16 +272,19 @@ function _checkExcludeArgument(exclude) {
     return exclude;
 }
 
-
 export function firstElementWithValue<T>(elements: T[], defaultResult: T = null): T {
     var result: T = defaultResult;
     _.each(elements, (item) => {
-        if (!_.isNull(item) && !_.isUndefined(item)) {
+        if (hasValue(item)) {
             result = item;
             return false; // break out of lodash loop
         }
     });
     return result;
+}
+
+export function hasValue(thing: any) {
+    return !_.isNull(thing) && !_.isUndefined(thing);
 }
 
 export function getOrGetFirst(getFrom: string | string[]) : string {

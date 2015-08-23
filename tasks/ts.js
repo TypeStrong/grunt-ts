@@ -1,6 +1,7 @@
 /// <reference path="../defs/tsd.d.ts"/>
 /// <reference path="./modules/interfaces.d.ts"/>
 /// <reference path="../defs/csproj2ts/csproj2ts.d.ts" />
+'use strict';
 /*
  * grunt-ts
  * Licensed under the MIT license.
@@ -9,7 +10,6 @@
 var _ = require('lodash');
 var path = require('path');
 var fs = require('fs');
-// import csproj2ts = require('csproj2ts');
 // Modules of grunt-ts
 var utils = require('./modules/utils');
 var compileModule = require('./modules/compile');
@@ -18,9 +18,8 @@ var amdLoaderModule = require('./modules/amdLoader');
 var html2tsModule = require('./modules/html2ts');
 var templateCacheModule = require('./modules/templateCache');
 var transformers = require('./modules/transformers');
+var es6_promise_1 = require('es6-promise');
 var optionsResolver = require('../tasks/modules/optionsResolver');
-// plain vanilla imports
-var Promise = require('es6-promise').Promise;
 /**
  * Time a function and print the result.
  *
@@ -39,18 +38,20 @@ function timeIt(makeIt) {
 /**
  * Run a map operation async in series (simplified)
  */
-function asyncSeries(arr, iter) {
-    arr = arr.slice(0);
+function asyncSeries(items, callPerItem) {
+    items = items.slice(0);
     var memo = [];
     // Run one at a time
-    return new Promise(function (resolve, reject) {
+    return new es6_promise_1.Promise(function (resolve, reject) {
         var next = function () {
-            if (arr.length === 0) {
+            if (items.length === 0) {
                 resolve(memo);
                 return;
             }
-            Promise.cast(iter(arr.shift())).then(function (res) {
-                memo.push(res);
+            es6_promise_1.Promise
+                .cast(callPerItem(items.shift()))
+                .then(function (result) {
+                memo.push(result);
                 next();
             }, reject);
         };
@@ -61,9 +62,9 @@ function pluginFn(grunt) {
     /////////////////////////////////////////////////////////////////////
     // The grunt task
     ////////////////////////////////////////////////////////////////////
-    // Note: this function is called once for each target
-    // so task + target options are a bit blurred inside this function
     grunt.registerMultiTask('ts', 'Compile TypeScript files', function () {
+        // tracks which index in the task "files" property is next for processing
+        var filesCompilationIndex = 0;
         var done, options;
         {
             var currentTask = this;
@@ -73,15 +74,14 @@ function pluginFn(grunt) {
             // get unprocessed templates from configuration
             var rawTaskConfig = (grunt.config.getRaw(currentTask.name) || {});
             var rawTargetConfig = (grunt.config.getRaw(currentTask.name + '.' + currentTask.target) || {});
-            options = optionsResolver.resolve(rawTaskConfig, rawTargetConfig, currentTask.target, files);
-            options.warnings.forEach(function (warning) {
-                grunt.log.writeln(warning.magenta);
+            optionsResolver.resolveAsync(rawTaskConfig, rawTargetConfig, currentTask.target, files).then(function (result) {
+                options = result;
+                options.warnings.forEach(function (warning) {
+                    grunt.log.writeln(warning.magenta);
+                });
+                proceed();
             });
         }
-        var watch;
-        // tracks which index in the task "files" property is next for processing
-        var filesCompilationIndex = 0;
-        proceed();
         function proceed() {
             var srcFromVS_RelativePathsFromGruntFile = [];
             // Run compiler
@@ -328,38 +328,19 @@ function pluginFn(grunt) {
                         }
                         else {
                             grunt.log.writeln('No files to compile'.red);
-                            return Promise.resolve(true);
+                            return es6_promise_1.Promise.resolve(true);
                         }
                     }
                     else {
-                        return Promise.resolve(true);
+                        return es6_promise_1.Promise.resolve(true);
                     }
                 }
                 // Time (in ms) when last compile took place
                 var lastCompile = 0;
                 // Watch a folder?
-                watch = options.watch;
-                if (!!watch) {
-                    // local event to handle file event
-                    function handleFileEvent(filepath, displaystr, addedOrChanged) {
-                        if (addedOrChanged === void 0) { addedOrChanged = false; }
-                        // Only ts and html :
-                        if (!utils.endsWith(filepath.toLowerCase(), '.ts') && !utils.endsWith(filepath.toLowerCase(), '.html')) {
-                            return;
-                        }
-                        // Do not run if just ran, behaviour same as grunt-watch
-                        // These are the files our run modified
-                        if ((new Date().getTime() - lastCompile) <= 100) {
-                            // Uncomment for debugging which files were ignored
-                            // grunt.log.writeln((' ///'  + ' >>' + filepath).grey);
-                            return;
-                        }
-                        // Log and run the debounced version.
-                        grunt.log.writeln((displaystr + ' >>' + filepath).yellow);
-                        filterFilesAndCompile();
-                    }
+                if (!!options.watch) {
                     // get path(s)
-                    var watchpath = grunt.file.expand(watch);
+                    var watchpath = grunt.file.expand([options.watch]);
                     // create a file watcher for path
                     var chokidar = require('chokidar');
                     var watcher = chokidar.watch(watchpath, { ignoreInitial: true, persistent: true });
@@ -390,9 +371,27 @@ function pluginFn(grunt) {
                 lastCompile = new Date().getTime();
                 // Run initial compile
                 return filterFilesAndCompile();
+                // local event to handle file event
+                function handleFileEvent(filepath, displaystr, addedOrChanged) {
+                    if (addedOrChanged === void 0) { addedOrChanged = false; }
+                    // Only ts and html :
+                    if (!utils.endsWith(filepath.toLowerCase(), '.ts') && !utils.endsWith(filepath.toLowerCase(), '.html')) {
+                        return;
+                    }
+                    // Do not run if just ran, behaviour same as grunt-watch
+                    // These are the files our run modified
+                    if ((new Date().getTime() - lastCompile) <= 100) {
+                        // Uncomment for debugging which files were ignored
+                        // grunt.log.writeln((' ///'  + ' >>' + filepath).grey);
+                        return;
+                    }
+                    // Log and run the debounced version.
+                    grunt.log.writeln((displaystr + ' >>' + filepath).yellow);
+                    filterFilesAndCompile();
+                }
             }).then(function (res) {
                 // Ignore res? (either logs or throws)
-                if (!watch) {
+                if (!options.watch) {
                     if (res.some(function (succes) {
                         return !succes;
                     })) {

@@ -2,6 +2,8 @@
 /// <reference path="./modules/interfaces.d.ts"/>
 /// <reference path="../defs/csproj2ts/csproj2ts.d.ts" />
 
+'use strict';
+
 /*
  * grunt-ts
  * Licensed under the MIT license.
@@ -11,7 +13,6 @@
 import _ = require('lodash');
 import path = require('path');
 import fs = require('fs');
-// import csproj2ts = require('csproj2ts');
 
 // Modules of grunt-ts
 import utils = require('./modules/utils');
@@ -21,12 +22,9 @@ import amdLoaderModule = require('./modules/amdLoader');
 import html2tsModule = require('./modules/html2ts');
 import templateCacheModule = require('./modules/templateCache');
 import transformers = require('./modules/transformers');
+import {Promise} from 'es6-promise';
+
 import * as optionsResolver from '../tasks/modules/optionsResolver';
-
-
-
-// plain vanilla imports
-var Promise = require('es6-promise').Promise;
 
 /**
  * Time a function and print the result.
@@ -56,20 +54,22 @@ function timeIt<R>(makeIt: () => R): {
 /**
  * Run a map operation async in series (simplified)
  */
-function asyncSeries<U, W>(arr: U[], iter: (item: U) => Promise<W>): Promise<W[]> {
-    arr = arr.slice(0);
+function asyncSeries<U, W>(items: U[], callPerItem: (item: U) => Promise<W>): Promise<W[]> {
+    items = items.slice(0);
 
-    var memo: W[] = [];
+    const memo: W[] = [];
 
     // Run one at a time
     return new Promise((resolve, reject) => {
-        var next = () => {
-            if (arr.length === 0) {
+        const next = () => {
+            if (items.length === 0) {
                 resolve(memo);
                 return;
             }
-            Promise.cast(iter(arr.shift())).then((res: W) => {
-                memo.push(res);
+            (<any>Promise)
+              .cast(callPerItem(items.shift()))
+              .then((result: W) => {
+                memo.push(result);
                 next();
             }, reject);
         };
@@ -82,10 +82,10 @@ function pluginFn(grunt: IGrunt) {
     /////////////////////////////////////////////////////////////////////
     // The grunt task
     ////////////////////////////////////////////////////////////////////
-
-    // Note: this function is called once for each target
-    // so task + target options are a bit blurred inside this function
     grunt.registerMultiTask('ts', 'Compile TypeScript files', function () {
+
+        // tracks which index in the task "files" property is next for processing
+        let filesCompilationIndex = 0;
 
         let done: grunt.task.AsyncResultCatcher,
           options: IGruntTSOptions;
@@ -102,20 +102,18 @@ function pluginFn(grunt: IGrunt) {
           let rawTargetConfig =
             <grunt.task.IMultiTask<ITargetOptions>>(grunt.config.getRaw(currentTask.name + '.' + currentTask.target) || {});
 
-          options = optionsResolver.resolve(rawTaskConfig, rawTargetConfig, currentTask.target, files);
+          optionsResolver.resolveAsync(rawTaskConfig, rawTargetConfig, currentTask.target, files).then((result) => {
+            options = result;
 
-          options.warnings.forEach((warning) => {
-            grunt.log.writeln(warning.magenta);
+            options.warnings.forEach((warning) => {
+              grunt.log.writeln(warning.magenta);
+            });
+
+            proceed();
           });
 
         }
 
-        var watch;
-
-        // tracks which index in the task "files" property is next for processing
-        var filesCompilationIndex = 0;
-
-        proceed();
 
         function proceed() {
 
@@ -423,33 +421,10 @@ function pluginFn(grunt: IGrunt) {
                 var lastCompile = 0;
 
                 // Watch a folder?
-                watch = options.watch;
-                if (!!watch) {
-
-                    // local event to handle file event
-                    function handleFileEvent(filepath: string, displaystr: string, addedOrChanged: boolean = false) {
-
-                        // Only ts and html :
-                        if (!utils.endsWith(filepath.toLowerCase(), '.ts') && !utils.endsWith(filepath.toLowerCase(), '.html')) {
-                            return;
-                        }
-
-                        // Do not run if just ran, behaviour same as grunt-watch
-                        // These are the files our run modified
-                        if ((new Date().getTime() - lastCompile) <= 100) {
-                            // Uncomment for debugging which files were ignored
-                            // grunt.log.writeln((' ///'  + ' >>' + filepath).grey);
-                            return;
-                        }
-
-                        // Log and run the debounced version.
-                        grunt.log.writeln((displaystr + ' >>' + filepath).yellow);
-
-                        filterFilesAndCompile();
-                    }
+                if (!!options.watch) {
 
                     // get path(s)
-                    var watchpath = grunt.file.expand(watch);
+                    var watchpath = grunt.file.expand([options.watch]);
 
                     // create a file watcher for path
                     var chokidar = require('chokidar');
@@ -486,9 +461,31 @@ function pluginFn(grunt: IGrunt) {
                 // Run initial compile
                 return filterFilesAndCompile();
 
+                // local event to handle file event
+                function handleFileEvent(filepath: string, displaystr: string, addedOrChanged: boolean = false) {
+
+                    // Only ts and html :
+                    if (!utils.endsWith(filepath.toLowerCase(), '.ts') && !utils.endsWith(filepath.toLowerCase(), '.html')) {
+                        return;
+                    }
+
+                    // Do not run if just ran, behaviour same as grunt-watch
+                    // These are the files our run modified
+                    if ((new Date().getTime() - lastCompile) <= 100) {
+                        // Uncomment for debugging which files were ignored
+                        // grunt.log.writeln((' ///'  + ' >>' + filepath).grey);
+                        return;
+                    }
+
+                    // Log and run the debounced version.
+                    grunt.log.writeln((displaystr + ' >>' + filepath).yellow);
+
+                    filterFilesAndCompile();
+                }
+
             }).then((res: boolean[]) => {
                 // Ignore res? (either logs or throws)
-                if (!watch) {
+                if (!options.watch) {
                     if (res.some((succes: boolean) => {
                         return !succes;
                     })) {

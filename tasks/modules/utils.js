@@ -260,7 +260,7 @@ function firstElementWithValue(elements, defaultResult) {
     if (defaultResult === void 0) { defaultResult = null; }
     var result = defaultResult;
     _.each(elements, function (item) {
-        if (!_.isNull(item) && !_.isUndefined(item)) {
+        if (hasValue(item)) {
             result = item;
             return false; // break out of lodash loop
         }
@@ -268,6 +268,10 @@ function firstElementWithValue(elements, defaultResult) {
     return result;
 }
 exports.firstElementWithValue = firstElementWithValue;
+function hasValue(thing) {
+    return !_.isNull(thing) && !_.isUndefined(thing);
+}
+exports.hasValue = hasValue;
 function getOrGetFirst(getFrom) {
     if (_.isArray(getFrom)) {
         if (getFrom.length > 0) {
