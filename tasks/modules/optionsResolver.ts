@@ -4,7 +4,6 @@
 'use strict';
 
 import {GruntTSDefaults} from './defaults';
-import * as path from 'path';
 import * as utils from './utils';
 import * as _ from 'lodash';
 import {Promise} from 'es6-promise';
