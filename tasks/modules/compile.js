@@ -1,5 +1,6 @@
 /// <reference path="../../defs/tsd.d.ts"/>
 /// <reference path="./interfaces.d.ts"/>
+'use strict';
 var path = require('path');
 var fs = require('fs');
 var _ = require('lodash');

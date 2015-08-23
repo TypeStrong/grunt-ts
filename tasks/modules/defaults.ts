@@ -1,3 +1,5 @@
+'use strict';
+
 import * as utils from './utils';
 
 export const TypeScriptDefaults: IGruntTSOptions = {
