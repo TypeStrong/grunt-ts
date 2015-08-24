@@ -17,8 +17,8 @@ const propertiesFromTarget = ['amdloader', 'html', 'htmlOutDir', 'htmlOutDirFlat
         'noEmitHelpers', 'noEmitOnError', 'noImplicitAny', 'noResolve', 'preserveConstEnums', 'removeComments', 'sourceRoot',
         'sourceMap', 'suppressImplicitAnyIndexErrors', 'target', 'verbose'];
 
-export function resolveAsync(rawTaskOptions: grunt.task.IMultiTask<ITargetOptions>,
-                        rawTargetOptions: grunt.task.IMultiTask<ITargetOptions>,
+export function resolveAsync(rawTaskOptions: ITargetOptions,
+                        rawTargetOptions: ITargetOptions,
                         targetName = '',
                         files: IGruntTSCompilationInfo[] = []): Promise<IGruntTSOptions> {
 
@@ -67,8 +67,8 @@ function emptyOptionsResolveResult() {
   };
 }
 
-function resolveAndWarnOnCapitalizationErrors(task: grunt.task.IMultiTask<ITargetOptions>,
-  target: grunt.task.IMultiTask<ITargetOptions>, targetName: string) {
+function resolveAndWarnOnCapitalizationErrors(task: ITargetOptions,
+  target: ITargetOptions, targetName: string) {
 
     let errors : string[] = [], warnings: string[] = [];
     const lowercaseTargetProps = _.map(propertiesFromTarget, (prop) => prop.toLocaleLowerCase());
@@ -81,7 +81,7 @@ function resolveAndWarnOnCapitalizationErrors(task: grunt.task.IMultiTask<ITarge
 
     return {errors, warnings};
 
-    function checkLocations(task: grunt.task.IMultiTask<ITargetOptions>, configName: string) {
+    function checkLocations(task: ITargetOptions, configName: string) {
       if (task) {
         for (let propertyName in task) {
           if (propertiesFromTarget.indexOf(propertyName) === -1 && propertyName !== 'options') {
@@ -103,7 +103,7 @@ function resolveAndWarnOnCapitalizationErrors(task: grunt.task.IMultiTask<ITarge
       }
     }
 
-    function checkFixableCaseIssues(task: grunt.task.IMultiTask<ITargetOptions>, configName: string) {
+    function checkFixableCaseIssues(task: ITargetOptions, configName: string) {
       if (task) {
         for (let propertyName in task) {
           if ((propertiesFromTarget.indexOf(propertyName) === -1)
@@ -141,7 +141,7 @@ function resolveAndWarnOnCapitalizationErrors(task: grunt.task.IMultiTask<ITarge
     }
 }
 
-function applyGruntOptions(applyTo: IGruntTSOptions, gruntOptions: grunt.task.IMultiTask<ITargetOptions>): IGruntTSOptions {
+function applyGruntOptions(applyTo: IGruntTSOptions, gruntOptions: ITargetOptions): IGruntTSOptions {
 
     if (gruntOptions) {
 

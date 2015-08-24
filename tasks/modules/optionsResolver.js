@@ -25,12 +25,6 @@ function resolveAsync(rawTaskOptions, rawTargetOptions, targetName, files) {
         result = copyCompilationTasks(result, files);
         visualStudioOptionsResolver_1.resolveVSOptionsAsync(result, rawTaskOptions, rawTargetOptions).then(function (result) {
             // apply `tsconfig` configuration here
-            if (result.CompilationTasks.length > 0 && result.vs) {
-                result.CompilationTasks.forEach(function (item) {
-                    item.out = rawTargetOptions.out || rawTaskOptions.out || item.out;
-                    item.outDir = rawTargetOptions.outDir || rawTaskOptions.outDir || item.outDir;
-                });
-            }
             result = applyAssociatedOptionsAndResolveConflicts(result);
             result = applyGruntTSDefaults(result);
             if (result.targetName === undefined ||

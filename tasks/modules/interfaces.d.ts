@@ -1,14 +1,11 @@
 
+interface IGruntTargetOptions extends ITargetOptions {
+    out?: string; // if sepecified e.g. 'single.js' all output js files are merged into single.js using tsc --out command
+    outDir?: string; // if sepecified e.g. '/build/js' all output js files are put in this location
+}
+
 interface ITargetOptions {
-    // src?: string[]; // input files  // Note : this is a getter and returns a new "live globbed" array
-    // dest?: string;
-    // files?: {
-    //     src: string[];
-    //     dest: string;
-    // }[];
     reference?: string; // path to a reference.ts e.g. './approot/'
-    // out?: string; // if sepecified e.g. 'single.js' all output js files are merged into single.js using tsc --out command
-    // outDir?: string; // if sepecified e.g. '/build/js' all output js files are put in this location
     baseDir?: string; // If specified. outDir files are made relative to this.
     html: string[];  // if specified this is used to generate typescript files with a single variable which contains the content of the html
     htmlOutDir: string; // if specified with html, the generated typescript file will be produce in the directory
@@ -23,6 +20,7 @@ interface ITargetOptions {
     testExecute?: (args: string[]) => Promise<ICompileResult>;
     vs?: string | IVisualStudioProjectSupport;
     targetName?: string;
+    options?: ITaskOptions;
 }
 
 interface ITaskOptions {
