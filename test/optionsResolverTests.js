@@ -81,6 +81,13 @@ var config = {
             ignoreSettings: true
         },
         options: {}
+    },
+    "vs TestOutFile": {
+        vs: {
+            project: "test/vsproj/testproject.csproj",
+            config: "TestOutFile",
+        },
+        options: {}
     }
 };
 function getConfig(name, asCopy) {
@@ -247,14 +254,13 @@ exports.tests = {
     },
     "Visual Studio `vs` Integration Tests": {
         "Visual Studio properties should override the grunt-ts defaults ONLY": function (test) {
-            test.expect(4);
+            test.expect(3);
             var cfg = getConfig("vs minimalist", true);
             cfg.options.sourceMap = false;
             var result = or.resolveAsync(null, cfg).then(function (result) {
                 test.strictEqual(result.removeComments, false);
                 test.strictEqual(result.sourceMap, false);
                 test.strictEqual(result.module, 'commonjs');
-                test.strictEqual(result.CompilationTasks[0].outDir, 'vsproj_test');
                 test.done();
             }).catch(function (err) { test.ifError(err); test.done(); });
         },
@@ -271,6 +277,33 @@ exports.tests = {
             cfg.outDir = "this is the test outDir";
             var result = or.resolveAsync(null, cfg).then(function (result) {
                 test.strictEqual(result.CompilationTasks[0].outDir, "this is the test outDir");
+                test.done();
+            }).catch(function (err) { test.ifError(err); test.done(); });
+        },
+        // "Any 'options' options specified on the task should override the Visual Studio settings": (test) => {
+        //   const cfg = getConfig("vs ignoreSettings Release");
+        //   test.strictEqual(cfg.outDir,"");
+        //     test.done();
+        // },
+        // "Any properties specified on the target should override the Visual Studio settings": (test) => {
+        //     test.ok(false);
+        //     test.done();
+        // },
+        // "Any options specified on the target should override the Visual Studio settings": (test) => {
+        //     test.ok(false);
+        //     test.done();
+        // },
+        "out in Visual Studio settings is converted from relative to project to relative to gruntfile.": function (test) {
+            test.expect(1);
+            var result = or.resolveAsync(null, getConfig("vs TestOutFile")).then(function (result) {
+                test.strictEqual(result.CompilationTasks[0].out, "test/vsproj/test_out.js");
+                test.done();
+            }).catch(function (err) { test.ifError(err); test.done(); });
+        },
+        "outDir in Visual Studio settings is converted from relative to project to relative to gruntfile.": function (test) {
+            test.expect(1);
+            var result = or.resolveAsync(null, getConfig("vs minimalist")).then(function (result) {
+                test.strictEqual(result.CompilationTasks[0].outDir, 'test/vsproj/vsproj_test');
                 test.done();
             }).catch(function (err) { test.ifError(err); test.done(); });
         },

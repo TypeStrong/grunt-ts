@@ -132,7 +132,7 @@ exports.vsproj_test = function (strings, options) {
         if (options.sourceMap === true &&
             options.removeComments === false &&
             options.module === 'commonjs' &&
-            options.CompilationTasks[0].outDir === 'vsproj_test') {
+            options.CompilationTasks[0].outDir === 'test/vsproj/vsproj_test') {
             resolve({
                 code: 0,
                 output: ""

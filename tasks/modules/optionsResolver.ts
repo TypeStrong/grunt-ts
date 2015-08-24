@@ -37,7 +37,7 @@ export function resolveAsync(rawTaskOptions: ITargetOptions,
 
       // apply `tsconfig` configuration here
 
-      result = applyAssociatedOptionsAndResolveConflicts(result);
+      result = addressAssociatedOptionsAndResolveConflicts(result);
       result = applyGruntTSDefaults(result);
 
       if (result.targetName === undefined ||
@@ -179,7 +179,7 @@ function copyCompilationTasks(options: IGruntTSOptions, files: IGruntTSCompilati
   return options;
 }
 
-function applyAssociatedOptionsAndResolveConflicts(options: IGruntTSOptions) {
+function addressAssociatedOptionsAndResolveConflicts(options: IGruntTSOptions) {
 
   if (options.emitDecoratorMetadata) {
     options.experimentalDecorators = true;
@@ -207,6 +207,16 @@ function applyAssociatedOptionsAndResolveConflicts(options: IGruntTSOptions) {
     options.removeComments = !!options.removeComments;
     options.comments = !options.removeComments;
   }
+
+  options.CompilationTasks.forEach(compileTask => {
+    if (compileTask.out && compileTask.outDir) {
+      console.log(JSON.stringify(compileTask));
+      options.warnings.push(
+        'The parameter `out` is incompatible with `outDir`; pass one or the other - not both.  Ignoring `out` and using `outDir`.'
+      );
+      compileTask.out = '';
+    }
+  });
 
   return options;
 }

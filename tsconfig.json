@@ -38,6 +38,7 @@
         "./tasks/modules/transformers.ts",
         "./tasks/modules/tsconfig.ts",
         "./tasks/modules/utils.ts",
+        "./tasks/modules/visualStudioOptionsResolver.ts",
         "./tasks/scratch.ts",
         "./tasks/ts.ts",
         "./test/commandLineAssertions.ts",

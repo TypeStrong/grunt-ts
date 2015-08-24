@@ -25,7 +25,7 @@ function resolveAsync(rawTaskOptions, rawTargetOptions, targetName, files) {
         result = copyCompilationTasks(result, files);
         visualStudioOptionsResolver_1.resolveVSOptionsAsync(result, rawTaskOptions, rawTargetOptions).then(function (result) {
             // apply `tsconfig` configuration here
-            result = applyAssociatedOptionsAndResolveConflicts(result);
+            result = addressAssociatedOptionsAndResolveConflicts(result);
             result = applyGruntTSDefaults(result);
             if (result.targetName === undefined ||
                 (!result.targetName && targetName)) {
@@ -147,7 +147,7 @@ function copyCompilationTasks(options, files) {
     }
     return options;
 }
-function applyAssociatedOptionsAndResolveConflicts(options) {
+function addressAssociatedOptionsAndResolveConflicts(options) {
     if (options.emitDecoratorMetadata) {
         options.experimentalDecorators = true;
     }
@@ -171,6 +171,13 @@ function applyAssociatedOptionsAndResolveConflicts(options) {
         options.removeComments = !!options.removeComments;
         options.comments = !options.removeComments;
     }
+    options.CompilationTasks.forEach(function (compileTask) {
+        if (compileTask.out && compileTask.outDir) {
+            console.log(JSON.stringify(compileTask));
+            options.warnings.push('The parameter `out` is incompatible with `outDir`; pass one or the other - not both.  Ignoring `out` and using `outDir`.');
+            compileTask.out = '';
+        }
+    });
     return options;
 }
 function applyGruntTSDefaults(options) {

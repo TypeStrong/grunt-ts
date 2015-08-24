@@ -86,6 +86,13 @@ const config : {[name: string]: IGruntTargetOptions} = {
       ignoreSettings: true
     },
     options: {}
+  },
+  "vs TestOutFile": <any>{
+    vs: {
+      project: "test/vsproj/testproject.csproj",
+      config: "TestOutFile",
+    },
+    options: {}
   }
 };
 
@@ -263,14 +270,13 @@ export var tests : nodeunit.ITestGroup = {
 
   "Visual Studio `vs` Integration Tests": {
     "Visual Studio properties should override the grunt-ts defaults ONLY": (test) => {
-      test.expect(4);
+      test.expect(3);
       const cfg = getConfig("vs minimalist", true);
       cfg.options.sourceMap = false;
       const result = or.resolveAsync(null, cfg).then((result) => {
         test.strictEqual(result.removeComments, false);
         test.strictEqual(result.sourceMap, false);
         test.strictEqual(result.module, 'commonjs');
-        test.strictEqual(result.CompilationTasks[0].outDir, 'vsproj_test');
         test.done();
       }).catch((err) => {test.ifError(err); test.done();});
     },
@@ -300,6 +306,24 @@ export var tests : nodeunit.ITestGroup = {
     //     test.done();
     // },
     // "Any options specified on the target should override the Visual Studio settings": (test) => {
+    //     test.ok(false);
+    //     test.done();
+    // },
+    "out in Visual Studio settings is converted from relative to project to relative to gruntfile.": (test) => {
+      test.expect(1);
+      const result = or.resolveAsync(null, getConfig("vs TestOutFile")).then((result) => {
+        test.strictEqual(result.CompilationTasks[0].out, "test/vsproj/test_out.js");
+        test.done();
+      }).catch((err) => {test.ifError(err); test.done();});
+    },
+    "outDir in Visual Studio settings is converted from relative to project to relative to gruntfile.": (test) => {
+      test.expect(1);
+      const result = or.resolveAsync(null, getConfig("vs minimalist")).then((result) => {
+        test.strictEqual(result.CompilationTasks[0].outDir, 'test/vsproj/vsproj_test');
+        test.done();
+      }).catch((err) => {test.ifError(err); test.done();});
+    },
+    // "paths to TypeScript files in Visual Studio project are converted from relative to project to relative to gruntfile.": (test) => {
     //     test.ok(false);
     //     test.done();
     // }

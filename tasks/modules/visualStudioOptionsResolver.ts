@@ -47,6 +47,7 @@ export function resolveVSOptionsAsync(applyTo: IGruntTSOptions,
             ProjectFileName: (<IVisualStudioProjectSupport>applyTo.vs).project,
             ActiveConfiguration: (<IVisualStudioProjectSupport>applyTo.vs).config || undefined
         }).then((vsConfig) => {
+
           applyTo = applyVSOptions(applyTo, vsConfig);
           applyTo = resolve_out_and_outDir(applyTo, taskOptions, targetOptions);
           resolve(applyTo);
@@ -102,13 +103,14 @@ function applyVSOptions(options: IGruntTSOptions, vsSettings: csproj2ts.TypeScri
       let src = options.CompilationTasks[0].src;
       let absolutePathToVSProjectFolder = path.resolve(vsSettings.VSProjectDetails.ProjectFileName, '..');
 
+      const gruntfileFolder = path.resolve('.');
       _.map(_.uniq(vsSettings.files), (file) => {
-          var absolutePathToFile = path.normalize(path.join(absolutePathToVSProjectFolder, file));
-          var relativePathToFile = path.relative(path.resolve('.'), absolutePathToFile).replace(new RegExp('\\' + path.sep, 'g'), '/');
+          const absolutePathToFile = path.normalize(path.join(absolutePathToVSProjectFolder, file));
+          const relativePathToFileFromGruntfile = path.relative(gruntfileFolder, absolutePathToFile).replace(new RegExp('\\' + path.sep, 'g'), '/');
 
           if (src.indexOf(absolutePathToFile) === -1 &&
-              src.indexOf(relativePathToFile) === -1) {
-              src.push(relativePathToFile);
+              src.indexOf(relativePathToFileFromGruntfile) === -1) {
+              src.push(relativePathToFileFromGruntfile);
           }
       });
   }
@@ -118,6 +120,10 @@ function applyVSOptions(options: IGruntTSOptions, vsSettings: csproj2ts.TypeScri
   }
 
   return options;
+}
+
+function relativePathToVSProjectFolderFromGruntfile(settings: csproj2ts.TypeScriptSettings) {
+  return path.resolve(settings.VSProjectDetails.ProjectFileName, '..');
 }
 
 function applyVSSettings(options: IGruntTSOptions, vsSettings: csproj2ts.TypeScriptSettings) {
@@ -150,15 +156,23 @@ function applyVSSettings(options: IGruntTSOptions, vsSettings: csproj2ts.TypeScr
       }
   }
 
-  if (utils.hasValue(vsSettings.OutDir)) {
+  const gruntfileToProject = relativePathToVSProjectFolderFromGruntfile(vsSettings);
+
+  if (utils.hasValue(vsSettings.OutDir) && vsSettings.OutDir !== '') {
       options.CompilationTasks.forEach((item) => {
-        item.outDir = vsSettings.OutDir;
-      });
+      let absolutePath = path.resolve(gruntfileToProject, vsSettings.OutDir);
+      item.outDir = utils.escapePathIfRequired(
+        path.relative(path.resolve('.'), absolutePath).replace(new RegExp('\\' + path.sep, 'g'), '/')
+      );
+    });
   }
 
-  if (utils.hasValue(vsSettings.OutFile)) {
+  if (utils.hasValue(vsSettings.OutFile) && vsSettings.OutFile !== '') {
     options.CompilationTasks.forEach((item) => {
-      item.out = vsSettings.OutFile;
+      let absolutePath = path.resolve(gruntfileToProject, vsSettings.OutFile);
+      item.out = utils.escapePathIfRequired(
+        path.relative(path.resolve('.'), absolutePath).replace(new RegExp('\\' + path.sep, 'g'), '/')
+      );
     });
   }
 
