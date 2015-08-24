@@ -44,9 +44,9 @@ function pluginFn(grunt: IGrunt) {
 
           // get unprocessed templates from configuration
           let rawTaskConfig =
-             <grunt.task.IMultiTask<ITargetOptions>>(grunt.config.getRaw(currentTask.name) || {});
+             <ITargetOptions>(grunt.config.getRaw(currentTask.name) || {});
           let rawTargetConfig =
-            <grunt.task.IMultiTask<ITargetOptions>>(grunt.config.getRaw(currentTask.name + '.' + currentTask.target) || {});
+            <ITargetOptions>(grunt.config.getRaw(currentTask.name + '.' + currentTask.target) || {});
 
           optionsResolver.resolveAsync(rawTaskConfig, rawTargetConfig, currentTask.target, files).then((result) => {
             options = result;
