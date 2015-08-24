@@ -82,6 +82,13 @@ var config = {
         },
         options: {}
     },
+    "vs Release": {
+        vs: {
+            project: "test/vsproj/testproject.csproj",
+            config: "Release",
+        },
+        options: {}
+    },
     "vs TestOutFile": {
         vs: {
             project: "test/vsproj/testproject.csproj",
@@ -271,28 +278,24 @@ exports.tests = {
                 test.done();
             }).catch(function (err) { test.ifError(err); test.done(); });
         },
-        "Any options specified on the task should override the Visual Studio settings": function (test) {
+        "Any options specified on the target should override the Visual Studio settings": function (test) {
             test.expect(1);
-            var cfg = getConfig("vs ignoreSettings Release", true);
+            var cfg = getConfig("vs Release", true);
             cfg.outDir = "this is the test outDir";
             var result = or.resolveAsync(null, cfg).then(function (result) {
                 test.strictEqual(result.CompilationTasks[0].outDir, "this is the test outDir");
                 test.done();
             }).catch(function (err) { test.ifError(err); test.done(); });
         },
-        // "Any 'options' options specified on the task should override the Visual Studio settings": (test) => {
-        //   const cfg = getConfig("vs ignoreSettings Release");
-        //   test.strictEqual(cfg.outDir,"");
-        //     test.done();
-        // },
-        // "Any properties specified on the target should override the Visual Studio settings": (test) => {
-        //     test.ok(false);
-        //     test.done();
-        // },
-        // "Any options specified on the target should override the Visual Studio settings": (test) => {
-        //     test.ok(false);
-        //     test.done();
-        // },
+        "Any 'options' options specified on the target should override the Visual Studio settings": function (test) {
+            test.expect(1);
+            var cfg = getConfig("vs Release", true);
+            cfg.options.removeComments = false;
+            var result = or.resolveAsync(null, cfg).then(function (result) {
+                test.strictEqual(result.removeComments, false);
+                test.done();
+            }).catch(function (err) { test.ifError(err); test.done(); });
+        },
         "out in Visual Studio settings is converted from relative to project to relative to gruntfile.": function (test) {
             test.expect(1);
             var result = or.resolveAsync(null, getConfig("vs TestOutFile")).then(function (result) {
@@ -307,6 +310,13 @@ exports.tests = {
                 test.done();
             }).catch(function (err) { test.ifError(err); test.done(); });
         },
+        "paths to TypeScript files in Visual Studio project are converted from relative to project to relative to gruntfile.": function (test) {
+            test.expect(1);
+            var result = or.resolveAsync(null, getConfig("vs minimalist")).then(function (result) {
+                test.strictEqual(result.CompilationTasks[0].src[0], 'test/vsproj/vsprojtest1.ts');
+                test.done();
+            }).catch(function (err) { test.ifError(err); test.done(); });
+        }
     },
 };
 //# sourceMappingURL=optionsResolverTests.js.map

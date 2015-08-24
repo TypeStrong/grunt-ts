@@ -87,6 +87,13 @@ const config : {[name: string]: IGruntTargetOptions} = {
     },
     options: {}
   },
+  "vs Release": <any>{
+    vs: {
+      project: "test/vsproj/testproject.csproj",
+      config: "Release",
+    },
+    options: {}
+  },
   "vs TestOutFile": <any>{
     vs: {
       project: "test/vsproj/testproject.csproj",
@@ -287,28 +294,24 @@ export var tests : nodeunit.ITestGroup = {
         test.done();
       }).catch((err) => {test.ifError(err); test.done();});
     },
-    "Any options specified on the task should override the Visual Studio settings": (test) => {
+    "Any options specified on the target should override the Visual Studio settings": (test) => {
       test.expect(1);
-      const cfg = getConfig("vs ignoreSettings Release", true);
+      const cfg = getConfig("vs Release", true);
       cfg.outDir = "this is the test outDir";
       const result = or.resolveAsync(null, cfg).then((result) => {
         test.strictEqual(result.CompilationTasks[0].outDir, "this is the test outDir");
         test.done();
       }).catch((err) => {test.ifError(err); test.done();});
     },
-    // "Any 'options' options specified on the task should override the Visual Studio settings": (test) => {
-    //   const cfg = getConfig("vs ignoreSettings Release");
-    //   test.strictEqual(cfg.outDir,"");
-    //     test.done();
-    // },
-    // "Any properties specified on the target should override the Visual Studio settings": (test) => {
-    //     test.ok(false);
-    //     test.done();
-    // },
-    // "Any options specified on the target should override the Visual Studio settings": (test) => {
-    //     test.ok(false);
-    //     test.done();
-    // },
+    "Any 'options' options specified on the target should override the Visual Studio settings": (test) => {
+      test.expect(1);
+      const cfg = getConfig("vs Release", true);
+      cfg.options.removeComments = false;
+      const result = or.resolveAsync(null, cfg).then((result) => {
+        test.strictEqual(result.removeComments, false);
+        test.done();
+      }).catch((err) => {test.ifError(err); test.done();});
+    },
     "out in Visual Studio settings is converted from relative to project to relative to gruntfile.": (test) => {
       test.expect(1);
       const result = or.resolveAsync(null, getConfig("vs TestOutFile")).then((result) => {
@@ -323,10 +326,13 @@ export var tests : nodeunit.ITestGroup = {
         test.done();
       }).catch((err) => {test.ifError(err); test.done();});
     },
-    // "paths to TypeScript files in Visual Studio project are converted from relative to project to relative to gruntfile.": (test) => {
-    //     test.ok(false);
-    //     test.done();
-    // }
+    "paths to TypeScript files in Visual Studio project are converted from relative to project to relative to gruntfile.": (test) => {
+      test.expect(1);
+      const result = or.resolveAsync(null, getConfig("vs minimalist")).then((result) => {
+        test.strictEqual(result.CompilationTasks[0].src[0], 'test/vsproj/vsprojtest1.ts');
+        test.done();
+      }).catch((err) => {test.ifError(err); test.done();});
+    }
   },
 
   // "tsconfig.json Integration Tests": {

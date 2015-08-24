@@ -1,6 +1,7 @@
 # Releases
 
 ## Next
+* out and outDir in VS projects will now work consistently between grunt-ts and Visual Studio; the paths will resolve to be relative to the gruntfile even if the VS project is not in the same folder.
 
 ## v4.2.0 (2015-07-21)
 * FEAT: TypeScript 1.5.3 support (TypeScript 1.5 "RTM").
