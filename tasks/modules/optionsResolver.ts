@@ -37,13 +37,6 @@ export function resolveAsync(rawTaskOptions: ITargetOptions,
 
       // apply `tsconfig` configuration here
 
-      if (result.CompilationTasks.length > 0 && result.vs) {
-        result.CompilationTasks.forEach((item) => {
-          item.out = (<any>rawTargetOptions).out || (<any>rawTaskOptions).out || item.out;
-          item.outDir = (<any>rawTargetOptions).outDir || (<any>rawTaskOptions).outDir || item.outDir;
-        });
-      }
-
       result = applyAssociatedOptionsAndResolveConflicts(result);
       result = applyGruntTSDefaults(result);
 

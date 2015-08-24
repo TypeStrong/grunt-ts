@@ -7,14 +7,14 @@ import {Promise} from 'es6-promise';
 import * as _ from 'lodash';
 
 export function resolveVSOptionsAsync(applyTo: IGruntTSOptions,
-  taskOptions: grunt.task.IMultiTask<ITargetOptions>,
-  targetOptions: grunt.task.IMultiTask<ITargetOptions>) {
+  taskOptions: ITargetOptions,
+  targetOptions: ITargetOptions) {
 
   return new Promise<IGruntTSOptions>((resolve, reject) => {
 
     {
-      const vsTask: IVisualStudioProjectSupport = getVSSettings(<ITargetOptions><any>taskOptions),
-            vsTarget: IVisualStudioProjectSupport = getVSSettings(<ITargetOptions><any>targetOptions);
+      const vsTask: IVisualStudioProjectSupport = getVSSettings(taskOptions),
+            vsTarget: IVisualStudioProjectSupport = getVSSettings(targetOptions);
       let vs: IVisualStudioProjectSupport = null;
 
       if (vsTask) {
@@ -48,6 +48,7 @@ export function resolveVSOptionsAsync(applyTo: IGruntTSOptions,
             ActiveConfiguration: (<IVisualStudioProjectSupport>applyTo.vs).config || undefined
         }).then((vsConfig) => {
           applyTo = applyVSOptions(applyTo, vsConfig);
+          applyTo = resolve_out_and_outDir(applyTo, taskOptions, targetOptions);
           resolve(applyTo);
           return;
         }).catch((error) => {
@@ -64,6 +65,24 @@ export function resolveVSOptionsAsync(applyTo: IGruntTSOptions,
     resolve(applyTo);
   });
 }
+
+function resolve_out_and_outDir(options: IGruntTSOptions, taskOptions: IGruntTargetOptions,
+    targetOptions: IGruntTargetOptions) {
+  if (options.CompilationTasks && options.CompilationTasks.length > 0) {
+    options.CompilationTasks.forEach((compilationTask) => {
+      [taskOptions, targetOptions].forEach(optionSet => {
+          if (optionSet && optionSet.out) {
+            compilationTask.out = optionSet.out;
+          }
+          if (optionSet && optionSet.outDir) {
+            compilationTask.outDir = optionSet.outDir;
+          }
+      });
+    });
+  }
+  return options;
+}
+
 
 function applyVSOptions(options: IGruntTSOptions, vsSettings: csproj2ts.TypeScriptSettings) {
   let ignoreFiles = false, ignoreSettings = false;

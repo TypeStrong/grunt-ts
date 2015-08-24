@@ -39,6 +39,7 @@ function resolveVSOptionsAsync(applyTo, taskOptions, targetOptions) {
                 ActiveConfiguration: applyTo.vs.config || undefined
             }).then(function (vsConfig) {
                 applyTo = applyVSOptions(applyTo, vsConfig);
+                applyTo = resolve_out_and_outDir(applyTo, taskOptions, targetOptions);
                 resolve(applyTo);
                 return;
             }).catch(function (error) {
@@ -57,6 +58,21 @@ function resolveVSOptionsAsync(applyTo, taskOptions, targetOptions) {
     });
 }
 exports.resolveVSOptionsAsync = resolveVSOptionsAsync;
+function resolve_out_and_outDir(options, taskOptions, targetOptions) {
+    if (options.CompilationTasks && options.CompilationTasks.length > 0) {
+        options.CompilationTasks.forEach(function (compilationTask) {
+            [taskOptions, targetOptions].forEach(function (optionSet) {
+                if (optionSet && optionSet.out) {
+                    compilationTask.out = optionSet.out;
+                }
+                if (optionSet && optionSet.outDir) {
+                    compilationTask.outDir = optionSet.outDir;
+                }
+            });
+        });
+    }
+    return options;
+}
 function applyVSOptions(options, vsSettings) {
     var ignoreFiles = false, ignoreSettings = false;
     if (typeof options.vs !== 'string') {
