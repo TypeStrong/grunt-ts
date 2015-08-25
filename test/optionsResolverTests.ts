@@ -2,6 +2,7 @@
 
 import * as nodeunit from 'nodeunit';
 import * as or from '../tasks/modules/optionsResolver';
+import * as tsconfig from '../tasks/modules/tsconfig';
 import * as utils from '../tasks/modules/utils';
 
 
@@ -115,19 +116,19 @@ function getConfig(name: string, asCopy = false) : IGruntTargetOptions {
 export var tests : nodeunit.ITestGroup = {
 
   // "Templates Tests": {
-  //   "Processed on Task Properties": (test) => {
+  //   "Processed on Task Properties": (test: nodeunit.Test) => {
   //       test.ok(false);
   //       test.done();
   //   },
-  //   "Processed on Task Options": (test) => {
+  //   "Processed on Task Options": (test: nodeunit.Test) => {
   //       test.ok(false);
   //       test.done();
   //   },
-  //   "Processed on Target Properties": (test) => {
+  //   "Processed on Target Properties": (test: nodeunit.Test) => {
   //       test.ok(false);
   //       test.done();
   //   },
-  //   "Processed on Target Options": (test) => {
+  //   "Processed on Target Options": (test: nodeunit.Test) => {
   //       test.ok(false);
   //       test.done();
   //   }
@@ -275,7 +276,7 @@ export var tests : nodeunit.ITestGroup = {
 
 
   "Visual Studio `vs` Integration Tests": {
-    "Visual Studio properties should override the grunt-ts defaults ONLY": (test) => {
+    "Visual Studio properties should override the grunt-ts defaults ONLY": (test: nodeunit.Test) => {
       test.expect(3);
       const cfg = getConfig("vs minimalist", true);
       cfg.options.sourceMap = false;
@@ -286,14 +287,14 @@ export var tests : nodeunit.ITestGroup = {
         test.done();
       }).catch((err) => {test.ifError(err); test.done();});
     },
-    "If a particular grunt-ts setting is not specified in the gruntfile, and `ignoreSettings` is true, the grunt-ts defaults should be used for that setting": (test) => {
+    "If a particular grunt-ts setting is not specified in the gruntfile, and `ignoreSettings` is true, the grunt-ts defaults should be used for that setting": (test: nodeunit.Test) => {
       test.expect(1);
       const result = or.resolveAsync(null, getConfig("vs ignoreSettings Release")).then((result) => {
         test.strictEqual(result.sourceMap, true, 'Since this csproj file\'s Release config sets sourceMap as false, if the setting is ignored, the grunt-ts default of true should come through.');
         test.done();
       }).catch((err) => {test.ifError(err); test.done();});
     },
-    "Any options specified on the target should override the Visual Studio settings": (test) => {
+    "Any options specified on the target should override the Visual Studio settings": (test: nodeunit.Test) => {
       test.expect(1);
       const cfg = getConfig("vs Release", true);
       cfg.outDir = "this is the test outDir";
@@ -302,7 +303,7 @@ export var tests : nodeunit.ITestGroup = {
         test.done();
       }).catch((err) => {test.ifError(err); test.done();});
     },
-    "Any 'options' options specified on the target should override the Visual Studio settings": (test) => {
+    "Any 'options' options specified on the target should override the Visual Studio settings": (test: nodeunit.Test) => {
       test.expect(1);
       const cfg = getConfig("vs Release", true);
       cfg.options.removeComments = false;
@@ -311,21 +312,21 @@ export var tests : nodeunit.ITestGroup = {
         test.done();
       }).catch((err) => {test.ifError(err); test.done();});
     },
-    "out in Visual Studio settings is converted from relative to project to relative to gruntfile.": (test) => {
+    "out in Visual Studio settings is converted from relative to project to relative to gruntfile.": (test: nodeunit.Test) => {
       test.expect(1);
       const result = or.resolveAsync(null, getConfig("vs TestOutFile")).then((result) => {
         test.strictEqual(result.CompilationTasks[0].out, "test/vsproj/test_out.js");
         test.done();
       }).catch((err) => {test.ifError(err); test.done();});
     },
-    "outDir in Visual Studio settings is converted from relative to project to relative to gruntfile.": (test) => {
+    "outDir in Visual Studio settings is converted from relative to project to relative to gruntfile.": (test: nodeunit.Test) => {
       test.expect(1);
       const result = or.resolveAsync(null, getConfig("vs minimalist")).then((result) => {
         test.strictEqual(result.CompilationTasks[0].outDir, 'test/vsproj/vsproj_test');
         test.done();
       }).catch((err) => {test.ifError(err); test.done();});
     },
-    "paths to TypeScript files in Visual Studio project are converted from relative to project to relative to gruntfile.": (test) => {
+    "paths to TypeScript files in Visual Studio project are converted from relative to project to relative to gruntfile.": (test: nodeunit.Test) => {
       test.expect(1);
       const result = or.resolveAsync(null, getConfig("vs minimalist")).then((result) => {
         test.strictEqual(result.CompilationTasks[0].src[0], 'test/vsproj/vsprojtest1.ts');
@@ -334,11 +335,50 @@ export var tests : nodeunit.ITestGroup = {
     }
   },
 
-  // "tsconfig.json Integration Tests": {
-  //   "todo": (test) => {
-  //       test.ok(false);
-  //       test.done();
-  //   }
-  // }
+
+  "tsconfig.json Integration Tests": {
+    "Can get config from a valid file": (test: nodeunit.Test) => {
+        test.expect(1);
+        const t = tsconfig.resolveAsync('./test/tsconfig/full_valid_tsconfig.json').then((result) => {
+          test.ok(true);
+          test.done();
+        }).catch((err) => {test.ifError(err); test.done();});
+    },
+    "Exception from invalid file": (test: nodeunit.Test) => {
+        test.expect(1);
+        const t = tsconfig.resolveAsync('./test/tsconfig/invalid_tsconfig.json').then((result) => {
+          test.ok(false, 'expected exception from invalid file.');
+          test.done();
+        }).catch((err) => {
+          test.ok(err.indexOf('Error parsing') > -1);
+          test.done();
+        });
+    },
+    "Exception from missing file": (test: nodeunit.Test) => {
+        test.expect(1);
+        const t = tsconfig.resolveAsync('./test/tsconfig/does_not_exist_tsconfig.json').then((result) => {
+          test.ok(false, 'expected exception from missing file.');
+          test.done();
+        }).catch((err) => {
+          test.ok(err.indexOf('Could not find file') > -1);
+          test.done();
+        });
+    },
+    "config entries come through appropriately": (test: nodeunit.Test) => {
+        test.expect(9);
+        const t = tsconfig.resolveAsync('./test/tsconfig/full_valid_tsconfig.json').then((result) => {
+          test.strictEqual(result.target, 'es5');
+          test.strictEqual(result.module, 'commonjs');
+          test.strictEqual(result.declaration, false);
+          test.strictEqual(result.noImplicitAny, false);
+          test.strictEqual(result.removeComments, false);
+          test.strictEqual(result.preserveConstEnums, false);
+          test.strictEqual(result.suppressImplicitAnyIndexErrors, true);
+          test.strictEqual(result.sourceMap, true);
+          test.strictEqual(result.emitDecoratorMetadata, undefined, 'emitDecoratorMetadata is not specified in this tsconfig.json');
+          test.done();
+        }).catch((err) => {test.ifError(err); test.done();});
+    },
+  }
 
 };

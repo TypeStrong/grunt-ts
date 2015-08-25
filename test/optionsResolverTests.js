@@ -1,5 +1,6 @@
 /// <reference path="../defs/tsd.d.ts" />
 var or = require('../tasks/modules/optionsResolver');
+var tsconfig = require('../tasks/modules/tsconfig');
 var utils = require('../tasks/modules/utils');
 var grunt = require('grunt');
 var config = {
@@ -108,19 +109,19 @@ function getConfig(name, asCopy) {
 }
 exports.tests = {
     // "Templates Tests": {
-    //   "Processed on Task Properties": (test) => {
+    //   "Processed on Task Properties": (test: nodeunit.Test) => {
     //       test.ok(false);
     //       test.done();
     //   },
-    //   "Processed on Task Options": (test) => {
+    //   "Processed on Task Options": (test: nodeunit.Test) => {
     //       test.ok(false);
     //       test.done();
     //   },
-    //   "Processed on Target Properties": (test) => {
+    //   "Processed on Target Properties": (test: nodeunit.Test) => {
     //       test.ok(false);
     //       test.done();
     //   },
-    //   "Processed on Target Options": (test) => {
+    //   "Processed on Target Options": (test: nodeunit.Test) => {
     //       test.ok(false);
     //       test.done();
     //   }
@@ -318,5 +319,49 @@ exports.tests = {
             }).catch(function (err) { test.ifError(err); test.done(); });
         }
     },
+    "tsconfig.json Integration Tests": {
+        "Can get config from a valid file": function (test) {
+            test.expect(1);
+            var t = tsconfig.resolveAsync('./test/tsconfig/full_valid_tsconfig.json').then(function (result) {
+                test.ok(true);
+                test.done();
+            }).catch(function (err) { test.ifError(err); test.done(); });
+        },
+        "Exception from invalid file": function (test) {
+            test.expect(1);
+            var t = tsconfig.resolveAsync('./test/tsconfig/invalid_tsconfig.json').then(function (result) {
+                test.ok(false, 'expected exception from invalid file.');
+                test.done();
+            }).catch(function (err) {
+                test.ok(err.indexOf('Error parsing') > -1);
+                test.done();
+            });
+        },
+        "Exception from missing file": function (test) {
+            test.expect(1);
+            var t = tsconfig.resolveAsync('./test/tsconfig/does_not_exist_tsconfig.json').then(function (result) {
+                test.ok(false, 'expected exception from missing file.');
+                test.done();
+            }).catch(function (err) {
+                test.ok(err.indexOf('Could not find file') > -1);
+                test.done();
+            });
+        },
+        "config entries come through appropriately": function (test) {
+            test.expect(9);
+            var t = tsconfig.resolveAsync('./test/tsconfig/full_valid_tsconfig.json').then(function (result) {
+                test.strictEqual(result.target, 'es5');
+                test.strictEqual(result.module, 'commonjs');
+                test.strictEqual(result.declaration, false);
+                test.strictEqual(result.noImplicitAny, false);
+                test.strictEqual(result.removeComments, false);
+                test.strictEqual(result.preserveConstEnums, false);
+                test.strictEqual(result.suppressImplicitAnyIndexErrors, true);
+                test.strictEqual(result.sourceMap, true);
+                test.strictEqual(result.emitDecoratorMetadata, undefined, 'emitDecoratorMetadata is not specified in this tsconfig.json');
+                test.done();
+            }).catch(function (err) { test.ifError(err); test.done(); });
+        },
+    }
 };
 //# sourceMappingURL=optionsResolverTests.js.map
