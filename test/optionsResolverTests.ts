@@ -189,7 +189,6 @@ export var tests : nodeunit.ITestGroup = {
           test.strictEqual(result.CompilationTasks[0].out, "\"my folder/out has spaces.js\"");
           test.done();
         }).catch((err) => {test.ifError(err); test.done();});
-
     },
     "outDir with spaces gets escaped with double-quotes": (test: nodeunit.Test) => {
         test.expect(1);
