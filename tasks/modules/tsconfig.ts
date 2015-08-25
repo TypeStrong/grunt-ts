@@ -68,34 +68,34 @@ interface ICompilerOptions {
     diagnostics?: boolean;
     emitBOM?: boolean;
     experimentalAsyncFunctions?: boolean;
-    experimentalDecorators?: boolean;                 // Experimental. Needed for the next option `emitDecoratorMetadata` see : https://github.com/Microsoft/TypeScript/pull/3330
-    emitDecoratorMetadata?: boolean;                  // Experimental. Emits addition type information for this reflection API https://github.com/rbuckton/ReflectDecorators
+    experimentalDecorators?: boolean;
+    emitDecoratorMetadata?: boolean;
     help?: boolean;
     isolatedModules?: boolean;
     inlineSourceMap?: boolean;
     inlineSources?: boolean;
     jsx?: string;
     locale?: string;
-    mapRoot?: string;                                 // Optionally Specifies the location where debugger should locate map files after deployment
+    mapRoot?: string;
     module?: string;
     newLine?: string;
     noEmit?: boolean;
     noEmitHelpers?: boolean;
     noEmitOnError?: boolean;
     noErrorTruncation?: boolean;
-    noImplicitAny?: boolean;                          // Error on inferred `any` type
+    noImplicitAny?: boolean;
     noLib?: boolean;
     noLibCheck?: boolean;
     noResolve?: boolean;
     out?: string;
-    outDir?: string;                                  // Redirect output structure to this directory
+    outDir?: string;
     preserveConstEnums?: boolean;
-    removeComments?: boolean;                         // Do not emit comments in output
+    removeComments?: boolean;
     rootDir?: string;
-    sourceMap?: boolean;                              // Generates SourceMaps (.map files)
-    sourceRoot?: string;                              // Optionally specifies the location where debugger should locate TypeScript source files after deployment
+    sourceMap?: boolean;
+    sourceRoot?: string;
     suppressImplicitAnyIndexErrors?: boolean;
-    target?: string;                                  // 'es3'|'es5' (default)|'es6'
+    target?: string;
     version?: boolean;
     watch?: boolean;
 }
