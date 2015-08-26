@@ -24,6 +24,9 @@ export function resolveAsync(rawTaskOptions: ITargetOptions,
 
   return new Promise<IGruntTSOptions>((resolve, reject) => {
 
+    fixMissingOptions(rawTaskOptions);
+    fixMissingOptions(rawTargetOptions);
+
     let {errors, warnings} = resolveAndWarnOnCapitalizationErrors(rawTaskOptions, rawTargetOptions, targetName);
     let result = emptyOptionsResolveResult();
     result.errors.push(...errors);
@@ -51,6 +54,12 @@ export function resolveAsync(rawTaskOptions: ITargetOptions,
       reject(error);
     });
   });
+}
+
+function fixMissingOptions(config: ITargetOptions) {
+  if (config && !config.options) {
+    config.options = <any>{};
+  }
 }
 
 function emptyOptionsResolveResult() {

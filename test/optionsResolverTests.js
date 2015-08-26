@@ -72,30 +72,29 @@ var config = {
         reference: undefined
     },
     "vs minimalist": {
-        vs: "test/vsproj/testproject.csproj",
-        options: {}
+        vs: "test/vsproj/testproject.csproj"
     },
     "vs ignoreSettings Release": {
         vs: {
             project: "test/vsproj/testproject.csproj",
             config: "Release",
             ignoreSettings: true
-        },
-        options: {}
+        }
     },
     "vs Release": {
         vs: {
             project: "test/vsproj/testproject.csproj",
             config: "Release",
-        },
-        options: {}
+        }
     },
     "vs TestOutFile": {
         vs: {
             project: "test/vsproj/testproject.csproj",
             config: "TestOutFile",
-        },
-        options: {}
+        }
+    },
+    "tsconfig has true": {
+        tsconfig: true
     }
 };
 function getConfig(name, asCopy) {
@@ -264,7 +263,7 @@ exports.tests = {
         "Visual Studio properties should override the grunt-ts defaults ONLY": function (test) {
             test.expect(3);
             var cfg = getConfig("vs minimalist", true);
-            cfg.options.sourceMap = false;
+            cfg.options = { sourceMap: false };
             var result = or.resolveAsync(null, cfg).then(function (result) {
                 test.strictEqual(result.removeComments, false);
                 test.strictEqual(result.sourceMap, false);
@@ -291,7 +290,7 @@ exports.tests = {
         "Any 'options' options specified on the target should override the Visual Studio settings": function (test) {
             test.expect(1);
             var cfg = getConfig("vs Release", true);
-            cfg.options.removeComments = false;
+            cfg.options = { removeComments: false };
             var result = or.resolveAsync(null, cfg).then(function (result) {
                 test.strictEqual(result.removeComments, false);
                 test.done();

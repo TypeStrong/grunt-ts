@@ -77,30 +77,29 @@ const config : {[name: string]: IGruntTargetOptions} = {
     reference: undefined
   },
   "vs minimalist": <any>{
-    vs: "test/vsproj/testproject.csproj",
-    options: {}
+    vs: "test/vsproj/testproject.csproj"
   },
   "vs ignoreSettings Release": <any>{
     vs: {
       project: "test/vsproj/testproject.csproj",
       config: "Release",
       ignoreSettings: true
-    },
-    options: {}
+    }
   },
   "vs Release": <any>{
     vs: {
       project: "test/vsproj/testproject.csproj",
       config: "Release",
-    },
-    options: {}
+    }
   },
   "vs TestOutFile": <any>{
     vs: {
       project: "test/vsproj/testproject.csproj",
       config: "TestOutFile",
-    },
-    options: {}
+    }
+  },
+  "tsconfig has true": <any>{
+    tsconfig: true
   }
 };
 
@@ -279,7 +278,7 @@ export var tests : nodeunit.ITestGroup = {
     "Visual Studio properties should override the grunt-ts defaults ONLY": (test: nodeunit.Test) => {
       test.expect(3);
       const cfg = getConfig("vs minimalist", true);
-      cfg.options.sourceMap = false;
+      cfg.options = <any>{sourceMap : false};
       const result = or.resolveAsync(null, cfg).then((result) => {
         test.strictEqual(result.removeComments, false);
         test.strictEqual(result.sourceMap, false);
@@ -306,7 +305,7 @@ export var tests : nodeunit.ITestGroup = {
     "Any 'options' options specified on the target should override the Visual Studio settings": (test: nodeunit.Test) => {
       test.expect(1);
       const cfg = getConfig("vs Release", true);
-      cfg.options.removeComments = false;
+      cfg.options = <any>{removeComments: false};
       const result = or.resolveAsync(null, cfg).then((result) => {
         test.strictEqual(result.removeComments, false);
         test.done();

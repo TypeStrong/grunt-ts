@@ -16,6 +16,8 @@ function resolveAsync(rawTaskOptions, rawTargetOptions, targetName, files) {
     if (targetName === void 0) { targetName = ''; }
     if (files === void 0) { files = []; }
     return new es6_promise_1.Promise(function (resolve, reject) {
+        fixMissingOptions(rawTaskOptions);
+        fixMissingOptions(rawTargetOptions);
         var _a = resolveAndWarnOnCapitalizationErrors(rawTaskOptions, rawTargetOptions, targetName), errors = _a.errors, warnings = _a.warnings;
         var result = emptyOptionsResolveResult();
         (_b = result.errors).push.apply(_b, errors);
@@ -39,6 +41,11 @@ function resolveAsync(rawTaskOptions, rawTargetOptions, targetName, files) {
     });
 }
 exports.resolveAsync = resolveAsync;
+function fixMissingOptions(config) {
+    if (config && !config.options) {
+        config.options = {};
+    }
+}
 function emptyOptionsResolveResult() {
     return {
         warnings: [],
