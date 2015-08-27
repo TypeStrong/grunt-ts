@@ -3,6 +3,7 @@ var es6_promise_1 = require('es6-promise');
 var fs = require('fs');
 var path = require('path');
 var stripBom = require('strip-bom');
+var _ = require('lodash');
 function resolveAsync(applyTo, taskOptions, targetOptions) {
     return new es6_promise_1.Promise(function (resolve, reject) {
         try {
@@ -112,15 +113,34 @@ function getTSConfigSettings(raw) {
 function applyCompilerOptions(applyTo, projectSpec) {
     var result = applyTo || {};
     var co = projectSpec.compilerOptions;
-    var tsconfigMappingToGruntTSProperty = ['declaration', 'emitDecoratorMetadata',
-        'experimentalDecorators', 'isolatedModules',
-        'inlineSourceMap', 'inlineSources', 'mapRoot', 'module', 'newLine', 'noEmit',
-        'noEmitHelpers', 'noEmitOnError', 'noImplicitAny', 'noLib', 'noResolve',
-        'out', 'outDir', 'preserveConstEnums', 'removeComments', 'sourceMap',
-        'sourceRoot', 'suppressImplicitAnyIndexErrors', 'target'];
-    tsconfigMappingToGruntTSProperty.forEach(function (propertyName) {
-        if (propertyName in co) {
-            result[propertyName] = co[propertyName];
+    var tsconfig = applyTo.tsconfig;
+    if (!tsconfig.ignoreSettings) {
+        var tsconfigMappingToGruntTSProperty = ['declaration', 'emitDecoratorMetadata',
+            'experimentalDecorators', 'isolatedModules',
+            'inlineSourceMap', 'inlineSources', 'mapRoot', 'module', 'newLine', 'noEmit',
+            'noEmitHelpers', 'noEmitOnError', 'noImplicitAny', 'noLib', 'noResolve',
+            'out', 'outDir', 'preserveConstEnums', 'removeComments', 'sourceMap',
+            'sourceRoot', 'suppressImplicitAnyIndexErrors', 'target'];
+        tsconfigMappingToGruntTSProperty.forEach(function (propertyName) {
+            if (propertyName in co) {
+                if (!(propertyName in result)) {
+                    result[propertyName] = co[propertyName];
+                }
+            }
+        });
+    }
+    if (applyTo.CompilationTasks.length === 0) {
+        applyTo.CompilationTasks.push({ src: [] });
+    }
+    var src = applyTo.CompilationTasks[0].src;
+    var absolutePathToTSConfig = path.resolve(tsconfig.tsconfig, '..');
+    var gruntfileFolder = path.resolve('.');
+    _.map(_.uniq(projectSpec.files), function (file) {
+        var absolutePathToFile = path.normalize(path.join(absolutePathToTSConfig, file));
+        var relativePathToFileFromGruntfile = path.relative(gruntfileFolder, absolutePathToFile).replace(new RegExp('\\' + path.sep, 'g'), '/');
+        if (src.indexOf(absolutePathToFile) === -1 &&
+            src.indexOf(relativePathToFileFromGruntfile) === -1) {
+            src.push(relativePathToFileFromGruntfile);
         }
     });
     return result;

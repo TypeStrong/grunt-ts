@@ -118,7 +118,8 @@ interface ITSConfigSupport {
 }
 
 interface ITSConfigFile {
-    compilerOptions: ICompilerOptions;
+    compilerOptions?: ICompilerOptions;
+    files?: string[];
 }
 
 // NOTE: This is from tsconfig.ts in atom-typescript

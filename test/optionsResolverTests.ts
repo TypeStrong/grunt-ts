@@ -101,6 +101,9 @@ const config : {[name: string]: IGruntTargetOptions} = {
   },
   "tsconfig has true": <any>{
     tsconfig: true
+  },
+  "tsconfig has specific file": <any>{
+    tsconfig: 'test/tsconfig/test_simple_tsconfig.json'
   }
 };
 
@@ -389,11 +392,11 @@ export var tests : nodeunit.ITestGroup = {
           test.done();
         }).catch((err) => {test.ifError(err); test.done();});
     },
-    "simple tsconfig with true works": (test: nodeunit.Test) => {
-      test.expect(10);
+    "most basic tsconfig with true works": (test: nodeunit.Test) => {
+      test.expect(12);
       const result = or.resolveAsync(null, getConfig("tsconfig has true")).then((result) => {
 
-        // todo: This depends on the actuall grunt-ts tsconfig so technically it could be wrong in the future.
+        // NOTE: With tsconfig: true, this depends on the actual grunt-ts tsconfig so technically it could be wrong in the future.
         test.strictEqual((<ITSConfigSupport>result.tsconfig).tsconfig, path.join(path.resolve('.'), 'tsconfig.json'));
         test.strictEqual(result.target, 'es5');
         test.strictEqual(result.module, 'commonjs');
@@ -405,9 +408,63 @@ export var tests : nodeunit.ITestGroup = {
         test.strictEqual(result.sourceMap, true);
         test.strictEqual(result.emitDecoratorMetadata, undefined, 'emitDecoratorMetadata is not specified in this tsconfig.json');
 
+        test.ok(result.CompilationTasks[0].src.indexOf('tasks/ts.ts') > -1);
+        test.ok(result.CompilationTasks[0].src.indexOf('tasks/modules/compile.ts') > -1);
+
         test.done();
       }).catch((err) => {test.ifError(err); test.done();});
     }
+  },
+  "simple tsconfig with file path works": (test: nodeunit.Test) => {
+    test.expect(13);
+    const result = or.resolveAsync(null, getConfig("tsconfig has specific file")).then((result) => {
+
+      test.strictEqual((<ITSConfigSupport>result.tsconfig).tsconfig, 'test/tsconfig/test_simple_tsconfig.json');
+      test.strictEqual(result.target, 'es6');
+      test.strictEqual(result.module, 'amd');
+      test.strictEqual(result.declaration, true);
+      test.strictEqual(result.noImplicitAny, true);
+      test.strictEqual(result.removeComments, false);
+      test.strictEqual(result.preserveConstEnums, false);
+      test.strictEqual(result.suppressImplicitAnyIndexErrors, true);
+      test.strictEqual(result.sourceMap, false);
+      test.strictEqual(result.emitDecoratorMetadata, true);
+      test.strictEqual(result.experimentalDecorators, true);
+
+      test.strictEqual(result.CompilationTasks[0].src.length, 1);
+      test.ok(result.CompilationTasks[0].src.indexOf('test/tsconfig/files/validtsconfig.ts') === 0);
+
+      test.done();
+    }).catch((err) => {test.ifError(err); test.done();});
+  },
+  "src appends to files from tsconfig": (test: nodeunit.Test) => {
+    test.expect(3);
+
+    const cfg = getConfig("tsconfig has specific file");
+    const files: IGruntTSCompilationInfo[] = [{src: ['test/simple/ts/zoo.ts']}];
+
+    const result = or.resolveAsync(null, getConfig("tsconfig has specific file"), null, files).then((result) => {
+
+      test.strictEqual(result.CompilationTasks[0].src.length, 2);
+      test.ok(result.CompilationTasks[0].src.indexOf('test/tsconfig/files/validtsconfig.ts') > -1);
+      test.ok(result.CompilationTasks[0].src.indexOf('test/simple/ts/zoo.ts') > -1);
+
+      test.done();
+    }).catch((err) => {test.ifError(err); test.done();});
+  },
+  "target settings override tsconfig": (test: nodeunit.Test) => {
+    test.expect(2);
+    let cfg = getConfig("tsconfig has specific file", true);
+    cfg.options.target = 'es3';
+
+    const result = or.resolveAsync(null, cfg).then((result) => {
+
+      test.strictEqual(result.target, 'es3', 'this setting on the grunt-ts target options overrides the tsconfig');
+      test.strictEqual(result.removeComments, false,
+        'this setting is not specified in the options so tsconfig wins over grunt-ts defaults');
+
+      test.done();
+    }).catch((err) => {test.ifError(err); test.done();});
   }
 
 };

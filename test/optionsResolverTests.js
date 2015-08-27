@@ -95,6 +95,9 @@ var config = {
     },
     "tsconfig has true": {
         tsconfig: true
+    },
+    "tsconfig has specific file": {
+        tsconfig: 'test/tsconfig/test_simple_tsconfig.json'
     }
 };
 function getConfig(name, asCopy) {
@@ -370,10 +373,10 @@ exports.tests = {
                 test.done();
             }).catch(function (err) { test.ifError(err); test.done(); });
         },
-        "simple tsconfig with true works": function (test) {
-            test.expect(10);
+        "most basic tsconfig with true works": function (test) {
+            test.expect(12);
             var result = or.resolveAsync(null, getConfig("tsconfig has true")).then(function (result) {
-                // todo: This depends on the actuall grunt-ts tsconfig so technically it could be wrong in the future.
+                // NOTE: With tsconfig: true, this depends on the actual grunt-ts tsconfig so technically it could be wrong in the future.
                 test.strictEqual(result.tsconfig.tsconfig, path.join(path.resolve('.'), 'tsconfig.json'));
                 test.strictEqual(result.target, 'es5');
                 test.strictEqual(result.module, 'commonjs');
@@ -384,9 +387,51 @@ exports.tests = {
                 test.strictEqual(result.suppressImplicitAnyIndexErrors, true);
                 test.strictEqual(result.sourceMap, true);
                 test.strictEqual(result.emitDecoratorMetadata, undefined, 'emitDecoratorMetadata is not specified in this tsconfig.json');
+                test.ok(result.CompilationTasks[0].src.indexOf('tasks/ts.ts') > -1);
+                test.ok(result.CompilationTasks[0].src.indexOf('tasks/modules/compile.ts') > -1);
                 test.done();
             }).catch(function (err) { test.ifError(err); test.done(); });
         }
+    },
+    "simple tsconfig with file path works": function (test) {
+        test.expect(13);
+        var result = or.resolveAsync(null, getConfig("tsconfig has specific file")).then(function (result) {
+            test.strictEqual(result.tsconfig.tsconfig, 'test/tsconfig/test_simple_tsconfig.json');
+            test.strictEqual(result.target, 'es6');
+            test.strictEqual(result.module, 'amd');
+            test.strictEqual(result.declaration, true);
+            test.strictEqual(result.noImplicitAny, true);
+            test.strictEqual(result.removeComments, false);
+            test.strictEqual(result.preserveConstEnums, false);
+            test.strictEqual(result.suppressImplicitAnyIndexErrors, true);
+            test.strictEqual(result.sourceMap, false);
+            test.strictEqual(result.emitDecoratorMetadata, true);
+            test.strictEqual(result.experimentalDecorators, true);
+            test.strictEqual(result.CompilationTasks[0].src.length, 1);
+            test.ok(result.CompilationTasks[0].src.indexOf('test/tsconfig/files/validtsconfig.ts') === 0);
+            test.done();
+        }).catch(function (err) { test.ifError(err); test.done(); });
+    },
+    "src appends to files from tsconfig": function (test) {
+        test.expect(3);
+        var cfg = getConfig("tsconfig has specific file");
+        var files = [{ src: ['test/simple/ts/zoo.ts'] }];
+        var result = or.resolveAsync(null, getConfig("tsconfig has specific file"), null, files).then(function (result) {
+            test.strictEqual(result.CompilationTasks[0].src.length, 2);
+            test.ok(result.CompilationTasks[0].src.indexOf('test/tsconfig/files/validtsconfig.ts') > -1);
+            test.ok(result.CompilationTasks[0].src.indexOf('test/simple/ts/zoo.ts') > -1);
+            test.done();
+        }).catch(function (err) { test.ifError(err); test.done(); });
+    },
+    "target settings override tsconfig": function (test) {
+        test.expect(2);
+        var cfg = getConfig("tsconfig has specific file", true);
+        cfg.options.target = 'es3';
+        var result = or.resolveAsync(null, cfg).then(function (result) {
+            test.strictEqual(result.target, 'es3', 'this setting on the grunt-ts target options overrides the tsconfig');
+            test.strictEqual(result.removeComments, false, 'this setting is not specified in the options so tsconfig wins over grunt-ts defaults');
+            test.done();
+        }).catch(function (err) { test.ifError(err); test.done(); });
     }
 };
 //# sourceMappingURL=optionsResolverTests.js.map

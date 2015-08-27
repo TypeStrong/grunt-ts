@@ -4,6 +4,7 @@ import {Promise} from 'es6-promise';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as stripBom from 'strip-bom';
+import * as _ from 'lodash';
 
 export function resolveAsync(applyTo: IGruntTSOptions,
   taskOptions: ITargetOptions,
@@ -127,18 +128,41 @@ function applyCompilerOptions(applyTo: IGruntTSOptions, projectSpec: ITSConfigFi
   const result: IGruntTSOptions = applyTo || <any>{};
 
   const co = projectSpec.compilerOptions;
+  const tsconfig: ITSConfigSupport = applyTo.tsconfig;
 
-  const tsconfigMappingToGruntTSProperty = ['declaration', 'emitDecoratorMetadata',
-    'experimentalDecorators', 'isolatedModules',
-    'inlineSourceMap', 'inlineSources', 'mapRoot', 'module', 'newLine', 'noEmit',
-    'noEmitHelpers', 'noEmitOnError', 'noImplicitAny', 'noLib', 'noResolve',
-    'out', 'outDir', 'preserveConstEnums', 'removeComments', 'sourceMap',
-    'sourceRoot', 'suppressImplicitAnyIndexErrors', 'target'];
+  if (!tsconfig.ignoreSettings) {
+    const tsconfigMappingToGruntTSProperty = ['declaration', 'emitDecoratorMetadata',
+      'experimentalDecorators', 'isolatedModules',
+      'inlineSourceMap', 'inlineSources', 'mapRoot', 'module', 'newLine', 'noEmit',
+      'noEmitHelpers', 'noEmitOnError', 'noImplicitAny', 'noLib', 'noResolve',
+      'out', 'outDir', 'preserveConstEnums', 'removeComments', 'sourceMap',
+      'sourceRoot', 'suppressImplicitAnyIndexErrors', 'target'];
 
-  tsconfigMappingToGruntTSProperty.forEach((propertyName) => {
-    if (propertyName in co) {
-        result[propertyName] = co[propertyName];
-    }
+    tsconfigMappingToGruntTSProperty.forEach((propertyName) => {
+      if (propertyName in co) {
+        if (!(propertyName in result)) {
+          result[propertyName] = co[propertyName];
+        }
+      }
+    });
+  }
+
+  if (applyTo.CompilationTasks.length === 0) {
+    applyTo.CompilationTasks.push({src: []});
+  }
+
+  let src = applyTo.CompilationTasks[0].src;
+  let absolutePathToTSConfig = path.resolve(tsconfig.tsconfig, '..');
+
+  const gruntfileFolder = path.resolve('.');
+  _.map(_.uniq(projectSpec.files), (file) => {
+      const absolutePathToFile = path.normalize(path.join(absolutePathToTSConfig, file));
+      const relativePathToFileFromGruntfile = path.relative(gruntfileFolder, absolutePathToFile).replace(new RegExp('\\' + path.sep, 'g'), '/');
+
+      if (src.indexOf(absolutePathToFile) === -1 &&
+          src.indexOf(relativePathToFileFromGruntfile) === -1) {
+          src.push(relativePathToFileFromGruntfile);
+      }
   });
 
   return result;

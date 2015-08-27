@@ -7,6 +7,7 @@
 Grunt-ts is an npm package that handles TypeScript compilation work in GruntJS build scripts.  It provides a [Grunt-compatible wrapper](#support-for-tsc-switches) for the `tsc` command-line compiler, and provides some [additional functionality](#grunt-ts-gruntfilejs-options) that improves the TypeScript development workflow. Grunt-ts even supports compiling against a [Visual Studio project](#vs) directly.  Grunt-ts is itself written in [TypeScript](./tasks/ts.ts).
 
 ### Latest Changes
+Latest test release is `5.0.0-beta.1` which includes tsconfig support.
 Current major release is 4.2, which includes TypeScript 1.5.
 
 [Full changelog is here](CHANGELOG.md).
@@ -122,6 +123,7 @@ For file ordering, look at [JavaScript Generation](#javascript-generation).
 |[suppressImplicitAnyIndexErrors](#suppressimplicitanyindexerrors)|option|`false` (default), `true` - indicates if TypeScript should allow access to properties of an object by string indexer when `--noImplicitAny` is active, even if TypeScript doesn't know about them.|
 |[src](#src)|target|`string` or `string[]` - glob of TypeScript files to compile.|
 |[target](#target)|option|`'es5'` (default), `'es3'`, or `'es6'` - targeted ECMAScript version|
+|[tsconfig](#tsconfig)|target|true, a string path, or an object.  See [tsconfig](#tsconfig) for details.|
 |[verbose](#verbose)|option|`true`, `false` (default) - logs `tsc` command-line options to console|
 |[vs](#vs)|target|`string` referencing a `.csproj` or `.vbproj` file or, `{}` (object) (see [Visual Studio Projects](#vs) for details)|
 |[watch](#watch)|target|`string` - will watch for changes in the specified directory or below|
@@ -988,6 +990,50 @@ grunt.initConfig({
   }
 });
 ````
+
+#### tsconfig
+
+Grunt-ts supports using a tsconfig.json file.  Here are some example Gruntfile initConfig sections:
+
+```js
+grunt.initConfig({
+  ts: {
+    default: {
+      tsconfig: true   // Value must be a string referencing a file path such as "./somefolder/tsconfig.json", OR `true` to use the 'tsconfig.json' in same folder as Gruntfile.js
+    }
+  }
+});
+```
+
+or
+
+```js
+grunt.initConfig({
+  ts: {
+    default: {
+      tsconfig: './some/path/to/tsconfig.json'
+    }
+  }
+});
+```
+
+also:
+
+```js
+grunt.initConfig({
+  ts: {
+    default: {
+      tsconfig: {
+        tsconfig: './SomeOtherFolder/tsconfig.json',
+        ignoreFiles: true
+      }
+    }
+  }
+});
+```
+
+Documentation for how this feature will work when fully implemented is here: https://github.com/TypeStrong/grunt-ts/issues/202#issuecomment-125992243
+
 
 #### verbose
 
