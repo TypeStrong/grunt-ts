@@ -1,6 +1,7 @@
 /// <reference path="../defs/tsd.d.ts" />
 
 import * as nodeunit from 'nodeunit';
+import * as path from 'path';
 import * as or from '../tasks/modules/optionsResolver';
 import * as tsconfig from '../tasks/modules/tsconfig';
 import * as utils from '../tasks/modules/utils';
@@ -338,14 +339,18 @@ export var tests : nodeunit.ITestGroup = {
   "tsconfig.json Integration Tests": {
     "Can get config from a valid file": (test: nodeunit.Test) => {
         test.expect(1);
-        const t = tsconfig.resolveAsync('./test/tsconfig/full_valid_tsconfig.json').then((result) => {
+        const cfg = getConfig("minimalist", true);
+        cfg.tsconfig = './test/tsconfig/full_valid_tsconfig.json';
+        const result = or.resolveAsync(null, cfg).then((result) => {
           test.ok(true);
           test.done();
         }).catch((err) => {test.ifError(err); test.done();});
     },
     "Exception from invalid file": (test: nodeunit.Test) => {
         test.expect(1);
-        const t = tsconfig.resolveAsync('./test/tsconfig/invalid_tsconfig.json').then((result) => {
+        const cfg = getConfig("minimalist", true);
+        cfg.tsconfig = './test/tsconfig/invalid_tsconfig.json';
+        const result = or.resolveAsync(null, cfg).then((result) => {
           test.ok(false, 'expected exception from invalid file.');
           test.done();
         }).catch((err) => {
@@ -354,18 +359,24 @@ export var tests : nodeunit.ITestGroup = {
         });
     },
     "Exception from missing file": (test: nodeunit.Test) => {
-        test.expect(1);
-        const t = tsconfig.resolveAsync('./test/tsconfig/does_not_exist_tsconfig.json').then((result) => {
+        test.expect(2);
+        const cfg = getConfig("minimalist", true);
+        cfg.tsconfig = './test/tsconfig/does_not_exist_tsconfig.json';
+        const result = or.resolveAsync(null, cfg).then((result) => {
           test.ok(false, 'expected exception from missing file.');
           test.done();
         }).catch((err) => {
-          test.ok(err.indexOf('Could not find file') > -1);
+          test.strictEqual(err.code, 'ENOENT');
+          test.ok(err.path && err.path.indexOf('does_not_exist_tsconfig.json') > -1)
           test.done();
         });
     },
     "config entries come through appropriately": (test: nodeunit.Test) => {
         test.expect(9);
-        const t = tsconfig.resolveAsync('./test/tsconfig/full_valid_tsconfig.json').then((result) => {
+        const cfg = getConfig("minimalist", true);
+        cfg.tsconfig = './test/tsconfig/full_valid_tsconfig.json';
+
+        const result = or.resolveAsync(null, cfg).then((result) => {
           test.strictEqual(result.target, 'es5');
           test.strictEqual(result.module, 'commonjs');
           test.strictEqual(result.declaration, false);
@@ -378,6 +389,25 @@ export var tests : nodeunit.ITestGroup = {
           test.done();
         }).catch((err) => {test.ifError(err); test.done();});
     },
+    "simple tsconfig with true works": (test: nodeunit.Test) => {
+      test.expect(10);
+      const result = or.resolveAsync(null, getConfig("tsconfig has true")).then((result) => {
+
+        // todo: This depends on the actuall grunt-ts tsconfig so technically it could be wrong in the future.
+        test.strictEqual((<ITSConfigSupport>result.tsconfig).tsconfig, path.join(path.resolve('.'), 'tsconfig.json'));
+        test.strictEqual(result.target, 'es5');
+        test.strictEqual(result.module, 'commonjs');
+        test.strictEqual(result.declaration, false);
+        test.strictEqual(result.noImplicitAny, false);
+        test.strictEqual(result.removeComments, false);
+        test.strictEqual(result.preserveConstEnums, false);
+        test.strictEqual(result.suppressImplicitAnyIndexErrors, true);
+        test.strictEqual(result.sourceMap, true);
+        test.strictEqual(result.emitDecoratorMetadata, undefined, 'emitDecoratorMetadata is not specified in this tsconfig.json');
+
+        test.done();
+      }).catch((err) => {test.ifError(err); test.done();});
+    }
   }
 
 };

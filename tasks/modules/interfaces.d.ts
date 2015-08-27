@@ -19,6 +19,7 @@ interface ITargetOptions {
     };
     testExecute?: (args: string[]) => Promise<ICompileResult>;
     vs?: string | IVisualStudioProjectSupport;
+    tsconfig?: boolean | string | ITSConfigSupport;
     targetName?: string;
     options?: ITaskOptions;
 }
@@ -103,8 +104,60 @@ interface IGruntTSCompilationInfo extends grunt.file.IFilesConfig {
   src?: string[];
 }
 
-
 declare module 'strip-bom' {
   var stripBom: Function;
   export = stripBom;
+}
+
+interface ITSConfigSupport {
+  tsconfig?: string;
+  ignoreSettings?: boolean;
+  overwriteFilesGlob?: boolean;
+  updateFiles?: boolean;
+  passThrough?: boolean;
+}
+
+interface ITSConfigFile {
+    compilerOptions: ICompilerOptions;
+}
+
+// NOTE: This is from tsconfig.ts in atom-typescript
+interface ICompilerOptions {
+    allowNonTsExtensions?: boolean;
+    charset?: string;
+    codepage?: number;
+    declaration?: boolean;
+    diagnostics?: boolean;
+    emitBOM?: boolean;
+    experimentalAsyncFunctions?: boolean;
+    experimentalDecorators?: boolean;
+    emitDecoratorMetadata?: boolean;
+    help?: boolean;
+    isolatedModules?: boolean;
+    inlineSourceMap?: boolean;
+    inlineSources?: boolean;
+    jsx?: string;
+    locale?: string;
+    mapRoot?: string;
+    module?: string;
+    newLine?: string;
+    noEmit?: boolean;
+    noEmitHelpers?: boolean;
+    noEmitOnError?: boolean;
+    noErrorTruncation?: boolean;
+    noImplicitAny?: boolean;
+    noLib?: boolean;
+    noLibCheck?: boolean;
+    noResolve?: boolean;
+    out?: string;
+    outDir?: string;
+    preserveConstEnums?: boolean;
+    removeComments?: boolean;
+    rootDir?: string;
+    sourceMap?: boolean;
+    sourceRoot?: string;
+    suppressImplicitAnyIndexErrors?: boolean;
+    target?: string;
+    version?: boolean;
+    watch?: boolean;
 }

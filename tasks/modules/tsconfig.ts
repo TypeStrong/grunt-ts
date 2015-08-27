@@ -2,40 +2,129 @@
 
 import {Promise} from 'es6-promise';
 import * as fs from 'fs';
+import * as path from 'path';
 import * as stripBom from 'strip-bom';
 
-
-export function resolveAsync(projectFile: string) {
+export function resolveAsync(applyTo: IGruntTSOptions,
+  taskOptions: ITargetOptions,
+  targetOptions: ITargetOptions) {
   return new Promise<IGruntTSOptions>((resolve, reject) => {
 
+    try {
+      const taskTSConfig = getTSConfigSettings(taskOptions);
+      const targetTSConfig = getTSConfigSettings(targetOptions);
+
+      let tsconfig: ITSConfigSupport = null;
+
+      if (taskTSConfig) {
+        tsconfig = taskTSConfig;
+      }
+      if (targetTSConfig) {
+        if (!tsconfig) {
+          tsconfig = targetTSConfig;
+        }
+
+        if ('tsconfig' in targetTSConfig) {
+          tsconfig.tsconfig = targetTSConfig.tsconfig;
+        }
+        if ('ignoreSettings' in targetTSConfig) {
+          tsconfig.ignoreSettings = targetTSConfig.ignoreSettings;
+        }
+        if ('overwriteFilesGlob' in targetTSConfig) {
+          tsconfig.overwriteFilesGlob = targetTSConfig.overwriteFilesGlob;
+        }
+        if ('updateFiles' in targetTSConfig) {
+          tsconfig.updateFiles = targetTSConfig.updateFiles;
+        }
+        if ('passThrough' in targetTSConfig) {
+          tsconfig.passThrough = targetTSConfig.passThrough;
+        }
+      }
+
+      applyTo.tsconfig = tsconfig;
+
+    } catch (ex) {
+      reject(ex);
+      return;
+    }
+
+    if (!applyTo.tsconfig) {
+      resolve(applyTo);
+      return;
+    }
+
+    let projectFile = (<ITSConfigSupport>applyTo.tsconfig).tsconfig;
     try {
       var projectFileTextContent = fs.readFileSync(projectFile, 'utf8');
     } catch (ex) {
       if (ex && ex.code === 'ENOENT') {
           reject('Could not find file "' + projectFile + '".');
+          return;
       } else if (ex && ex.errno) {
           reject('Error ' + ex.errno + ' reading "' + projectFile + '".');
+          return;
       } else {
           reject('Error reading "' + projectFile + '": ' + JSON.stringify(ex));
+          return;
       }
       reject(ex);
+      return;
     }
 
     try {
-      var projectSpec = JSON.parse(stripBom(projectFileTextContent));
+      var projectSpec: ITSConfigFile = JSON.parse(stripBom(projectFileTextContent));
     } catch (ex) {
       reject('Error parsing "' + projectFile + '".  It may not be valid JSON in UTF-8.');
+      return;
     }
 
-    let spec: IGruntTSOptions = getCompilerOptions(projectSpec);
+    applyTo = applyCompilerOptions(applyTo, projectSpec);
 
-    resolve(spec);
-
+    resolve(applyTo);
   });
 }
 
-function getCompilerOptions(projectSpec: ITSConfig) {
-  const result: IGruntTSOptions = <any>{};
+function getTSConfigSettings(raw: ITargetOptions): ITSConfigSupport {
+
+  try {
+    if (!raw || !raw.tsconfig) {
+      return null;
+    }
+
+    if (typeof raw.tsconfig === 'boolean') {
+      return {
+        tsconfig: path.join(path.resolve('.'), 'tsconfig.json')
+      };
+    } else if (typeof raw.tsconfig === 'string') {
+
+      let tsconfigName = <string>raw.tsconfig;
+      let fileInfo = fs.lstatSync(tsconfigName);
+
+      if (fileInfo.isDirectory()) {
+        tsconfigName = path.join(tsconfigName, 'tsconfig.json');
+      }
+
+      return {
+        tsconfig: tsconfigName
+      };
+    }
+    return raw.tsconfig;
+  } catch (ex) {
+    if (ex.code === 'ENOENT') {
+      throw ex;
+    }
+    let exception : NodeJS.ErrnoException = {
+      name: 'Invalid tsconfig setting',
+      message: 'Exception due to invalid tsconfig setting.  Details: ' + ex,
+      code: ex.code,
+      errno: ex.errno
+    };
+    throw exception;
+  }
+}
+
+function applyCompilerOptions(applyTo: IGruntTSOptions, projectSpec: ITSConfigFile) {
+  const result: IGruntTSOptions = applyTo || <any>{};
 
   const co = projectSpec.compilerOptions;
 
@@ -53,49 +142,4 @@ function getCompilerOptions(projectSpec: ITSConfig) {
   });
 
   return result;
-}
-
-interface ITSConfig {
-    compilerOptions: ICompilerOptions;
-}
-
-// NOTE: This is from tsconfig.ts in atom-typescript
-interface ICompilerOptions {
-    allowNonTsExtensions?: boolean;
-    charset?: string;
-    codepage?: number;
-    declaration?: boolean;
-    diagnostics?: boolean;
-    emitBOM?: boolean;
-    experimentalAsyncFunctions?: boolean;
-    experimentalDecorators?: boolean;
-    emitDecoratorMetadata?: boolean;
-    help?: boolean;
-    isolatedModules?: boolean;
-    inlineSourceMap?: boolean;
-    inlineSources?: boolean;
-    jsx?: string;
-    locale?: string;
-    mapRoot?: string;
-    module?: string;
-    newLine?: string;
-    noEmit?: boolean;
-    noEmitHelpers?: boolean;
-    noEmitOnError?: boolean;
-    noErrorTruncation?: boolean;
-    noImplicitAny?: boolean;
-    noLib?: boolean;
-    noLibCheck?: boolean;
-    noResolve?: boolean;
-    out?: string;
-    outDir?: string;
-    preserveConstEnums?: boolean;
-    removeComments?: boolean;
-    rootDir?: string;
-    sourceMap?: boolean;
-    sourceRoot?: string;
-    suppressImplicitAnyIndexErrors?: boolean;
-    target?: string;
-    version?: boolean;
-    watch?: boolean;
 }

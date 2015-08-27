@@ -6,6 +6,7 @@ var utils = require('./utils');
 var _ = require('lodash');
 var es6_promise_1 = require('es6-promise');
 var visualStudioOptionsResolver_1 = require('./visualStudioOptionsResolver');
+var tsconfig_1 = require('./tsconfig');
 var propertiesFromTarget = ['amdloader', 'html', 'htmlOutDir', 'htmlOutDirFlatten', 'reference', 'testExecute', 'tsconfig',
     'templateCache', 'vs', 'watch'], propertiesFromTargetOptions = ['additionalFlags', 'comments', 'compile', 'compiler', 'declaration',
     'emitDecoratorMetadata', 'experimentalDecorators', 'failOnTypeErrors', 'fast', 'htmlModuleTemplate',
@@ -26,16 +27,22 @@ function resolveAsync(rawTaskOptions, rawTargetOptions, targetName, files) {
         result = applyGruntOptions(result, rawTargetOptions);
         result = copyCompilationTasks(result, files);
         visualStudioOptionsResolver_1.resolveVSOptionsAsync(result, rawTaskOptions, rawTargetOptions).then(function (result) {
-            // apply `tsconfig` configuration here
-            result = addressAssociatedOptionsAndResolveConflicts(result);
-            result = applyGruntTSDefaults(result);
-            if (result.targetName === undefined ||
-                (!result.targetName && targetName)) {
-                result.targetName = targetName;
-            }
-            resolve(result);
+            tsconfig_1.resolveAsync(result, rawTaskOptions, rawTargetOptions).then(function (result) {
+                result = addressAssociatedOptionsAndResolveConflicts(result);
+                result = applyGruntTSDefaults(result);
+                if (result.targetName === undefined ||
+                    (!result.targetName && targetName)) {
+                    result.targetName = targetName;
+                }
+                resolve(result);
+                return;
+            }).catch(function (error) {
+                reject(error);
+                return;
+            });
         }).catch(function (error) {
             reject(error);
+            return;
         });
         var _b, _c;
     });

@@ -8,6 +8,7 @@ import * as utils from './utils';
 import * as _ from 'lodash';
 import {Promise} from 'es6-promise';
 import {resolveVSOptionsAsync} from './visualStudioOptionsResolver';
+import {resolveAsync as resolveTSConfigAsync} from './tsconfig';
 
 const propertiesFromTarget = ['amdloader', 'html', 'htmlOutDir', 'htmlOutDirFlatten', 'reference', 'testExecute', 'tsconfig',
         'templateCache', 'vs', 'watch'],
@@ -37,8 +38,7 @@ export function resolveAsync(rawTaskOptions: ITargetOptions,
     result = copyCompilationTasks(result, files);
 
     resolveVSOptionsAsync(result, rawTaskOptions, rawTargetOptions).then((result) => {
-
-      // apply `tsconfig` configuration here
+    resolveTSConfigAsync(result, rawTaskOptions, rawTargetOptions).then((result) => {
 
       result = addressAssociatedOptionsAndResolveConflicts(result);
       result = applyGruntTSDefaults(result);
@@ -49,9 +49,14 @@ export function resolveAsync(rawTaskOptions: ITargetOptions,
       }
 
       resolve(result);
-
+      return;
     }).catch((error) => {
       reject(error);
+      return;
+    });
+    }).catch((error) => {
+      reject(error);
+      return;
     });
   });
 }

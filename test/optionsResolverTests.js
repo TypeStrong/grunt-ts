@@ -1,6 +1,6 @@
 /// <reference path="../defs/tsd.d.ts" />
+var path = require('path');
 var or = require('../tasks/modules/optionsResolver');
-var tsconfig = require('../tasks/modules/tsconfig');
 var utils = require('../tasks/modules/utils');
 var grunt = require('grunt');
 var config = {
@@ -321,14 +321,18 @@ exports.tests = {
     "tsconfig.json Integration Tests": {
         "Can get config from a valid file": function (test) {
             test.expect(1);
-            var t = tsconfig.resolveAsync('./test/tsconfig/full_valid_tsconfig.json').then(function (result) {
+            var cfg = getConfig("minimalist", true);
+            cfg.tsconfig = './test/tsconfig/full_valid_tsconfig.json';
+            var result = or.resolveAsync(null, cfg).then(function (result) {
                 test.ok(true);
                 test.done();
             }).catch(function (err) { test.ifError(err); test.done(); });
         },
         "Exception from invalid file": function (test) {
             test.expect(1);
-            var t = tsconfig.resolveAsync('./test/tsconfig/invalid_tsconfig.json').then(function (result) {
+            var cfg = getConfig("minimalist", true);
+            cfg.tsconfig = './test/tsconfig/invalid_tsconfig.json';
+            var result = or.resolveAsync(null, cfg).then(function (result) {
                 test.ok(false, 'expected exception from invalid file.');
                 test.done();
             }).catch(function (err) {
@@ -337,18 +341,23 @@ exports.tests = {
             });
         },
         "Exception from missing file": function (test) {
-            test.expect(1);
-            var t = tsconfig.resolveAsync('./test/tsconfig/does_not_exist_tsconfig.json').then(function (result) {
+            test.expect(2);
+            var cfg = getConfig("minimalist", true);
+            cfg.tsconfig = './test/tsconfig/does_not_exist_tsconfig.json';
+            var result = or.resolveAsync(null, cfg).then(function (result) {
                 test.ok(false, 'expected exception from missing file.');
                 test.done();
             }).catch(function (err) {
-                test.ok(err.indexOf('Could not find file') > -1);
+                test.strictEqual(err.code, 'ENOENT');
+                test.ok(err.path && err.path.indexOf('does_not_exist_tsconfig.json') > -1);
                 test.done();
             });
         },
         "config entries come through appropriately": function (test) {
             test.expect(9);
-            var t = tsconfig.resolveAsync('./test/tsconfig/full_valid_tsconfig.json').then(function (result) {
+            var cfg = getConfig("minimalist", true);
+            cfg.tsconfig = './test/tsconfig/full_valid_tsconfig.json';
+            var result = or.resolveAsync(null, cfg).then(function (result) {
                 test.strictEqual(result.target, 'es5');
                 test.strictEqual(result.module, 'commonjs');
                 test.strictEqual(result.declaration, false);
@@ -361,6 +370,23 @@ exports.tests = {
                 test.done();
             }).catch(function (err) { test.ifError(err); test.done(); });
         },
+        "simple tsconfig with true works": function (test) {
+            test.expect(10);
+            var result = or.resolveAsync(null, getConfig("tsconfig has true")).then(function (result) {
+                // todo: This depends on the actuall grunt-ts tsconfig so technically it could be wrong in the future.
+                test.strictEqual(result.tsconfig.tsconfig, path.join(path.resolve('.'), 'tsconfig.json'));
+                test.strictEqual(result.target, 'es5');
+                test.strictEqual(result.module, 'commonjs');
+                test.strictEqual(result.declaration, false);
+                test.strictEqual(result.noImplicitAny, false);
+                test.strictEqual(result.removeComments, false);
+                test.strictEqual(result.preserveConstEnums, false);
+                test.strictEqual(result.suppressImplicitAnyIndexErrors, true);
+                test.strictEqual(result.sourceMap, true);
+                test.strictEqual(result.emitDecoratorMetadata, undefined, 'emitDecoratorMetadata is not specified in this tsconfig.json');
+                test.done();
+            }).catch(function (err) { test.ifError(err); test.done(); });
+        }
     }
 };
 //# sourceMappingURL=optionsResolverTests.js.map
