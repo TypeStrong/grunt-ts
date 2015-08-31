@@ -28,7 +28,7 @@ export function resolveAsync(rawTaskOptions: ITargetOptions,
     fixMissingOptions(rawTaskOptions);
     fixMissingOptions(rawTargetOptions);
 
-    let {errors, warnings} = resolveAndWarnOnCapitalizationErrors(rawTaskOptions, rawTargetOptions, targetName);
+    let {errors, warnings} = resolveAndWarnOnConfigurationIssues(rawTaskOptions, rawTargetOptions, targetName);
     let result = emptyOptionsResolveResult();
     result.errors.push(...errors);
     result.warnings.push(...warnings);
@@ -74,7 +74,7 @@ function emptyOptionsResolveResult() {
   };
 }
 
-function resolveAndWarnOnCapitalizationErrors(task: ITargetOptions,
+function resolveAndWarnOnConfigurationIssues(task: ITargetOptions,
   target: ITargetOptions, targetName: string) {
 
     let errors : string[] = [], warnings: string[] = [];
@@ -89,6 +89,7 @@ function resolveAndWarnOnCapitalizationErrors(task: ITargetOptions,
     return {errors, warnings};
 
     function checkLocations(task: ITargetOptions, configName: string) {
+      // todo: clean this up.  The top and bottom sections are largely the same.
       if (task) {
         for (let propertyName in task) {
           if (propertiesFromTarget.indexOf(propertyName) === -1 && propertyName !== 'options') {
@@ -104,6 +105,25 @@ function resolveAndWarnOnCapitalizationErrors(task: ITargetOptions,
               let warningText = `Property "${propertyName}" in ${configName} is possibly in the wrong place and will be ignored.  ` +
                 `It is expected on the options object.  It is also the wrong case and should be ${correctPropertyName}.`;
               warnings.push(warningText);
+            }
+          }
+        }
+        if (task.options) {
+          for (let propertyName in task.options) {
+            if (propertiesFromTargetOptions.indexOf(propertyName) === -1) {
+              if (propertiesFromTarget.indexOf(propertyName) > -1) {
+                let warningText = `Property "${propertyName}" in ${configName} is possibly in the wrong place and will be ignored.  ` +
+                  `It is expected on the task or target, not under options.`;
+                warnings.push(warningText);
+              } else if (lowercaseTargetOptionsProps.indexOf(propertyName.toLocaleLowerCase()) === -1
+                && lowercaseTargetProps.indexOf(propertyName.toLocaleLowerCase()) > -1) {
+                let index = lowercaseTargetProps.indexOf(propertyName.toLocaleLowerCase());
+                let correctPropertyName = propertiesFromTarget[index];
+
+                let warningText = `Property "${propertyName}" in ${configName} is possibly in the wrong place and will be ignored.  ` +
+                  `It is expected on the task or target, not under options.  It is also the wrong case and should be ${correctPropertyName}.`;
+                warnings.push(warningText);
+              }
             }
           }
         }

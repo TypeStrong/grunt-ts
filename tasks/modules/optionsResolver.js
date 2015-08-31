@@ -19,7 +19,7 @@ function resolveAsync(rawTaskOptions, rawTargetOptions, targetName, files) {
     return new es6_promise_1.Promise(function (resolve, reject) {
         fixMissingOptions(rawTaskOptions);
         fixMissingOptions(rawTargetOptions);
-        var _a = resolveAndWarnOnCapitalizationErrors(rawTaskOptions, rawTargetOptions, targetName), errors = _a.errors, warnings = _a.warnings;
+        var _a = resolveAndWarnOnConfigurationIssues(rawTaskOptions, rawTargetOptions, targetName), errors = _a.errors, warnings = _a.warnings;
         var result = emptyOptionsResolveResult();
         (_b = result.errors).push.apply(_b, errors);
         (_c = result.warnings).push.apply(_c, warnings);
@@ -59,7 +59,7 @@ function emptyOptionsResolveResult() {
         errors: []
     };
 }
-function resolveAndWarnOnCapitalizationErrors(task, target, targetName) {
+function resolveAndWarnOnConfigurationIssues(task, target, targetName) {
     var errors = [], warnings = [];
     var lowercaseTargetProps = _.map(propertiesFromTarget, function (prop) { return prop.toLocaleLowerCase(); });
     var lowercaseTargetOptionsProps = _.map(propertiesFromTargetOptions, function (prop) { return prop.toLocaleLowerCase(); });
@@ -69,6 +69,7 @@ function resolveAndWarnOnCapitalizationErrors(task, target, targetName) {
     checkLocations(target, "target \"" + targetName + "\"");
     return { errors: errors, warnings: warnings };
     function checkLocations(task, configName) {
+        // todo: clean this up.  The top and bottom sections are largely the same.
         if (task) {
             for (var propertyName in task) {
                 if (propertiesFromTarget.indexOf(propertyName) === -1 && propertyName !== 'options') {
@@ -84,6 +85,25 @@ function resolveAndWarnOnCapitalizationErrors(task, target, targetName) {
                         var warningText = ("Property \"" + propertyName + "\" in " + configName + " is possibly in the wrong place and will be ignored.  ") +
                             ("It is expected on the options object.  It is also the wrong case and should be " + correctPropertyName + ".");
                         warnings.push(warningText);
+                    }
+                }
+            }
+            if (task.options) {
+                for (var propertyName in task.options) {
+                    if (propertiesFromTargetOptions.indexOf(propertyName) === -1) {
+                        if (propertiesFromTarget.indexOf(propertyName) > -1) {
+                            var warningText = ("Property \"" + propertyName + "\" in " + configName + " is possibly in the wrong place and will be ignored.  ") +
+                                "It is expected on the task or target, not under options.";
+                            warnings.push(warningText);
+                        }
+                        else if (lowercaseTargetOptionsProps.indexOf(propertyName.toLocaleLowerCase()) === -1
+                            && lowercaseTargetProps.indexOf(propertyName.toLocaleLowerCase()) > -1) {
+                            var index = lowercaseTargetProps.indexOf(propertyName.toLocaleLowerCase());
+                            var correctPropertyName = propertiesFromTarget[index];
+                            var warningText = ("Property \"" + propertyName + "\" in " + configName + " is possibly in the wrong place and will be ignored.  ") +
+                                ("It is expected on the task or target, not under options.  It is also the wrong case and should be " + correctPropertyName + ".");
+                            warnings.push(warningText);
+                        }
                     }
                 }
             }

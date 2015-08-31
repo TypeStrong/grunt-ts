@@ -31,6 +31,16 @@ const config : {[name: string]: IGruntTargetOptions} = {
     },
     sourceMap: true
   },
+  "tsconfig in wrong place": <any>{
+    options: {
+      tsconfig: true
+    }
+  },
+  "tsconfig in wrong place and wrong case": <any>{
+    options: {
+      TSConfig: true
+    }
+  },
   "bad sourceMap capitalization in wrong place": <any>{
     options: {
       target: 'es3'
@@ -152,6 +162,23 @@ export var tests : nodeunit.ITestGroup = {
         const result = or.resolveAsync(null, getConfig("sourceMap in wrong place")).then((result) => {
           let allWarnings = result.warnings.join('\n');
           test.ok(allWarnings.indexOf('Property "sourceMap" in target "" is possibly in the wrong place and will be ignored.  It is expected on the options object.') > -1);
+          test.done();
+        }).catch((err) => {test.ifError(err); test.done();});
+    },
+    "tsconfig in wrong place detected and warns": (test: nodeunit.Test) => {
+        test.expect(1);
+        const result = or.resolveAsync(null, getConfig("tsconfig in wrong place")).then((result) => {
+          let allWarnings = result.warnings.join('\n');
+          test.ok(allWarnings.indexOf('Property "tsconfig" in target "" is possibly in the wrong place and will be ignored.  It is expected on the task or target, not under options.') > -1);
+          test.done();
+        }).catch((err) => {test.ifError(err); test.done();});
+    },
+    "tsconfig in wrong place and wrong case detected and warns": (test: nodeunit.Test) => {
+        test.expect(2);
+        const result = or.resolveAsync(null, getConfig("tsconfig in wrong place and wrong case")).then((result) => {
+          let allWarnings = result.warnings.join('\n');
+          test.ok(allWarnings.indexOf('Property "TSConfig" in target "" is possibly in the wrong place and will be ignored.  It is expected on the task or target, not under options.') > -1);
+          test.ok(allWarnings.indexOf('It is also the wrong case and should be tsconfig') > -1);
           test.done();
         }).catch((err) => {test.ifError(err); test.done();});
 
