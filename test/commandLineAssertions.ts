@@ -28,6 +28,19 @@ export var decoratorMetadataNotPassed : ICompilePromise = (strings, options) => 
   });
 };
 
+export var variablesReplacedForTSConfig : ICompilePromise = (strings, options) => {
+  return new Promise(function(resolve, reject) {
+    const expected = "";
+    if (options.tsconfig && (<ITSConfigSupport>options.tsconfig).tsconfig === expected) {
+      resolve({
+        code: 0,
+        output: ""
+      });
+    }
+    throw `expected tsconfig file === ${expected}, was ${(<ITSConfigSupport>options.tsconfig).tsconfig}`;
+  });
+};
+
 export var experimentalDecoratorsPassed: ICompilePromise = (strings, options) => {
     return new Promise((resolve, reject) => {
         if (options.experimentalDecorators === true) {

@@ -354,6 +354,13 @@ module.exports = function (grunt) {
                     noImplicitAny: true
                 }
             },
+            variablesReplacedForTSConfig: {
+                test: true,
+                // src: ['test/abtest/**/*.ts'],
+                tsconfig: 'test/tsconfig/tsconfig-<% pkg.name %>.json',
+                // outDir: 'test/tsconfig/tsconfig-<% pkg.name %>-outDir',
+                testExecute: commandLineAssertions.variablesReplacedForTSConfig
+            },
             warnbothcomments: {
                 test: true,
                 src: ['test/abtest/**/*.ts'],

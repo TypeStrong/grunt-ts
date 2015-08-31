@@ -48,7 +48,8 @@ function pluginFn(grunt: IGrunt) {
           let rawTargetConfig =
             <ITargetOptions>(grunt.config.getRaw(currentTask.name + '.' + currentTask.target) || {});
 
-          optionsResolver.resolveAsync(rawTaskConfig, rawTargetConfig, currentTask.target, files).then((result) => {
+          optionsResolver.resolveAsync(rawTaskConfig, rawTargetConfig, currentTask.target, files,
+              grunt.template.process).then((result) => {
             options = result;
 
             options.warnings.forEach((warning) => {
@@ -444,14 +445,6 @@ function pluginFn(grunt: IGrunt) {
             }, done);
         }
     });
-
-    // function processAllTargetTemplates(targetCfg: ITargetOptions, targetOpt: ITaskOptions) {
-    //     targetCfg.out = processIndividualTemplate(targetCfg.out);
-    //     targetCfg.outDir = processIndividualTemplate(targetCfg.outDir);
-    //     targetCfg.reference = processIndividualTemplate(targetCfg.reference);
-    //     targetOpt.mapRoot = processIndividualTemplate(targetOpt.mapRoot);
-    //     targetOpt.sourceRoot = processIndividualTemplate(targetOpt.sourceRoot);
-    // }
 
     function processIndividualTemplate(template: string) {
         if (template) {

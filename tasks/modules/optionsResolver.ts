@@ -18,12 +18,26 @@ const propertiesFromTarget = ['amdloader', 'html', 'htmlOutDir', 'htmlOutDirFlat
         'noEmitHelpers', 'noEmitOnError', 'noImplicitAny', 'noResolve', 'preserveConstEnums', 'removeComments', 'sourceRoot',
         'sourceMap', 'suppressImplicitAnyIndexErrors', 'target', 'verbose'];
 
+let templateProcessor: (templateString: string, options: any) => string = null;
+
+function noopTemplateProcessor(templateString: string, options: any) {
+  return templateString;
+}
+
 export function resolveAsync(rawTaskOptions: ITargetOptions,
                         rawTargetOptions: ITargetOptions,
                         targetName = '',
-                        files: IGruntTSCompilationInfo[] = []): Promise<IGruntTSOptions> {
+                        files: IGruntTSCompilationInfo[] = [],
+                        theTemplateProcessor : (templateString: string, options: any) => string = null): Promise<IGruntTSOptions> {
 
   return new Promise<IGruntTSOptions>((resolve, reject) => {
+
+
+    if (theTemplateProcessor && typeof theTemplateProcessor === 'function') {
+        templateProcessor = theTemplateProcessor;
+    } else {
+        templateProcessor = noopTemplateProcessor;
+    }
 
     fixMissingOptions(rawTaskOptions);
     fixMissingOptions(rawTargetOptions);
@@ -174,14 +188,22 @@ function applyGruntOptions(applyTo: IGruntTSOptions, gruntOptions: ITargetOption
 
       for (const propertyName of propertiesFromTarget) {
         if (propertyName in gruntOptions && propertyName !== 'vs') {
-          applyTo[propertyName] = gruntOptions[propertyName];
+          if (typeof gruntOptions[propertyName] === 'string' && utils.hasValue(gruntOptions[propertyName])) {
+            applyTo[propertyName] = templateProcessor(gruntOptions[propertyName],{});
+          } else {
+            applyTo[propertyName] = gruntOptions[propertyName];
+          }
         }
       }
 
       if (gruntOptions.options) {
         for (const propertyName of propertiesFromTargetOptions) {
           if (propertyName in gruntOptions.options) {
-            applyTo[propertyName] = gruntOptions.options[propertyName];
+            if (typeof gruntOptions.options[propertyName] === 'string' && utils.hasValue(gruntOptions.options[propertyName])) {
+              applyTo[propertyName] = templateProcessor(gruntOptions.options[propertyName],{});
+            } else {
+              applyTo[propertyName] = gruntOptions.options[propertyName];
+            }
           }
         }
       }

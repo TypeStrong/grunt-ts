@@ -24,6 +24,18 @@ exports.decoratorMetadataNotPassed = function (strings, options) {
         throw "expected emitDecoratorMetadata === false, was " + options.emitDecoratorMetadata;
     });
 };
+exports.variablesReplacedForTSConfig = function (strings, options) {
+    return new Promise(function (resolve, reject) {
+        var expected = "";
+        if (options.tsconfig && options.tsconfig.tsconfig === expected) {
+            resolve({
+                code: 0,
+                output: ""
+            });
+        }
+        throw "expected tsconfig file === " + expected + ", was " + options.tsconfig.tsconfig;
+    });
+};
 exports.experimentalDecoratorsPassed = function (strings, options) {
     return new Promise(function (resolve, reject) {
         if (options.experimentalDecorators === true) {

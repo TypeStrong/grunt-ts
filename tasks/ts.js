@@ -35,7 +35,7 @@ function pluginFn(grunt) {
             // get unprocessed templates from configuration
             var rawTaskConfig = (grunt.config.getRaw(currentTask.name) || {});
             var rawTargetConfig = (grunt.config.getRaw(currentTask.name + '.' + currentTask.target) || {});
-            optionsResolver.resolveAsync(rawTaskConfig, rawTargetConfig, currentTask.target, files).then(function (result) {
+            optionsResolver.resolveAsync(rawTaskConfig, rawTargetConfig, currentTask.target, files, grunt.template.process).then(function (result) {
                 options = result;
                 options.warnings.forEach(function (warning) {
                     grunt.log.writeln(warning.magenta);
@@ -365,13 +365,6 @@ function pluginFn(grunt) {
             }, done);
         }
     });
-    // function processAllTargetTemplates(targetCfg: ITargetOptions, targetOpt: ITaskOptions) {
-    //     targetCfg.out = processIndividualTemplate(targetCfg.out);
-    //     targetCfg.outDir = processIndividualTemplate(targetCfg.outDir);
-    //     targetCfg.reference = processIndividualTemplate(targetCfg.reference);
-    //     targetOpt.mapRoot = processIndividualTemplate(targetOpt.mapRoot);
-    //     targetOpt.sourceRoot = processIndividualTemplate(targetOpt.sourceRoot);
-    // }
     function processIndividualTemplate(template) {
         if (template) {
             return grunt.template.process(template, {});
