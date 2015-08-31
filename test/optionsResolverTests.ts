@@ -166,10 +166,11 @@ export var tests : nodeunit.ITestGroup = {
         }).catch((err) => {test.ifError(err); test.done();});
     },
     "tsconfig in wrong place detected and warns": (test: nodeunit.Test) => {
-        test.expect(1);
+        test.expect(2);
         const result = or.resolveAsync(null, getConfig("tsconfig in wrong place")).then((result) => {
           let allWarnings = result.warnings.join('\n');
           test.ok(allWarnings.indexOf('Property "tsconfig" in target "" is possibly in the wrong place and will be ignored.  It is expected on the task or target, not under options.') > -1);
+          test.strictEqual(allWarnings.indexOf('It is also the wrong case and should be tsconfig'),-1, 'expect to not find warning about case.');
           test.done();
         }).catch((err) => {test.ifError(err); test.done();});
     },

@@ -157,10 +157,11 @@ exports.tests = {
             }).catch(function (err) { test.ifError(err); test.done(); });
         },
         "tsconfig in wrong place detected and warns": function (test) {
-            test.expect(1);
+            test.expect(2);
             var result = or.resolveAsync(null, getConfig("tsconfig in wrong place")).then(function (result) {
                 var allWarnings = result.warnings.join('\n');
                 test.ok(allWarnings.indexOf('Property "tsconfig" in target "" is possibly in the wrong place and will be ignored.  It is expected on the task or target, not under options.') > -1);
+                test.strictEqual(allWarnings.indexOf('It is also the wrong case and should be tsconfig'), -1, 'expect to not find warning about case.');
                 test.done();
             }).catch(function (err) { test.ifError(err); test.done(); });
         },
