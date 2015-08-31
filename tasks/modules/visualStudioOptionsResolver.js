@@ -4,7 +4,9 @@ var path = require('path');
 var utils = require('./utils');
 var es6_promise_1 = require('es6-promise');
 var _ = require('lodash');
-function resolveVSOptionsAsync(applyTo, taskOptions, targetOptions) {
+var templateProcessor = null;
+function resolveVSOptionsAsync(applyTo, taskOptions, targetOptions, theTemplateProcessor) {
+    templateProcessor = theTemplateProcessor;
     return new es6_promise_1.Promise(function (resolve, reject) {
         {
             var vsTask = getVSSettings(taskOptions), vsTarget = getVSSettings(targetOptions);
@@ -31,6 +33,12 @@ function resolveVSOptionsAsync(applyTo, taskOptions, targetOptions) {
             }
             if (vs) {
                 applyTo.vs = vs;
+                if (typeof applyTo.vs.project === 'string') {
+                    applyTo.vs.project = templateProcessor(applyTo.vs.project, {});
+                }
+                if (typeof applyTo.vs.config === 'string') {
+                    applyTo.vs.config = templateProcessor(applyTo.vs.config, {});
+                }
             }
         }
         if (applyTo.vs) {
@@ -38,10 +46,16 @@ function resolveVSOptionsAsync(applyTo, taskOptions, targetOptions) {
                 ProjectFileName: applyTo.vs.project,
                 ActiveConfiguration: applyTo.vs.config || undefined
             }).then(function (vsConfig) {
-                applyTo = applyVSOptions(applyTo, vsConfig);
-                applyTo = resolve_out_and_outDir(applyTo, taskOptions, targetOptions);
-                resolve(applyTo);
-                return;
+                try {
+                    applyTo = applyVSOptions(applyTo, vsConfig);
+                    applyTo = resolve_out_and_outDir(applyTo, taskOptions, targetOptions);
+                    resolve(applyTo);
+                    return;
+                }
+                catch (ex) {
+                    reject(ex);
+                    return;
+                }
             }).catch(function (error) {
                 if (error.errno === 34) {
                     applyTo.errors.push('In target "' + applyTo.targetName + '" - could not find VS project at "' + error.path + '".');

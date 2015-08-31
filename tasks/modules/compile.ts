@@ -107,7 +107,7 @@ export function compileAllFiles(options: IGruntTSOptions, compilationInfo: IGrun
         else {
             newFiles = getChangedFiles(files, options.targetName);
 
-            if (newFiles.length !== 0) {
+            if (newFiles.length !== 0 || options.testExecute) {
                 files = newFiles;
 
                 // If outDir is specified but no baseDir is specified we need to determine one
@@ -308,7 +308,7 @@ export function compileAllFiles(options: IGruntTSOptions, compilationInfo: IGrun
         if (_.isFunction(options.testExecute)) {
             executeNode = options.testExecute;
         } else {
-            let invalidTestExecuteError = 'Invalid testExecute node present on target "' +
+            const invalidTestExecuteError = 'Invalid testExecute node present on target "' +
                 options.targetName + '".  Value of testExecute must be a function.';
             throw (new Error(invalidTestExecuteError));
         }

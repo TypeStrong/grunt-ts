@@ -30,7 +30,7 @@ export var decoratorMetadataNotPassed : ICompilePromise = (strings, options) => 
 
 export var variablesReplacedForTSConfig : ICompilePromise = (strings, options) => {
   return new Promise(function(resolve, reject) {
-    const expected = "";
+    const expected = "test/tsconfig/tsconfig-grunt-ts.json";
     if (options.tsconfig && (<ITSConfigSupport>options.tsconfig).tsconfig === expected) {
       resolve({
         code: 0,
@@ -38,6 +38,19 @@ export var variablesReplacedForTSConfig : ICompilePromise = (strings, options) =
       });
     }
     throw `expected tsconfig file === ${expected}, was ${(<ITSConfigSupport>options.tsconfig).tsconfig}`;
+  });
+};
+
+export var variablesReplacedFor_vs : ICompilePromise = (strings, options) => {
+  return new Promise(function(resolve, reject) {
+    const expected = "test/vsproj/testproject.csproj";
+    if (options.vs && (<IVisualStudioProjectSupport>options.vs).project === expected) {
+      resolve({
+        code: 0,
+        output: ""
+      });
+    }
+    throw `expected vs project file === ${expected}, was ${(<IVisualStudioProjectSupport>options.vs).project}`;
   });
 };
 

@@ -7,6 +7,7 @@ module.exports = function (grunt) {
 
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
+        vsproj_path: 'test/vsproj',
         clean: {
             test: [
                 'test/**/*.js',
@@ -356,10 +357,13 @@ module.exports = function (grunt) {
             },
             variablesReplacedForTSConfig: {
                 test: true,
-                // src: ['test/abtest/**/*.ts'],
-                tsconfig: 'test/tsconfig/tsconfig-<% pkg.name %>.json',
-                // outDir: 'test/tsconfig/tsconfig-<% pkg.name %>-outDir',
+                tsconfig: 'test/tsconfig/tsconfig-<%= pkg.name %>.json',
                 testExecute: commandLineAssertions.variablesReplacedForTSConfig
+            },
+            variablesReplacedFor_vs: {
+                test: true,
+                vs: '<%= vsproj_path %>/testproject.csproj',
+                testExecute: commandLineAssertions.variablesReplacedFor_vs
             },
             warnbothcomments: {
                 test: true,

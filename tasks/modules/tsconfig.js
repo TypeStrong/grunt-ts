@@ -4,7 +4,9 @@ var fs = require('fs');
 var path = require('path');
 var stripBom = require('strip-bom');
 var _ = require('lodash');
-function resolveAsync(applyTo, taskOptions, targetOptions) {
+var templateProcessor = null;
+function resolveAsync(applyTo, taskOptions, targetOptions, theTemplateProcessor) {
+    templateProcessor = theTemplateProcessor;
     return new es6_promise_1.Promise(function (resolve, reject) {
         try {
             var taskTSConfig = getTSConfigSettings(taskOptions);
@@ -18,7 +20,7 @@ function resolveAsync(applyTo, taskOptions, targetOptions) {
                     tsconfig = targetTSConfig;
                 }
                 if ('tsconfig' in targetTSConfig) {
-                    tsconfig.tsconfig = targetTSConfig.tsconfig;
+                    tsconfig.tsconfig = templateProcessor(targetTSConfig.tsconfig, {});
                 }
                 if ('ignoreSettings' in targetTSConfig) {
                     tsconfig.ignoreSettings = targetTSConfig.ignoreSettings;
@@ -86,7 +88,7 @@ function getTSConfigSettings(raw) {
             };
         }
         else if (typeof raw.tsconfig === 'string') {
-            var tsconfigName = raw.tsconfig;
+            var tsconfigName = templateProcessor(raw.tsconfig, {});
             var fileInfo = fs.lstatSync(tsconfigName);
             if (fileInfo.isDirectory()) {
                 tsconfigName = path.join(tsconfigName, 'tsconfig.json');

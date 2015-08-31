@@ -347,14 +347,13 @@ function pluginFn(grunt: IGrunt) {
 
                     // Return promise to compliation
                     if (options.compile) {
-                        // Compile, if there are any files to compile!
-                        if (filesToCompile.length > 0) {
-
+                        if (filesToCompile.length > 0 || options.testExecute) {
                             return runCompilation(options, currentFiles).then((success: boolean) => {
                                 return success;
                             });
                         }
-                        else { // Nothing to do
+                        else {
+                            // Nothing to do
                             grunt.log.writeln('No files to compile'.red);
                             return Promise.resolve(true);
                         }

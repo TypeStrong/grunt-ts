@@ -26,7 +26,7 @@ exports.decoratorMetadataNotPassed = function (strings, options) {
 };
 exports.variablesReplacedForTSConfig = function (strings, options) {
     return new Promise(function (resolve, reject) {
-        var expected = "";
+        var expected = "test/tsconfig/tsconfig-grunt-ts.json";
         if (options.tsconfig && options.tsconfig.tsconfig === expected) {
             resolve({
                 code: 0,
@@ -34,6 +34,18 @@ exports.variablesReplacedForTSConfig = function (strings, options) {
             });
         }
         throw "expected tsconfig file === " + expected + ", was " + options.tsconfig.tsconfig;
+    });
+};
+exports.variablesReplacedFor_vs = function (strings, options) {
+    return new Promise(function (resolve, reject) {
+        var expected = "test/vsproj/testproject.csproj";
+        if (options.vs && options.vs.project === expected) {
+            resolve({
+                code: 0,
+                output: ""
+            });
+        }
+        throw "expected vs project file === " + expected + ", was " + options.vs.project;
     });
 };
 exports.experimentalDecoratorsPassed = function (strings, options) {

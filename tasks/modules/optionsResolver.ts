@@ -16,7 +16,8 @@ const propertiesFromTarget = ['amdloader', 'html', 'htmlOutDir', 'htmlOutDirFlat
         'emitDecoratorMetadata', 'experimentalDecorators', 'failOnTypeErrors', 'fast', 'htmlModuleTemplate',
         'htmlVarTemplate', 'inlineSourceMap', 'inlineSources', 'isolatedModules', 'mapRoot', 'module', 'newLine', 'noEmit',
         'noEmitHelpers', 'noEmitOnError', 'noImplicitAny', 'noResolve', 'preserveConstEnums', 'removeComments', 'sourceRoot',
-        'sourceMap', 'suppressImplicitAnyIndexErrors', 'target', 'verbose'];
+        'sourceMap', 'suppressImplicitAnyIndexErrors', 'target', 'verbose'],
+      delayTemplateExpansion = ['htmlModuleTemplate', 'htmlVarTemplate'];
 
 let templateProcessor: (templateString: string, options: any) => string = null;
 
@@ -28,7 +29,7 @@ export function resolveAsync(rawTaskOptions: ITargetOptions,
                         rawTargetOptions: ITargetOptions,
                         targetName = '',
                         files: IGruntTSCompilationInfo[] = [],
-                        theTemplateProcessor : (templateString: string, options: any) => string = null): Promise<IGruntTSOptions> {
+                        theTemplateProcessor: (templateString: string, options: any) => string = null): Promise<IGruntTSOptions> {
 
   return new Promise<IGruntTSOptions>((resolve, reject) => {
 
@@ -51,8 +52,8 @@ export function resolveAsync(rawTaskOptions: ITargetOptions,
     result = applyGruntOptions(result, rawTargetOptions);
     result = copyCompilationTasks(result, files);
 
-    resolveVSOptionsAsync(result, rawTaskOptions, rawTargetOptions).then((result) => {
-    resolveTSConfigAsync(result, rawTaskOptions, rawTargetOptions).then((result) => {
+    resolveVSOptionsAsync(result, rawTaskOptions, rawTargetOptions, templateProcessor).then((result) => {
+    resolveTSConfigAsync(result, rawTaskOptions, rawTargetOptions, templateProcessor).then((result) => {
 
       result = addressAssociatedOptionsAndResolveConflicts(result);
       result = applyGruntTSDefaults(result);
@@ -188,8 +189,9 @@ function applyGruntOptions(applyTo: IGruntTSOptions, gruntOptions: ITargetOption
 
       for (const propertyName of propertiesFromTarget) {
         if (propertyName in gruntOptions && propertyName !== 'vs') {
-          if (typeof gruntOptions[propertyName] === 'string' && utils.hasValue(gruntOptions[propertyName])) {
-            applyTo[propertyName] = templateProcessor(gruntOptions[propertyName],{});
+          if (typeof gruntOptions[propertyName] === 'string' && utils.hasValue(gruntOptions[propertyName]) &&
+              delayTemplateExpansion.indexOf(propertyName) === -1) {
+            applyTo[propertyName] = templateProcessor(gruntOptions[propertyName], {});
           } else {
             applyTo[propertyName] = gruntOptions[propertyName];
           }
@@ -199,8 +201,9 @@ function applyGruntOptions(applyTo: IGruntTSOptions, gruntOptions: ITargetOption
       if (gruntOptions.options) {
         for (const propertyName of propertiesFromTargetOptions) {
           if (propertyName in gruntOptions.options) {
-            if (typeof gruntOptions.options[propertyName] === 'string' && utils.hasValue(gruntOptions.options[propertyName])) {
-              applyTo[propertyName] = templateProcessor(gruntOptions.options[propertyName],{});
+            if (typeof gruntOptions.options[propertyName] === 'string' && utils.hasValue(gruntOptions.options[propertyName]) &&
+                delayTemplateExpansion.indexOf(propertyName) === -1) {
+              applyTo[propertyName] = templateProcessor(gruntOptions.options[propertyName], {});
             } else {
               applyTo[propertyName] = gruntOptions.options[propertyName];
             }

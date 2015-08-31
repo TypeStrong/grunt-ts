@@ -6,9 +6,14 @@ import * as utils from './utils';
 import {Promise} from 'es6-promise';
 import * as _ from 'lodash';
 
+let templateProcessor: (templateString: string, options: any) => string = null;
+
 export function resolveVSOptionsAsync(applyTo: IGruntTSOptions,
   taskOptions: ITargetOptions,
-  targetOptions: ITargetOptions) {
+  targetOptions: ITargetOptions,
+  theTemplateProcessor: (templateString: string, options: any) => string) {
+
+  templateProcessor = theTemplateProcessor;
 
   return new Promise<IGruntTSOptions>((resolve, reject) => {
 
@@ -39,6 +44,12 @@ export function resolveVSOptionsAsync(applyTo: IGruntTSOptions,
       }
       if (vs) {
         applyTo.vs = vs;
+        if (typeof (<IVisualStudioProjectSupport>applyTo.vs).project === 'string') {
+          (<IVisualStudioProjectSupport>applyTo.vs).project = templateProcessor((<IVisualStudioProjectSupport>applyTo.vs).project, {});
+        }
+        if (typeof (<IVisualStudioProjectSupport>applyTo.vs).config === 'string') {
+          (<IVisualStudioProjectSupport>applyTo.vs).config = templateProcessor((<IVisualStudioProjectSupport>applyTo.vs).config, {});
+        }
       }
     }
 
@@ -47,11 +58,15 @@ export function resolveVSOptionsAsync(applyTo: IGruntTSOptions,
             ProjectFileName: (<IVisualStudioProjectSupport>applyTo.vs).project,
             ActiveConfiguration: (<IVisualStudioProjectSupport>applyTo.vs).config || undefined
         }).then((vsConfig) => {
-
-          applyTo = applyVSOptions(applyTo, vsConfig);
-          applyTo = resolve_out_and_outDir(applyTo, taskOptions, targetOptions);
-          resolve(applyTo);
-          return;
+          try {
+            applyTo = applyVSOptions(applyTo, vsConfig);
+            applyTo = resolve_out_and_outDir(applyTo, taskOptions, targetOptions);
+            resolve(applyTo);
+            return;
+          } catch (ex) {
+            reject(ex);
+            return;
+          }
         }).catch((error) => {
             if (error.errno === 34) {
                 applyTo.errors.push('In target "' + applyTo.targetName + '" - could not find VS project at "' + error.path + '".');

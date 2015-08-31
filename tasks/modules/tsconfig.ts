@@ -6,9 +6,15 @@ import * as path from 'path';
 import * as stripBom from 'strip-bom';
 import * as _ from 'lodash';
 
+let templateProcessor: (templateString: string, options: any) => string = null;
+
 export function resolveAsync(applyTo: IGruntTSOptions,
   taskOptions: ITargetOptions,
-  targetOptions: ITargetOptions) {
+  targetOptions: ITargetOptions,
+  theTemplateProcessor: (templateString: string, options: any) => string) {
+
+  templateProcessor = theTemplateProcessor;
+
   return new Promise<IGruntTSOptions>((resolve, reject) => {
 
     try {
@@ -26,7 +32,7 @@ export function resolveAsync(applyTo: IGruntTSOptions,
         }
 
         if ('tsconfig' in targetTSConfig) {
-          tsconfig.tsconfig = targetTSConfig.tsconfig;
+          tsconfig.tsconfig = templateProcessor(targetTSConfig.tsconfig, {});
         }
         if ('ignoreSettings' in targetTSConfig) {
           tsconfig.ignoreSettings = targetTSConfig.ignoreSettings;
@@ -98,7 +104,7 @@ function getTSConfigSettings(raw: ITargetOptions): ITSConfigSupport {
       };
     } else if (typeof raw.tsconfig === 'string') {
 
-      let tsconfigName = <string>raw.tsconfig;
+      let tsconfigName = templateProcessor(<string>raw.tsconfig, {});
       let fileInfo = fs.lstatSync(tsconfigName);
 
       if (fileInfo.isDirectory()) {
