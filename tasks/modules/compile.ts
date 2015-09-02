@@ -159,13 +159,10 @@ export function compileAllFiles(options: IGruntTSOptions, compilationInfo: IGrun
     // }
 
     var args: string[] = files.slice(0);
+    const tsconfig: ITSConfigSupport = options.tsconfig;
 
-    if ((<ITSConfigSupport>options.tsconfig).passThrough) {
-      let project = (<ITSConfigSupport>options.tsconfig).tsconfig;
-      if (!project) {
-        project = '.';
-      }
-      args.push('--project', project)
+    if (tsconfig && tsconfig.passThrough) {
+      args.push('--project', tsconfig.tsconfig);
     } else {
       if (options.sourceMap) {
           args.push('--sourcemap');

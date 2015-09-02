@@ -368,18 +368,18 @@ module.exports = function (grunt) {
             tsconfig_passThrough_onlySendsConfigThrough_WithPathAndAdditional: {
                 test: true,
                 tsconfig: {
-                  tsconfig: 'test/tsconfig',
-                  passThrough: true
+                    tsconfig: 'test/tsconfig',
+                    passThrough: true
                 },
                 options: {
-                  additionalFlags: '--someNewThing'
+                    additionalFlags: '--someNewThing'
                 },
                 testExecute: commandLineAssertions.tsconfig_passThrough_onlySendsConfigThrough_WithPathAndAdditional
             },
             tsconfig_passThrough_onlySendsConfigThrough_WithoutPath: {
                 test: true,
                 tsconfig: {
-                  passThrough: true
+                    passThrough: true
                 },
                 testExecute: commandLineAssertions.tsconfig_passThrough_onlySendsConfigThrough_WithoutPath
             },

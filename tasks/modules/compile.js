@@ -127,12 +127,9 @@ function compileAllFiles(options, compilationInfo) {
     //   outFile = `"${path.resolve(outFile)}"`;
     // }
     var args = files.slice(0);
-    if (options.tsconfig.passThrough) {
-        var project = options.tsconfig.tsconfig;
-        if (!project) {
-            project = '.';
-        }
-        args.push('--project', project);
+    var tsconfig = options.tsconfig;
+    if (tsconfig && tsconfig.passThrough) {
+        args.push('--project', tsconfig.tsconfig);
     }
     else {
         if (options.sourceMap) {
