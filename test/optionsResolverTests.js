@@ -367,7 +367,7 @@ exports.tests = {
             });
         },
         "config entries come through appropriately": function (test) {
-            test.expect(11);
+            test.expect(12);
             var cfg = getConfig("minimalist", true);
             cfg.tsconfig = './test/tsconfig/full_valid_tsconfig.json';
             var result = or.resolveAsync(null, cfg).then(function (result) {
@@ -382,6 +382,18 @@ exports.tests = {
                 test.strictEqual(result.emitDecoratorMetadata, undefined, 'emitDecoratorMetadata is not specified in this tsconfig.json');
                 test.strictEqual(result.CompilationTasks.length, 1);
                 test.strictEqual(result.CompilationTasks[0].outDir, './files');
+                test.strictEqual(result.CompilationTasks[0].out, undefined);
+                test.done();
+            }).catch(function (err) { test.ifError(err); test.done(); });
+        },
+        "out comes through appropriately": function (test) {
+            test.expect(3);
+            var cfg = getConfig("minimalist", true);
+            cfg.tsconfig = './test/tsconfig/test_simple_with_out.json';
+            var result = or.resolveAsync(null, cfg).then(function (result) {
+                test.strictEqual(result.CompilationTasks.length, 1);
+                test.strictEqual(result.CompilationTasks[0].out, './files/this_is_the_out_file.js');
+                test.strictEqual(result.CompilationTasks[0].outDir, undefined);
                 test.done();
             }).catch(function (err) { test.ifError(err); test.done(); });
         },

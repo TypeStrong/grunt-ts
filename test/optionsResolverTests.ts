@@ -384,7 +384,7 @@ export var tests : nodeunit.ITestGroup = {
         });
     },
     "config entries come through appropriately": (test: nodeunit.Test) => {
-        test.expect(11);
+        test.expect(12);
         const cfg = getConfig("minimalist", true);
         cfg.tsconfig = './test/tsconfig/full_valid_tsconfig.json';
 
@@ -400,6 +400,19 @@ export var tests : nodeunit.ITestGroup = {
           test.strictEqual(result.emitDecoratorMetadata, undefined, 'emitDecoratorMetadata is not specified in this tsconfig.json');
           test.strictEqual(result.CompilationTasks.length, 1);
           test.strictEqual(result.CompilationTasks[0].outDir, './files');
+          test.strictEqual(result.CompilationTasks[0].out, undefined);
+          test.done();
+        }).catch((err) => {test.ifError(err); test.done();});
+    },
+    "out comes through appropriately": (test: nodeunit.Test) => {
+        test.expect(3);
+        const cfg = getConfig("minimalist", true);
+        cfg.tsconfig = './test/tsconfig/test_simple_with_out.json';
+
+        const result = or.resolveAsync(null, cfg).then((result) => {
+          test.strictEqual(result.CompilationTasks.length, 1);
+          test.strictEqual(result.CompilationTasks[0].out, './files/this_is_the_out_file.js');
+          test.strictEqual(result.CompilationTasks[0].outDir, undefined);
           test.done();
         }).catch((err) => {test.ifError(err); test.done();});
     },
