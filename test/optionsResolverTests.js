@@ -367,7 +367,7 @@ exports.tests = {
             });
         },
         "config entries come through appropriately": function (test) {
-            test.expect(9);
+            test.expect(11);
             var cfg = getConfig("minimalist", true);
             cfg.tsconfig = './test/tsconfig/full_valid_tsconfig.json';
             var result = or.resolveAsync(null, cfg).then(function (result) {
@@ -380,6 +380,8 @@ exports.tests = {
                 test.strictEqual(result.suppressImplicitAnyIndexErrors, true);
                 test.strictEqual(result.sourceMap, true);
                 test.strictEqual(result.emitDecoratorMetadata, undefined, 'emitDecoratorMetadata is not specified in this tsconfig.json');
+                test.strictEqual(result.CompilationTasks.length, 1);
+                test.strictEqual(result.CompilationTasks[0].outDir, './files');
                 test.done();
             }).catch(function (err) { test.ifError(err); test.done(); });
         },

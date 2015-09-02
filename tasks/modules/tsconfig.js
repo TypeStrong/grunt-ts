@@ -75,11 +75,28 @@ function resolveAsync(applyTo, taskOptions, targetOptions, theTemplateProcessor)
                 return reject('Error parsing "' + projectFile + '".  It may not be valid JSON in UTF-8.');
             }
             applyTo = applyCompilerOptions(applyTo, projectSpec);
+            applyTo = resolve_out_and_outDir(applyTo, projectSpec);
         }
         resolve(applyTo);
     });
 }
 exports.resolveAsync = resolveAsync;
+function resolve_out_and_outDir(options, projectSpec) {
+    if (options.CompilationTasks
+        && options.CompilationTasks.length > 0
+        && projectSpec
+        && projectSpec.compilerOptions) {
+        options.CompilationTasks.forEach(function (compilationTask) {
+            if (projectSpec.compilerOptions.out) {
+                compilationTask.out = projectSpec.compilerOptions.out;
+            }
+            if (projectSpec.compilerOptions.outDir) {
+                compilationTask.outDir = projectSpec.compilerOptions.outDir;
+            }
+        });
+    }
+    return options;
+}
 function getTSConfigSettings(raw) {
     try {
         if (!raw || !raw.tsconfig) {

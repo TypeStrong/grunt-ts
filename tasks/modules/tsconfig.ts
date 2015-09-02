@@ -87,10 +87,28 @@ export function resolveAsync(applyTo: IGruntTSOptions,
       }
 
       applyTo = applyCompilerOptions(applyTo, projectSpec);
+      applyTo = resolve_out_and_outDir(applyTo, projectSpec);
     }
 
     resolve(applyTo);
   });
+}
+
+function resolve_out_and_outDir(options: IGruntTSOptions, projectSpec: ITSConfigFile) {
+  if (options.CompilationTasks
+      && options.CompilationTasks.length > 0
+      && projectSpec
+      && projectSpec.compilerOptions) {
+    options.CompilationTasks.forEach((compilationTask) => {
+        if (projectSpec.compilerOptions.out) {
+          compilationTask.out = projectSpec.compilerOptions.out;
+        }
+        if (projectSpec.compilerOptions.outDir) {
+          compilationTask.outDir = projectSpec.compilerOptions.outDir;
+        }
+    });
+  }
+  return options;
 }
 
 function getTSConfigSettings(raw: ITargetOptions): ITSConfigSupport {

@@ -384,7 +384,7 @@ export var tests : nodeunit.ITestGroup = {
         });
     },
     "config entries come through appropriately": (test: nodeunit.Test) => {
-        test.expect(9);
+        test.expect(11);
         const cfg = getConfig("minimalist", true);
         cfg.tsconfig = './test/tsconfig/full_valid_tsconfig.json';
 
@@ -398,6 +398,8 @@ export var tests : nodeunit.ITestGroup = {
           test.strictEqual(result.suppressImplicitAnyIndexErrors, true);
           test.strictEqual(result.sourceMap, true);
           test.strictEqual(result.emitDecoratorMetadata, undefined, 'emitDecoratorMetadata is not specified in this tsconfig.json');
+          test.strictEqual(result.CompilationTasks.length, 1);
+          test.strictEqual(result.CompilationTasks[0].outDir, './files');
           test.done();
         }).catch((err) => {test.ifError(err); test.done();});
     },
