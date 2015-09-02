@@ -41,6 +41,35 @@ export var variablesReplacedForTSConfig : ICompilePromise = (strings, options) =
   });
 };
 
+export var tsconfig_passThrough_onlySendsConfigThrough_WithPathAndAdditional : ICompilePromise = (strings, options) => {
+  return new Promise(function(resolve, reject) {
+    let tscfg = <ITSConfigSupport>options.tsconfig;
+    if (tscfg
+        && tscfg.passThrough
+        && tscfg.tsconfig === 'test/tsconfig'
+        && options.additionalFlags === '--someNewThing') {
+      resolve({
+        code: 0,
+        output: ""
+      });
+    }
+    throw `expected --project .  The tsconfig was ${JSON.stringify(tscfg)}.  AddlFlags was ${options.additionalFlags}`;
+  });
+};
+
+export var tsconfig_passThrough_onlySendsConfigThrough_WithoutPath : ICompilePromise = (strings, options) => {
+  return new Promise(function(resolve, reject) {
+    let tscfg = <ITSConfigSupport>options.tsconfig;
+    if (tscfg && tscfg.passThrough && tscfg.tsconfig === '.') {
+      resolve({
+        code: 0,
+        output: ""
+      });
+    }
+    throw `expected --project .  The tsconfig was ${JSON.stringify(tscfg)}`;
+  });
+};
+
 export var variablesReplacedFor_vs : ICompilePromise = (strings, options) => {
   return new Promise(function(resolve, reject) {
     const expected = "test/vsproj/testproject.csproj";

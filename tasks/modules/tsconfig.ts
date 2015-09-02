@@ -58,27 +58,36 @@ export function resolveAsync(applyTo: IGruntTSOptions,
       return resolve(applyTo);
     }
 
-    let projectFile = (<ITSConfigSupport>applyTo.tsconfig).tsconfig;
-    try {
-      var projectFileTextContent = fs.readFileSync(projectFile, 'utf8');
-    } catch (ex) {
-      if (ex && ex.code === 'ENOENT') {
-          return reject('Could not find file "' + projectFile + '".');
-      } else if (ex && ex.errno) {
-          return reject('Error ' + ex.errno + ' reading "' + projectFile + '".');
-      } else {
-          return reject('Error reading "' + projectFile + '": ' + JSON.stringify(ex));
+    if ((<ITSConfigSupport>applyTo.tsconfig).passThrough) {
+      if (applyTo.CompilationTasks.length === 0) {
+        applyTo.CompilationTasks.push({src: []});
       }
-      return reject(ex);
-    }
+      if (!(<ITSConfigSupport>applyTo.tsconfig).tsconfig) {
+        (<ITSConfigSupport>applyTo.tsconfig).tsconfig = '.';
+      }
+    } else {
+      let projectFile = (<ITSConfigSupport>applyTo.tsconfig).tsconfig;
+      try {
+        var projectFileTextContent = fs.readFileSync(projectFile, 'utf8');
+      } catch (ex) {
+        if (ex && ex.code === 'ENOENT') {
+            return reject('Could not find file "' + projectFile + '".');
+        } else if (ex && ex.errno) {
+            return reject('Error ' + ex.errno + ' reading "' + projectFile + '".');
+        } else {
+            return reject('Error reading "' + projectFile + '": ' + JSON.stringify(ex));
+        }
+        return reject(ex);
+      }
 
-    try {
-      var projectSpec: ITSConfigFile = JSON.parse(stripBom(projectFileTextContent));
-    } catch (ex) {
-      return reject('Error parsing "' + projectFile + '".  It may not be valid JSON in UTF-8.');
-    }
+      try {
+        var projectSpec: ITSConfigFile = JSON.parse(stripBom(projectFileTextContent));
+      } catch (ex) {
+        return reject('Error parsing "' + projectFile + '".  It may not be valid JSON in UTF-8.');
+      }
 
-    applyTo = applyCompilerOptions(applyTo, projectSpec);
+      applyTo = applyCompilerOptions(applyTo, projectSpec);
+    }
 
     resolve(applyTo);
   });

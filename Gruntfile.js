@@ -365,6 +365,24 @@ module.exports = function (grunt) {
                 vs: '<%= vsproj_path %>/testproject.csproj',
                 testExecute: commandLineAssertions.variablesReplacedFor_vs
             },
+            tsconfig_passThrough_onlySendsConfigThrough_WithPathAndAdditional: {
+                test: true,
+                tsconfig: {
+                  tsconfig: 'test/tsconfig',
+                  passThrough: true
+                },
+                options: {
+                  additionalFlags: '--someNewThing'
+                },
+                testExecute: commandLineAssertions.tsconfig_passThrough_onlySendsConfigThrough_WithPathAndAdditional
+            },
+            tsconfig_passThrough_onlySendsConfigThrough_WithoutPath: {
+                test: true,
+                tsconfig: {
+                  passThrough: true
+                },
+                testExecute: commandLineAssertions.tsconfig_passThrough_onlySendsConfigThrough_WithoutPath
+            },
             warnbothcomments: {
                 test: true,
                 src: ['test/abtest/**/*.ts'],

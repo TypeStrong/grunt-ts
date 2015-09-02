@@ -43,29 +43,39 @@ function resolveAsync(applyTo, taskOptions, targetOptions, theTemplateProcessor)
         if (!applyTo.tsconfig) {
             return resolve(applyTo);
         }
-        var projectFile = applyTo.tsconfig.tsconfig;
-        try {
-            var projectFileTextContent = fs.readFileSync(projectFile, 'utf8');
-        }
-        catch (ex) {
-            if (ex && ex.code === 'ENOENT') {
-                return reject('Could not find file "' + projectFile + '".');
+        if (applyTo.tsconfig.passThrough) {
+            if (applyTo.CompilationTasks.length === 0) {
+                applyTo.CompilationTasks.push({ src: [] });
             }
-            else if (ex && ex.errno) {
-                return reject('Error ' + ex.errno + ' reading "' + projectFile + '".');
+            if (!applyTo.tsconfig.tsconfig) {
+                applyTo.tsconfig.tsconfig = '.';
             }
-            else {
-                return reject('Error reading "' + projectFile + '": ' + JSON.stringify(ex));
+        }
+        else {
+            var projectFile = applyTo.tsconfig.tsconfig;
+            try {
+                var projectFileTextContent = fs.readFileSync(projectFile, 'utf8');
             }
-            return reject(ex);
+            catch (ex) {
+                if (ex && ex.code === 'ENOENT') {
+                    return reject('Could not find file "' + projectFile + '".');
+                }
+                else if (ex && ex.errno) {
+                    return reject('Error ' + ex.errno + ' reading "' + projectFile + '".');
+                }
+                else {
+                    return reject('Error reading "' + projectFile + '": ' + JSON.stringify(ex));
+                }
+                return reject(ex);
+            }
+            try {
+                var projectSpec = JSON.parse(stripBom(projectFileTextContent));
+            }
+            catch (ex) {
+                return reject('Error parsing "' + projectFile + '".  It may not be valid JSON in UTF-8.');
+            }
+            applyTo = applyCompilerOptions(applyTo, projectSpec);
         }
-        try {
-            var projectSpec = JSON.parse(stripBom(projectFileTextContent));
-        }
-        catch (ex) {
-            return reject('Error parsing "' + projectFile + '".  It may not be valid JSON in UTF-8.');
-        }
-        applyTo = applyCompilerOptions(applyTo, projectSpec);
         resolve(applyTo);
     });
 }

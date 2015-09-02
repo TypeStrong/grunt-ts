@@ -127,112 +127,118 @@ function compileAllFiles(options, compilationInfo) {
     //   outFile = `"${path.resolve(outFile)}"`;
     // }
     var args = files.slice(0);
-    // boolean options
-    if (options.sourceMap) {
-        args.push('--sourcemap');
-    }
-    if (options.emitDecoratorMetadata) {
-        args.push('--emitDecoratorMetadata');
-    }
-    if (options.declaration) {
-        args.push('--declaration');
-    }
-    if (options.removeComments) {
-        args.push('--removeComments');
-    }
-    if (options.noImplicitAny) {
-        args.push('--noImplicitAny');
-    }
-    if (options.noResolve) {
-        args.push('--noResolve');
-    }
-    if (options.noEmitOnError) {
-        args.push('--noEmitOnError');
-    }
-    if (options.preserveConstEnums) {
-        args.push('--preserveConstEnums');
-    }
-    if (options.suppressImplicitAnyIndexErrors) {
-        args.push('--suppressImplicitAnyIndexErrors');
-    }
-    if (options.noEmit) {
-        args.push('--noEmit');
-    }
-    if (options.inlineSources) {
-        args.push('--inlineSources');
-    }
-    if (options.inlineSourceMap) {
-        args.push('--inlineSourceMap');
-    }
-    if (options.newLine && !utils.newLineIsRedundant(options.newLine)) {
-        args.push('--newLine', options.newLine);
-    }
-    if (options.isolatedModules) {
-        args.push('--isolatedModules');
-    }
-    if (options.noEmitHelpers) {
-        args.push('--noEmitHelpers');
-    }
-    if (options.experimentalDecorators) {
-        args.push('--experimentalDecorators');
-    }
-    // string options
-    args.push('--target', options.target.toUpperCase());
-    // check the module compile option
-    if (options.module) {
-        var moduleOptionString = ('' + options.module).toLowerCase();
-        if ('amd|commonjs|system|umd'.indexOf(moduleOptionString) > -1) {
-            args.push('--module', moduleOptionString);
+    if (options.tsconfig.passThrough) {
+        var project = options.tsconfig.tsconfig;
+        if (!project) {
+            project = '.';
         }
-        else {
-            console.warn('WARNING: Option "module" only supports "amd" | "commonjs" | "system" | "umd" '.magenta);
-        }
+        args.push('--project', project);
     }
-    if (compilationInfo.outDir) {
-        if (compilationInfo.out) {
-            console.warn('WARNING: Option "out" and "outDir" should not be used together'.magenta);
+    else {
+        if (options.sourceMap) {
+            args.push('--sourcemap');
         }
-        args.push('--outDir', compilationInfo.outDir);
-    }
-    if (compilationInfo.out) {
-        args.push('--out', compilationInfo.out);
-    }
-    if (compilationInfo.dest && (!compilationInfo.out) && (!compilationInfo.outDir)) {
-        if (utils.isJavaScriptFile(compilationInfo.dest)) {
-            args.push('--out', compilationInfo.dest);
+        if (options.emitDecoratorMetadata) {
+            args.push('--emitDecoratorMetadata');
         }
-        else {
-            if (compilationInfo.dest === 'src') {
-                console.warn(('WARNING: Destination for target "' + options.targetName + '" is "src", which is the default.  If you have' +
-                    ' forgotten to specify a "dest" parameter, please add it.  If this is correct, you may wish' +
-                    ' to change the "dest" parameter to "src/" or just ignore this warning.').magenta);
-            }
-            if (Array.isArray(compilationInfo.dest)) {
-                if (compilationInfo.dest.length === 0) {
-                }
-                else if (compilationInfo.dest.length > 0) {
-                    console.warn((('WARNING: "dest" for target "' + options.targetName + '" is an array.  This is not supported by the' +
-                        ' TypeScript compiler or grunt-ts.' +
-                        ((compilationInfo.dest.length > 1) ? '  Only the first "dest" will be used.  The' +
-                            ' remaining items will be truncated.' : ''))).magenta);
-                    args.push('--outDir', compilationInfo.dest[0]);
-                }
+        if (options.declaration) {
+            args.push('--declaration');
+        }
+        if (options.removeComments) {
+            args.push('--removeComments');
+        }
+        if (options.noImplicitAny) {
+            args.push('--noImplicitAny');
+        }
+        if (options.noResolve) {
+            args.push('--noResolve');
+        }
+        if (options.noEmitOnError) {
+            args.push('--noEmitOnError');
+        }
+        if (options.preserveConstEnums) {
+            args.push('--preserveConstEnums');
+        }
+        if (options.suppressImplicitAnyIndexErrors) {
+            args.push('--suppressImplicitAnyIndexErrors');
+        }
+        if (options.noEmit) {
+            args.push('--noEmit');
+        }
+        if (options.inlineSources) {
+            args.push('--inlineSources');
+        }
+        if (options.inlineSourceMap) {
+            args.push('--inlineSourceMap');
+        }
+        if (options.newLine && !utils.newLineIsRedundant(options.newLine)) {
+            args.push('--newLine', options.newLine);
+        }
+        if (options.isolatedModules) {
+            args.push('--isolatedModules');
+        }
+        if (options.noEmitHelpers) {
+            args.push('--noEmitHelpers');
+        }
+        if (options.experimentalDecorators) {
+            args.push('--experimentalDecorators');
+        }
+        args.push('--target', options.target.toUpperCase());
+        if (options.module) {
+            var moduleOptionString = ('' + options.module).toLowerCase();
+            if ('amd|commonjs|system|umd'.indexOf(moduleOptionString) > -1) {
+                args.push('--module', moduleOptionString);
             }
             else {
-                args.push('--outDir', compilationInfo.dest);
+                console.warn('WARNING: Option "module" only supports "amd" | "commonjs" | "system" | "umd" '.magenta);
             }
         }
-    }
-    if (args.indexOf('--out') > -1 && args.indexOf('--module') > -1) {
-        console.warn(('WARNING: TypeScript does not allow external modules to be concatenated with' +
-            ' --out. Any exported code may be truncated.  See TypeScript issue #1544 for' +
-            ' more details.').magenta);
-    }
-    if (options.sourceRoot) {
-        args.push('--sourceRoot', options.sourceRoot);
-    }
-    if (options.mapRoot) {
-        args.push('--mapRoot', options.mapRoot);
+        if (compilationInfo.outDir) {
+            if (compilationInfo.out) {
+                console.warn('WARNING: Option "out" and "outDir" should not be used together'.magenta);
+            }
+            args.push('--outDir', compilationInfo.outDir);
+        }
+        if (compilationInfo.out) {
+            args.push('--out', compilationInfo.out);
+        }
+        if (compilationInfo.dest && (!compilationInfo.out) && (!compilationInfo.outDir)) {
+            if (utils.isJavaScriptFile(compilationInfo.dest)) {
+                args.push('--out', compilationInfo.dest);
+            }
+            else {
+                if (compilationInfo.dest === 'src') {
+                    console.warn(('WARNING: Destination for target "' + options.targetName + '" is "src", which is the default.  If you have' +
+                        ' forgotten to specify a "dest" parameter, please add it.  If this is correct, you may wish' +
+                        ' to change the "dest" parameter to "src/" or just ignore this warning.').magenta);
+                }
+                if (Array.isArray(compilationInfo.dest)) {
+                    if (compilationInfo.dest.length === 0) {
+                    }
+                    else if (compilationInfo.dest.length > 0) {
+                        console.warn((('WARNING: "dest" for target "' + options.targetName + '" is an array.  This is not supported by the' +
+                            ' TypeScript compiler or grunt-ts.' +
+                            ((compilationInfo.dest.length > 1) ? '  Only the first "dest" will be used.  The' +
+                                ' remaining items will be truncated.' : ''))).magenta);
+                        args.push('--outDir', compilationInfo.dest[0]);
+                    }
+                }
+                else {
+                    args.push('--outDir', compilationInfo.dest);
+                }
+            }
+        }
+        if (args.indexOf('--out') > -1 && args.indexOf('--module') > -1) {
+            console.warn(('WARNING: TypeScript does not allow external modules to be concatenated with' +
+                ' --out. Any exported code may be truncated.  See TypeScript issue #1544 for' +
+                ' more details.').magenta);
+        }
+        if (options.sourceRoot) {
+            args.push('--sourceRoot', options.sourceRoot);
+        }
+        if (options.mapRoot) {
+            args.push('--mapRoot', options.mapRoot);
+        }
     }
     if (options.additionalFlags) {
         args.push(options.additionalFlags);

@@ -36,6 +36,33 @@ exports.variablesReplacedForTSConfig = function (strings, options) {
         throw "expected tsconfig file === " + expected + ", was " + options.tsconfig.tsconfig;
     });
 };
+exports.tsconfig_passThrough_onlySendsConfigThrough_WithPathAndAdditional = function (strings, options) {
+    return new Promise(function (resolve, reject) {
+        var tscfg = options.tsconfig;
+        if (tscfg
+            && tscfg.passThrough
+            && tscfg.tsconfig === 'test/tsconfig'
+            && options.additionalFlags === '--someNewThing') {
+            resolve({
+                code: 0,
+                output: ""
+            });
+        }
+        throw "expected --project .  The tsconfig was " + JSON.stringify(tscfg) + ".  AddlFlags was " + options.additionalFlags;
+    });
+};
+exports.tsconfig_passThrough_onlySendsConfigThrough_WithoutPath = function (strings, options) {
+    return new Promise(function (resolve, reject) {
+        var tscfg = options.tsconfig;
+        if (tscfg && tscfg.passThrough && tscfg.tsconfig === '.') {
+            resolve({
+                code: 0,
+                output: ""
+            });
+        }
+        throw "expected --project .  The tsconfig was " + JSON.stringify(tscfg);
+    });
+};
 exports.variablesReplacedFor_vs = function (strings, options) {
     return new Promise(function (resolve, reject) {
         var expected = "test/vsproj/testproject.csproj";
