@@ -63,15 +63,12 @@ export function resolveAsync(rawTaskOptions: ITargetOptions,
         result.targetName = targetName;
       }
 
-      resolve(result);
-      return;
+      return resolve(result);
     }).catch((error) => {
-      reject(error);
-      return;
+      return reject(error);
     });
     }).catch((error) => {
-      reject(error);
-      return;
+      return reject(error);
     });
   });
 }

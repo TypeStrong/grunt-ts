@@ -54,18 +54,16 @@ export function resolveVSOptionsAsync(applyTo: IGruntTSOptions,
     }
 
     if (applyTo.vs) {
-        csproj2ts.getTypeScriptSettings({
+        return csproj2ts.getTypeScriptSettings({
             ProjectFileName: (<IVisualStudioProjectSupport>applyTo.vs).project,
             ActiveConfiguration: (<IVisualStudioProjectSupport>applyTo.vs).config || undefined
         }).then((vsConfig) => {
           try {
             applyTo = applyVSOptions(applyTo, vsConfig);
             applyTo = resolve_out_and_outDir(applyTo, taskOptions, targetOptions);
-            resolve(applyTo);
-            return;
+            return resolve(applyTo);
           } catch (ex) {
-            reject(ex);
-            return;
+            return reject(ex);
           }
         }).catch((error) => {
             if (error.errno === 34) {
@@ -73,12 +71,10 @@ export function resolveVSOptionsAsync(applyTo: IGruntTSOptions,
             } else {
                 applyTo.errors.push('In target "' + applyTo.targetName + '".  Error #' + error.errno + '.  ' + error);
             }
-            reject(error);
-            return;
+            return reject(error);
         });
-        return;
     }
-    resolve(applyTo);
+    return resolve(applyTo);
   });
 }
 

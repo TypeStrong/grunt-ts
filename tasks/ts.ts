@@ -57,6 +57,9 @@ function pluginFn(grunt: IGrunt) {
             });
 
             proceed();
+          }).catch((error) => {
+            grunt.log.writeln((error + '').red);
+            done(false);
           });
 
         }
@@ -432,8 +435,8 @@ function pluginFn(grunt: IGrunt) {
             }).then((res: boolean[]) => {
                 // Ignore res? (either logs or throws)
                 if (!options.watch) {
-                    if (res.some((succes: boolean) => {
-                        return !succes;
+                    if (res.some((success: boolean) => {
+                        return !success;
                     })) {
                         done(false);
                     }

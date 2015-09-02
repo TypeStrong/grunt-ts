@@ -41,6 +41,9 @@ function pluginFn(grunt) {
                     grunt.log.writeln(warning.magenta);
                 });
                 proceed();
+            }).catch(function (error) {
+                grunt.log.writeln((error + '').red);
+                done(false);
             });
         }
         function proceed() {
@@ -353,8 +356,8 @@ function pluginFn(grunt) {
             }).then(function (res) {
                 // Ignore res? (either logs or throws)
                 if (!options.watch) {
-                    if (res.some(function (succes) {
-                        return !succes;
+                    if (res.some(function (success) {
+                        return !success;
                     })) {
                         done(false);
                     }

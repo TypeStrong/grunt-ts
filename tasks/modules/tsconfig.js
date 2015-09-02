@@ -38,12 +38,10 @@ function resolveAsync(applyTo, taskOptions, targetOptions, theTemplateProcessor)
             applyTo.tsconfig = tsconfig;
         }
         catch (ex) {
-            reject(ex);
-            return;
+            return reject(ex);
         }
         if (!applyTo.tsconfig) {
-            resolve(applyTo);
-            return;
+            return resolve(applyTo);
         }
         var projectFile = applyTo.tsconfig.tsconfig;
         try {
@@ -51,26 +49,21 @@ function resolveAsync(applyTo, taskOptions, targetOptions, theTemplateProcessor)
         }
         catch (ex) {
             if (ex && ex.code === 'ENOENT') {
-                reject('Could not find file "' + projectFile + '".');
-                return;
+                return reject('Could not find file "' + projectFile + '".');
             }
             else if (ex && ex.errno) {
-                reject('Error ' + ex.errno + ' reading "' + projectFile + '".');
-                return;
+                return reject('Error ' + ex.errno + ' reading "' + projectFile + '".');
             }
             else {
-                reject('Error reading "' + projectFile + '": ' + JSON.stringify(ex));
-                return;
+                return reject('Error reading "' + projectFile + '": ' + JSON.stringify(ex));
             }
-            reject(ex);
-            return;
+            return reject(ex);
         }
         try {
             var projectSpec = JSON.parse(stripBom(projectFileTextContent));
         }
         catch (ex) {
-            reject('Error parsing "' + projectFile + '".  It may not be valid JSON in UTF-8.');
-            return;
+            return reject('Error parsing "' + projectFile + '".  It may not be valid JSON in UTF-8.');
         }
         applyTo = applyCompilerOptions(applyTo, projectSpec);
         resolve(applyTo);

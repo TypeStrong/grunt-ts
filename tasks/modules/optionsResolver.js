@@ -45,15 +45,12 @@ function resolveAsync(rawTaskOptions, rawTargetOptions, targetName, files, theTe
                     (!result.targetName && targetName)) {
                     result.targetName = targetName;
                 }
-                resolve(result);
-                return;
+                return resolve(result);
             }).catch(function (error) {
-                reject(error);
-                return;
+                return reject(error);
             });
         }).catch(function (error) {
-            reject(error);
-            return;
+            return reject(error);
         });
         var _b, _c;
     });
