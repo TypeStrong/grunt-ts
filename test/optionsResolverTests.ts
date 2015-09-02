@@ -128,25 +128,6 @@ function getConfig(name: string, asCopy = false) : IGruntTargetOptions {
 
 export var tests : nodeunit.ITestGroup = {
 
-  // "Templates Tests": {
-  //   "Processed on Task Properties": (test: nodeunit.Test) => {
-  //       test.ok(false);
-  //       test.done();
-  //   },
-  //   "Processed on Task Options": (test: nodeunit.Test) => {
-  //       test.ok(false);
-  //       test.done();
-  //   },
-  //   "Processed on Target Properties": (test: nodeunit.Test) => {
-  //       test.ok(false);
-  //       test.done();
-  //   },
-  //   "Processed on Target Options": (test: nodeunit.Test) => {
-  //       test.ok(false);
-  //       test.done();
-  //   }
-  // },
-
   "Warnings and Errors Tests": {
     "Bad capitalization detected and fixed": (test: nodeunit.Test) => {
         test.expect(2);

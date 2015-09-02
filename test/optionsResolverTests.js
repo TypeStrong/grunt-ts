@@ -120,24 +120,6 @@ function getConfig(name, asCopy) {
     return config[name];
 }
 exports.tests = {
-    // "Templates Tests": {
-    //   "Processed on Task Properties": (test: nodeunit.Test) => {
-    //       test.ok(false);
-    //       test.done();
-    //   },
-    //   "Processed on Task Options": (test: nodeunit.Test) => {
-    //       test.ok(false);
-    //       test.done();
-    //   },
-    //   "Processed on Target Properties": (test: nodeunit.Test) => {
-    //       test.ok(false);
-    //       test.done();
-    //   },
-    //   "Processed on Target Options": (test: nodeunit.Test) => {
-    //       test.ok(false);
-    //       test.done();
-    //   }
-    // },
     "Warnings and Errors Tests": {
         "Bad capitalization detected and fixed": function (test) {
             test.expect(2);
