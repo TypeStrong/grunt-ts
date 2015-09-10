@@ -5,8 +5,11 @@ var path = require('path');
 var stripBom = require('strip-bom');
 var _ = require('lodash');
 var templateProcessor = null;
-function resolveAsync(applyTo, taskOptions, targetOptions, theTemplateProcessor) {
+var globExpander = null;
+function resolveAsync(applyTo, taskOptions, targetOptions, theTemplateProcessor, theGlobExpander) {
+    if (theGlobExpander === void 0) { theGlobExpander = null; }
     templateProcessor = theTemplateProcessor;
+    globExpander = theGlobExpander;
     return new es6_promise_1.Promise(function (resolve, reject) {
         try {
             var taskTSConfig = getTSConfigSettings(taskOptions);
@@ -72,7 +75,8 @@ function resolveAsync(applyTo, taskOptions, targetOptions, theTemplateProcessor)
                 var projectSpec = JSON.parse(stripBom(projectFileTextContent));
             }
             catch (ex) {
-                return reject('Error parsing "' + projectFile + '".  It may not be valid JSON in UTF-8.');
+                return reject('Error parsing "' + projectFile + '".  It may not be valid JSON in UTF-8.  ' +
+                    'The shortest possible file contents that will "work" with grunt-ts is: {}');
             }
             applyTo = applyCompilerOptions(applyTo, projectSpec);
             applyTo = resolve_out_and_outDir(applyTo, projectSpec);
@@ -136,7 +140,7 @@ function applyCompilerOptions(applyTo, projectSpec) {
     var result = applyTo || {};
     var co = projectSpec.compilerOptions;
     var tsconfig = applyTo.tsconfig;
-    if (!tsconfig.ignoreSettings) {
+    if (!tsconfig.ignoreSettings && co) {
         var tsconfigMappingToGruntTSProperty = ['declaration', 'emitDecoratorMetadata',
             'experimentalDecorators', 'isolatedModules',
             'inlineSourceMap', 'inlineSources', 'mapRoot', 'module', 'newLine', 'noEmit',
@@ -156,15 +160,37 @@ function applyCompilerOptions(applyTo, projectSpec) {
     }
     var src = applyTo.CompilationTasks[0].src;
     var absolutePathToTSConfig = path.resolve(tsconfig.tsconfig, '..');
+    if (projectSpec.files) {
+        addUniqueRelativeFilesToSrc(projectSpec.files, src, absolutePathToTSConfig);
+    }
+    else {
+        // if files is not specified, default to including *.ts and *.tsx in folder and subfolders.
+        var virtualGlob = [path.resolve(absolutePathToTSConfig, './**/*.ts'),
+            path.resolve(absolutePathToTSConfig, './**/*.tsx')];
+        if (projectSpec.exclude && _.isArray(projectSpec.exclude)) {
+            projectSpec.exclude.forEach(function (exc) {
+                virtualGlob.push('!' + path.resolve(absolutePathToTSConfig, exc, './**/*.ts'));
+                virtualGlob.push('!' + path.resolve(absolutePathToTSConfig, exc, './**/*.tsx'));
+            });
+        }
+        var files = globExpander(virtualGlob);
+        // make files relative to the tsconfig.json file
+        for (var i = 0; i < files.length; i += 1) {
+            files[i] = path.relative(absolutePathToTSConfig, files[i]);
+        }
+        addUniqueRelativeFilesToSrc(files, src, absolutePathToTSConfig);
+    }
+    return result;
+}
+function addUniqueRelativeFilesToSrc(tsconfigFilesArray, compilationTaskSrc, absolutePathToTSConfig) {
     var gruntfileFolder = path.resolve('.');
-    _.map(_.uniq(projectSpec.files), function (file) {
+    _.map(_.uniq(tsconfigFilesArray), function (file) {
         var absolutePathToFile = path.normalize(path.join(absolutePathToTSConfig, file));
         var relativePathToFileFromGruntfile = path.relative(gruntfileFolder, absolutePathToFile).replace(new RegExp('\\' + path.sep, 'g'), '/');
-        if (src.indexOf(absolutePathToFile) === -1 &&
-            src.indexOf(relativePathToFileFromGruntfile) === -1) {
-            src.push(relativePathToFileFromGruntfile);
+        if (compilationTaskSrc.indexOf(absolutePathToFile) === -1 &&
+            compilationTaskSrc.indexOf(relativePathToFileFromGruntfile) === -1) {
+            compilationTaskSrc.push(relativePathToFileFromGruntfile);
         }
     });
-    return result;
 }
 //# sourceMappingURL=tsconfig.js.map

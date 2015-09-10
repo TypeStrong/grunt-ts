@@ -108,6 +108,9 @@ var config = {
     },
     "tsconfig has specific file": {
         tsconfig: 'test/tsconfig/test_simple_tsconfig.json'
+    },
+    "tsconfig test exclude": {
+        tsconfig: 'test/tsconfig/test_exclude_tsconfig.json'
     }
 };
 function getConfig(name, asCopy) {
@@ -353,6 +356,27 @@ exports.tests = {
                 test.done();
             });
         },
+        "Exception from blank file": function (test) {
+            test.expect(1);
+            var cfg = getConfig("minimalist", true);
+            cfg.tsconfig = './test/tsconfig/blank_tsconfig.json';
+            var result = or.resolveAsync(null, cfg).then(function (result) {
+                test.ok(false, 'expected exception from invalid file.');
+                test.done();
+            }).catch(function (err) {
+                test.ok(err.indexOf('Error parsing') > -1);
+                test.done();
+            });
+        },
+        "No exception from file with contents {}": function (test) {
+            test.expect(1);
+            var cfg = getConfig("minimalist", true);
+            cfg.tsconfig = './test/tsconfig/empty_object_literal_tsconfig.json';
+            var result = or.resolveAsync(null, cfg, "", null, null, grunt.file.expand).then(function (result) {
+                test.ok(true);
+                test.done();
+            }).catch(function (err) { test.ifError(err); test.done(); });
+        },
         "Exception from missing file": function (test) {
             test.expect(2);
             var cfg = getConfig("minimalist", true);
@@ -456,6 +480,31 @@ exports.tests = {
             test.strictEqual(result.removeComments, false, 'this setting is not specified in the options so tsconfig wins over grunt-ts defaults');
             test.done();
         }).catch(function (err) { test.ifError(err); test.done(); });
-    }
+    },
+    "If files and exclude, files will be used and exclude will be ignored.": function (test) {
+        test.expect(1);
+        var result = or.resolveAsync(null, getConfig("tsconfig has specific file")).then(function (result) {
+            test.ok(result.CompilationTasks[0].src.indexOf('test/tsconfig/otherFiles/other.ts') === -1);
+            test.done();
+        }).catch(function (err) { test.ifError(err); test.done(); });
+    },
+    "if no files, but exclude, *.ts and *.tsx will be included except for the excluded files and folders": function (test) {
+        test.expect(2);
+        var result = or.resolveAsync(null, getConfig("tsconfig test exclude"), "", null, null, grunt.file.expand).then(function (result) {
+            test.ok(result.CompilationTasks[0].src.indexOf('test/tsconfig/otherFiles/other.ts') === 0);
+            test.ok(result.CompilationTasks[0].src.indexOf('test/tsconfig/files/validconfig.ts') === -1);
+            test.done();
+        }).catch(function (err) { test.ifError(err); test.done(); });
+    },
+    "if no files and no exclude, *.ts and *.tsx will be included": function (test) {
+        test.expect(2);
+        var cfg = getConfig("minimalist", true);
+        cfg.tsconfig = './test/tsconfig/empty_object_literal_tsconfig.json';
+        var result = or.resolveAsync(null, cfg, "", null, null, grunt.file.expand).then(function (result) {
+            test.ok(result.CompilationTasks[0].src.indexOf('test/tsconfig/otherFiles/other.ts') >= 0, 'expected other.ts');
+            test.ok(result.CompilationTasks[0].src.indexOf('test/tsconfig/files/validtsconfig.ts') >= 0, 'expexted validconfig.ts');
+            test.done();
+        }).catch(function (err) { test.ifError(err); test.done(); });
+    },
 };
 //# sourceMappingURL=optionsResolverTests.js.map

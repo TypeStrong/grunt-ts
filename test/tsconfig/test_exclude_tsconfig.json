@@ -15,10 +15,7 @@
         "emitDecoratorMetadata": true,
         "experimentalDecorators": true
     },
-    "files": [
-        "./files/validtsconfig.ts"
-    ],
     "exclude": [
-        "./files"
+      "./files"
     ]
 }

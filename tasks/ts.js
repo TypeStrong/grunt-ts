@@ -35,7 +35,7 @@ function pluginFn(grunt) {
             // get unprocessed templates from configuration
             var rawTaskConfig = (grunt.config.getRaw(currentTask.name) || {});
             var rawTargetConfig = (grunt.config.getRaw(currentTask.name + '.' + currentTask.target) || {});
-            optionsResolver.resolveAsync(rawTaskConfig, rawTargetConfig, currentTask.target, files, grunt.template.process).then(function (result) {
+            optionsResolver.resolveAsync(rawTaskConfig, rawTargetConfig, currentTask.target, files, grunt.template.process, grunt.file.expand).then(function (result) {
                 options = result;
                 options.warnings.forEach(function (warning) {
                     grunt.log.writeln(warning.magenta);

@@ -14,19 +14,30 @@ var propertiesFromTarget = ['amdloader', 'html', 'htmlOutDir', 'htmlOutDirFlatte
     'noEmitHelpers', 'noEmitOnError', 'noImplicitAny', 'noResolve', 'preserveConstEnums', 'removeComments', 'sourceRoot',
     'sourceMap', 'suppressImplicitAnyIndexErrors', 'target', 'verbose'], delayTemplateExpansion = ['htmlModuleTemplate', 'htmlVarTemplate'];
 var templateProcessor = null;
+var globExpander = null;
 function noopTemplateProcessor(templateString, options) {
     return templateString;
 }
-function resolveAsync(rawTaskOptions, rawTargetOptions, targetName, files, theTemplateProcessor) {
+function throwGlobExpander(globs) {
+    throw new Error('globExpander called, but one was not passsed to resolveAsync.');
+}
+function resolveAsync(rawTaskOptions, rawTargetOptions, targetName, files, theTemplateProcessor, theGlobExpander) {
     if (targetName === void 0) { targetName = ''; }
     if (files === void 0) { files = []; }
     if (theTemplateProcessor === void 0) { theTemplateProcessor = null; }
+    if (theGlobExpander === void 0) { theGlobExpander = null; }
     return new es6_promise_1.Promise(function (resolve, reject) {
         if (theTemplateProcessor && typeof theTemplateProcessor === 'function') {
             templateProcessor = theTemplateProcessor;
         }
         else {
             templateProcessor = noopTemplateProcessor;
+        }
+        if (theGlobExpander && typeof theGlobExpander === 'function') {
+            globExpander = theGlobExpander;
+        }
+        else {
+            globExpander = throwGlobExpander;
         }
         fixMissingOptions(rawTaskOptions);
         fixMissingOptions(rawTargetOptions);
@@ -38,7 +49,7 @@ function resolveAsync(rawTaskOptions, rawTargetOptions, targetName, files, theTe
         result = applyGruntOptions(result, rawTargetOptions);
         result = copyCompilationTasks(result, files);
         visualStudioOptionsResolver_1.resolveVSOptionsAsync(result, rawTaskOptions, rawTargetOptions, templateProcessor).then(function (result) {
-            tsconfig_1.resolveAsync(result, rawTaskOptions, rawTargetOptions, templateProcessor).then(function (result) {
+            tsconfig_1.resolveAsync(result, rawTaskOptions, rawTargetOptions, templateProcessor, globExpander).then(function (result) {
                 result = addressAssociatedOptionsAndResolveConflicts(result);
                 result = applyGruntTSDefaults(result);
                 if (result.targetName === undefined ||
@@ -180,8 +191,11 @@ function applyGruntOptions(applyTo, gruntOptions) {
     return applyTo;
 }
 function copyCompilationTasks(options, files) {
-    if (options.CompilationTasks === null || options.CompilationTasks === undefined) {
+    if (!utils.hasValue(options.CompilationTasks)) {
         options.CompilationTasks = [];
+    }
+    if (!utils.hasValue(files)) {
+        return options;
     }
     for (var i = 0; i < files.length; i += 1) {
         var compilationSet = {

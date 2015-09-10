@@ -49,7 +49,7 @@ function pluginFn(grunt: IGrunt) {
             <ITargetOptions>(grunt.config.getRaw(currentTask.name + '.' + currentTask.target) || {});
 
           optionsResolver.resolveAsync(rawTaskConfig, rawTargetConfig, currentTask.target, files,
-              grunt.template.process).then((result) => {
+              grunt.template.process, grunt.file.expand).then((result) => {
             options = result;
 
             options.warnings.forEach((warning) => {

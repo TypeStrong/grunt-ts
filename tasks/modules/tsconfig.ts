@@ -7,13 +7,16 @@ import * as stripBom from 'strip-bom';
 import * as _ from 'lodash';
 
 let templateProcessor: (templateString: string, options: any) => string = null;
+let globExpander: (globs: string[]) => string[] = null;
 
 export function resolveAsync(applyTo: IGruntTSOptions,
   taskOptions: ITargetOptions,
   targetOptions: ITargetOptions,
-  theTemplateProcessor: (templateString: string, options: any) => string) {
+  theTemplateProcessor: (templateString: string, options: any) => string,
+  theGlobExpander: (globs: string[]) => string[] = null) {
 
   templateProcessor = theTemplateProcessor;
+  globExpander = theGlobExpander;
 
   return new Promise<IGruntTSOptions>((resolve, reject) => {
 
@@ -83,7 +86,8 @@ export function resolveAsync(applyTo: IGruntTSOptions,
       try {
         var projectSpec: ITSConfigFile = JSON.parse(stripBom(projectFileTextContent));
       } catch (ex) {
-        return reject('Error parsing "' + projectFile + '".  It may not be valid JSON in UTF-8.');
+        return reject('Error parsing "' + projectFile + '".  It may not be valid JSON in UTF-8.  ' +
+          'The shortest possible file contents that will "work" with grunt-ts is: {}');
       }
 
       applyTo = applyCompilerOptions(applyTo, projectSpec);
@@ -152,11 +156,10 @@ function getTSConfigSettings(raw: ITargetOptions): ITSConfigSupport {
 
 function applyCompilerOptions(applyTo: IGruntTSOptions, projectSpec: ITSConfigFile) {
   const result: IGruntTSOptions = applyTo || <any>{};
-
   const co = projectSpec.compilerOptions;
   const tsconfig: ITSConfigSupport = applyTo.tsconfig;
 
-  if (!tsconfig.ignoreSettings) {
+  if (!tsconfig.ignoreSettings && co) {
     const tsconfigMappingToGruntTSProperty = ['declaration', 'emitDecoratorMetadata',
       'experimentalDecorators', 'isolatedModules',
       'inlineSourceMap', 'inlineSources', 'mapRoot', 'module', 'newLine', 'noEmit',
@@ -177,19 +180,45 @@ function applyCompilerOptions(applyTo: IGruntTSOptions, projectSpec: ITSConfigFi
     applyTo.CompilationTasks.push({src: []});
   }
 
-  let src = applyTo.CompilationTasks[0].src;
-  let absolutePathToTSConfig = path.resolve(tsconfig.tsconfig, '..');
+  const src = applyTo.CompilationTasks[0].src;
+  const absolutePathToTSConfig = path.resolve(tsconfig.tsconfig, '..');
 
+  if (projectSpec.files) {
+    addUniqueRelativeFilesToSrc(projectSpec.files, src, absolutePathToTSConfig);
+  } else {
+    // if files is not specified, default to including *.ts and *.tsx in folder and subfolders.
+    const virtualGlob = [path.resolve(absolutePathToTSConfig, './**/*.ts'),
+                      path.resolve(absolutePathToTSConfig, './**/*.tsx')];
+    if (projectSpec.exclude && _.isArray(projectSpec.exclude)) {
+        projectSpec.exclude.forEach(exc => {
+          virtualGlob.push('!' + path.resolve(absolutePathToTSConfig, exc, './**/*.ts'));
+          virtualGlob.push('!' + path.resolve(absolutePathToTSConfig, exc, './**/*.tsx'));
+        });
+    }
+
+    const files = globExpander(virtualGlob);
+
+    // make files relative to the tsconfig.json file
+    for (let i = 0; i < files.length; i += 1) {
+      files[i] = path.relative(absolutePathToTSConfig, files[i]);
+    }
+
+    addUniqueRelativeFilesToSrc(files, src, absolutePathToTSConfig);
+  }
+
+  return result;
+}
+
+function addUniqueRelativeFilesToSrc(tsconfigFilesArray: string[], compilationTaskSrc: string[], absolutePathToTSConfig: string) {
   const gruntfileFolder = path.resolve('.');
-  _.map(_.uniq(projectSpec.files), (file) => {
+
+  _.map(_.uniq(tsconfigFilesArray), (file) => {
       const absolutePathToFile = path.normalize(path.join(absolutePathToTSConfig, file));
       const relativePathToFileFromGruntfile = path.relative(gruntfileFolder, absolutePathToFile).replace(new RegExp('\\' + path.sep, 'g'), '/');
 
-      if (src.indexOf(absolutePathToFile) === -1 &&
-          src.indexOf(relativePathToFileFromGruntfile) === -1) {
-          src.push(relativePathToFileFromGruntfile);
+      if (compilationTaskSrc.indexOf(absolutePathToFile) === -1 &&
+          compilationTaskSrc.indexOf(relativePathToFileFromGruntfile) === -1) {
+          compilationTaskSrc.push(relativePathToFileFromGruntfile);
       }
   });
-
-  return result;
 }

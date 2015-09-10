@@ -20,16 +20,22 @@ const propertiesFromTarget = ['amdloader', 'html', 'htmlOutDir', 'htmlOutDirFlat
       delayTemplateExpansion = ['htmlModuleTemplate', 'htmlVarTemplate'];
 
 let templateProcessor: (templateString: string, options: any) => string = null;
+let globExpander: (globs: string[]) => string[] = null;
 
 function noopTemplateProcessor(templateString: string, options: any) {
   return templateString;
+}
+
+function throwGlobExpander(globs: string[]): string[] {
+  throw new Error('globExpander called, but one was not passsed to resolveAsync.');
 }
 
 export function resolveAsync(rawTaskOptions: ITargetOptions,
                         rawTargetOptions: ITargetOptions,
                         targetName = '',
                         files: IGruntTSCompilationInfo[] = [],
-                        theTemplateProcessor: (templateString: string, options: any) => string = null): Promise<IGruntTSOptions> {
+                        theTemplateProcessor: (templateString: string, options: any) => string = null,
+                        theGlobExpander: (globs: string[]) => string[] = null): Promise<IGruntTSOptions> {
 
   return new Promise<IGruntTSOptions>((resolve, reject) => {
 
@@ -38,6 +44,12 @@ export function resolveAsync(rawTaskOptions: ITargetOptions,
         templateProcessor = theTemplateProcessor;
     } else {
         templateProcessor = noopTemplateProcessor;
+    }
+
+    if (theGlobExpander && typeof theGlobExpander === 'function') {
+        globExpander = theGlobExpander;
+    } else {
+        globExpander = throwGlobExpander;
     }
 
     fixMissingOptions(rawTaskOptions);
@@ -53,7 +65,7 @@ export function resolveAsync(rawTaskOptions: ITargetOptions,
     result = copyCompilationTasks(result, files);
 
     resolveVSOptionsAsync(result, rawTaskOptions, rawTargetOptions, templateProcessor).then((result) => {
-    resolveTSConfigAsync(result, rawTaskOptions, rawTargetOptions, templateProcessor).then((result) => {
+    resolveTSConfigAsync(result, rawTaskOptions, rawTargetOptions, templateProcessor, globExpander).then((result) => {
 
       result = addressAssociatedOptionsAndResolveConflicts(result);
       result = applyGruntTSDefaults(result);
@@ -214,8 +226,11 @@ function applyGruntOptions(applyTo: IGruntTSOptions, gruntOptions: ITargetOption
 
 function copyCompilationTasks(options: IGruntTSOptions, files: IGruntTSCompilationInfo[]) {
 
-  if (options.CompilationTasks === null || options.CompilationTasks === undefined) {
+  if (!utils.hasValue(options.CompilationTasks)) {
     options.CompilationTasks = [];
+  }
+  if (!utils.hasValue(files)) {
+    return options;
   }
   for (let i = 0; i < files.length; i += 1) {
     let compilationSet = {
