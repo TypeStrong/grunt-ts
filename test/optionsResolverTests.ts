@@ -374,6 +374,20 @@ export var tests : nodeunit.ITestGroup = {
           test.done();
         }).catch((err) => {test.ifError(err); test.done();});
     },
+    "ignoreSettings works": (test: nodeunit.Test) => {
+        test.expect(2);
+        const cfg = getConfig("minimalist", true);
+        cfg.tsconfig = {
+          tsconfig: './test/tsconfig/test_simple_tsconfig.json',
+          ignoreSettings: true
+        };
+        const result = or.resolveAsync(null, cfg).then((result) => {
+          // test.ok(true);
+          test.strictEqual(result.target, 'es5');
+          test.strictEqual(result.module, undefined);
+          test.done();
+        }).catch((err) => {test.ifError(err); test.done();});
+    },
     "Exception from invalid file": (test: nodeunit.Test) => {
         test.expect(1);
         const cfg = getConfig("minimalist", true);

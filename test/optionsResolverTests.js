@@ -355,6 +355,20 @@ exports.tests = {
                 test.done();
             }).catch(function (err) { test.ifError(err); test.done(); });
         },
+        "ignoreSettings works": function (test) {
+            test.expect(2);
+            var cfg = getConfig("minimalist", true);
+            cfg.tsconfig = {
+                tsconfig: './test/tsconfig/test_simple_tsconfig.json',
+                ignoreSettings: true
+            };
+            var result = or.resolveAsync(null, cfg).then(function (result) {
+                // test.ok(true);
+                test.strictEqual(result.target, 'es5');
+                test.strictEqual(result.module, undefined);
+                test.done();
+            }).catch(function (err) { test.ifError(err); test.done(); });
+        },
         "Exception from invalid file": function (test) {
             test.expect(1);
             var cfg = getConfig("minimalist", true);
