@@ -4,7 +4,7 @@ var fs = require('fs');
 var path = require('path');
 var stripBom = require('strip-bom');
 var _ = require('lodash');
-var utils = require("./utils");
+var utils = require('./utils');
 var templateProcessor = null;
 var globExpander = null;
 function resolveAsync(applyTo, taskOptions, targetOptions, theTemplateProcessor, theGlobExpander) {
@@ -214,8 +214,7 @@ function updateTSConfigAndFilesFromGlob(filesRelativeToTSConfig, globRelativeToT
         }
         filesRelativeToTSConfig = filesRelativeToTSConfig_temp;
     }
-    var projectFileTextContent, tsconfigJSONContent;
-    tsconfigJSONContent = utils.readAndParseJSONFromFileSync(tsconfigFileName);
+    var tsconfigJSONContent = utils.readAndParseJSONFromFileSync(tsconfigFileName);
     var tempTSConfigFiles = tsconfigJSONContent.files || [];
     if (_.difference(tempTSConfigFiles, filesRelativeToTSConfig).length > 0 ||
         _.difference(filesRelativeToTSConfig, tempTSConfigFiles).length > 0) {

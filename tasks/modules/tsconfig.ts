@@ -5,7 +5,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as stripBom from 'strip-bom';
 import * as _ from 'lodash';
-import * as utils from "./utils";
+import * as utils from './utils';
 
 let templateProcessor: (templateString: string, options: any) => string = null;
 let globExpander: (globs: string[]) => string[] = null;
@@ -211,7 +211,7 @@ function applyCompilerOptions(applyTo: IGruntTSOptions, projectSpec: ITSConfigFi
 
       // make files relative to the tsconfig.json file
       for (let i = 0; i < files.length; i += 1) {
-        files[i] = path.relative(absolutePathToTSConfig, files[i]).replace(/\\/g,'/');
+        files[i] = path.relative(absolutePathToTSConfig, files[i]).replace(/\\/g, '/');
       }
 
       projectSpec.files = files;
@@ -245,18 +245,16 @@ function updateTSConfigAndFilesFromGlob(filesRelativeToTSConfig: string[],
 
     {
       let filesRelativeToTSConfig_temp = [];
-      const relativePathFromGruntfileToTSConfig = path.relative('.', absolutePathToTSConfig).replace(/\\/g,'/');
+      const relativePathFromGruntfileToTSConfig = path.relative('.', absolutePathToTSConfig).replace(/\\/g, '/');
       for (let i = 0; i < filesRelativeToGruntfile.length; i += 1) {
-        filesRelativeToGruntfile[i] = filesRelativeToGruntfile[i].replace(/\\/g,'/');
+        filesRelativeToGruntfile[i] = filesRelativeToGruntfile[i].replace(/\\/g, '/');
         filesRelativeToTSConfig_temp.push(path.relative(relativePathFromGruntfileToTSConfig, filesRelativeToGruntfile[i]));
       }
 
       filesRelativeToTSConfig = filesRelativeToTSConfig_temp;
     }
 
-    let projectFileTextContent: string, tsconfigJSONContent: any;
-
-    tsconfigJSONContent = utils.readAndParseJSONFromFileSync(tsconfigFileName);
+    const tsconfigJSONContent = utils.readAndParseJSONFromFileSync(tsconfigFileName);
 
     const tempTSConfigFiles = tsconfigJSONContent.files || [];
 
