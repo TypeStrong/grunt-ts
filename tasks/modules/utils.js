@@ -341,4 +341,28 @@ function asyncSeries(items, callPerItem) {
     });
 }
 exports.asyncSeries = asyncSeries;
+function copyFileSync(srcFile, destFile, encoding) {
+    if (encoding === void 0) { encoding = 'utf8'; }
+    var content = fs.readFileSync(srcFile, encoding);
+    fs.writeFileSync(destFile, content, encoding);
+}
+exports.copyFileSync = copyFileSync;
+function readAndParseJSONFromFileSync(fileName, encoding) {
+    if (encoding === void 0) { encoding = 'utf8'; }
+    var textContent, result;
+    try {
+        textContent = fs.readFileSync(fileName, encoding);
+    }
+    catch (ex) {
+        throw new Error("Error reading file " + fileName + ": " + ex);
+    }
+    try {
+        result = JSON.parse(textContent);
+    }
+    catch (ex) {
+        throw new Error("Error parsing JSON in file " + fileName + ": " + ex);
+    }
+    return result;
+}
+exports.readAndParseJSONFromFileSync = readAndParseJSONFromFileSync;
 //# sourceMappingURL=utils.js.map

@@ -18,9 +18,10 @@ var globExpander = null;
 function noopTemplateProcessor(templateString, options) {
     return templateString;
 }
-function throwGlobExpander(globs) {
-    throw new Error('globExpander called, but one was not passsed to resolveAsync.');
+function emptyGlobExpander(globs) {
+    return [];
 }
+emptyGlobExpander.isStub = true;
 function resolveAsync(rawTaskOptions, rawTargetOptions, targetName, files, theTemplateProcessor, theGlobExpander) {
     if (targetName === void 0) { targetName = ''; }
     if (files === void 0) { files = []; }
@@ -37,7 +38,7 @@ function resolveAsync(rawTaskOptions, rawTargetOptions, targetName, files, theTe
             globExpander = theGlobExpander;
         }
         else {
-            globExpander = throwGlobExpander;
+            globExpander = emptyGlobExpander;
         }
         fixMissingOptions(rawTaskOptions);
         fixMissingOptions(rawTargetOptions);

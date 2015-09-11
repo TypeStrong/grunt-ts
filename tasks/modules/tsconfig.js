@@ -4,6 +4,7 @@ var fs = require('fs');
 var path = require('path');
 var stripBom = require('strip-bom');
 var _ = require('lodash');
+var utils = require("./utils");
 var templateProcessor = null;
 var globExpander = null;
 function resolveAsync(applyTo, taskOptions, targetOptions, theTemplateProcessor, theGlobExpander) {
@@ -155,32 +156,81 @@ function applyCompilerOptions(applyTo, projectSpec) {
             }
         });
     }
+    if (!('updateFiles' in tsconfig)) {
+        tsconfig.updateFiles = true;
+    }
     if (applyTo.CompilationTasks.length === 0) {
         applyTo.CompilationTasks.push({ src: [] });
     }
     var src = applyTo.CompilationTasks[0].src;
+    if (tsconfig.updateFiles && projectSpec.filesGlob) {
+        updateTSConfigAndFilesFromGlob(projectSpec.files, projectSpec.filesGlob, tsconfig.tsconfig);
+    }
     var absolutePathToTSConfig = path.resolve(tsconfig.tsconfig, '..');
     if (projectSpec.files) {
         addUniqueRelativeFilesToSrc(projectSpec.files, src, absolutePathToTSConfig);
     }
     else {
-        // if files is not specified, default to including *.ts and *.tsx in folder and subfolders.
-        var virtualGlob = [path.resolve(absolutePathToTSConfig, './**/*.ts'),
-            path.resolve(absolutePathToTSConfig, './**/*.tsx')];
-        if (projectSpec.exclude && _.isArray(projectSpec.exclude)) {
-            projectSpec.exclude.forEach(function (exc) {
-                virtualGlob.push('!' + path.resolve(absolutePathToTSConfig, exc, './**/*.ts'));
-                virtualGlob.push('!' + path.resolve(absolutePathToTSConfig, exc, './**/*.tsx'));
-            });
+        if (!globExpander.isStub) {
+            // if files is not specified, default to including *.ts and *.tsx in folder and subfolders.
+            var virtualGlob = [path.resolve(absolutePathToTSConfig, './**/*.ts'),
+                path.resolve(absolutePathToTSConfig, './**/*.tsx')];
+            if (projectSpec.exclude && _.isArray(projectSpec.exclude)) {
+                projectSpec.exclude.forEach(function (exc) {
+                    virtualGlob.push('!' + path.resolve(absolutePathToTSConfig, exc, './**/*.ts'));
+                    virtualGlob.push('!' + path.resolve(absolutePathToTSConfig, exc, './**/*.tsx'));
+                });
+            }
+            var files = globExpander(virtualGlob);
+            // make files relative to the tsconfig.json file
+            for (var i = 0; i < files.length; i += 1) {
+                files[i] = path.relative(absolutePathToTSConfig, files[i]).replace(/\\/g, '/');
+            }
+            projectSpec.files = files;
+            if (projectSpec.filesGlob) {
+                saveTSConfigSync(tsconfig.tsconfig, projectSpec);
+            }
+            addUniqueRelativeFilesToSrc(files, src, absolutePathToTSConfig);
         }
-        var files = globExpander(virtualGlob);
-        // make files relative to the tsconfig.json file
-        for (var i = 0; i < files.length; i += 1) {
-            files[i] = path.relative(absolutePathToTSConfig, files[i]);
-        }
-        addUniqueRelativeFilesToSrc(files, src, absolutePathToTSConfig);
     }
     return result;
+}
+function updateTSConfigAndFilesFromGlob(filesRelativeToTSConfig, globRelativeToTSConfig, tsconfigFileName) {
+    if (!globExpander.isStub) {
+        return;
+    }
+    var absolutePathToTSConfig = path.resolve(tsconfigFileName, '..');
+    var filesGlobRelativeToGruntfile = [];
+    for (var i = 0; i < globRelativeToTSConfig.length; i += 1) {
+        filesGlobRelativeToGruntfile.push(path.relative(path.resolve('.'), path.join(absolutePathToTSConfig, globRelativeToTSConfig[i])));
+    }
+    var filesRelativeToGruntfile = globExpander(filesGlobRelativeToGruntfile);
+    {
+        var filesRelativeToTSConfig_temp = [];
+        var relativePathFromGruntfileToTSConfig = path.relative('.', absolutePathToTSConfig).replace(/\\/g, '/');
+        for (var i = 0; i < filesRelativeToGruntfile.length; i += 1) {
+            filesRelativeToGruntfile[i] = filesRelativeToGruntfile[i].replace(/\\/g, '/');
+            filesRelativeToTSConfig_temp.push(path.relative(relativePathFromGruntfileToTSConfig, filesRelativeToGruntfile[i]));
+        }
+        filesRelativeToTSConfig = filesRelativeToTSConfig_temp;
+    }
+    var projectFileTextContent, tsconfigJSONContent;
+    tsconfigJSONContent = utils.readAndParseJSONFromFileSync(tsconfigFileName);
+    var tempTSConfigFiles = tsconfigJSONContent.files || [];
+    if (_.difference(tempTSConfigFiles, filesRelativeToTSConfig).length > 0 ||
+        _.difference(filesRelativeToTSConfig, tempTSConfigFiles).length > 0) {
+        try {
+            tsconfigJSONContent.files = filesRelativeToTSConfig;
+            saveTSConfigSync(tsconfigFileName, tsconfigJSONContent);
+        }
+        catch (ex) {
+            var error = new Error('Error updating tsconfig.json: ' + ex);
+            throw error;
+        }
+    }
+}
+function saveTSConfigSync(fileName, content) {
+    fs.writeFileSync(fileName, JSON.stringify(content, null, '    '));
 }
 function addUniqueRelativeFilesToSrc(tsconfigFilesArray, compilationTaskSrc, absolutePathToTSConfig) {
     var gruntfileFolder = path.resolve('.');

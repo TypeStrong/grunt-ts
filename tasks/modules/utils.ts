@@ -364,3 +364,26 @@ export function asyncSeries<U, W>(items: U[], callPerItem: (item: U) => Promise<
         next();
     });
 }
+
+export function copyFileSync(srcFile: string, destFile: string, encoding = 'utf8') {
+  var content = fs.readFileSync(srcFile, encoding);
+  fs.writeFileSync(destFile, content, encoding);
+}
+
+export function readAndParseJSONFromFileSync(fileName: string, encoding = 'utf8') : any {
+
+  let textContent: string, result: any;
+  try {
+    textContent = fs.readFileSync(fileName, encoding);
+  } catch (ex) {
+    throw new Error(`Error reading file ${fileName}: ${ex}`);
+  }
+
+  try {
+     result = JSON.parse(textContent);
+  } catch (ex) {
+    throw new Error(`Error parsing JSON in file ${fileName}: ${ex}`);
+  }
+
+  return result;
+}

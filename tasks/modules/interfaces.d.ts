@@ -121,6 +121,7 @@ interface ITSConfigFile {
     compilerOptions?: ICompilerOptions;
     files?: string[];
     exclude?: string[];
+    filesGlob?: string[];
 }
 
 // NOTE: This is from tsconfig.ts in atom-typescript

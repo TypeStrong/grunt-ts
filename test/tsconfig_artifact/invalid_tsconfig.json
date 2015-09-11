@@ -1,0 +1,8 @@
+{
+    "version": "1.5.3",
+    "compilerOptions": {
+        "target": "es5",
+        "module": "commonjs",
+        "declaration": false,
+
+PURPOSEFULLY INVALID FILE.

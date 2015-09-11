@@ -25,6 +25,7 @@ test/definitelytypedtest/reference.ts
 !test/commandLineAssertions.js
 !test/optionsResolverTests.js
 .tscache/
+!test/tsconfig/*.json
 bin/
 obj/
 *.user

@@ -26,9 +26,11 @@ function noopTemplateProcessor(templateString: string, options: any) {
   return templateString;
 }
 
-function throwGlobExpander(globs: string[]): string[] {
-  throw new Error('globExpander called, but one was not passsed to resolveAsync.');
+function emptyGlobExpander(globs: string[]): string[] {
+    return [];
 }
+
+(<any>emptyGlobExpander).isStub = true;
 
 export function resolveAsync(rawTaskOptions: ITargetOptions,
                         rawTargetOptions: ITargetOptions,
@@ -49,7 +51,7 @@ export function resolveAsync(rawTaskOptions: ITargetOptions,
     if (theGlobExpander && typeof theGlobExpander === 'function') {
         globExpander = theGlobExpander;
     } else {
-        globExpander = throwGlobExpander;
+        globExpander = emptyGlobExpander;
     }
 
     fixMissingOptions(rawTaskOptions);
