@@ -1,4 +1,5 @@
 var commandLineAssertions = require('./test/commandLineAssertions');
+var utils = require('./tasks/modules/utils');
 
 module.exports = function (grunt) {
     'use strict';
@@ -875,7 +876,6 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-continue');
     grunt.loadNpmTasks('grunt-contrib-nodeunit');
     grunt.loadNpmTasks('grunt-contrib-watch');
-
     grunt.loadNpmTasks('grunt-debug-task');
 
     // Build
@@ -884,7 +884,7 @@ module.exports = function (grunt) {
 
     // Test
     grunt.registerTask('fail', ['continueOn', 'test_fail', 'continueOff']);
-    grunt.registerTask('test', ['test_all', 'fail', 'nodeunit:fast', 'nodeunit:slow',
+    grunt.registerTask('test', ['stageFiles', 'test_all', 'fail', 'nodeunit:fast', 'nodeunit:slow',
       'tslint:transformedHtml', 'clean:testPost']);
 
     // Release
@@ -955,6 +955,17 @@ module.exports = function (grunt) {
     grunt.registerTask('report-time-elapsed','Reports the time elapsed since gruntStartedTimestamp', function() {
         var seconds = ((new Date().getTime()) - gruntStartedTimestamp) / 1000;
         console.log(('Your "Grunt work" took ' + seconds.toFixed(2) + ' seconds.').green);
+        return true;
+    });
+
+    grunt.registerTask('stageFiles','Ensures that certain files that are cleaned will be present for the tests.',
+      function() {
+        try {
+            utils.copyFileSync('test/tsconfig_artifact/tsconfig-grunt-ts.json','test/tsconfig/tsconfig-grunt-ts.json');
+        } catch (ex) {
+            console.log(ex);
+            return false;
+        }
         return true;
     });
 };
