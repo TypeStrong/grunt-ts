@@ -27,7 +27,8 @@ module.exports = function (grunt) {
                 'src/b.js',
                 'src/c.js',
                 'src/reference.js',
-                '**/.baseDir.ts'
+                '**/.baseDir.ts',
+                'test/tsconfig/*.json'
             ]
         },
         jshint: {

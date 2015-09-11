@@ -9,6 +9,7 @@ import * as utils from './utils';
 
 let templateProcessor: (templateString: string, options: any) => string = null;
 let globExpander: (globs: string[]) => string[] = null;
+let gruntfileGlobs : string[] = null;
 
 export function resolveAsync(applyTo: IGruntTSOptions,
   taskOptions: ITargetOptions,
@@ -18,6 +19,7 @@ export function resolveAsync(applyTo: IGruntTSOptions,
 
   templateProcessor = theTemplateProcessor;
   globExpander = theGlobExpander;
+  gruntfileGlobs = getGlobs(taskOptions, targetOptions);
 
   return new Promise<IGruntTSOptions>((resolve, reject) => {
 
@@ -97,6 +99,17 @@ export function resolveAsync(applyTo: IGruntTSOptions,
 
     resolve(applyTo);
   });
+}
+
+function getGlobs(taskOptions: ITargetOptions, targetOptions: ITargetOptions) {
+  let globs = null;
+  if (taskOptions && (<any>taskOptions).src) {
+    globs = (<any>taskOptions).src;
+  }
+  if (targetOptions && (<any>targetOptions).src) {
+    globs = (<any>targetOptions).src;
+  }
+  return globs;
 }
 
 function resolve_out_and_outDir(options: IGruntTSOptions, projectSpec: ITSConfigFile) {
@@ -186,12 +199,36 @@ function applyCompilerOptions(applyTo: IGruntTSOptions, projectSpec: ITSConfigFi
   }
 
   const src = applyTo.CompilationTasks[0].src;
+  const absolutePathToTSConfig = path.resolve(tsconfig.tsconfig, '..');
 
-  if (tsconfig.updateFiles && projectSpec.filesGlob) {
-    updateTSConfigAndFilesFromGlob(projectSpec.files, projectSpec.filesGlob, tsconfig.tsconfig );
+  if (tsconfig.overwriteFilesGlob) {
+    if (!gruntfileGlobs) {
+      throw new Error('The tsconfig option overwriteFilesGlob is set to true, but no glob was passed-in.');
+    }
+
+    const relativePathFromGruntfileToTSConfig = path.relative('.', absolutePathToTSConfig).replace(/\\/g, '/');
+    const gruntGlobsRelativeToTSConfig: string[] = [];
+    for (let i = 0; i < gruntfileGlobs.length; i += 1) {
+        gruntfileGlobs[i] = gruntfileGlobs[i].replace(/\\/g, '/');
+        gruntGlobsRelativeToTSConfig.push(path.relative(relativePathFromGruntfileToTSConfig, gruntfileGlobs[i]).replace(/\\/g, '/'));
+    }
+
+    if (_.difference(projectSpec.filesGlob, gruntGlobsRelativeToTSConfig).length > 0 ||
+        _.difference(gruntGlobsRelativeToTSConfig, projectSpec.filesGlob).length > 0) {
+          projectSpec.filesGlob = gruntGlobsRelativeToTSConfig;
+          if (projectSpec.files) {
+            projectSpec.files = [];
+          }
+          saveTSConfigSync(tsconfig.tsconfig, projectSpec);
+    }
   }
 
-  const absolutePathToTSConfig = path.resolve(tsconfig.tsconfig, '..');
+  if (tsconfig.updateFiles && projectSpec.filesGlob) {
+    if (projectSpec.files === undefined) {
+      projectSpec.files = [];
+    }
+    updateTSConfigAndFilesFromGlob(projectSpec.files, projectSpec.filesGlob, tsconfig.tsconfig );
+  }
 
   if (projectSpec.files) {
     addUniqueRelativeFilesToSrc(projectSpec.files, src, absolutePathToTSConfig);
@@ -229,7 +266,7 @@ function applyCompilerOptions(applyTo: IGruntTSOptions, projectSpec: ITSConfigFi
 function updateTSConfigAndFilesFromGlob(filesRelativeToTSConfig: string[],
       globRelativeToTSConfig: string[], tsconfigFileName: string) {
 
-    if (!(<any>globExpander).isStub) {
+    if ((<any>globExpander).isStub) {
       return;
     }
 
@@ -248,10 +285,11 @@ function updateTSConfigAndFilesFromGlob(filesRelativeToTSConfig: string[],
       const relativePathFromGruntfileToTSConfig = path.relative('.', absolutePathToTSConfig).replace(/\\/g, '/');
       for (let i = 0; i < filesRelativeToGruntfile.length; i += 1) {
         filesRelativeToGruntfile[i] = filesRelativeToGruntfile[i].replace(/\\/g, '/');
-        filesRelativeToTSConfig_temp.push(path.relative(relativePathFromGruntfileToTSConfig, filesRelativeToGruntfile[i]));
+        filesRelativeToTSConfig_temp.push(path.relative(relativePathFromGruntfileToTSConfig, filesRelativeToGruntfile[i]).replace(/\\/g, '/'));
       }
 
-      filesRelativeToTSConfig = filesRelativeToTSConfig_temp;
+      filesRelativeToTSConfig.length = 0;
+      filesRelativeToTSConfig.push(...filesRelativeToTSConfig_temp);
     }
 
     const tsconfigJSONContent = utils.readAndParseJSONFromFileSync(tsconfigFileName);

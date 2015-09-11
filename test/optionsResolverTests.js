@@ -112,7 +112,10 @@ var config = {
     },
     "tsconfig test exclude": {
         tsconfig: 'test/tsconfig/test_exclude_tsconfig.json'
-    }
+    },
+    "zoo": {
+        src: ["test/simple/ts/**/*.ts"]
+    },
 };
 function getConfig(name, asCopy) {
     if (asCopy === void 0) { asCopy = false; }
@@ -547,6 +550,23 @@ exports.tests = {
             test.strictEqual(resultingTSConfig.files.length, 2, 'Expected two files.');
             test.ok(resultingTSConfig.files.indexOf('otherFiles/other.ts') >= 0);
             test.ok(resultingTSConfig.files.indexOf('files/validtsconfig.ts') >= 0);
+            test.done();
+        }).catch(function (err) { test.ifError(err); test.done(); });
+    },
+    "option overwriteFilesGlob updates the filesGlob and the new glob results are included": function (test) {
+        test.expect(5);
+        var cfg = getConfig("zoo", true);
+        cfg.tsconfig = {
+            tsconfig: './test/tsconfig/simple_filesGlob_tsconfig.json',
+            overwriteFilesGlob: true
+        };
+        var result = or.resolveAsync(null, cfg, "", null, null, grunt.file.expand).then(function (result) {
+            test.ok(result.CompilationTasks[0].src.indexOf('test/simple/ts/zoo.ts') >= 0, 'expected to find zoo.ts');
+            test.strictEqual(result.CompilationTasks[0].src.length, 1);
+            var resultingTSConfig = utils.readAndParseJSONFromFileSync(cfg.tsconfig.tsconfig);
+            test.strictEqual(resultingTSConfig.filesGlob[0], '../simple/ts/**/*.ts');
+            test.ok(resultingTSConfig.files.indexOf('../simple/ts/zoo.ts') >= 0);
+            test.strictEqual(resultingTSConfig.files.length, 1, 'expected a single item in the files array');
             test.done();
         }).catch(function (err) { test.ifError(err); test.done(); });
     }
