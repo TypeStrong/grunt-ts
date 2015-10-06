@@ -365,4 +365,12 @@ function readAndParseJSONFromFileSync(fileName, encoding) {
     return result;
 }
 exports.readAndParseJSONFromFileSync = readAndParseJSONFromFileSync;
+function shouldCompile(options) {
+    return !!options.compile;
+}
+exports.shouldCompile = shouldCompile;
+function shouldPassThrough(options) {
+    return (options.tsconfig && options.tsconfig.passThrough);
+}
+exports.shouldPassThrough = shouldPassThrough;
 //# sourceMappingURL=utils.js.map

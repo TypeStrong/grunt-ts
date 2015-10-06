@@ -349,8 +349,8 @@ function pluginFn(grunt: IGrunt) {
                     currentFiles.src = filesToCompile;
 
                     // Return promise to compliation
-                    if (options.compile) {
-                        if (filesToCompile.length > 0 || options.testExecute) {
+                    if (utils.shouldCompile(options)) {
+                        if (filesToCompile.length > 0 || options.testExecute || utils.shouldPassThrough(options)) {
                             return runCompilation(options, currentFiles).then((success: boolean) => {
                                 return success;
                             });

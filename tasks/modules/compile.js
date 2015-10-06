@@ -82,7 +82,7 @@ function compileAllFiles(options, compilationInfo) {
         }
         else {
             newFiles = getChangedFiles(files, options.targetName);
-            if (newFiles.length !== 0 || options.testExecute) {
+            if (newFiles.length !== 0 || options.testExecute || utils.shouldPassThrough(options)) {
                 files = newFiles;
                 // If outDir is specified but no baseDir is specified we need to determine one
                 if (compilationInfo.outDir && !options.baseDir) {

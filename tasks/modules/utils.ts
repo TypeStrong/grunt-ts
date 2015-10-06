@@ -387,3 +387,12 @@ export function readAndParseJSONFromFileSync(fileName: string, encoding = 'utf8'
 
   return result;
 }
+
+
+export function shouldCompile(options: IGruntTSOptions) {
+  return !!options.compile;
+}
+
+export function shouldPassThrough(options: IGruntTSOptions) {
+  return (options.tsconfig && (<ITSConfigSupport>options.tsconfig).passThrough);
+}

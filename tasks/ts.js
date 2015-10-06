@@ -283,8 +283,8 @@ function pluginFn(grunt) {
                     transformers.transformFiles(filesToCompile /*TODO: only unchanged files*/, filesToCompile, options);
                     currentFiles.src = filesToCompile;
                     // Return promise to compliation
-                    if (options.compile) {
-                        if (filesToCompile.length > 0 || options.testExecute) {
+                    if (utils.shouldCompile(options)) {
+                        if (filesToCompile.length > 0 || options.testExecute || utils.shouldPassThrough(options)) {
                             return runCompilation(options, currentFiles).then(function (success) {
                                 return success;
                             });
