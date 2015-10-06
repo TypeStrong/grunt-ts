@@ -106,6 +106,7 @@ module.exports = function (grunt) {
             },
             out_with_spaces: {
                 test: true,
+                testExecute: commandLineAssertions.out_with_spaces,
                 options: {
                     fast: 'never',
                     sourceMap: false

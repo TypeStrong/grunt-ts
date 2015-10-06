@@ -263,9 +263,11 @@ function compileAllFiles(options, compilationInfo) {
         throw (new Error('cannot create temp file'));
     }
     fs.writeFileSync(tempfilename, args.join(' '));
+    var command;
     // Switch implementation if a test version of executeNode exists.
     if ('testExecute' in options) {
         if (_.isFunction(options.testExecute)) {
+            command = [tsc, args.join(' ')];
             executeNode = options.testExecute;
         }
         else {
@@ -276,10 +278,11 @@ function compileAllFiles(options, compilationInfo) {
     }
     else {
         // this is the normal path.
+        command = [tsc, '@' + tempfilename];
         executeNode = executeNodeDefault;
     }
     // Execute command
-    return executeNode([tsc, '@' + tempfilename], options).then(function (result) {
+    return executeNode(command, options).then(function (result) {
         if (options.fast !== 'never' && result.code === 0) {
             resetChangedFiles(newFiles, options.targetName);
         }

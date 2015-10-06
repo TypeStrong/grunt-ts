@@ -330,4 +330,16 @@ exports.bad_sourcemap_option = function (strings, options) {
         throw "expected to see a warning for bad sourceMap option.";
     });
 };
+exports.out_with_spaces = function (strings, options) {
+    return new Promise(function (resolve, reject) {
+        var command = strings[1];
+        if (command.indexOf('--out "test/out with spaces/out with spaces.js"') > -1) {
+            resolve({
+                code: 0,
+                output: ""
+            });
+        }
+        throw "expected to see relative path to out with spaces.js surrounded in quotes.";
+    });
+};
 //# sourceMappingURL=commandLineAssertions.js.map

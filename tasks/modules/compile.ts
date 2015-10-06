@@ -304,9 +304,12 @@ export function compileAllFiles(options: IGruntTSOptions, compilationInfo: IGrun
 
     fs.writeFileSync(tempfilename, args.join(' '));
 
+    let command: string[];
+
     // Switch implementation if a test version of executeNode exists.
     if ('testExecute' in options) {
         if (_.isFunction(options.testExecute)) {
+            command = [tsc, args.join(' ')];
             executeNode = options.testExecute;
         } else {
             const invalidTestExecuteError = 'Invalid testExecute node present on target "' +
@@ -315,11 +318,12 @@ export function compileAllFiles(options: IGruntTSOptions, compilationInfo: IGrun
         }
     } else {
       // this is the normal path.
+      command = [tsc, '@' + tempfilename];
       executeNode = executeNodeDefault;
     }
 
     // Execute command
-    return executeNode([tsc, '@' + tempfilename], options).then((result: ICompileResult) => {
+    return executeNode(command, options).then((result: ICompileResult) => {
 
         if (options.fast !== 'never' && result.code === 0) {
             resetChangedFiles(newFiles, options.targetName);

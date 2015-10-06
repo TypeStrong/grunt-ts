@@ -359,3 +359,17 @@ export var bad_sourcemap_option: ICompilePromise = (strings, options) => {
     throw `expected to see a warning for bad sourceMap option.`;
   });
 };
+
+export var out_with_spaces: ICompilePromise = (strings, options) => {
+  return new Promise(function(resolve, reject) {
+
+    const command = strings[1];
+    if (command.indexOf('--out "test/out with spaces/out with spaces.js"') > -1) {
+      resolve({
+        code: 0,
+        output: ""
+      });
+    }
+    throw `expected to see relative path to out with spaces.js surrounded in quotes.`;
+  });
+};
