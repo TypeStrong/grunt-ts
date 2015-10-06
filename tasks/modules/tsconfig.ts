@@ -234,14 +234,29 @@ function applyCompilerOptions(applyTo: IGruntTSOptions, projectSpec: ITSConfigFi
     addUniqueRelativeFilesToSrc(projectSpec.files, src, absolutePathToTSConfig);
   } else {
     if (!(<any>globExpander).isStub) {
-      // if files is not specified, default to including *.ts and *.tsx in folder and subfolders.
-      const virtualGlob = [path.resolve(absolutePathToTSConfig, './**/*.ts'),
-                        path.resolve(absolutePathToTSConfig, './**/*.tsx')];
+
+      const virtualGlob: string[] = [];
+
       if (projectSpec.exclude && _.isArray(projectSpec.exclude)) {
-          projectSpec.exclude.forEach(exc => {
-            virtualGlob.push('!' + path.resolve(absolutePathToTSConfig, exc, './**/*.ts'));
-            virtualGlob.push('!' + path.resolve(absolutePathToTSConfig, exc, './**/*.tsx'));
-          });
+        virtualGlob.push(path.resolve(absolutePathToTSConfig, './*.ts'));
+        virtualGlob.push(path.resolve(absolutePathToTSConfig, './*.tsx'));
+
+        const tsconfigExcludedDirectories: string[] = [];
+        projectSpec.exclude.forEach(exc => {
+          tsconfigExcludedDirectories.push(path.normalize(path.join(absolutePathToTSConfig, exc)));
+        });
+        fs.readdirSync(absolutePathToTSConfig).forEach(item => {
+            const filePath = path.normalize(path.join(absolutePathToTSConfig, item));
+            if (fs.statSync(filePath).isDirectory()) {
+              if (tsconfigExcludedDirectories.indexOf(filePath) === -1) {
+                virtualGlob.push(path.resolve(absolutePathToTSConfig, item, './**/*.ts'));
+                virtualGlob.push(path.resolve(absolutePathToTSConfig, item, './**/*.tsx'));
+              }
+            }
+        });
+      } else {
+        virtualGlob.push(path.resolve(absolutePathToTSConfig, './**/*.ts'));
+        virtualGlob.push(path.resolve(absolutePathToTSConfig, './**/*.tsx'));
       }
 
       const files = globExpander(virtualGlob);

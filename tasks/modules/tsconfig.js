@@ -206,14 +206,27 @@ function applyCompilerOptions(applyTo, projectSpec) {
     }
     else {
         if (!globExpander.isStub) {
-            // if files is not specified, default to including *.ts and *.tsx in folder and subfolders.
-            var virtualGlob = [path.resolve(absolutePathToTSConfig, './**/*.ts'),
-                path.resolve(absolutePathToTSConfig, './**/*.tsx')];
+            var virtualGlob = [];
             if (projectSpec.exclude && _.isArray(projectSpec.exclude)) {
+                virtualGlob.push(path.resolve(absolutePathToTSConfig, './*.ts'));
+                virtualGlob.push(path.resolve(absolutePathToTSConfig, './*.tsx'));
+                var tsconfigExcludedDirectories = [];
                 projectSpec.exclude.forEach(function (exc) {
-                    virtualGlob.push('!' + path.resolve(absolutePathToTSConfig, exc, './**/*.ts'));
-                    virtualGlob.push('!' + path.resolve(absolutePathToTSConfig, exc, './**/*.tsx'));
+                    tsconfigExcludedDirectories.push(path.normalize(path.join(absolutePathToTSConfig, exc)));
                 });
+                fs.readdirSync(absolutePathToTSConfig).forEach(function (item) {
+                    var filePath = path.normalize(path.join(absolutePathToTSConfig, item));
+                    if (fs.statSync(filePath).isDirectory()) {
+                        if (tsconfigExcludedDirectories.indexOf(filePath) === -1) {
+                            virtualGlob.push(path.resolve(absolutePathToTSConfig, item, './**/*.ts'));
+                            virtualGlob.push(path.resolve(absolutePathToTSConfig, item, './**/*.tsx'));
+                        }
+                    }
+                });
+            }
+            else {
+                virtualGlob.push(path.resolve(absolutePathToTSConfig, './**/*.ts'));
+                virtualGlob.push(path.resolve(absolutePathToTSConfig, './**/*.tsx'));
             }
             var files = globExpander(virtualGlob);
             // make files relative to the tsconfig.json file
