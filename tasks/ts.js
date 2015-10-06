@@ -187,8 +187,14 @@ function pluginFn(grunt) {
                             // Report successful build.
                             var time = (endtime - starttime) / 1000;
                             grunt.log.writeln('');
-                            grunt.log.writeln(('TypeScript compilation complete: ' + time.toFixed(2) +
-                                's for ' + result.fileCount + ' typescript files').green);
+                            var message = 'TypeScript compilation complete: ' + time.toFixed(2) + 's';
+                            if (utils.shouldPassThrough(options)) {
+                                message += ' for TypeScript pass-through.';
+                            }
+                            else {
+                                message += ' for ' + result.fileCount + ' TypeScript files.';
+                            }
+                            grunt.log.writeln(message.green);
                         }
                         else {
                             // Report unsuccessful build.

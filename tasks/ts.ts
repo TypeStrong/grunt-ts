@@ -230,8 +230,13 @@ function pluginFn(grunt: IGrunt) {
                             // Report successful build.
                             let time = (endtime - starttime) / 1000;
                             grunt.log.writeln('');
-                            grunt.log.writeln(('TypeScript compilation complete: ' + time.toFixed(2) +
-                                's for ' + result.fileCount + ' typescript files').green);
+                            let message = 'TypeScript compilation complete: ' + time.toFixed(2) + 's';
+                            if (utils.shouldPassThrough(options)) {
+                              message += ' for TypeScript pass-through.';
+                            } else {
+                              message += ' for ' + result.fileCount + ' TypeScript files.';
+                            }
+                            grunt.log.writeln(message.green);
                         } else {
                             // Report unsuccessful build.
                             grunt.log.error(('Error: tsc return code: ' + result.code).yellow);
