@@ -487,3 +487,23 @@ export const files_testWarnIfFilesHasDestArray: ICompilePromise = (strings, opti
       `There should be no commas in the command line (which would indicate the array was passed as an array).`;
   });
 };
+
+export const warnbothcomments: ICompilePromise = (strings, options) => {
+  return new Promise(function(resolve, reject) {
+
+    const command = strings[1].replace(/\\/g,'/');
+    const expectedWarning = `WARNING: Option "comments" and "removeComments" should not be used together.  ` +
+      `The --removeComments value of false supercedes the --comments value of true`;
+
+    if (command.indexOf('test/abtest/reference.ts') > -1 &&
+        command.indexOf('comments') === -1 &&
+        command.indexOf('remove') === -1 &&
+        options.warnings.indexOf(expectedWarning) > -1) {
+      resolve({
+        code: 0,
+        output: ""
+      });
+    }
+    throw `expected to not see removeComments passed.`;
+  });
+};

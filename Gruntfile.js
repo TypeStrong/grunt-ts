@@ -377,6 +377,7 @@ module.exports = function (grunt) {
             },
             warnbothcomments: {
                 test: true,
+                testExecute: commandLineAssertions.warnbothcomments,
                 src: ['test/abtest/**/*.ts'],
                 reference: 'test/abtest/reference.ts',
                 out: 'test/abtest/out.js',

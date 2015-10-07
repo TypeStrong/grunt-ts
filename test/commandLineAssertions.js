@@ -441,4 +441,21 @@ exports.files_testWarnIfFilesHasDestArray = function (strings, options) {
             "There should be no commas in the command line (which would indicate the array was passed as an array).";
     });
 };
+exports.warnbothcomments = function (strings, options) {
+    return new Promise(function (resolve, reject) {
+        var command = strings[1].replace(/\\/g, '/');
+        var expectedWarning = "WARNING: Option \"comments\" and \"removeComments\" should not be used together.  " +
+            "The --removeComments value of false supercedes the --comments value of true";
+        if (command.indexOf('test/abtest/reference.ts') > -1 &&
+            command.indexOf('comments') === -1 &&
+            command.indexOf('remove') === -1 &&
+            options.warnings.indexOf(expectedWarning) > -1) {
+            resolve({
+                code: 0,
+                output: ""
+            });
+        }
+        throw "expected to not see removeComments passed.";
+    });
+};
 //# sourceMappingURL=commandLineAssertions.js.map
