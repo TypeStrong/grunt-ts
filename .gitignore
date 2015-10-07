@@ -23,7 +23,9 @@ test/definitelytypedtest/reference.ts
 !test/expected/**/*.js
 !test/expected/**/*.map
 !test/commandLineAssertions.js
+!test/optionsResolverTests.js
 .tscache/
+!test/tsconfig/*.json
 bin/
 obj/
 *.user

@@ -3,6 +3,7 @@ var path = require('path');
 var fs = require('fs');
 var util = require('util');
 var _ = require('lodash');
+var es6_promise_1 = require('es6-promise');
 exports.grunt = require('grunt');
 exports.eol = exports.grunt.util.linefeed;
 function newLineIsRedundant(newLineParameter) {
@@ -260,7 +261,7 @@ function firstElementWithValue(elements, defaultResult) {
     if (defaultResult === void 0) { defaultResult = null; }
     var result = defaultResult;
     _.each(elements, function (item) {
-        if (!_.isNull(item) && !_.isUndefined(item)) {
+        if (hasValue(item)) {
             result = item;
             return false; // break out of lodash loop
         }
@@ -268,6 +269,10 @@ function firstElementWithValue(elements, defaultResult) {
     return result;
 }
 exports.firstElementWithValue = firstElementWithValue;
+function hasValue(thing) {
+    return !_.isNull(thing) && !_.isUndefined(thing);
+}
+exports.hasValue = hasValue;
 function getOrGetFirst(getFrom) {
     if (_.isArray(getFrom)) {
         if (getFrom.length > 0) {
@@ -278,4 +283,94 @@ function getOrGetFirst(getFrom) {
     return getFrom;
 }
 exports.getOrGetFirst = getOrGetFirst;
+function escapePathIfRequired(path) {
+    if (!path || !path.indexOf) {
+        return path;
+    }
+    if (path.indexOf(' ') === -1) {
+        return path;
+    }
+    else {
+        var newPath = path.trim();
+        if (newPath.indexOf('"') === 0 && newPath.lastIndexOf('"') === newPath.length - 1) {
+            return newPath;
+        }
+        else {
+            return '"' + newPath + '"';
+        }
+    }
+}
+exports.escapePathIfRequired = escapePathIfRequired;
+/**
+ * Time a function and print the result.
+ *
+ * @param makeIt the code to time
+ * @returns the result of the block of code
+ */
+function timeIt(makeIt) {
+    var starttime = new Date().getTime();
+    var it = makeIt();
+    var endtime = new Date().getTime();
+    return {
+        it: it,
+        time: endtime - starttime
+    };
+}
+exports.timeIt = timeIt;
+/**
+ * Run a map operation async in series (simplified)
+ */
+function asyncSeries(items, callPerItem) {
+    items = items.slice(0);
+    var memo = [];
+    // Run one at a time
+    return new es6_promise_1.Promise(function (resolve, reject) {
+        var next = function () {
+            if (items.length === 0) {
+                resolve(memo);
+                return;
+            }
+            es6_promise_1.Promise
+                .cast(callPerItem(items.shift()))
+                .then(function (result) {
+                memo.push(result);
+                next();
+            }, reject);
+        };
+        next();
+    });
+}
+exports.asyncSeries = asyncSeries;
+function copyFileSync(srcFile, destFile, encoding) {
+    if (encoding === void 0) { encoding = 'utf8'; }
+    var content = fs.readFileSync(srcFile, encoding);
+    fs.writeFileSync(destFile, content, encoding);
+}
+exports.copyFileSync = copyFileSync;
+function readAndParseJSONFromFileSync(fileName, encoding) {
+    if (encoding === void 0) { encoding = 'utf8'; }
+    var textContent, result;
+    try {
+        textContent = fs.readFileSync(fileName, encoding);
+    }
+    catch (ex) {
+        throw new Error("Error reading file " + fileName + ": " + ex);
+    }
+    try {
+        result = JSON.parse(textContent);
+    }
+    catch (ex) {
+        throw new Error("Error parsing JSON in file " + fileName + ": " + ex);
+    }
+    return result;
+}
+exports.readAndParseJSONFromFileSync = readAndParseJSONFromFileSync;
+function shouldCompile(options) {
+    return !!options.compile;
+}
+exports.shouldCompile = shouldCompile;
+function shouldPassThrough(options) {
+    return (options.tsconfig && options.tsconfig.passThrough);
+}
+exports.shouldPassThrough = shouldPassThrough;
 //# sourceMappingURL=utils.js.map

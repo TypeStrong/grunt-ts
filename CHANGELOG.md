@@ -1,6 +1,26 @@
 # Releases
 
-## Next
+## v5.0.0 (2015-10-07)
+Version 5 of grunt-ts represents a major overhaul of the options resolution system.  More than 100 new tests have been added, so this should be the highest quality version of grunt-ts yet.  Also, many integration tests have been rewritten as "heavy unit tests" (meaning they call into grunt-ts from grunt, but don't actually call `tsc`, so they run in ~0.02 sec).  This allows validation of grunt-ts warnings, and assertion of exact command line parameters.  Even though testing quality has gone up *significantly*, the overall time to run `grunt release` on grunt-ts itself has dropped from 184 seconds to 112 seconds - a 64% improvement.
+* FEAT: Added support for `tsconfig.json` [#202](https://github.com/TypeStrong/grunt-ts/issues/202).  Supports maintenance of `files` property and optional TypeStrong custom `filesGlob` extension.
+* NOTE: Upgrade to TypeScript 1.6 was out of scope for version 5.0 - that will be part of version 5.1 which should be available soon.
+* NOTE: Significant use of ES6 features throughout - let & const, ES6 imports, destructuring, etc.
+* CHORE: Upgraded to tslint v2.4.0.
+* CHORE: Upgraded to csproj2ts v0.0.4.
+* NOTE: Added dependency on strip-bom npm package.
+* CHORE: Updated several definition files including nodeunit, NodeJS, and es6-promises.
+* CHORE: 'use strict' throughout.
+* CHORE: Upgraded to csproj2ts v0.0.4.
+* FIX: Will now provide warning if `sourcemap` is used; should be `sourceMap`.  This issue will be auto-resolved.
+* FIX: Templates in grunt targets should always be resolved consistently now [#273](https://github.com/TypeStrong/grunt-ts/issues/273).  Thanks for the report, @bjorm.
+* FIX: html2ts should now honor the `outdir` setting [#271](https://github.com/TypeStrong/grunt-ts/issues/271).  Thanks for the report, @hoeni.
+* FIX: Target options should always work properly in conjunction with the `vs` option [#264](https://github.com/TypeStrong/grunt-ts/issues/264).  Thanks for the report, @vtkalek.
+* FIX: Task and target-level options should always override consistently now [#248](https://github.com/TypeStrong/grunt-ts/issues/248).
+* FIX: out and outDir in VS projects will now work consistently between grunt-ts and Visual Studio; the paths will resolve to be relative to the gruntfile even if the VS project is not in the same folder.
+
+* If `vs` is used with `files`, there will still be a warning, but grunt-ts will now append the files from the Visual Studio project to the result of each files glob.  Previously it would compile the Visual Studio project files only (once per files entry).
+* Fixed several broken warnings such as using an array for `dest` with `files`.
+
 
 ## v4.2.0 (2015-07-21)
 * FEAT: TypeScript 1.5.3 support (TypeScript 1.5 "RTM").

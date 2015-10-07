@@ -1,4 +1,5 @@
 var commandLineAssertions = require('./test/commandLineAssertions');
+var utils = require('./tasks/modules/utils');
 
 module.exports = function (grunt) {
     'use strict';
@@ -7,6 +8,7 @@ module.exports = function (grunt) {
 
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
+        vsproj_path: 'test/vsproj',
         clean: {
             test: [
                 'test/**/*.js',
@@ -26,7 +28,8 @@ module.exports = function (grunt) {
                 'src/b.js',
                 'src/c.js',
                 'src/reference.js',
-                '**/.baseDir.ts'
+                '**/.baseDir.ts',
+                'test/tsconfig/*.json'
             ]
         },
         jshint: {
@@ -51,19 +54,20 @@ module.exports = function (grunt) {
                 target: 'es5',
                 module: 'commonjs',
                 comments: true,
-                sourcemap: true,
+                sourceMap: true,
                 verbose: true,
                 fast: 'always'
             },
             build: {
-                src: ['tasks/**/*.ts', 'test/commandLineAssertions.ts']
+                src: ['tasks/**/*.ts']
             },
             test: {
-                src: ['test/test.ts']
+                src: ['test/test.ts', 'test/commandLineAssertions.ts', 'test/optionsResolverTests.ts']
             }
         },
         nodeunit: {
-            tests: ['test/test.js']
+            slow: ['test/test.js'],
+            fast: ['test/optionsResolverTests.js']
         },
         watch: {
             dev: {
@@ -87,14 +91,14 @@ module.exports = function (grunt) {
                 out: 'test/work/out.js',
                 // Override the default options, see : http://gruntjs.com/configuring-tasks#options
                 options: {
-                    sourcemap: true,
+                    sourceMap: true,
                     declaration: true,
                 },
             },
             simple: {
                 test: true,
                 options: {
-                    sourcemap: true,
+                    sourceMap: true,
                     declaration: true
                 },
                 src: ['test/simple/ts/zoo.ts'],
@@ -102,18 +106,29 @@ module.exports = function (grunt) {
             },
             out_with_spaces: {
                 test: true,
+                testExecute: commandLineAssertions.out_with_spaces,
                 options: {
                     fast: 'never',
-                    sourcemap: false
+                    sourceMap: false
                 },
                 src: ['test/simple/ts/zoo.ts'],
                 out: 'test/out with spaces/out with spaces.js'
+            },
+            bad_sourcemap_option: {
+                test: true,
+                testExecute: commandLineAssertions.bad_sourcemap_option,
+                options: {
+                    fast: 'never',
+                    sourcemap: true // should be sourceMap
+                },
+                src: ['test/simple/ts/zoo.ts'],
+                out: 'test/badSourceMap.js'
             },
             outDir_with_spaces: {
                 test: true,
                 options: {
                     fast: 'never',
-                    sourcemap: false
+                    sourceMap: false
                 },
                 src: ['test/simple/ts/zoo.ts'],
                 outDir: 'test/out with spaces'
@@ -152,6 +167,7 @@ module.exports = function (grunt) {
             },
             files_showWarningIfFilesIsUsedWithSrcOrOut: {
                 test: true,
+                testExecute: commandLineAssertions.files_showWarningIfFilesIsUsedWithSrcOrOut,
                 files: [{ src: ['test/multifile/a/**/*.ts'], dest: 'test/multifile/a/out.js' }],
                 src: ['test/multifile/b/**/*.ts'],
                 out: 'test/multifile/a/out.js',
@@ -161,6 +177,7 @@ module.exports = function (grunt) {
             },
             files_showWarningIfFilesIsUsedWithSrcOrOutDir: {
                 test: true,
+                testExecute: commandLineAssertions.files_showWarningIfFilesIsUsedWithSrcOrOutDir,
                 files: [{ src: ['test/multifile/a/**/*.ts'], dest: 'test/multifile/a' }],
                 src: ['test/multifile/b/**/*.ts'],
                 outDir: 'test/multifile/a',
@@ -170,22 +187,16 @@ module.exports = function (grunt) {
             },
             files_showWarningIfFilesIsUsedWithVs: {
                 test: true,
+                testExecute: commandLineAssertions.files_showWarningIfFilesIsUsedWithVs,
                 files: [{ src: ['test/multifile/a/**/*.ts'], dest: 'test/multifile/a' }],
                 vs: 'test/vsproj/testproject.csproj',
                 options: {
                     fast: 'never'
                 }
             },
-            files_showWarningIfFilesIsUsedWithWatch: {
-                //note this should not actually watch.
-                files: [{ src: ['test/multifile/a/**/*.ts'], dest: 'test/multifile/a' }],
-                watch: ['test/multifile/a/**/*.ts'],
-                options: {
-                    fast: 'never'
-                }
-            },
             files_showWarningIfFilesIsUsedWithFast: {
                 test: true,
+                testExecute: commandLineAssertions.files_showWarningIfFilesIsUsedWithFast,
                 files: [{ src: ['test/multifile/a/**/*.ts'], dest: 'test/multifile/a' }],
                 options: {
                     fast: 'always'
@@ -221,16 +232,9 @@ module.exports = function (grunt) {
                 }
             },
             files_testWarnIfFilesHasDestArray: {
-                // TODO: This test is currently broken.  grunt-ts does not warn.
                 test: true,
+                testExecute: commandLineAssertions.files_testWarnIfFilesHasDestArray,
                 files: [{ src: ['test/multifile/a/**/*.ts'], dest: ['test/multifile/a', 'test/multifile/b'] }],
-                options: {
-                    fast: 'never'
-                }
-            },
-            files_testWarnIfFilesIsAnObjectWithSrcOnly: {
-                test: true,
-                files: { src: ['test/multifile/a/**/*.ts']},
                 options: {
                     fast: 'never'
                 }
@@ -250,6 +254,9 @@ module.exports = function (grunt) {
                 src: ['test/abtest/**/*.ts'],
                 reference: 'test/abtest/reference.ts',
                 out: 'test/abtest/out.js',
+                options: {
+                    removeComments: false
+                }
             },
             amdloadersrc: {
                 test: true,
@@ -343,8 +350,37 @@ module.exports = function (grunt) {
                     noImplicitAny: true
                 }
             },
+            variablesReplacedForTSConfig: {
+                test: true,
+                tsconfig: 'test/tsconfig/tsconfig-<%= pkg.name %>.json',
+                testExecute: commandLineAssertions.variablesReplacedForTSConfig
+            },
+            variablesReplacedFor_vs: {
+                test: true,
+                vs: '<%= vsproj_path %>/testproject.csproj',
+                testExecute: commandLineAssertions.variablesReplacedFor_vs
+            },
+            tsconfig_passThrough_onlySendsConfigThrough_WithPathAndAdditional: {
+                test: true,
+                tsconfig: {
+                    tsconfig: 'test/tsconfig',
+                    passThrough: true
+                },
+                options: {
+                    additionalFlags: '--someNewThing'
+                },
+                testExecute: commandLineAssertions.tsconfig_passThrough_onlySendsConfigThrough_WithPathAndAdditional
+            },
+            tsconfig_passThrough_onlySendsConfigThrough_WithoutPath: {
+                test: true,
+                tsconfig: {
+                    passThrough: true
+                },
+                testExecute: commandLineAssertions.tsconfig_passThrough_onlySendsConfigThrough_WithoutPath
+            },
             warnbothcomments: {
                 test: true,
+                testExecute: commandLineAssertions.warnbothcomments,
                 src: ['test/abtest/**/*.ts'],
                 reference: 'test/abtest/reference.ts',
                 out: 'test/abtest/out.js',
@@ -354,8 +390,8 @@ module.exports = function (grunt) {
                     removeComments: false,
                 },
             },
-            htmlSpecifiedButNoTypeScriptSource_ShouldWarn: {
-                test: true,
+            htmlSpecifiedButNoTypeScriptSource_ShouldError: {
+                fail: true,
                 html: ['test/html/**/*.tpl.html'],
                 out: 'test/html/out.js',
             },
@@ -434,7 +470,7 @@ module.exports = function (grunt) {
                     sourceMap: true
                 },
             },
-            templatecache: {
+            templatecache_test: {
                 test: true,
                 src: ['test/templatecache/**/*.ts'],
                 reference: 'test/templatecache/ts/reference.ts',
@@ -549,10 +585,10 @@ module.exports = function (grunt) {
                 baseDir: 'test/fail/ts',
                 // watch: 'test',
                 options: {                  // overide the main options for this target
-                    sourcemap: false
+                    sourceMap: false
                 }
             },
-            failOnTypeErrors: {
+            test_failOnTypeErrors: {
                 fail: true,
                 src: ['test/failontypeerror/**/*.ts'],
                 outDir: 'test/failontypeerror/js',
@@ -614,7 +650,7 @@ module.exports = function (grunt) {
             decoratorMetadataPassed: {
                 test: true,
                 testExecute: commandLineAssertions.decoratorMetadataPassed,
-                src: 'test/simple/ts/zoo.ts',
+                src: 'test/simple/ts/z*o.ts',
                 options: {
                     fast: 'never',
                     target: 'es6',
@@ -758,7 +794,7 @@ module.exports = function (grunt) {
                     fast: 'never',
                     additionalFlags: '--version'
                 }
-            },
+            }
         }
     });
 
@@ -834,7 +870,6 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-continue');
     grunt.loadNpmTasks('grunt-contrib-nodeunit');
     grunt.loadNpmTasks('grunt-contrib-watch');
-
     grunt.loadNpmTasks('grunt-debug-task');
 
     // Build
@@ -843,7 +878,8 @@ module.exports = function (grunt) {
 
     // Test
     grunt.registerTask('fail', ['continueOn', 'test_fail', 'continueOff']);
-    grunt.registerTask('test', ['test_all', 'fail', 'nodeunit', 'tslint:transformedHtml', 'clean:testPost']);
+    grunt.registerTask('test', ['stageFiles', 'test_all', 'fail', 'nodeunit:fast', 'nodeunit:slow',
+      'tslint:transformedHtml', 'clean:testPost']);
 
     // Release
     grunt.registerTask('release', ['build', 'test', 'report-time-elapsed']);
@@ -913,6 +949,17 @@ module.exports = function (grunt) {
     grunt.registerTask('report-time-elapsed','Reports the time elapsed since gruntStartedTimestamp', function() {
         var seconds = ((new Date().getTime()) - gruntStartedTimestamp) / 1000;
         console.log(('Your "Grunt work" took ' + seconds.toFixed(2) + ' seconds.').green);
+        return true;
+    });
+
+    grunt.registerTask('stageFiles','Ensures that certain files that are cleaned will be present for the tests.',
+      function() {
+        try {
+            utils.copyFileSync('test/tsconfig_artifact/tsconfig-grunt-ts.json','test/tsconfig/tsconfig-grunt-ts.json');
+        } catch (ex) {
+            console.log(ex);
+            return false;
+        }
         return true;
     });
 };

@@ -4,6 +4,7 @@ import path = require('path');
 import fs = require('fs');
 import util = require('util');
 import _ = require('lodash');
+import {Promise} from 'es6-promise';
 
 export var grunt: IGrunt = require('grunt');
 export const eol: string = grunt.util.linefeed;
@@ -272,16 +273,19 @@ function _checkExcludeArgument(exclude) {
     return exclude;
 }
 
-
 export function firstElementWithValue<T>(elements: T[], defaultResult: T = null): T {
     var result: T = defaultResult;
     _.each(elements, (item) => {
-        if (!_.isNull(item) && !_.isUndefined(item)) {
+        if (hasValue(item)) {
             result = item;
             return false; // break out of lodash loop
         }
     });
     return result;
+}
+
+export function hasValue(thing: any) {
+    return !_.isNull(thing) && !_.isUndefined(thing);
 }
 
 export function getOrGetFirst(getFrom: string | string[]) : string {
@@ -292,4 +296,103 @@ export function getOrGetFirst(getFrom: string | string[]) : string {
     return '';
   }
   return <string>getFrom;
+}
+
+export function escapePathIfRequired(path: string): string {
+  if (!path || !path.indexOf) {
+    return path;
+  }
+  if (path.indexOf(' ') === -1) {
+      return path;
+  } else {
+    const newPath = path.trim();
+    if (newPath.indexOf('"') === 0 && newPath.lastIndexOf('"') === newPath.length - 1) {
+      return newPath;
+    } else {
+      return '"' + newPath + '"';
+    }
+  }
+}
+
+/**
+ * Time a function and print the result.
+ *
+ * @param makeIt the code to time
+ * @returns the result of the block of code
+ */
+export function timeIt<R>(makeIt: () => R): {
+    /**
+     * The result of the computation
+     */
+    it: R;
+    /**
+     * Time in milliseconds.
+     */
+    time: number;
+} {
+    var starttime = new Date().getTime();
+    var it = makeIt();
+    var endtime = new Date().getTime();
+    return {
+        it: it,
+        time: endtime - starttime
+    };
+}
+
+/**
+ * Run a map operation async in series (simplified)
+ */
+export function asyncSeries<U, W>(items: U[], callPerItem: (item: U) => Promise<W>): Promise<W[]> {
+    items = items.slice(0);
+
+    const memo: W[] = [];
+
+    // Run one at a time
+    return new Promise((resolve, reject) => {
+        const next = () => {
+            if (items.length === 0) {
+                resolve(memo);
+                return;
+            }
+            (<any>Promise)
+              .cast(callPerItem(items.shift()))
+              .then((result: W) => {
+                memo.push(result);
+                next();
+            }, reject);
+        };
+        next();
+    });
+}
+
+export function copyFileSync(srcFile: string, destFile: string, encoding = 'utf8') {
+  var content = fs.readFileSync(srcFile, encoding);
+  fs.writeFileSync(destFile, content, encoding);
+}
+
+export function readAndParseJSONFromFileSync(fileName: string, encoding = 'utf8') : any {
+
+  let textContent: string, result: any;
+  try {
+    textContent = fs.readFileSync(fileName, encoding);
+  } catch (ex) {
+    throw new Error(`Error reading file ${fileName}: ${ex}`);
+  }
+
+  try {
+     result = JSON.parse(textContent);
+  } catch (ex) {
+    throw new Error(`Error parsing JSON in file ${fileName}: ${ex}`);
+  }
+
+  return result;
+}
+
+
+export function shouldCompile(options: IGruntTSOptions) {
+  return !!options.compile;
+}
+
+export function shouldPassThrough(options: IGruntTSOptions) {
+  return (options.tsconfig && (<ITSConfigSupport>options.tsconfig).passThrough);
 }

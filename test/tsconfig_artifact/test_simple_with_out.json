@@ -1,0 +1,14 @@
+{
+    "version": "1.5.3",
+    "compilerOptions": {
+        "target": "es6",
+        "module": "amd",
+        "out": "./files/this_is_the_out_file.js"
+    },
+    "filesGlob": [
+        "./files/*.ts"
+    ],
+    "files": [
+        "./files/validtsconfig.ts"
+    ]
+}

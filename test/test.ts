@@ -5,6 +5,7 @@ import fs = require('fs');
 import path = require('path');
 import utils = require('../tasks/modules/utils');
 import _ = require('lodash');
+import * as nodeunit from 'nodeunit';
 
 function testFile(test, path: string, whitespaceDifferencesOK = false) {
     var actualFileName = 'test/' + path,
@@ -51,7 +52,13 @@ function testDirectory(test, folder, whitespaceDifferencesOK = false) {
     });
 }
 
-export var typescript = {
+export var tests : nodeunit.ITestGroup = {
+    setUp: (callback) => {
+       callback();
+    },
+	  tearDown: (callback) => {
+       callback();
+    },
     simple: function (test) {
         testFile(test, 'simple/js/zoo.js', true);
         testFile(test, 'simple/js/zoo.d.ts');

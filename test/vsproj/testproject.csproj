@@ -52,6 +52,9 @@
     <TypeScriptSourceMap>false</TypeScriptSourceMap>
     <TypeScriptOutDir>vsproj_test_config</TypeScriptOutDir>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'TestOutFile'">
+    <TypeScriptOutFile>test_out.js</TypeScriptOutFile>
+  </PropertyGroup>
   <ItemGroup>
     <TypeScriptCompile Include="vsprojtest1.ts" />
   </ItemGroup>
