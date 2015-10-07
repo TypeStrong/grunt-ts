@@ -254,6 +254,9 @@ module.exports = function (grunt) {
                 src: ['test/abtest/**/*.ts'],
                 reference: 'test/abtest/reference.ts',
                 out: 'test/abtest/out.js',
+                options: {
+                    removeComments: false
+                }
             },
             amdloadersrc: {
                 test: true,
