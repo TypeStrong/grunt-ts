@@ -439,7 +439,28 @@ export var files_showWarningIfFilesIsUsedWithVs: ICompilePromise = (strings, opt
         output: ""
       });
     }
-    throw `expected to see TypeScript files in multifile/b, but not multifile/a.  Also, expected ` +
-      `a warning about using src with files.`;
+    throw `expected to see TypeScript files in multifile/a and vsproj.  Also, expected ` +
+      `a warning about using vs with files.`;
+  });
+};
+
+export var files_showWarningIfFilesIsUsedWithFast: ICompilePromise = (strings, options) => {
+  return new Promise(function(resolve, reject) {
+
+    const command = strings[1].replace(/\\/g,'/');
+    const expectedWarning = `Warning: target "files_showWarningIfFilesIsUsedWithFast" is attempting to use fast compilation with "files".` +
+      `  This is not currently supported.  Setting "fast" to "never".`;
+
+    if (command.indexOf('multifile/a/a.ts') > -1 &&
+        command.indexOf('multifile/a/b.ts') > -1 &&
+        command.indexOf('multifile/a/c.ts') > -1 &&
+        command.indexOf('multifile/a/reference.ts') > -1 &&
+        options.warnings.indexOf(expectedWarning) > -1) {
+      resolve({
+        code: 0,
+        output: ""
+      });
+    }
+    throw `expected to see TypeScript files in multifile/a and a warning about using src with files.`;
   });
 };

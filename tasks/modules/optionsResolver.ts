@@ -118,6 +118,9 @@ function resolveAndWarnOnConfigurationIssues(task: ITargetOptions,
     checkFixableCaseIssues(target, `target "${targetName}"`);
     checkLocations(task, 'ts task');
     checkLocations(target, `target "${targetName}"`);
+    fixFilesUsedWithFast(task, 'ts task');
+    fixFilesUsedWithFast(target, `target "${targetName}"`);
+
     warnings.push(...getAdditionalWarnings(task, target, targetName));
 
     return {errors, warnings};
@@ -137,7 +140,16 @@ function resolveAndWarnOnConfigurationIssues(task: ITargetOptions,
       return additionalWarnings;
     }
 
+    function fixFilesUsedWithFast(task: any, configName: string) {
+      if (task && task.files && task.options && task.options.fast) {
+        warnings.push(`Warning: ${configName} is attempting to use fast compilation with "files".  ` +
+          `This is not currently supported.  Setting "fast" to "never".`);
+        task.options.fast = 'never';
+      }
+    }
+
     function checkLocations(task: ITargetOptions, configName: string) {
+
       // todo: clean this up.  The top and bottom sections are largely the same.
       if (task) {
         for (let propertyName in task) {
