@@ -1,7 +1,9 @@
 # Releases
 
+## Next
 ## v5.0.0 (2015-10-07)
 Version 5 of grunt-ts represents a major overhaul of the options resolution system.  More than 100 new tests have been added, so this should be the highest quality version of grunt-ts yet.  Also, many integration tests have been rewritten as "heavy unit tests" (meaning they call into grunt-ts from grunt, but don't actually call `tsc`, so they run in ~0.02 sec).  This allows validation of grunt-ts warnings, and assertion of exact command line parameters.  Even though testing quality has gone up *significantly*, the overall time to run `grunt release` on grunt-ts itself has dropped from 184 seconds to 112 seconds - a 64% improvement.
+* FIX: amdloader will now work for [`.tsx` extension as well](https://github.com/TypeStrong/grunt-ts/pull/274)
 * FEAT: Added support for `tsconfig.json` [#202](https://github.com/TypeStrong/grunt-ts/issues/202).  Supports maintenance of `files` property and optional TypeStrong custom `filesGlob` extension.
 * NOTE: Upgrade to TypeScript 1.6 was out of scope for version 5.0 - that will be part of version 5.1 which should be available soon.
 * NOTE: Significant use of ES6 features throughout - let & const, ES6 imports, destructuring, etc.
