@@ -157,8 +157,8 @@ export function updateAmdLoader(referenceFile: string, files: IReferences, loade
                     // Remove common path and replace with absolute outDir
                     file = file.replace(commonPath, outDir);
 
-                    // remove ts extension '.ts':
-                    file = file.substr(0, file.length - 3);
+                    // remove extension '.ts' / '.tsx':
+                    file = file.substr(0, file.lastIndexOf('.'));
 
                     // Make relative to amd loader
                     file = utils.makeRelativePath(loaderPath, file);
