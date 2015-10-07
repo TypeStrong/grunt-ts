@@ -16,7 +16,8 @@ const propertiesFromTarget = ['amdloader', 'html', 'htmlOutDir', 'htmlOutDirFlat
         'emitDecoratorMetadata', 'experimentalDecorators', 'failOnTypeErrors', 'fast', 'htmlModuleTemplate',
         'htmlVarTemplate', 'inlineSourceMap', 'inlineSources', 'isolatedModules', 'mapRoot', 'module', 'newLine', 'noEmit',
         'noEmitHelpers', 'noEmitOnError', 'noImplicitAny', 'noResolve', 'preserveConstEnums', 'removeComments', 'sourceRoot',
-        'sourceMap', 'suppressImplicitAnyIndexErrors', 'target', 'verbose'],
+        'sourceMap', 'suppressImplicitAnyIndexErrors', 'target', 'verbose', 'jsx', 'moduleResolution',
+        'experimentalAsyncFunctions', 'rootDir'],
       delayTemplateExpansion = ['htmlModuleTemplate', 'htmlVarTemplate'];
 
 let templateProcessor: (templateString: string, options: any) => string = null;

@@ -212,6 +212,18 @@ export function compileAllFiles(options: IGruntTSOptions, compilationInfo: IGrun
       if (options.experimentalDecorators) {
           args.push('--experimentalDecorators');
       }
+      if (options.experimentalAsyncFunctions) {
+          args.push('--experimentalAsyncFunctions');
+      }
+      if (options.jsx) {
+          args.push('--jsx', options.jsx.toLocaleLowerCase());
+      }
+      if (options.moduleResolution) {
+          args.push('--moduleResolution', options.moduleResolution.toLocaleLowerCase());
+      }
+      if (options.rootDir) {
+          args.push('--rootDir', options.rootDir);
+      }
 
       args.push('--target', options.target.toUpperCase());
 

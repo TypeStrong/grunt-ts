@@ -12,7 +12,8 @@ var propertiesFromTarget = ['amdloader', 'html', 'htmlOutDir', 'htmlOutDirFlatte
     'emitDecoratorMetadata', 'experimentalDecorators', 'failOnTypeErrors', 'fast', 'htmlModuleTemplate',
     'htmlVarTemplate', 'inlineSourceMap', 'inlineSources', 'isolatedModules', 'mapRoot', 'module', 'newLine', 'noEmit',
     'noEmitHelpers', 'noEmitOnError', 'noImplicitAny', 'noResolve', 'preserveConstEnums', 'removeComments', 'sourceRoot',
-    'sourceMap', 'suppressImplicitAnyIndexErrors', 'target', 'verbose'], delayTemplateExpansion = ['htmlModuleTemplate', 'htmlVarTemplate'];
+    'sourceMap', 'suppressImplicitAnyIndexErrors', 'target', 'verbose', 'jsx', 'moduleResolution',
+    'experimentalAsyncFunctions', 'rootDir'], delayTemplateExpansion = ['htmlModuleTemplate', 'htmlVarTemplate'];
 var templateProcessor = null;
 var globExpander = null;
 function noopTemplateProcessor(templateString, options) {
