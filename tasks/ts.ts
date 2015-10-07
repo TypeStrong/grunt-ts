@@ -56,6 +56,15 @@ function pluginFn(grunt: IGrunt) {
               grunt.log.writeln(warning.magenta);
             });
 
+            options.errors.forEach((error) => {
+              grunt.log.writeln(error.red);
+            });
+
+            if (options.errors.length > 0) {
+              done(false);
+              return;
+            }
+
             proceed();
           }).catch((error) => {
             grunt.log.writeln((error + '').red);

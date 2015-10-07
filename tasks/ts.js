@@ -40,6 +40,13 @@ function pluginFn(grunt) {
                 options.warnings.forEach(function (warning) {
                     grunt.log.writeln(warning.magenta);
                 });
+                options.errors.forEach(function (error) {
+                    grunt.log.writeln(error.red);
+                });
+                if (options.errors.length > 0) {
+                    done(false);
+                    return;
+                }
                 proceed();
             }).catch(function (error) {
                 grunt.log.writeln((error + '').red);
