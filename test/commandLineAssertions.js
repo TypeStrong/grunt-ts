@@ -362,4 +362,24 @@ exports.files_showWarningIfFilesIsUsedWithSrcOrOut = function (strings, options)
             "a warning about using src with files.";
     });
 };
+exports.files_showWarningIfFilesIsUsedWithSrcOrOutDir = function (strings, options) {
+    return new Promise(function (resolve, reject) {
+        var command = strings[1].replace(/\\/g, '/');
+        var expectedWarning = "Warning: In task \"files_showWarningIfFilesIsUsedWithSrcOrOutDir\", either" +
+            " \"files\" or \"src\" should be used - not both.";
+        if (command.indexOf('multifile/b/a.ts') > -1 &&
+            command.indexOf('multifile/b/b.ts') > -1 &&
+            command.indexOf('multifile/b/c.ts') > -1 &&
+            command.indexOf('multifile/b/reference.ts') > -1 &&
+            command.indexOf('multifile/a/a.ts') === -1 &&
+            options.warnings.indexOf(expectedWarning) > -1) {
+            resolve({
+                code: 0,
+                output: ""
+            });
+        }
+        throw "expected to see TypeScript files in multifile/b, but not multifile/a.  Also, expected " +
+            "a warning about using src with files.";
+    });
+};
 //# sourceMappingURL=commandLineAssertions.js.map

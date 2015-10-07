@@ -396,3 +396,26 @@ export var files_showWarningIfFilesIsUsedWithSrcOrOut: ICompilePromise = (string
       `a warning about using src with files.`;
   });
 };
+
+export var files_showWarningIfFilesIsUsedWithSrcOrOutDir: ICompilePromise = (strings, options) => {
+  return new Promise(function(resolve, reject) {
+
+    const command = strings[1].replace(/\\/g,'/');
+    const expectedWarning = `Warning: In task "files_showWarningIfFilesIsUsedWithSrcOrOutDir", either` +
+      ` "files" or "src" should be used - not both.`;
+
+    if (command.indexOf('multifile/b/a.ts') > -1 &&
+        command.indexOf('multifile/b/b.ts') > -1 &&
+        command.indexOf('multifile/b/c.ts') > -1 &&
+        command.indexOf('multifile/b/reference.ts') > -1 &&
+        command.indexOf('multifile/a/a.ts') === -1 &&
+        options.warnings.indexOf(expectedWarning) > -1) {
+      resolve({
+        code: 0,
+        output: ""
+      });
+    }
+    throw `expected to see TypeScript files in multifile/b, but not multifile/a.  Also, expected ` +
+      `a warning about using src with files.`;
+  });
+};
