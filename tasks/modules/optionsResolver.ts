@@ -348,6 +348,11 @@ function addressAssociatedOptionsAndResolveConflicts(options: IGruntTSOptions) {
     options.comments = !options.removeComments;
   }
 
+  if ('html' in options && options.CompilationTasks.length === 0) {
+    options.errors.push(`ERROR: option \`html\` provided without specifying corresponding TypeScript source files to ` +
+    `compile.  The transform will not occur unless grunt-ts also expects to compile these files.`);
+  }
+
   options.CompilationTasks.forEach(compileTask => {
     if (compileTask.out && compileTask.outDir) {
       console.log(JSON.stringify(compileTask));

@@ -387,8 +387,8 @@ module.exports = function (grunt) {
                     removeComments: false,
                 },
             },
-            htmlSpecifiedButNoTypeScriptSource_ShouldWarn: {
-                test: true,
+            htmlSpecifiedButNoTypeScriptSource_ShouldError: {
+                fail: true,
                 html: ['test/html/**/*.tpl.html'],
                 out: 'test/html/out.js',
             },
@@ -791,7 +791,7 @@ module.exports = function (grunt) {
                     fast: 'never',
                     additionalFlags: '--version'
                 }
-            },
+            }
         }
     });
 
