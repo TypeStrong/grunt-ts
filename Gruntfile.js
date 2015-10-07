@@ -874,7 +874,7 @@ module.exports = function (grunt) {
 
     // Build
     grunt.registerTask('prep', ['clean:test', 'jshint:support']);
-    grunt.registerTask('build', ['prep', 'ts-internal', 'tslint:source']);
+    grunt.registerTask('build', ['prep', 'ts-internal', 'tslint:source', 'nodeunit:fast', 'clean:testPost']);
 
     // Test
     grunt.registerTask('fail', ['continueOn', 'test_fail', 'continueOff']);
