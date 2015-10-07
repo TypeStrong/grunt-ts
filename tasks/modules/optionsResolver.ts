@@ -137,8 +137,28 @@ function resolveAndWarnOnConfigurationIssues(task: ITargetOptions,
         additionalWarnings.push(`Warning: In task "${targetName}", either "files" or "vs" should be used - not both.`);
       }
 
+
+      if (usingDestArray(task) || usingDestArray(target)) {
+        additionalWarnings.push(`Warning: target "${targetName}" has an array specified for the files.dest property.` +
+            `  This is not supported.  Taking first element and ignoring the rest.`);
+      }
+
       return additionalWarnings;
+
+      function usingDestArray(task) {
+        let result = false;
+        if (task && task.files && _.isArray(task.files)) {
+          task.files.forEach(item => {
+            if (_.isArray(item.dest)) {
+              result = true;
+            };
+          });
+        }
+        return result;
+      }
     }
+
+
 
     function fixFilesUsedWithFast(task: any, configName: string) {
       if (task && task.files && task.options && task.options.fast) {
@@ -275,11 +295,18 @@ function copyCompilationTasks(options: IGruntTSOptions, files: IGruntTSCompilati
       out: utils.escapePathIfRequired(files[i].out),
       outDir: utils.escapePathIfRequired(files[i].outDir)
     };
-    if ('dest' in files[i]) {
-      if (utils.isJavaScriptFile(files[i].dest)) {
-        compilationSet.out = files[i].dest;
+    if ('dest' in files[i] && files[i].dest) {
+      let dest: string;
+      if (_.isArray(files[i].dest)) {
+        // using an array for dest is not supported.  Only take first element.
+        dest = files[i].dest[0];
       } else {
-        compilationSet.outDir = files[i].dest;
+        dest = files[i].dest;
+      }
+      if (utils.isJavaScriptFile(dest)) {
+        compilationSet.out = dest;
+      } else {
+        compilationSet.outDir = dest;
       }
     }
     options.CompilationTasks.push(compilationSet);

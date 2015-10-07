@@ -232,8 +232,8 @@ module.exports = function (grunt) {
                 }
             },
             files_testWarnIfFilesHasDestArray: {
-                // TODO: This test is currently broken.  grunt-ts does not warn.
                 test: true,
+                testExecute: commandLineAssertions.files_testWarnIfFilesHasDestArray,
                 files: [{ src: ['test/multifile/a/**/*.ts'], dest: ['test/multifile/a', 'test/multifile/b'] }],
                 options: {
                     fast: 'never'

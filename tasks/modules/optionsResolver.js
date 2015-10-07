@@ -107,7 +107,23 @@ function resolveAndWarnOnConfigurationIssues(task, target, targetName) {
             ((task && task.files) || (target && target.files))) {
             additionalWarnings.push("Warning: In task \"" + targetName + "\", either \"files\" or \"vs\" should be used - not both.");
         }
+        if (usingDestArray(task) || usingDestArray(target)) {
+            additionalWarnings.push(("Warning: target \"" + targetName + "\" has an array specified for the files.dest property.") +
+                "  This is not supported.  Taking first element and ignoring the rest.");
+        }
         return additionalWarnings;
+        function usingDestArray(task) {
+            var result = false;
+            if (task && task.files && _.isArray(task.files)) {
+                task.files.forEach(function (item) {
+                    if (_.isArray(item.dest)) {
+                        result = true;
+                    }
+                    ;
+                });
+            }
+            return result;
+        }
     }
     function fixFilesUsedWithFast(task, configName) {
         if (task && task.files && task.options && task.options.fast) {
@@ -232,12 +248,20 @@ function copyCompilationTasks(options, files) {
             out: utils.escapePathIfRequired(files[i].out),
             outDir: utils.escapePathIfRequired(files[i].outDir)
         };
-        if ('dest' in files[i]) {
-            if (utils.isJavaScriptFile(files[i].dest)) {
-                compilationSet.out = files[i].dest;
+        if ('dest' in files[i] && files[i].dest) {
+            var dest = void 0;
+            if (_.isArray(files[i].dest)) {
+                // using an array for dest is not supported.  Only take first element.
+                dest = files[i].dest[0];
             }
             else {
-                compilationSet.outDir = files[i].dest;
+                dest = files[i].dest;
+            }
+            if (utils.isJavaScriptFile(dest)) {
+                compilationSet.out = dest;
+            }
+            else {
+                compilationSet.outDir = dest;
             }
         }
         options.CompilationTasks.push(compilationSet);

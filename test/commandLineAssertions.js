@@ -421,4 +421,24 @@ exports.files_showWarningIfFilesIsUsedWithFast = function (strings, options) {
         throw "expected to see TypeScript files in multifile/a and a warning about using src with files.";
     });
 };
+exports.files_testWarnIfFilesHasDestArray = function (strings, options) {
+    return new Promise(function (resolve, reject) {
+        var command = strings[1].replace(/\\/g, '/');
+        var expectedWarning = "Warning: target \"files_testWarnIfFilesHasDestArray\" has an array specified for the files.dest property." +
+            "  This is not supported.  Taking first element and ignoring the rest.";
+        if (command.indexOf('multifile/a/a.ts') > -1 &&
+            command.indexOf('multifile/a/b.ts') > -1 &&
+            command.indexOf('multifile/a/c.ts') > -1 &&
+            command.indexOf('multifile/a/reference.ts') > -1 &&
+            command.indexOf(',') === -1 &&
+            options.warnings.indexOf(expectedWarning) > -1) {
+            resolve({
+                code: 0,
+                output: ""
+            });
+        }
+        throw "expected to see TypeScript files in multifile/a and a warning about using an array for dest." +
+            "There should be no commas in the command line (which would indicate the array was passed as an array).";
+    });
+};
 //# sourceMappingURL=commandLineAssertions.js.map
