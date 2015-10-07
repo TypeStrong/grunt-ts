@@ -4,11 +4,10 @@
 
 ## TypeScript Compilation Task for GruntJS
 
-Grunt-ts is an npm package that handles TypeScript compilation work in GruntJS build scripts.  It provides a [Grunt-compatible wrapper](#support-for-tsc-switches) for the `tsc` command-line compiler, and provides some [additional functionality](#grunt-ts-gruntfilejs-options) that improves the TypeScript development workflow. Grunt-ts even supports compiling against a [Visual Studio project](#vs) directly.  Grunt-ts is itself written in [TypeScript](./tasks/ts.ts).
+Grunt-ts is an npm package that handles TypeScript compilation work in GruntJS build scripts.  It provides a [Grunt-compatible wrapper](#support-for-tsc-switches) for the `tsc` command-line compiler, and provides some [additional functionality](#grunt-ts-gruntfilejs-options) that improves the TypeScript development workflow. Grunt-ts supports compiling against [tsconfig.json](#tsconfig) or even a [Visual Studio project](#vs) directly.  Grunt-ts is itself written in [TypeScript](./tasks/ts.ts).
 
 ### Latest Changes
-Latest test release is `5.0.0-beta.1` which includes tsconfig support.
-Current major release is 4.2, which includes TypeScript 1.5.
+Latest test release is `5.0.0`, which includes tsconfig.json and TypeScript 1.5 support, among many other improvements.
 
 [Full changelog is here](CHANGELOG.md).
 
@@ -993,47 +992,85 @@ grunt.initConfig({
 
 #### tsconfig
 
-Grunt-ts supports using a tsconfig.json file.  Here are some example Gruntfile initConfig sections:
+Grunt-ts can integrate with a `tsconfig.json` file in three ways which offer different behavior:
+  * As a `boolean`: simplest way for default behavior.
+  * As a `string`: still uses defaults, but allows specifying a specific path to the `tsconfig.json` file or the containing folder.
+  * As an `object`: allows detailed control over how grunt-ts works with `tsconfig.json`
+
+**When specifying tsconfig as a boolean**
+In this scenario, grunt-ts will use all settings from the `tsconfig.json` file in the same folder as `Gruntfile.js`.
+  * If a `filesGlob` property is present in the `tsconfig.json` file:
+    * It will be evaluated, and any identified files will be added to the compilation context.
+    * If a `files` property is present, it will be modified with the result from evaluating the `filesGlob` that is present **inside** `tsconfig.json` (the `files` element will **not** be updated with the results from any glob inside `Gruntfile.js`).
+    * If `exclude` is present, it will be ignored.
+  * If a `filesGlob` property is NOT present, but `files` is present:
+    * Any files specified in `files` will be added to the compilation context.
+    * If `exclude` is present, it will be ignored.
+  * If neither `filesGlob` nor `files` is present:
+    * All \*.ts and \*.tsx files in all subfolders will be added to the compilation context, **excluding** any subfolders specified in the optional `exclude` property.
+  * If a glob is also specified in the `Gruntfile.js`, grunt-ts will NOT update the `filesGlob` in the `tsconfig.json` file with it nor will those files be added to the `tsconfig.json` `files` element.
+  * The `tsconfig` property should function correctly as either a task option or a target property.
+  * If the `tsconfig.json` file does not exist or there is a parse error, compilation will be aborted with an error.
 
 ```js
 grunt.initConfig({
   ts: {
     default: {
-      tsconfig: true   // Value must be a string referencing a file path such as "./somefolder/tsconfig.json", OR `true` to use the 'tsconfig.json' in same folder as Gruntfile.js
+      // specifying tsconfig as a boolean will use the 'tsconfig.json' in same folder as Gruntfile.js
+      tsconfig: true
     }
   }
 });
 ```
 
-or
+**When specifying tsconfig as a string**
+This scenario follows the same behavior as specifying `tsconfig.json` as a boolean, except that it is possible to use an explicit file name.  If a directory name is provided instead, grunt-ts will use `tsconfig.json` in that directory.  The path to `tsconfig.json` (or the directory that contains it) is relative to `Gruntfile.js`.
 
 ```js
 grunt.initConfig({
   ts: {
     default: {
+      // specifying tsconfig as a string will use the specified `tsconfig.json` file.
       tsconfig: './some/path/to/tsconfig.json'
     }
   }
 });
 ```
 
-also:
+**When specifying tsconfig as an object**
+This provides the most control over how grunt-ts integrates with `tsconfig.json`.  Supported properties are:
+  * `tsconfig`: `string` (optional) - if absent, will default to `tsconfig.json` in same folder as `Gruntfile.js`.  If a folder is passed, will use `tsconfig.json` in that folder.
+  * `ignoreFiles`: `boolean` (optional) - default is `false`.  If true, will not inlcude files in `files` array from `tsconfig.json` in the compilation context.
+  * `ignoreSettings`: `boolean` (optional) - default is `false`.  If true, will ignore `compilerOptions` section in `tsconfig.json` (will only use settings from `Gruntfile.js` or grunt-ts defaults)
+  * `overwriteFilesGlob`: `boolean` (optional) - default is `false`.  If true, will overwrite the contents of the `filesGlob` array with the contents of the `src` glob from grunt-ts.
+  * `updateFiles`: `boolean` (optional) - default is `true`.  Will modify the `files` array in `tsconfig.json` to match the result of evaluating a `filesGlob` that is present **inside** `tsconfig.json` (the `files` element will **not** be updated with the results from any glob inside `Gruntfile.js` unless `overwriteFilesGlob` is also `true`).
+  * `passThrough`: `boolean` (optional) - default is `false`.  If `passThrough` is `true`, grunt-ts will run TypeScript (`tsc`) with the specified tsconfig folder, passing the `--project` option only (and anything in `additionalFlags`).  This provides support for custom compilers with custom implementations of `tsconfig.json` support.  Note: Since this entirely depends on support from `tsc`, the `tsconfig` option must be a directory (not a file) as of TypeScript 1.6.
+
 
 ```js
 grunt.initConfig({
   ts: {
     default: {
+      // specifying tsconfig as an object allows detailed configuration overrides...
       tsconfig: {
         tsconfig: './SomeOtherFolder/tsconfig.json',
-        ignoreFiles: true
+        ignoreFiles: false,
+        ignoreSettings: false,
+        overwriteFilesGlob: false,
+        updateFiles: true,
+        passThrough: false
       }
     }
   }
 });
+
+
 ```
-
-Documentation for how this feature will work when fully implemented is here: https://github.com/TypeStrong/grunt-ts/issues/202#issuecomment-125992243
-
+### Important notes:
+  * Globs in `filesGlob` in `tsconfig.json` are relative to the `tsconfig.json`, **not** the `Gruntfile.js`.
+  * `tsconfig` has a restriction when used with `files` in the Grunt task configuration: `overwriteFilesGlob` is NOT supported if `files` has more than one element.  This will abort compilation.
+  *  If `files` is absent in `tsconfig.json`, but `filesGlob` is present, grunt-ts will create and update the `files` array in `tsconfig.json` as long as `updateFiles` is `true` (the default).  Since `files` will be created in this scenario, any values in the `exclude` array will be ignored.
+  * This feature may be used along with the `vs` keyword.  Any settings found in `tsconfig.json` will override any settings found in the Visual Studio project file.  Any files referenced in the Visual Studio file that are not also referenced in tsconfig.json *will* be included in the compilation context after any files from `tsconfig.json` (any files from `src` but not in `vs` or `tsconfig` will be included after that).  The order of the files in `tsconfig.json` will override the order of the files in the VS project file.
 
 #### verbose
 
