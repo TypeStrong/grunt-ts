@@ -284,6 +284,10 @@ function addressAssociatedOptionsAndResolveConflicts(options) {
         options.inlineSourceMap = true;
         options.sourceMap = false;
     }
+    if ('comments' in options && 'removeComments' in options) {
+        options.warnings.push("WARNING: Option \"comments\" and \"removeComments\" should not be used together.  " +
+            ("The --removeComments value of " + !!options.removeComments + " supercedes the --comments value of " + !!options.comments));
+    }
     if ('comments' in options && !('removeComments' in options)) {
         options.comments = !!options.comments;
         options.removeComments = !options.comments;
