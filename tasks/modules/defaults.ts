@@ -42,9 +42,14 @@ export const TypeScriptDefaults: IGruntTSOptions = {
     additionalFlags: '',
     templateCache: null,
     targetName: '',
+    jsx: null,
+    moduleResolution: null,
+    experimentalAsyncFunctions: null,
+    rootDir: null,
     warnings: [],
     errors: []
 };
+
 
 export const GruntTSDefaults = applyGruntTSDefaults(TypeScriptDefaults);
 
