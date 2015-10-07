@@ -167,6 +167,7 @@ module.exports = function (grunt) {
             },
             files_showWarningIfFilesIsUsedWithSrcOrOut: {
                 test: true,
+                testExecute: commandLineAssertions.files_showWarningIfFilesIsUsedWithSrcOrOut,
                 files: [{ src: ['test/multifile/a/**/*.ts'], dest: 'test/multifile/a/out.js' }],
                 src: ['test/multifile/b/**/*.ts'],
                 out: 'test/multifile/a/out.js',

@@ -42,16 +42,19 @@ function resolveAsync(rawTaskOptions, rawTargetOptions, targetName, files, theTe
         }
         fixMissingOptions(rawTaskOptions);
         fixMissingOptions(rawTargetOptions);
-        var _a = resolveAndWarnOnConfigurationIssues(rawTaskOptions, rawTargetOptions, targetName), errors = _a.errors, warnings = _a.warnings;
         var result = emptyOptionsResolveResult();
-        (_b = result.errors).push.apply(_b, errors);
-        (_c = result.warnings).push.apply(_c, warnings);
+        {
+            var _a = resolveAndWarnOnConfigurationIssues(rawTaskOptions, rawTargetOptions, targetName), errors = _a.errors, warnings = _a.warnings;
+            (_b = result.errors).push.apply(_b, errors);
+            (_c = result.warnings).push.apply(_c, warnings);
+        }
         result = applyGruntOptions(result, rawTaskOptions);
         result = applyGruntOptions(result, rawTargetOptions);
         result = copyCompilationTasks(result, files);
         visualStudioOptionsResolver_1.resolveVSOptionsAsync(result, rawTaskOptions, rawTargetOptions, templateProcessor).then(function (result) {
             tsconfig_1.resolveAsync(result, rawTaskOptions, rawTargetOptions, templateProcessor, globExpander).then(function (result) {
                 result = addressAssociatedOptionsAndResolveConflicts(result);
+                result = logAdditionalConfigurationWarnings(result);
                 result = applyGruntTSDefaults(result);
                 if (result.targetName === undefined ||
                     (!result.targetName && targetName)) {
@@ -79,6 +82,9 @@ function emptyOptionsResolveResult() {
         errors: []
     };
 }
+function logAdditionalConfigurationWarnings(options) {
+    return options;
+}
 function resolveAndWarnOnConfigurationIssues(task, target, targetName) {
     var errors = [], warnings = [];
     var lowercaseTargetProps = _.map(propertiesFromTarget, function (prop) { return prop.toLocaleLowerCase(); });
@@ -87,7 +93,15 @@ function resolveAndWarnOnConfigurationIssues(task, target, targetName) {
     checkFixableCaseIssues(target, "target \"" + targetName + "\"");
     checkLocations(task, 'ts task');
     checkLocations(target, "target \"" + targetName + "\"");
+    warnings.push.apply(warnings, warnOnSrcWithFiles(task, target, targetName));
     return { errors: errors, warnings: warnings };
+    function warnOnSrcWithFiles(task, target, targetName) {
+        if (((task && task.src) || (target && target.src)) &&
+            ((task && task.files) || (target && target.files))) {
+            return [("Warning: In task \"" + targetName + "\", either \"files\" or \"src\" should be used - not both.")];
+        }
+        return [];
+    }
     function checkLocations(task, configName) {
         // todo: clean this up.  The top and bottom sections are largely the same.
         if (task) {

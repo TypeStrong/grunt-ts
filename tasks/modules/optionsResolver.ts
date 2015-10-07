@@ -57,11 +57,12 @@ export function resolveAsync(rawTaskOptions: ITargetOptions,
     fixMissingOptions(rawTaskOptions);
     fixMissingOptions(rawTargetOptions);
 
-    let {errors, warnings} = resolveAndWarnOnConfigurationIssues(rawTaskOptions, rawTargetOptions, targetName);
     let result = emptyOptionsResolveResult();
-    result.errors.push(...errors);
-    result.warnings.push(...warnings);
-
+    {
+      const {errors, warnings} = resolveAndWarnOnConfigurationIssues(rawTaskOptions, rawTargetOptions, targetName);
+      result.errors.push(...errors);
+      result.warnings.push(...warnings);
+    }
     result = applyGruntOptions(result, rawTaskOptions);
     result = applyGruntOptions(result, rawTargetOptions);
     result = copyCompilationTasks(result, files);
@@ -70,6 +71,7 @@ export function resolveAsync(rawTaskOptions: ITargetOptions,
     resolveTSConfigAsync(result, rawTaskOptions, rawTargetOptions, templateProcessor, globExpander).then((result) => {
 
       result = addressAssociatedOptionsAndResolveConflicts(result);
+      result = logAdditionalConfigurationWarnings(result);
       result = applyGruntTSDefaults(result);
 
       if (result.targetName === undefined ||
@@ -100,6 +102,11 @@ function emptyOptionsResolveResult() {
   };
 }
 
+function logAdditionalConfigurationWarnings(options: IGruntTSOptions) {
+
+  return options;
+}
+
 function resolveAndWarnOnConfigurationIssues(task: ITargetOptions,
   target: ITargetOptions, targetName: string) {
 
@@ -111,8 +118,17 @@ function resolveAndWarnOnConfigurationIssues(task: ITargetOptions,
     checkFixableCaseIssues(target, `target "${targetName}"`);
     checkLocations(task, 'ts task');
     checkLocations(target, `target "${targetName}"`);
+    warnings.push(...warnOnSrcWithFiles(task, target, targetName));
 
     return {errors, warnings};
+
+    function warnOnSrcWithFiles(task: any, target: any, targetName: string) {
+      if (((task && task.src) || (target && target.src)) &&
+          ((task && task.files) || (target && target.files))) {
+        return [`Warning: In task "${targetName}", either "files" or "src" should be used - not both.`];
+      }
+      return [];
+    }
 
     function checkLocations(task: ITargetOptions, configName: string) {
       // todo: clean this up.  The top and bottom sections are largely the same.
