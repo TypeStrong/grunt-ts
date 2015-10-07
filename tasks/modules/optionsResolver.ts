@@ -118,16 +118,23 @@ function resolveAndWarnOnConfigurationIssues(task: ITargetOptions,
     checkFixableCaseIssues(target, `target "${targetName}"`);
     checkLocations(task, 'ts task');
     checkLocations(target, `target "${targetName}"`);
-    warnings.push(...warnOnSrcWithFiles(task, target, targetName));
+    warnings.push(...getAdditionalWarnings(task, target, targetName));
 
     return {errors, warnings};
 
-    function warnOnSrcWithFiles(task: any, target: any, targetName: string) {
+    function getAdditionalWarnings(task: any, target: any, targetName: string) {
+      const additionalWarnings = [];
       if (((task && task.src) || (target && target.src)) &&
           ((task && task.files) || (target && target.files))) {
-        return [`Warning: In task "${targetName}", either "files" or "src" should be used - not both.`];
+        additionalWarnings.push(`Warning: In task "${targetName}", either "files" or "src" should be used - not both.`);
       }
-      return [];
+
+      if (((task && task.vs) || (target && target.vs)) &&
+          ((task && task.files) || (target && target.files))) {
+        additionalWarnings.push(`Warning: In task "${targetName}", either "files" or "vs" should be used - not both.`);
+      }
+
+      return additionalWarnings;
     }
 
     function checkLocations(task: ITargetOptions, configName: string) {

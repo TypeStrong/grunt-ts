@@ -187,6 +187,7 @@ module.exports = function (grunt) {
             },
             files_showWarningIfFilesIsUsedWithVs: {
                 test: true,
+                testExecute: commandLineAssertions.files_showWarningIfFilesIsUsedWithVs,
                 files: [{ src: ['test/multifile/a/**/*.ts'], dest: 'test/multifile/a' }],
                 vs: 'test/vsproj/testproject.csproj',
                 options: {

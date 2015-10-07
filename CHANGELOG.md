@@ -2,6 +2,8 @@
 
 ## Next
 * out and outDir in VS projects will now work consistently between grunt-ts and Visual Studio; the paths will resolve to be relative to the gruntfile even if the VS project is not in the same folder.
+* If `vs` is used with `files`, there will still be a warning, but grunt-ts will now append the files from the Visual Studio project to the result of each files glob.  Previously it would compile the Visual Studio project files only (once per files entry).
+
 
 ## v4.2.0 (2015-07-21)
 * FEAT: TypeScript 1.5.3 support (TypeScript 1.5 "RTM").
