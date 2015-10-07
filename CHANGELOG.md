@@ -1,6 +1,7 @@
 # Releases
 
 ## Next
+
 ## v5.0.0 (2015-10-07)
 Version 5 of grunt-ts represents a major overhaul of the options resolution system.  More than 100 new tests have been added, so this should be the highest quality version of grunt-ts yet.  Also, many integration tests have been rewritten as "heavy unit tests" (meaning they call into grunt-ts from grunt, but don't actually call `tsc`, so they run in ~0.02 sec).  This allows validation of grunt-ts warnings, and assertion of exact command line parameters.  Even though testing quality has gone up *significantly*, the overall time to run `grunt release` on grunt-ts itself has dropped from 184 seconds to 112 seconds - a 64% improvement.
 * FIX: amdloader will now work for [`.tsx` extension as well](https://github.com/TypeStrong/grunt-ts/pull/274)
@@ -19,7 +20,6 @@ Version 5 of grunt-ts represents a major overhaul of the options resolution syst
 * FIX: Target options should always work properly in conjunction with the `vs` option [#264](https://github.com/TypeStrong/grunt-ts/issues/264).  Thanks for the report, @vtkalek.
 * FIX: Task and target-level options should always override consistently now [#248](https://github.com/TypeStrong/grunt-ts/issues/248).
 * FIX: out and outDir in VS projects will now work consistently between grunt-ts and Visual Studio; the paths will resolve to be relative to the gruntfile even if the VS project is not in the same folder.
-
 * If `vs` is used with `files`, there will still be a warning, but grunt-ts will now append the files from the Visual Studio project to the result of each files glob.  Previously it would compile the Visual Studio project files only (once per files entry).
 * Fixed several broken warnings such as using an array for `dest` with `files`.
 
