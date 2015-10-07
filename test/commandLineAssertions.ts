@@ -3,7 +3,7 @@
 /// <reference path="../defs/csproj2ts/csproj2ts.d.ts" />
 
 
-export var decoratorMetadataPassed : ICompilePromise = (strings, options) => {
+export const decoratorMetadataPassed : ICompilePromise = (strings, options) => {
   return new Promise(function(resolve, reject) {
       if (options.emitDecoratorMetadata === true &&
         options.experimentalDecorators === true) {
@@ -16,7 +16,7 @@ export var decoratorMetadataPassed : ICompilePromise = (strings, options) => {
   });
 };
 
-export var decoratorMetadataNotPassed : ICompilePromise = (strings, options) => {
+export const decoratorMetadataNotPassed : ICompilePromise = (strings, options) => {
   return new Promise(function(resolve, reject) {
     if (options.emitDecoratorMetadata === undefined) {
       resolve({
@@ -28,7 +28,7 @@ export var decoratorMetadataNotPassed : ICompilePromise = (strings, options) => 
   });
 };
 
-export var variablesReplacedForTSConfig : ICompilePromise = (strings, options) => {
+export const variablesReplacedForTSConfig : ICompilePromise = (strings, options) => {
   return new Promise(function(resolve, reject) {
     const expected = "test/tsconfig/tsconfig-grunt-ts.json";
     if (options.tsconfig && (<ITSConfigSupport>options.tsconfig).tsconfig === expected) {
@@ -41,7 +41,7 @@ export var variablesReplacedForTSConfig : ICompilePromise = (strings, options) =
   });
 };
 
-export var tsconfig_passThrough_onlySendsConfigThrough_WithPathAndAdditional : ICompilePromise = (strings, options) => {
+export const tsconfig_passThrough_onlySendsConfigThrough_WithPathAndAdditional : ICompilePromise = (strings, options) => {
   return new Promise(function(resolve, reject) {
     let tscfg = <ITSConfigSupport>options.tsconfig;
     if (tscfg
@@ -57,7 +57,7 @@ export var tsconfig_passThrough_onlySendsConfigThrough_WithPathAndAdditional : I
   });
 };
 
-export var tsconfig_passThrough_onlySendsConfigThrough_WithoutPath : ICompilePromise = (strings, options) => {
+export const tsconfig_passThrough_onlySendsConfigThrough_WithoutPath : ICompilePromise = (strings, options) => {
   return new Promise(function(resolve, reject) {
     let tscfg = <ITSConfigSupport>options.tsconfig;
     if (tscfg && tscfg.passThrough && tscfg.tsconfig === '.') {
@@ -70,7 +70,7 @@ export var tsconfig_passThrough_onlySendsConfigThrough_WithoutPath : ICompilePro
   });
 };
 
-export var variablesReplacedFor_vs : ICompilePromise = (strings, options) => {
+export const variablesReplacedFor_vs : ICompilePromise = (strings, options) => {
   return new Promise(function(resolve, reject) {
     const expected = "test/vsproj/testproject.csproj";
     if (options.vs && (<IVisualStudioProjectSupport>options.vs).project === expected) {
@@ -83,7 +83,7 @@ export var variablesReplacedFor_vs : ICompilePromise = (strings, options) => {
   });
 };
 
-export var experimentalDecoratorsPassed: ICompilePromise = (strings, options) => {
+export const experimentalDecoratorsPassed: ICompilePromise = (strings, options) => {
     return new Promise((resolve, reject) => {
         if (options.experimentalDecorators === true) {
             resolve({
@@ -95,7 +95,7 @@ export var experimentalDecoratorsPassed: ICompilePromise = (strings, options) =>
     });
 };
 
-export var noEmitPassed : ICompilePromise = (strings, options) => {
+export const noEmitPassed : ICompilePromise = (strings, options) => {
   return new Promise(function(resolve, reject) {
     if (options.noEmit === true) {
       resolve({
@@ -108,7 +108,7 @@ export var noEmitPassed : ICompilePromise = (strings, options) => {
 };
 
 
-export var noEmitNotPassed : ICompilePromise = (strings, options) => {
+export const noEmitNotPassed : ICompilePromise = (strings, options) => {
   return new Promise(function(resolve, reject) {
     if (options.noEmit === undefined) {
       resolve({
@@ -121,7 +121,7 @@ export var noEmitNotPassed : ICompilePromise = (strings, options) => {
 };
 
 
-export var inlineSourcesPassed : ICompilePromise = (strings, options) => {
+export const inlineSourcesPassed : ICompilePromise = (strings, options) => {
   return new Promise(function(resolve, reject) {
       if (options.inlineSources === true &&
           options.sourceMap === false &&
@@ -140,7 +140,7 @@ export var inlineSourcesPassed : ICompilePromise = (strings, options) => {
   });
 };
 
-export var inlineSourcesAndInlineSourceMapPassed: ICompilePromise = (strings, options) => {
+export const inlineSourcesAndInlineSourceMapPassed: ICompilePromise = (strings, options) => {
     return new Promise(function (resolve, reject) {
         if (options.inlineSources === true &&
             options.sourceMap === false &&
@@ -159,7 +159,7 @@ export var inlineSourcesAndInlineSourceMapPassed: ICompilePromise = (strings, op
     });
 };
 
-export var inlineSourceMapPassedWithSourceMap: ICompilePromise = (strings, options) => {
+export const inlineSourceMapPassedWithSourceMap: ICompilePromise = (strings, options) => {
     return new Promise(function (resolve, reject) {
         if (options.inlineSources === undefined &&
             options.sourceMap === false &&
@@ -178,7 +178,7 @@ export var inlineSourceMapPassedWithSourceMap: ICompilePromise = (strings, optio
     });
 };
 
-export var inlineSourcesNotPassed : ICompilePromise = (strings, options) => {
+export const inlineSourcesNotPassed : ICompilePromise = (strings, options) => {
   return new Promise(function(resolve, reject) {
     if (options.inlineSources === undefined && options.sourceMap === false) {
       resolve({
@@ -195,7 +195,7 @@ export var inlineSourcesNotPassed : ICompilePromise = (strings, options) => {
   });
 };
 
-export var vsproj_test : ICompilePromise = (strings, options) => {
+export const vsproj_test : ICompilePromise = (strings, options) => {
   return new Promise(function(resolve, reject) {
     if (options.sourceMap === true &&
         options.removeComments === false &&
@@ -213,7 +213,7 @@ export var vsproj_test : ICompilePromise = (strings, options) => {
   });
 };
 
-export var vsproj_test_config : ICompilePromise = (strings, options) => {
+export const vsproj_test_config : ICompilePromise = (strings, options) => {
   return new Promise(function(resolve, reject) {
     if (options.sourceMap === false &&
         options.removeComments === true &&
@@ -230,7 +230,7 @@ export var vsproj_test_config : ICompilePromise = (strings, options) => {
   });
 };
 
-export var param_newLine_CRLF: ICompilePromise = (strings, options) => {
+export const param_newLine_CRLF: ICompilePromise = (strings, options) => {
   return new Promise(function(resolve, reject) {
     if (options.newLine === "CRLF") {
       resolve({
@@ -243,7 +243,7 @@ export var param_newLine_CRLF: ICompilePromise = (strings, options) => {
   });
 };
 
-export var param_newLine_LF: ICompilePromise = (strings, options) => {
+export const param_newLine_LF: ICompilePromise = (strings, options) => {
   return new Promise(function(resolve, reject) {
     if (options.newLine === "LF") {
       resolve({
@@ -256,7 +256,7 @@ export var param_newLine_LF: ICompilePromise = (strings, options) => {
   });
 };
 
-export var files_testFilesUsedWithDestAsAFolder: ICompilePromise = (strings, options) => {
+export const files_testFilesUsedWithDestAsAFolder: ICompilePromise = (strings, options) => {
   return new Promise(function(resolve, reject) {
     if (options.CompilationTasks[0].outDir === "test/multifile/files_testFilesUsedWithDestAsAJSFolder" &&
       (options.CompilationTasks[0].out || "not specified") === "not specified") {
@@ -270,7 +270,7 @@ export var files_testFilesUsedWithDestAsAFolder: ICompilePromise = (strings, opt
   });
 };
 
-export var files_testFilesUsedWithDestAsAFile: ICompilePromise = (strings, options) => {
+export const files_testFilesUsedWithDestAsAFile: ICompilePromise = (strings, options) => {
   return new Promise(function(resolve, reject) {
     if (options.CompilationTasks[0].out === "test/multifile/files_testFilesUsedWithDestAsAJSFile/testDest.js" &&
       (options.CompilationTasks[0].outDir || "not specified") === "not specified") {
@@ -284,7 +284,7 @@ export var files_testFilesUsedWithDestAsAFile: ICompilePromise = (strings, optio
   });
 };
 
-export var test_systemJS: ICompilePromise = (strings, options) => {
+export const test_systemJS: ICompilePromise = (strings, options) => {
   return new Promise(function(resolve, reject) {
     if (options.module === "system") {
       resolve({
@@ -297,7 +297,7 @@ export var test_systemJS: ICompilePromise = (strings, options) => {
   });
 };
 
-export var test_umd: ICompilePromise = (strings, options) => {
+export const test_umd: ICompilePromise = (strings, options) => {
   return new Promise(function(resolve, reject) {
     if (options.module === "umd") {
       resolve({
@@ -310,7 +310,7 @@ export var test_umd: ICompilePromise = (strings, options) => {
   });
 };
 
-export var test_isolatedModules: ICompilePromise = (strings, options) => {
+export const test_isolatedModules: ICompilePromise = (strings, options) => {
   return new Promise(function(resolve, reject) {
     if (options.isolatedModules === true) {
       resolve({
@@ -322,7 +322,7 @@ export var test_isolatedModules: ICompilePromise = (strings, options) => {
   });
 };
 
-export var test_noEmitHelpers: ICompilePromise = (strings, options) => {
+export const test_noEmitHelpers: ICompilePromise = (strings, options) => {
   return new Promise(function(resolve, reject) {
     if (options.noEmitHelpers === true) {
       resolve({
@@ -334,7 +334,7 @@ export var test_noEmitHelpers: ICompilePromise = (strings, options) => {
   });
 };
 
-export var test_additionalFlags: ICompilePromise = (strings, options) => {
+export const test_additionalFlags: ICompilePromise = (strings, options) => {
   return new Promise(function(resolve, reject) {
     if (options.additionalFlags === '--version') {
       resolve({
@@ -346,7 +346,7 @@ export var test_additionalFlags: ICompilePromise = (strings, options) => {
   });
 };
 
-export var bad_sourcemap_option: ICompilePromise = (strings, options) => {
+export const bad_sourcemap_option: ICompilePromise = (strings, options) => {
   return new Promise(function(resolve, reject) {
 
     if (options.warnings.length > 0
@@ -360,7 +360,7 @@ export var bad_sourcemap_option: ICompilePromise = (strings, options) => {
   });
 };
 
-export var out_with_spaces: ICompilePromise = (strings, options) => {
+export const out_with_spaces: ICompilePromise = (strings, options) => {
   return new Promise(function(resolve, reject) {
 
     const command = strings[1];
@@ -374,7 +374,7 @@ export var out_with_spaces: ICompilePromise = (strings, options) => {
   });
 };
 
-export var files_showWarningIfFilesIsUsedWithSrcOrOut: ICompilePromise = (strings, options) => {
+export const files_showWarningIfFilesIsUsedWithSrcOrOut: ICompilePromise = (strings, options) => {
   return new Promise(function(resolve, reject) {
 
     const command = strings[1].replace(/\\/g,'/');
@@ -397,7 +397,7 @@ export var files_showWarningIfFilesIsUsedWithSrcOrOut: ICompilePromise = (string
   });
 };
 
-export var files_showWarningIfFilesIsUsedWithSrcOrOutDir: ICompilePromise = (strings, options) => {
+export const files_showWarningIfFilesIsUsedWithSrcOrOutDir: ICompilePromise = (strings, options) => {
   return new Promise(function(resolve, reject) {
 
     const command = strings[1].replace(/\\/g,'/');
@@ -420,7 +420,7 @@ export var files_showWarningIfFilesIsUsedWithSrcOrOutDir: ICompilePromise = (str
   });
 };
 
-export var files_showWarningIfFilesIsUsedWithVs: ICompilePromise = (strings, options) => {
+export const files_showWarningIfFilesIsUsedWithVs: ICompilePromise = (strings, options) => {
   return new Promise(function(resolve, reject) {
 
     const command = strings[1].replace(/\\/g,'/');
@@ -444,7 +444,7 @@ export var files_showWarningIfFilesIsUsedWithVs: ICompilePromise = (strings, opt
   });
 };
 
-export var files_showWarningIfFilesIsUsedWithFast: ICompilePromise = (strings, options) => {
+export const files_showWarningIfFilesIsUsedWithFast: ICompilePromise = (strings, options) => {
   return new Promise(function(resolve, reject) {
 
     const command = strings[1].replace(/\\/g,'/');
