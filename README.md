@@ -7,7 +7,7 @@
 Grunt-ts is an npm package that handles TypeScript compilation work in GruntJS build scripts.  It provides a [Grunt-compatible wrapper](#support-for-tsc-switches) for the `tsc` command-line compiler, and provides some [additional functionality](#grunt-ts-gruntfilejs-options) that improves the TypeScript development workflow. Grunt-ts supports compiling against [tsconfig.json](#tsconfig) or even a [Visual Studio project](#vs) directly.  Grunt-ts is itself written in [TypeScript](./tasks/ts.ts).
 
 ### Latest Changes
-Latest release is `5.0.0`, which includes `tsconfig.json` support and TypeScript 1.5, among many other improvements.
+Latest release is `5.0.1`, which includes `tsconfig.json` support and TypeScript 1.5, among many other improvements.
 
 [Full changelog is here](CHANGELOG.md).
 
@@ -1332,7 +1332,7 @@ $ grunt upgrade
 
  * Run `grunt release` and ensure it comes back clean (should finish but with warnings).
  * Update the version in package.json.
- * Update CHANGELOG.md.
+ * Update CHANGELOG.md and README.md (top section referencing latest version number).
  * Commit to master.
  * Publish to npm.
  * Push version tag to GitHub.
