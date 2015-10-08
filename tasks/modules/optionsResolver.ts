@@ -14,10 +14,10 @@ const propertiesFromTarget = ['amdloader', 'html', 'htmlOutDir', 'htmlOutDirFlat
         'templateCache', 'vs', 'watch'],
       propertiesFromTargetOptions = ['additionalFlags', 'comments', 'compile', 'compiler', 'declaration',
         'emitDecoratorMetadata', 'experimentalDecorators', 'failOnTypeErrors', 'fast', 'htmlModuleTemplate',
-        'htmlVarTemplate', 'inlineSourceMap', 'inlineSources', 'isolatedModules', 'mapRoot', 'module', 'newLine', 'noEmit',
+        'htmlVarTemplate', 'htmlOutputTemplate', 'inlineSourceMap', 'inlineSources', 'isolatedModules', 'mapRoot', 'module', 'newLine', 'noEmit',
         'noEmitHelpers', 'noEmitOnError', 'noImplicitAny', 'noResolve', 'preserveConstEnums', 'removeComments', 'sourceRoot',
         'sourceMap', 'suppressImplicitAnyIndexErrors', 'target', 'verbose'],
-      delayTemplateExpansion = ['htmlModuleTemplate', 'htmlVarTemplate'];
+      delayTemplateExpansion = ['htmlModuleTemplate', 'htmlVarTemplate', 'htmlOutputTemplate'];
 
 let templateProcessor: (templateString: string, options: any) => string = null;
 let globExpander: (globs: string[]) => string[] = null;
