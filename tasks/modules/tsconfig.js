@@ -154,19 +154,24 @@ function applyCompilerOptions(applyTo, projectSpec) {
     var co = projectSpec.compilerOptions;
     var tsconfig = applyTo.tsconfig;
     if (!tsconfig.ignoreSettings && co) {
-        var tsconfigMappingToGruntTSProperty = ['declaration', 'emitDecoratorMetadata',
-            'experimentalDecorators', 'isolatedModules',
-            'inlineSourceMap', 'inlineSources', 'mapRoot', 'module', 'newLine', 'noEmit',
+        var sameNameInTSConfigAndGruntTS = ['declaration', 'emitDecoratorMetadata',
+            'experimentalAsyncFunctions', 'experimentalDecorators', 'isolatedModules',
+            'inlineSourceMap', 'inlineSources', 'jsx', 'mapRoot', 'module',
+            'moduleResolution', 'newLine', 'noEmit',
             'noEmitHelpers', 'noEmitOnError', 'noImplicitAny', 'noLib', 'noResolve',
-            'out', 'outDir', 'preserveConstEnums', 'removeComments', 'sourceMap',
-            'sourceRoot', 'suppressImplicitAnyIndexErrors', 'target'];
-        tsconfigMappingToGruntTSProperty.forEach(function (propertyName) {
-            if (propertyName in co) {
-                if (!(propertyName in result)) {
-                    result[propertyName] = co[propertyName];
-                }
+            'out', 'outDir', 'preserveConstEnums', 'removeComments', 'rootDir',
+            'sourceMap', 'sourceRoot', 'suppressImplicitAnyIndexErrors', 'target'];
+        sameNameInTSConfigAndGruntTS.forEach(function (propertyName) {
+            if ((propertyName in co) && !(propertyName in result)) {
+                result[propertyName] = co[propertyName];
             }
         });
+        // now copy the ones that don't have the same names.
+        //outFile was added in TypeScript 1.6 and is the same as out for command-line
+        // purposes except that `outFile` is relative to the tsconfig.json.
+        if (('outFile' in co) && !('out' in result)) {
+            result['out'] = co['outFile'];
+        }
     }
     if (!('updateFiles' in tsconfig)) {
         tsconfig.updateFiles = true;
