@@ -55,6 +55,7 @@ function resolveAsync(rawTaskOptions, rawTargetOptions, targetName, files, theTe
         visualStudioOptionsResolver_1.resolveVSOptionsAsync(result, rawTaskOptions, rawTargetOptions, templateProcessor).then(function (result) {
             tsconfig_1.resolveAsync(result, rawTaskOptions, rawTargetOptions, templateProcessor, globExpander).then(function (result) {
                 result = addressAssociatedOptionsAndResolveConflicts(result);
+                result = enclosePathsInQuotesIfRequired(result);
                 result = logAdditionalConfigurationWarnings(result);
                 result = applyGruntTSDefaults(result);
                 if (result.targetName === undefined ||
@@ -245,9 +246,9 @@ function copyCompilationTasks(options, files) {
     }
     for (var i = 0; i < files.length; i += 1) {
         var compilationSet = {
-            src: _.map(files[i].src, function (fileName) { return utils.escapePathIfRequired(fileName); }),
-            out: utils.escapePathIfRequired(files[i].out),
-            outDir: utils.escapePathIfRequired(files[i].outDir)
+            src: _.map(files[i].src, function (fileName) { return utils.enclosePathInQuotesIfRequired(fileName); }),
+            out: utils.enclosePathInQuotesIfRequired(files[i].out),
+            outDir: utils.enclosePathInQuotesIfRequired(files[i].outDir)
         };
         if ('dest' in files[i] && files[i].dest) {
             var dest = void 0;
@@ -266,6 +267,18 @@ function copyCompilationTasks(options, files) {
             }
         }
         options.CompilationTasks.push(compilationSet);
+    }
+    return options;
+}
+function enclosePathsInQuotesIfRequired(options) {
+    if (options.rootDir) {
+        options.rootDir = utils.enclosePathInQuotesIfRequired(options.rootDir);
+    }
+    if (options.mapRoot) {
+        options.mapRoot = utils.enclosePathInQuotesIfRequired(options.mapRoot);
+    }
+    if (options.sourceRoot) {
+        options.sourceRoot = utils.enclosePathInQuotesIfRequired(options.sourceRoot);
     }
     return options;
 }

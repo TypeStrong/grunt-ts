@@ -283,7 +283,7 @@ function getOrGetFirst(getFrom) {
     return getFrom;
 }
 exports.getOrGetFirst = getOrGetFirst;
-function escapePathIfRequired(path) {
+function enclosePathInQuotesIfRequired(path) {
     if (!path || !path.indexOf) {
         return path;
     }
@@ -300,7 +300,7 @@ function escapePathIfRequired(path) {
         }
     }
 }
-exports.escapePathIfRequired = escapePathIfRequired;
+exports.enclosePathInQuotesIfRequired = enclosePathInQuotesIfRequired;
 /**
  * Time a function and print the result.
  *

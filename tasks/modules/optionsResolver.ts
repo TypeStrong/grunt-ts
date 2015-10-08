@@ -72,6 +72,7 @@ export function resolveAsync(rawTaskOptions: ITargetOptions,
     resolveTSConfigAsync(result, rawTaskOptions, rawTargetOptions, templateProcessor, globExpander).then((result) => {
 
       result = addressAssociatedOptionsAndResolveConflicts(result);
+      result = enclosePathsInQuotesIfRequired(result);
       result = logAdditionalConfigurationWarnings(result);
       result = applyGruntTSDefaults(result);
 
@@ -292,9 +293,9 @@ function copyCompilationTasks(options: IGruntTSOptions, files: IGruntTSCompilati
   }
   for (let i = 0; i < files.length; i += 1) {
     let compilationSet = {
-      src: _.map(files[i].src, (fileName) => utils.escapePathIfRequired(fileName)),
-      out: utils.escapePathIfRequired(files[i].out),
-      outDir: utils.escapePathIfRequired(files[i].outDir)
+      src: _.map(files[i].src, (fileName) => utils.enclosePathInQuotesIfRequired(fileName)),
+      out: utils.enclosePathInQuotesIfRequired(files[i].out),
+      outDir: utils.enclosePathInQuotesIfRequired(files[i].outDir)
     };
     if ('dest' in files[i] && files[i].dest) {
       let dest: string;
@@ -311,6 +312,19 @@ function copyCompilationTasks(options: IGruntTSOptions, files: IGruntTSCompilati
       }
     }
     options.CompilationTasks.push(compilationSet);
+  }
+  return options;
+}
+
+function enclosePathsInQuotesIfRequired(options: IGruntTSOptions) {
+  if (options.rootDir) {
+    options.rootDir = utils.enclosePathInQuotesIfRequired(options.rootDir);
+  }
+  if (options.mapRoot) {
+    options.mapRoot = utils.enclosePathInQuotesIfRequired(options.mapRoot);
+  }
+  if (options.sourceRoot) {
+    options.sourceRoot = utils.enclosePathInQuotesIfRequired(options.sourceRoot);
   }
   return options;
 }

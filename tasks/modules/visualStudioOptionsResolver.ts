@@ -172,7 +172,7 @@ function applyVSSettings(options: IGruntTSOptions, vsSettings: csproj2ts.TypeScr
   if (utils.hasValue(vsSettings.OutDir) && vsSettings.OutDir !== '') {
       options.CompilationTasks.forEach((item) => {
       let absolutePath = path.resolve(gruntfileToProject, vsSettings.OutDir);
-      item.outDir = utils.escapePathIfRequired(
+      item.outDir = utils.enclosePathInQuotesIfRequired(
         path.relative(path.resolve('.'), absolutePath).replace(new RegExp('\\' + path.sep, 'g'), '/')
       );
     });
@@ -181,7 +181,7 @@ function applyVSSettings(options: IGruntTSOptions, vsSettings: csproj2ts.TypeScr
   if (utils.hasValue(vsSettings.OutFile) && vsSettings.OutFile !== '') {
     options.CompilationTasks.forEach((item) => {
       let absolutePath = path.resolve(gruntfileToProject, vsSettings.OutFile);
-      item.out = utils.escapePathIfRequired(
+      item.out = utils.enclosePathInQuotesIfRequired(
         path.relative(path.resolve('.'), absolutePath).replace(new RegExp('\\' + path.sep, 'g'), '/')
       );
     });
