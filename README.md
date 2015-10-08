@@ -70,6 +70,7 @@ Grunt-ts provides explicit support for most `tsc` switches.  Any arbitrary switc
 |--newLine|[newLine](#newline)|Explicitly specify newline character (`CRLF` or `LF`); if omitted, uses OS default.|
 |--noEmit|[noEmit](#noemit)|Check, but do not emit JS, even in the absence of errors.|
 |--noEmitHelpers|[noEmitHelpers](#noemithelpers)|Do not generate custom helper functions like `__extends` in compiled output.|
+|--noEmitOnError|[noEmitOnError](#noemitonerror)|Do no emit any javascript if there is a type error.|
 |--noImplicitAny|[noImplicitAny](#noimplicitany)|Warn on expressions and declarations with an implied `any` type.|
 |--noResolve|[noResolve](#noresolve)|Do not add triple-slash references or module import targets to the compilation context.|
 |--out FILE|[out](#out)|Concatenate and emit output to a single file.|
