@@ -794,6 +794,50 @@ module.exports = function (grunt) {
                     fast: 'never',
                     additionalFlags: '--version'
                 }
+            },
+            test_jsx: {
+                test: true,
+                testExecute: commandLineAssertions.test_jsx,
+                src: 'test/simple/ts/zoo.ts',
+                options: {
+                    jsx: 'preserve'
+                }
+            },
+            test_moduleResolution: {
+                test: true,
+                testExecute: commandLineAssertions.test_moduleResolution,
+                src: 'test/simple/ts/zoo.ts',
+                options: {
+                    moduleResolution: 'classic'
+                }
+            },
+            test_experimentalAsyncFunctions: {
+                test: true,
+                testExecute: commandLineAssertions.test_experimentalAsyncFunctions,
+                src: 'test/simple/ts/zoo.ts',
+                options: {
+                    experimentalAsyncFunctions: true
+                }
+            },
+            test_rootDir: {
+                test: true,
+                testExecute: commandLineAssertions.test_rootDir,
+                src: 'test/simple/ts/zoo.ts',
+                outDir: 'test/simple/js/test_rootDir',
+                options: {
+                    rootDir: 'test/simple'
+                }
+            },
+            test_directoriesWithSpaces: {
+                test: true,
+                testExecute: commandLineAssertions.test_directoriesWithSpaces,
+                src: 'test/simple/ts/zoo.ts',
+                outDir: 'test/outDir with spaces',
+                options: {
+                    rootDir: 'test/rootDir with spaces',
+                    sourceRoot: 'test/sourceRoot with spaces',
+                    mapRoot: 'test/mapRoot with spaces'
+                }
             }
         }
     });

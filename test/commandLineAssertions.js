@@ -458,4 +458,71 @@ exports.warnbothcomments = function (strings, options) {
         throw "expected to not see removeComments passed.";
     });
 };
+exports.test_jsx = function (strings, options) {
+    return new Promise(function (resolve, reject) {
+        var command = strings[1].replace(/\\/g, '/');
+        var expected = '--jsx preserve';
+        if (command.indexOf(expected) > -1) {
+            resolve({
+                code: 0,
+                output: ""
+            });
+        }
+        throw "expected to see " + expected + " in the command line and didn't.  Got this: " + command;
+    });
+};
+exports.test_moduleResolution = function (strings, options) {
+    return new Promise(function (resolve, reject) {
+        var command = strings[1].replace(/\\/g, '/');
+        var expected = '--moduleResolution classic';
+        if (command.indexOf(expected) > -1) {
+            resolve({
+                code: 0,
+                output: ""
+            });
+        }
+        throw "expected to see " + expected + " in the command line and didn't.  Got this: " + command;
+    });
+};
+exports.test_experimentalAsyncFunctions = function (strings, options) {
+    return new Promise(function (resolve, reject) {
+        var command = strings[1].replace(/\\/g, '/');
+        var expected = '--experimentalAsyncFunctions';
+        if (command.indexOf(expected) > -1) {
+            resolve({
+                code: 0,
+                output: ""
+            });
+        }
+        throw "expected to see " + expected + " in the command line and didn't.  Got this: " + command;
+    });
+};
+exports.test_rootDir = function (strings, options) {
+    return new Promise(function (resolve, reject) {
+        var command = strings[1].replace(/\\/g, '/');
+        var expected = '--rootDir test/simple';
+        if (command.indexOf(expected) > -1) {
+            resolve({
+                code: 0,
+                output: ""
+            });
+        }
+        throw "expected to see " + expected + " in the command line and didn't.  Got this: " + command;
+    });
+};
+exports.test_directoriesWithSpaces = function (strings, options) {
+    return new Promise(function (resolve, reject) {
+        var command = strings[1].replace(/\\/g, '/');
+        if (command.indexOf("--rootDir \"test/rootDir with spaces\"") > -1 &&
+            command.indexOf("--outDir \"test/outDir with spaces\"") > -1 &&
+            command.indexOf("--sourceRoot \"test/sourceRoot with spaces\"") > -1 &&
+            command.indexOf("--mapRoot \"test/mapRoot with spaces\"") > -1) {
+            resolve({
+                code: 0,
+                output: ""
+            });
+        }
+        throw "expected to see rootDir, outDir, sourceRoot, and mapRoot with quoted values in the command line and didn't.  Got this: " + command;
+    });
+};
 //# sourceMappingURL=commandLineAssertions.js.map
