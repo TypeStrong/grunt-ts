@@ -190,7 +190,7 @@ function applyCompilerOptions(applyTo: IGruntTSOptions, projectSpec: ITSConfigFi
 
     // now copy the ones that don't have the same names.
 
-    //outFile was added in TypeScript 1.6 and is the same as out for command-line
+    // `outFile` was added in TypeScript 1.6 and is the same as out for command-line
     // purposes except that `outFile` is relative to the tsconfig.json.
     if (('outFile' in co) && !('out' in result)) {
       result['out'] = co['outFile'];
