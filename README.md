@@ -7,7 +7,8 @@
 Grunt-ts is an npm package that handles TypeScript compilation work in GruntJS build scripts.  It provides a [Grunt-compatible wrapper](#support-for-tsc-switches) for the `tsc` command-line compiler, and provides some [additional functionality](#grunt-ts-gruntfilejs-options) that improves the TypeScript development workflow. Grunt-ts supports compiling against [tsconfig.json](#tsconfig) or even a [Visual Studio project](#vs) directly.  Grunt-ts is itself written in [TypeScript](./tasks/ts.ts).
 
 ### Latest Changes
-Latest release is `5.0.0`, which includes `tsconfig.json` support and TypeScript 1.5, among many other improvements.
+Latest production release is `5.0.0`, which includes `tsconfig.json` support and TypeScript 1.5, among many other improvements.
+Current beta release is `5.1.0-beta.1`, which includes TypeScript 1.6 support and some bug fixes.
 
 [Full changelog is here](CHANGELOG.md).
 
@@ -61,21 +62,26 @@ Grunt-ts provides explicit support for most `tsc` switches.  Any arbitrary switc
 |:----:|:----:|:-----|
 |--declaration|[declaration](#declaration)|Generates a `.d.ts` definitions file for compiled TypeScript files|
 |--emitDecoratorMetadata|[emitDecoratorMetadata](#emitdecoratormetadata)|Emit metadata for type/parameter decorators.|
+|--experimentalAsyncFunctions|[experimentalAsyncFunctions](#experimentalasyncfunctions)|Enables experimental support for ES7 async functions|
 |--experimentalDecorators|[experimentalDecorators](#experimentaldecorators)|Enables experimental support for ES7 decorators|
 |--inlineSourceMap|[inlineSourceMap](#inlinesourcemap)|Emit a single file that includes source maps instead of emitting a separate `.js.map` file.|
 |--inlineSources|[inlineSources](#inlinesources)|Emit the TypeScript source alongside the sourcemaps within a single file; requires `--inlineSourceMap` to be set.|
 |--isolatedModules|[isolatedModules](#isolatedmodules)|Ensures that the output is safe to only emit single files by making cases that break single-file transpilation an error|
+|--jsx|[jsx](#jsx)|Specifies the JSX code generation style: 'preserve' or 'react'|
 |--mapRoot LOCATION|[mapRoot](#maproot)|Specifies the location where debugger should locate map files instead of generated locations.|
 |--module KIND|[module](#module)|Specify module style for code generation|
+|--moduleResolution KIND|[moduleResolution](#moduleresolution)|Specifies module resolution strategy: 'node' (Node.js) or 'classic' (TypeScript pre-1.6).|
 |--newLine|[newLine](#newline)|Explicitly specify newline character (`CRLF` or `LF`); if omitted, uses OS default.|
 |--noEmit|[noEmit](#noemit)|Check, but do not emit JS, even in the absence of errors.|
 |--noEmitHelpers|[noEmitHelpers](#noemithelpers)|Do not generate custom helper functions like `__extends` in compiled output.|
+|--noEmitOnError|[noEmitOnError](#noemitonerror)|Do not emit JavaScript if there is a compilation error|
 |--noImplicitAny|[noImplicitAny](#noimplicitany)|Warn on expressions and declarations with an implied `any` type.|
 |--noResolve|[noResolve](#noresolve)|Do not add triple-slash references or module import targets to the compilation context.|
 |--out FILE|[out](#out)|Concatenate and emit output to a single file.|
 |--outDir DIRECTORY|[outDir](#outdir)|Redirect output structure to the directory.|
 |--preserveConstEnums|[preserveConstEnums](#preserveconstenums)|Const enums will be kept as enums in the emitted JS.|
 |--removeComments|[removeComments](#removecomments)|Configures if comments should be included in the output|
+|--rootDir|[rootDir](#rootdir)|Allows override of common root folder calculated by `--outDir`.|
 |--sourceMap|[sourceMap](#sourcemap)|Generates corresponding `.map` file|
 |--sourceRoot LOCATION|[sourceRoot](#sourceroot)|Specifies the location where debugger should locate TypeScript files instead of source locations.|
 |--suppressImplicitAnyIndexErrors|[suppressImplicitAnyIndexErrors](#suppressimplicitanyindexerrors)|Specifies the location where debugger should locate TypeScript files instead of source locations.|
@@ -86,7 +92,7 @@ For file ordering, look at [JavaScript Generation](#javascript-generation).
 
 ## grunt-ts gruntfile.js options
 
-|property|where to define|description|
+|grunt-ts property|where to define|description|
 |:----|:----|:-----|
 |[additionalFlags](#additionalflags)|option|`string` - allows passing arbitrary strings to the compiler.  This is intended to enable compatibility with features not supported directly by grunt-ts.|
 |[comments](#comments)|option|`true`, `false` (default) - include comments in emitted JS.|
@@ -94,8 +100,9 @@ For file ordering, look at [JavaScript Generation](#javascript-generation).
 |[compiler](#compiler)|option|`string` - path to custom compiler|
 |[declaration](#declaration)|option|`true`, `false` (default) - indicates that definition files should be emitted.|
 |[emitDecoratorMetadata](#emitdecoratormetadata)|option|`true`, `false` (default) - set to true to emit metadata for ES7 decorators (will enable experimentalDecorators)|
+|[experimentalAsyncFunctions](#experimentalasyncfunctions)|option|`true`, `false` (default) - set to true to enable support for ES7 async functions (in ES6 mode only)|
 |[experimentalDecorators](#experimentaldecorators)|option|`true`, `false` (default) - set to true to enable support for ES7 decorators|
-|[failOnTypeErrors](#failontypeerrors)|option|`true` (default), `false` - fail Grunt pipeline if there is a type error|
+|[failOnTypeErrors](#failontypeerrors)|option|`true` (default), `false` - fail Grunt pipeline if there is a type error.  (See also [noEmitOnError](#noemithelpers))|
 |[fast](#fast)|option|`'watch'` (default), `'always'`, `'never'` - how to decide on a "fast" grunt-ts compile.|
 |[files](#files)|target|Sets of files to compile and optional output destination|
 |[html](#html)|target|`string` or `string[]` - glob to HTML templates|
@@ -104,11 +111,14 @@ For file ordering, look at [JavaScript Generation](#javascript-generation).
 |[inlineSourceMap](#inlinesourcemap)|option|`true`, `false` (default) Emit a single file that includes source maps instead of emitting a separate `.js.map` file; If enabled, will automatically enable `sourceMap`.|
 |[inlineSources](#inlinesources)|option|`true`, `false` (default) Emit the TypeScript source alongside the sourcemaps within a single file; If enabled, will automatically enable `inlineSourceMap` and `sourceMap`.|
 |[isolatedModules](#isolatedmodules)|option|`true`, `false` (default) Ensures that the output is safe to only emit single files by making cases that break single-file transpilation an error.|
+|[jsx](#jsx)|option|`'preserve'`, `'react'`, (TypeScript default is `'react'`).  If `'preserve'`, TypeScript will emit `.jsx`; if `'react'`, TypeScript will transpile and emit `.js` files.|
 |[mapRoot](#maproot)|option|`string` - root for referencing `.js.map` files in JS|
 |[module](#module)|option|default to be nothing, If you want to set it you set it to either `'amd'` or `'commonjs'`|
+|[moduleResolution](#moduleresolution)|option|`'classic'` or `'node'`.  This was introduced in TypeScript 1.6.  The default is `'node'` if not passed.  [More details here](https://github.com/Microsoft/TypeScript/wiki/What%27s-new-in-TypeScript#adjustments-in-module-resolution-logic).|
 |[newLine](#newline)|option|`CRLF`, `LF`, `` (default) - If passed with a value, TypeScript will use the specified line endings.  Also affects grunt-ts transforms.|
 |[noEmit](#noemit)|option|`true`, `false` (default) - If passed as `true`, TypeScript will not emit even if it compiles cleanly|
 |[noEmitHelpers](#noemithelpers)|option|`true`, `false` (default) - If passed as `true`, TypeScript will not generate custom helper functions like `__extends` in compiled output|
+|[noEmitOnError](#noemithelpers)|option|`true`, `false` (default) - If passed as `true`, TypeScript will not emit JS if there is an error (see also [failOnTypeErrors](#failontypeerrors))|
 |[noImplicitAny](#noimplicitany)|option|`true`, `false` (default) - enable for stricter type checking|
 |[noResolve](#noresolve)|option|`true`, `false` (default) - for deprecated version of TypeScript|
 |[options](#grunt-ts-target-options)|target||
@@ -117,6 +127,7 @@ For file ordering, look at [JavaScript Generation](#javascript-generation).
 |[preserveConstEnums](#preserveconstenums)|option|`true`, `false` (default) - If true, const enums will be kept as enums in the emitted JS.|
 |[reference](#reference)|target|`string` - tells grunt-ts which file to use for maintaining references|
 |[removeComments](#removecomments)|option|`true` (default), `false` - removes comments in emitted JS|
+|[rootDir](#rootdir)|option|`string` - Allows override of common root folder calculated by `--outDir`.|
 |[sourceRoot](#sourceroot)|option|`string` - root for referencing TS files in `.js.map`|
 |[sourceMap](#sourcemap)|option|`true` (default), `false` - indicates if source maps should be generated (`.js.map`)|
 |[suppressImplicitAnyIndexErrors](#suppressimplicitanyindexerrors)|option|`false` (default), `true` - indicates if TypeScript should allow access to properties of an object by string indexer when `--noImplicitAny` is active, even if TypeScript doesn't know about them.|
@@ -126,6 +137,7 @@ For file ordering, look at [JavaScript Generation](#javascript-generation).
 |[verbose](#verbose)|option|`true`, `false` (default) - logs `tsc` command-line options to console|
 |[vs](#vs)|target|`string` referencing a `.csproj` or `.vbproj` file or, `{}` (object) (see [Visual Studio Projects](#vs) for details)|
 |[watch](#watch)|target|`string` - will watch for changes in the specified directory or below|
+|**something else**||Don't see the switch you're looking for?  Check out [additionalFlags](#additionalflags)|
 
 Note: In the above chart, if "where to define" is "target", the property must be defined on a target or on the `ts` object directly.  If "where to define" is "options", then the property must be defined on an `options` object on `ts` or on a target under `ts`.
 
@@ -506,6 +518,25 @@ grunt.initConfig({
 });
 ````
 
+#### experimentalAsyncFunctions
+
+````javascript
+true | false (default)
+````
+
+Enable support for experimental ES7 async functionality.  This is only available in TypeScript 1.6 and higher in 'es6' mode.
+
+````javascript
+grunt.initConfig({
+  ts: {
+    options: {
+      experimentalAsyncFunctions: true,
+      target: 'es6'
+    }
+  }
+});
+````
+
 #### experimentalDecorators
 
 ````javascript
@@ -696,6 +727,24 @@ grunt.initConfig({
 });
 ````
 
+#### jsx
+
+````javascript
+`'react'` (default) | `'preserve'`
+````
+
+Specify the JSX code generation style.  Documentation is here: [TypeScript Wiki - JSX](https://github.com/Microsoft/TypeScript/wiki/JSX).
+
+````javascript
+grunt.initConfig({
+  ts: {
+    options: {
+      jsx: 'preserve'
+    }
+  }
+});
+````
+
 
 #### mapRoot
 
@@ -728,6 +777,26 @@ grunt.initConfig({
     default: {
       options: {
         module: "amd"
+      }
+    }
+  }
+});
+````
+
+#### moduleResolution
+
+````javascript
+"node" (default) | "classic"
+````
+
+New in TypeScript 1.6.  TypeScript is gaining support for resolving definition files using rules similar to common JavaScript module loaders.  The first new one is support for CommonJS used by NodeJS, which is why this parameter is called `"node"`  The `"node"` setting performs an extra check to see if a definition file exists in the `node_modules/modulename` folder if a TypeScript definition can't be found for an imported module.  if this is not desired, set this setting to "classic".
+
+````javascript
+grunt.initConfig({
+  ts: {
+    default: {
+      options: {
+        moduleResolution: "classic"
       }
     }
   }
@@ -885,6 +954,24 @@ grunt.initConfig({
   ts: {
     options: {
       removeComments: false //preserves comments in output.
+    }
+  }
+});
+````
+
+#### rootDir
+
+````javascript
+string
+````
+
+Affects the creation of folders inside the `outDir` location.  `rootDir` allows manually specifying the desired common root folder when used in combination with `outDir`.  Otherwise, TypeScript attempts to calculate this automatically.
+
+````javascript
+grunt.initConfig({
+  ts: {
+    options: {
+      rootDir: "src/app"
     }
   }
 });
