@@ -151,6 +151,7 @@ interface ICompilerOptions {
     locale?: string;
     mapRoot?: string;
     module?: string;
+    moduleResolution: string;
     newLine?: string;
     noEmit?: boolean;
     noEmitHelpers?: boolean;
