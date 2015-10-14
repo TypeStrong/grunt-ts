@@ -9,11 +9,11 @@ var visualStudioOptionsResolver_1 = require('./visualStudioOptionsResolver');
 var tsconfig_1 = require('./tsconfig');
 var propertiesFromTarget = ['amdloader', 'html', 'htmlOutDir', 'htmlOutDirFlatten', 'reference', 'testExecute', 'tsconfig',
     'templateCache', 'vs', 'watch'], propertiesFromTargetOptions = ['additionalFlags', 'comments', 'compile', 'compiler', 'declaration',
-    'emitDecoratorMetadata', 'experimentalDecorators', 'failOnTypeErrors', 'fast', 'htmlModuleTemplate',
-    'htmlVarTemplate', 'inlineSourceMap', 'inlineSources', 'isolatedModules', 'mapRoot', 'module', 'newLine', 'noEmit',
-    'noEmitHelpers', 'noEmitOnError', 'noImplicitAny', 'noResolve', 'preserveConstEnums', 'removeComments', 'sourceRoot',
-    'sourceMap', 'suppressImplicitAnyIndexErrors', 'target', 'verbose', 'jsx', 'moduleResolution',
-    'experimentalAsyncFunctions', 'rootDir'], delayTemplateExpansion = ['htmlModuleTemplate', 'htmlVarTemplate'];
+    'emitDecoratorMetadata', 'experimentalDecorators', 'failOnTypeErrors', 'fast', 'htmlModuleTemplate', 'htmlOutDir',
+    'htmlOutputTemplate', 'htmlOutDirFlatten', 'htmlVarTemplate', 'inlineSourceMap', 'inlineSources', 'isolatedModules',
+    'mapRoot', 'module', 'newLine', 'noEmit', 'noEmitHelpers', 'noEmitOnError', 'noImplicitAny', 'noResolve',
+    'preserveConstEnums', 'removeComments', 'sourceRoot', 'sourceMap', 'suppressImplicitAnyIndexErrors', 'target',
+    'verbose', 'jsx', 'moduleResolution', 'experimentalAsyncFunctions', 'rootDir'], delayTemplateExpansion = ['htmlModuleTemplate', 'htmlVarTemplate'];
 var templateProcessor = null;
 var globExpander = null;
 function noopTemplateProcessor(templateString, options) {

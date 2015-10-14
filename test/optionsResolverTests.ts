@@ -129,7 +129,9 @@ const config : {[name: string]: IGruntTargetOptions} = {
         htmlOutputTemplate: '/* tslint:disable:max-line-length */ \n\
           export module <%= modulename %> {\n\
               export var <%= varname %> = \'<%= content %>\';\n\
-          }\n'
+          }\n',
+        htmlOutDir: 'html/generated',
+        htmlOutDirFlatten: true
       }
   }
 };
@@ -229,11 +231,14 @@ export var tests : nodeunit.ITestGroup = {
         }).catch((err) => {test.ifError(err); test.done();});
     },
     "html features are resolved correctly": (test: nodeunit.Test) => {
-        test.expect(1);
+        test.expect(5);
         const cfg = getConfig("use html templates");
         const result = or.resolveAsync(null, cfg, null).then((result) => {
-          //test.strictEqual(result.CompilationTasks[0].outDir, "\"./my folder\"");
-          console.log(JSON.stringify(result));
+          test.strictEqual(result.htmlModuleTemplate, "html");
+          test.strictEqual(result.htmlVarTemplate, "markup");
+          test.ok(result.htmlOutputTemplate.indexOf('export module <%= modulename %> {\n') > -1);
+          test.strictEqual(result.htmlOutDir, "html/generated");
+          test.strictEqual(result.htmlOutDirFlatten, true);
           test.done();
         }).catch((err) => {test.ifError(err); test.done();});
     }

@@ -13,11 +13,11 @@ import {resolveAsync as resolveTSConfigAsync} from './tsconfig';
 const propertiesFromTarget = ['amdloader', 'html', 'htmlOutDir', 'htmlOutDirFlatten', 'reference', 'testExecute', 'tsconfig',
         'templateCache', 'vs', 'watch'],
       propertiesFromTargetOptions = ['additionalFlags', 'comments', 'compile', 'compiler', 'declaration',
-        'emitDecoratorMetadata', 'experimentalDecorators', 'failOnTypeErrors', 'fast', 'htmlModuleTemplate',
-        'htmlVarTemplate', 'inlineSourceMap', 'inlineSources', 'isolatedModules', 'mapRoot', 'module', 'newLine', 'noEmit',
-        'noEmitHelpers', 'noEmitOnError', 'noImplicitAny', 'noResolve', 'preserveConstEnums', 'removeComments', 'sourceRoot',
-        'sourceMap', 'suppressImplicitAnyIndexErrors', 'target', 'verbose', 'jsx', 'moduleResolution',
-        'experimentalAsyncFunctions', 'rootDir'],
+        'emitDecoratorMetadata', 'experimentalDecorators', 'failOnTypeErrors', 'fast', 'htmlModuleTemplate', 'htmlOutDir',
+        'htmlOutputTemplate', 'htmlOutDirFlatten', 'htmlVarTemplate', 'inlineSourceMap', 'inlineSources', 'isolatedModules',
+        'mapRoot', 'module', 'newLine', 'noEmit', 'noEmitHelpers', 'noEmitOnError', 'noImplicitAny', 'noResolve',
+        'preserveConstEnums', 'removeComments', 'sourceRoot', 'sourceMap', 'suppressImplicitAnyIndexErrors', 'target',
+        'verbose', 'jsx', 'moduleResolution', 'experimentalAsyncFunctions', 'rootDir'],
       delayTemplateExpansion = ['htmlModuleTemplate', 'htmlVarTemplate'];
 
 let templateProcessor: (templateString: string, options: any) => string = null;
