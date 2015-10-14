@@ -107,6 +107,8 @@ For file ordering, look at [JavaScript Generation](#javascript-generation).
 |[files](#files)|target|Sets of files to compile and optional output destination|
 |[html](#html)|target|`string` or `string[]` - glob to HTML templates|
 |[htmlModuleTemplate](#htmlmoduletemplate)|option|`string` - HTML template namespace|
+|[htmlOutDir](#htmloutdir)|option|`string` - Sets a root for output of transformed-to-TypeScript HTML files|
+|[htmlOutDirFlatten](#htmloutdirflatten)|option|`true`, `false` (default) - Will flatten the transformed HTML files to a single folder|
 |[htmlVarTemplate](#htmlvartemplate)|option|`string` - HTML property name|
 |[inlineSourceMap](#inlinesourcemap)|option|`true`, `false` (default) Emit a single file that includes source maps instead of emitting a separate `.js.map` file; If enabled, will automatically enable `sourceMap`.|
 |[inlineSources](#inlinesources)|option|`true`, `false` (default) Emit the TypeScript source alongside the sourcemaps within a single file; If enabled, will automatically enable `inlineSourceMap` and `sourceMap`.|
@@ -636,15 +638,51 @@ grunt.initConfig({
 });
 ````
 
+#### htmlOutDir
+
+Sets a root for output of transformed-to-TypeScript HTML files.  See detailed explanation of [grunt-ts HTML template support](/docs/html2ts.md).
+
+````javascript
+//Note: incomplete - combine with html and src/files/etc.
+grunt.initConfig({
+  ts: {
+    default: {
+      options: {
+        htmlOutDir: 'generatedHtml'
+      }
+    }
+  }
+});
+````
+
+### htmlOutDirFlatten
+
+Will flatten the transformed HTML files to a single folder.  See detailed explanation of [grunt-ts HTML template support](/docs/html2ts.md).
+
+````javascript
+//Note: incomplete - combine with html and src/files/etc.
+grunt.initConfig({
+  ts: {
+    default: {
+      options: {
+        htmlOutDir: 'generatedHtml',
+        htmlOutDirFlatten: true
+      }
+    }
+  }
+});
+````
+
+
 #### htmlOutputTemplate
 
 Grunt-ts supports compilation of `.html` file content to TypeScript variables which is explained in detail [here](/docs/html2ts.md).  The `htmlOutputTemplate` target property allows the developer to override the internally defined output template to a custom one, useful if one would like to define the HTML output as an external modules, for example.
-Three variables can be used in this template, namely:
 
+Three variables can be used in the template, namely:
 
-* "<%= modulename %>" - This variable will be interpolated with the value of the htmlModuleTemplate option
-* "<%= varname %>" - This variable will be interpolated with the value of the htmlVarTemplate option
-* "<%= content %>" - This variable will be interpolated with the content of the HTML file
+* "<%= modulename %>" - This variable will be replaced with the value of the `htmlModuleTemplate` option.
+* "<%= varname %>" - This variable will be replaced with the value of the `htmlVarTemplate` option.
+* "<%= content %>" - This variable will be replaced with the content of the HTML file.
 
 ````javascript
 //Note: Outputs an external module
@@ -660,7 +698,6 @@ grunt.initConfig({
               export var <%= varname %> = \'<%= content %>\';\n\
           }\n'
       }
-
     }
   }
 });
