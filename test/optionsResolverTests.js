@@ -116,6 +116,16 @@ var config = {
     "zoo": {
         src: ["test/simple/ts/**/*.ts"]
     },
+    "use html templates": {
+        options: {
+            htmlVarTemplate: 'markup',
+            htmlModuleTemplate: 'html',
+            htmlOutputTemplate: '/* tslint:disable:max-line-length */ \n\
+          export module <%= modulename %> {\n\
+              export var <%= varname %> = \'<%= content %>\';\n\
+          }\n'
+        }
+    }
 };
 function getConfig(name, asCopy) {
     if (asCopy === void 0) { asCopy = false; }
@@ -205,6 +215,15 @@ exports.tests = {
             var files = [getConfig("outDir has spaces")];
             var result = or.resolveAsync(null, getConfig("outDir has spaces"), null, files).then(function (result) {
                 test.strictEqual(result.CompilationTasks[0].outDir, "\"./my folder\"");
+                test.done();
+            }).catch(function (err) { test.ifError(err); test.done(); });
+        },
+        "html features are resolved correctly": function (test) {
+            test.expect(1);
+            var cfg = getConfig("use html templates");
+            var result = or.resolveAsync(null, cfg, null).then(function (result) {
+                //test.strictEqual(result.CompilationTasks[0].outDir, "\"./my folder\"");
+                console.log(JSON.stringify(result));
                 test.done();
             }).catch(function (err) { test.ifError(err); test.done(); });
         }
@@ -434,18 +453,31 @@ exports.tests = {
                 test.strictEqual(result.sourceMap, true);
                 test.strictEqual(result.emitDecoratorMetadata, undefined, 'emitDecoratorMetadata is not specified in this tsconfig.json');
                 test.strictEqual(result.CompilationTasks.length, 1);
-                test.strictEqual(result.CompilationTasks[0].outDir, './files');
+                test.strictEqual(result.CompilationTasks[0].outDir, 'test/tsconfig/files');
                 test.strictEqual(result.CompilationTasks[0].out, undefined);
                 test.done();
             }).catch(function (err) { test.ifError(err); test.done(); });
         },
-        "out comes through appropriately": function (test) {
-            test.expect(3);
+        "out comes through with a warning and is NOT remapped relative to Gruntfile.js": function (test) {
+            test.expect(5);
             var cfg = getConfig("minimalist", true);
             cfg.tsconfig = './test/tsconfig/test_simple_with_out.json';
             var result = or.resolveAsync(null, cfg).then(function (result) {
                 test.strictEqual(result.CompilationTasks.length, 1);
-                test.strictEqual(result.CompilationTasks[0].out, './files/this_is_the_out_file.js');
+                test.strictEqual(result.CompilationTasks[0].out, 'files/this_is_the_out_file.js');
+                test.strictEqual(result.CompilationTasks[0].outDir, undefined);
+                test.strictEqual(result.warnings.length, 1);
+                test.ok(result.warnings[0].indexOf('Using `out` in tsconfig.json can be unreliable') > -1);
+                test.done();
+            }).catch(function (err) { test.ifError(err); test.done(); });
+        },
+        "outFile comes through appropriately and is remapped relative to Gruntfile.js": function (test) {
+            test.expect(3);
+            var cfg = getConfig("minimalist", true);
+            cfg.tsconfig = './test/tsconfig/test_simple_with_outFile.json';
+            var result = or.resolveAsync(null, cfg).then(function (result) {
+                test.strictEqual(result.CompilationTasks.length, 1);
+                test.strictEqual(result.CompilationTasks[0].out, 'test/tsconfig/files/this_is_the_outFile_file.js');
                 test.strictEqual(result.CompilationTasks[0].outDir, undefined);
                 test.done();
             }).catch(function (err) { test.ifError(err); test.done(); });

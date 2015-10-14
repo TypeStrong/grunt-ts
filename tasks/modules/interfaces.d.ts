@@ -162,6 +162,7 @@ interface ICompilerOptions {
     noLibCheck?: boolean;
     noResolve?: boolean;
     out?: string;
+    outFile?: string;
     outDir?: string;
     preserveConstEnums?: boolean;
     removeComments?: boolean;
