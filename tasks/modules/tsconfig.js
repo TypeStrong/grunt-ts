@@ -75,11 +75,17 @@ function resolveAsync(applyTo, taskOptions, targetOptions, theTemplateProcessor,
                 return reject(ex);
             }
             try {
-                var projectSpec = JSON.parse(stripBom(projectFileTextContent));
+                var projectSpec;
+                var content = stripBom(projectFileTextContent);
+                if (content.trim() === "") {
+                    projectSpec = {};
+                }
+                else {
+                    projectSpec = JSON.parse(content);
+                }
             }
             catch (ex) {
-                return reject('Error parsing "' + projectFile + '".  It may not be valid JSON in UTF-8.  ' +
-                    'The shortest possible file contents that will "work" with grunt-ts is: {}');
+                return reject('Error parsing "' + projectFile + '".  It may not be valid JSON in UTF-8.');
             }
             applyTo = applyCompilerOptions(applyTo, projectSpec);
             applyTo = resolve_out_and_outDir(applyTo, projectSpec);

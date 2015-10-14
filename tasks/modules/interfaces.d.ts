@@ -113,7 +113,7 @@ interface IGruntTSCompilationInfo extends grunt.file.IFilesConfig {
 }
 
 declare module 'strip-bom' {
-  var stripBom: Function;
+  var stripBom: (content: string) => string;
   export = stripBom;
 }
 

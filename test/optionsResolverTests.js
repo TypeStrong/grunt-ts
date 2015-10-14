@@ -384,15 +384,16 @@ exports.tests = {
                 test.done();
             });
         },
-        "Exception from blank file": function (test) {
+        "No exception from blank file": function (test) {
             test.expect(1);
+            var expectedMemo = 'expected blank file to NOT throw an exception (should be treated as contents = {}).';
             var cfg = getConfig("minimalist", true);
             cfg.tsconfig = './test/tsconfig/blank_tsconfig.json';
             var result = or.resolveAsync(null, cfg).then(function (result) {
-                test.ok(false, 'expected exception from invalid file.');
+                test.ok(true, expectedMemo);
                 test.done();
             }).catch(function (err) {
-                test.ok(err.indexOf('Error parsing') > -1);
+                test.ok(false, expectedMemo);
                 test.done();
             });
         },

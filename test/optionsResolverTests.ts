@@ -220,8 +220,6 @@ export var tests : nodeunit.ITestGroup = {
     }
   },
 
-
-
   "Precedence and defaults override Tests": {
     "The grunt-ts defaults come through when not specified": (test: nodeunit.Test) => {
         test.expect(2);
@@ -293,7 +291,6 @@ export var tests : nodeunit.ITestGroup = {
     }
   },
 
-
   "Visual Studio `vs` Integration Tests": {
     "Visual Studio properties should override the grunt-ts defaults ONLY": (test: nodeunit.Test) => {
       test.expect(3);
@@ -354,7 +351,6 @@ export var tests : nodeunit.ITestGroup = {
     }
   },
 
-
   "tsconfig.json Integration Tests": {
     setUp: (callback) => {
         let jsonFiles = fs.readdirSync('test/tsconfig_artifact');
@@ -403,15 +399,16 @@ export var tests : nodeunit.ITestGroup = {
           test.done();
         });
     },
-    "Exception from blank file":  (test: nodeunit.Test) => {
+    "No exception from blank file":  (test: nodeunit.Test) => {
       test.expect(1);
+      const expectedMemo = 'expected blank file to NOT throw an exception (should be treated as contents = {}).';
       const cfg = getConfig("minimalist", true);
       cfg.tsconfig = './test/tsconfig/blank_tsconfig.json';
       const result = or.resolveAsync(null, cfg).then((result) => {
-        test.ok(false, 'expected exception from invalid file.');
+        test.ok(true, expectedMemo);
         test.done();
       }).catch((err) => {
-        test.ok(err.indexOf('Error parsing') > -1);
+        test.ok(false, expectedMemo);
         test.done();
       });
     },
