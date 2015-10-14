@@ -9,10 +9,10 @@ import utils = require('./utils');
 
 /////////////////////////////////////////////////////////////////////
 // Reference file logic
-////////////////////////////////////////////////////////////////////    
+////////////////////////////////////////////////////////////////////
 
 // Updates the reference file
-export function updateReferenceFile(files: string[], generatedFiles: string[], referenceFile: string, referencePath: string): boolean {
+export function updateReferenceFile(files: string[], generatedFiles: string[], referenceFile: string, referencePath: string, eol: string): boolean {
     var referenceIntro = '/// <reference path="';
     var referenceEnd = '" />';
     var referenceMatch = /\/\/\/ <reference path=\"(.*?)\"/;
@@ -95,7 +95,7 @@ export function updateReferenceFile(files: string[], generatedFiles: string[], r
     contents.push(ourSignatureEnd);
 
     var updatedFileLines = utils.insertArrayAt(origFileLines, signatureSectionPosition, contents);
-    var updatedFileContents = updatedFileLines.join(utils.eol);
+    var updatedFileContents = updatedFileLines.join(eol);
 
     // Modify the orig contents to put in our contents only if changed
     // Also Return whether the file was changed

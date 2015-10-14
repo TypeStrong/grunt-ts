@@ -4,9 +4,29 @@ import path = require('path');
 import fs = require('fs');
 import util = require('util');
 import _ = require('lodash');
+import {Promise} from 'es6-promise';
 
 export var grunt: IGrunt = require('grunt');
-export var eol: string = grunt.util.linefeed;
+export const eol: string = grunt.util.linefeed;
+
+export function newLineIsRedundant(newLineParameter: string) {
+  return ((newLineParameter === 'CRLF' && grunt.util.linefeed === '\r\n') ||
+          (newLineParameter === 'LF' && grunt.util.linefeed === '\n'));
+}
+
+export function newLineActualAsParameter(actualNewLineChars: string) {
+  if (actualNewLineChars) {
+    return actualNewLineChars.replace(/\n/g, 'LF').replace(/\r/g, 'CR');
+  }
+  return '';
+}
+
+export function newLineParameterAsActual(parameterNewLineChars: string) {
+  if (parameterNewLineChars) {
+  return parameterNewLineChars.replace(/LF/g, '\n').replace(/CR/g, '\r');
+  }
+  return '';
+}
 
 // Converts "C:\boo" , "C:\boo\foo.ts" => "./foo.ts"; Works on unix as well.
 export function makeRelativePath(folderpath: string, filename: string, forceRelative = false) {
@@ -73,14 +93,26 @@ export function endsWith(str: string, suffix: string): boolean {
     return str.indexOf(suffix, str.length - suffix.length) !== -1;
 }
 
+export function stripQuotesIfQuoted(possiblyQuotedString: string) {
+    if (!possiblyQuotedString.length || possiblyQuotedString.length < 2) {
+      return possiblyQuotedString;
+    }
+    if (possiblyQuotedString.charAt(0) === '"' &&
+       possiblyQuotedString.charAt(possiblyQuotedString.length - 1) === '"') {
+         return possiblyQuotedString.substr(1, possiblyQuotedString.length - 2);
+    }
+    return possiblyQuotedString;
+}
+
 export function isJavaScriptFile(filePath: string): boolean {
     if (filePath.toLowerCase) {
-        return this.endsWith(filePath.toLowerCase(), '.js');
+        var normalizedFile = path.resolve(stripQuotesIfQuoted(filePath)).toLowerCase();
+        return endsWith(normalizedFile, '.js');
     }
     return false;
 }
 
-/** function for formatting strings 
+/** function for formatting strings
  * ('{0} says {1}','la','ba' ) => 'la says ba'
  */
 export function format(str: string, ...args: any[]) {
@@ -136,7 +168,7 @@ export function getTempFile(prefix?: string, dir: string = '', extension = '.tmp
  * Get all files from a directory and all its subdirectories.
  * @param {String} dirPath A path to a directory
  * @param {RegExp|Function} exclude Defines which files should be excluded.
-     Can be a RegExp (whole filepath is tested) or a Function which will get the filepath 
+     Can be a RegExp (whole filepath is tested) or a Function which will get the filepath
      as an argument and should return true (exclude file) or false (do not exclude).
  * @returns {Array} An array of files
  */
@@ -147,8 +179,8 @@ export function getFiles(dirPath, exclude?: (filename: string) => boolean): stri
 /**
  * Get all directories from a directory and all its subdirectories.
  * @param {String} dirPath A path to a directory
- * @param {RegExp|Function} exclude Defines which directories should be excluded. 
-    Can be a RegExp (whole dirpath is tested) or a Function which will get the dirpath 
+ * @param {RegExp|Function} exclude Defines which directories should be excluded.
+    Can be a RegExp (whole dirpath is tested) or a Function which will get the dirpath
     as an argument and should return true (exclude dir) or false (do not exclude).
  * @returns {Array} An array of directories
  */
@@ -159,8 +191,8 @@ export function getDirs(dirPath, exclude?: (filename: string) => boolean): strin
 /**
  * Get all files or directories from a directory and all its subdirectories.
  * @param {String} dirPath A path to a directory
- * @param {RegExp|Function} exclude Defines which files or directories should be excluded. 
-    Can be a RegExp (whole path is tested) or a Function which will get the path 
+ * @param {RegExp|Function} exclude Defines which files or directories should be excluded.
+    Can be a RegExp (whole path is tested) or a Function which will get the path
     as an argument and should return true (exclude) or false (do not exclude).
  * @param {Boolean} getFiles Whether to get files (true) or directories (false).
  * @returns {Array} An array of files or directories
@@ -241,14 +273,126 @@ function _checkExcludeArgument(exclude) {
     return exclude;
 }
 
-
 export function firstElementWithValue<T>(elements: T[], defaultResult: T = null): T {
     var result: T = defaultResult;
     _.each(elements, (item) => {
-        if (!_.isNull(item) && !_.isUndefined(item)) {
+        if (hasValue(item)) {
             result = item;
             return false; // break out of lodash loop
         }
     });
     return result;
+}
+
+export function hasValue(thing: any) {
+    return !_.isNull(thing) && !_.isUndefined(thing);
+}
+
+export function getOrGetFirst(getFrom: string | string[]) : string {
+  if (_.isArray(getFrom)) {
+    if (getFrom.length > 0) {
+        return getFrom[0];
+    }
+    return '';
+  }
+  return <string>getFrom;
+}
+
+export function enclosePathInQuotesIfRequired(path: string): string {
+  if (!path || !path.indexOf) {
+    return path;
+  }
+  if (path.indexOf(' ') === -1) {
+      return path;
+  } else {
+    const newPath = path.trim();
+    if (newPath.indexOf('"') === 0 && newPath.lastIndexOf('"') === newPath.length - 1) {
+      return newPath;
+    } else {
+      return '"' + newPath + '"';
+    }
+  }
+}
+
+/**
+ * Time a function and print the result.
+ *
+ * @param makeIt the code to time
+ * @returns the result of the block of code
+ */
+export function timeIt<R>(makeIt: () => R): {
+    /**
+     * The result of the computation
+     */
+    it: R;
+    /**
+     * Time in milliseconds.
+     */
+    time: number;
+} {
+    var starttime = new Date().getTime();
+    var it = makeIt();
+    var endtime = new Date().getTime();
+    return {
+        it: it,
+        time: endtime - starttime
+    };
+}
+
+/**
+ * Run a map operation async in series (simplified)
+ */
+export function asyncSeries<U, W>(items: U[], callPerItem: (item: U) => Promise<W>): Promise<W[]> {
+    items = items.slice(0);
+
+    const memo: W[] = [];
+
+    // Run one at a time
+    return new Promise((resolve, reject) => {
+        const next = () => {
+            if (items.length === 0) {
+                resolve(memo);
+                return;
+            }
+            (<any>Promise)
+              .cast(callPerItem(items.shift()))
+              .then((result: W) => {
+                memo.push(result);
+                next();
+            }, reject);
+        };
+        next();
+    });
+}
+
+export function copyFileSync(srcFile: string, destFile: string, encoding = 'utf8') {
+  var content = fs.readFileSync(srcFile, encoding);
+  fs.writeFileSync(destFile, content, encoding);
+}
+
+export function readAndParseJSONFromFileSync(fileName: string, encoding = 'utf8') : any {
+
+  let textContent: string, result: any;
+  try {
+    textContent = fs.readFileSync(fileName, encoding);
+  } catch (ex) {
+    throw new Error(`Error reading file ${fileName}: ${ex}`);
+  }
+
+  try {
+     result = JSON.parse(textContent);
+  } catch (ex) {
+    throw new Error(`Error parsing JSON in file ${fileName}: ${ex}`);
+  }
+
+  return result;
+}
+
+
+export function shouldCompile(options: IGruntTSOptions) {
+  return !!options.compile;
+}
+
+export function shouldPassThrough(options: IGruntTSOptions) {
+  return (options.tsconfig && (<ITSConfigSupport>options.tsconfig).passThrough);
 }

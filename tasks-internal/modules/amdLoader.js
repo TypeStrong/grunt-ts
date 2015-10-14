@@ -4,15 +4,8 @@ var _str = require('underscore.string');
 var path = require('path');
 var fs = require('fs');
 var utils = require('./utils');
-var eol = utils.eol;
 var grunt = utils.grunt;
 var pathSeperator = path.sep;
-(function (ReferenceOrder) {
-    ReferenceOrder[ReferenceOrder["before"] = 0] = "before";
-    ReferenceOrder[ReferenceOrder["unordered"] = 1] = "unordered";
-    ReferenceOrder[ReferenceOrder["after"] = 2] = "after";
-})(exports.ReferenceOrder || (exports.ReferenceOrder = {}));
-var ReferenceOrder = exports.ReferenceOrder;
 function getReferencesInOrder(referenceFile, referencePath, generatedFiles) {
     var toreturn = {
         all: [],
@@ -77,7 +70,8 @@ function getReferencesInOrder(referenceFile, referencePath, generatedFiles) {
 }
 exports.getReferencesInOrder = getReferencesInOrder;
 // It updates based on the order of reference files
-function updateAmdLoader(referenceFile, files, loaderFile, loaderPath, outDir) {
+function updateAmdLoader(referenceFile, files, loaderFile, loaderPath, outDir, newLine) {
+    if (newLine === void 0) { newLine = utils.eol; }
     // Read the original file if it exists
     if (fs.existsSync(referenceFile)) {
         grunt.log.verbose.writeln('Generating amdloader from reference file ' + referenceFile);
@@ -89,27 +83,19 @@ function updateAmdLoader(referenceFile, files, loaderFile, loaderPath, outDir) {
             grunt.warn('No files in reference file: ' + referenceFile);
         }
         if (files.before.length > 0) {
-            files.before = _.filter(files.before, function (file) {
-                return !utils.endsWith(file, '.d.ts');
-            });
+            files.before = _.filter(files.before, function (file) { return !utils.endsWith(file, '.d.ts'); });
             grunt.log.verbose.writeln('Before: ' + files.before.map(function (f) { return f.cyan; }).join(', '));
         }
         if (files.generated.length > 0) {
-            files.generated = _.filter(files.generated, function (file) {
-                return !utils.endsWith(file, '.d.ts');
-            });
+            files.generated = _.filter(files.generated, function (file) { return !utils.endsWith(file, '.d.ts'); });
             grunt.log.verbose.writeln('Generated: ' + files.generated.map(function (f) { return f.cyan; }).join(', '));
         }
         if (files.unordered.length > 0) {
-            files.unordered = _.filter(files.unordered, function (file) {
-                return !utils.endsWith(file, '.d.ts');
-            });
+            files.unordered = _.filter(files.unordered, function (file) { return !utils.endsWith(file, '.d.ts'); });
             grunt.log.verbose.writeln('Unordered: ' + files.unordered.map(function (f) { return f.cyan; }).join(', '));
         }
         if (files.after.length > 0) {
-            files.after = _.filter(files.after, function (file) {
-                return !utils.endsWith(file, '.d.ts');
-            });
+            files.after = _.filter(files.after, function (file) { return !utils.endsWith(file, '.d.ts'); });
             grunt.log.verbose.writeln('After: ' + files.after.map(function (f) { return f.cyan; }).join(', '));
         }
         // If target has outDir we need to make adjust the path
@@ -143,9 +129,13 @@ function updateAmdLoader(referenceFile, files, loaderFile, loaderPath, outDir) {
             files.generated = makeRelativeToOutDir(files.generated);
             files.unordered = makeRelativeToOutDir(files.unordered);
             files.after = makeRelativeToOutDir(files.after);
-            var mainTemplate = _.template('define(function (require) { ' + eol + '<%= body %>' + eol + '});');
+            var mainTemplate = _.template('define(function (require) { '
+                + newLine + '<%= body %>'
+                + newLine + '});');
             // The order in the before and after files is important
-            var singleRequireTemplate = _.template('\t require([<%= filename %>],function (){' + eol + '<%= subitem %>' + eol + '\t });');
+            var singleRequireTemplate = _.template('\t require([<%= filename %>],function (){'
+                + newLine + '<%= subitem %>'
+                + newLine + '\t });');
             // initial sub item
             var subitem = '';
             // Write out a binary file:
@@ -170,12 +160,12 @@ function updateAmdLoader(referenceFile, files, loaderFile, loaderPath, outDir) {
             // Next up add the unordered items:
             // For these we will use just one require call
             if (files.unordered.length > 0) {
-                var unorderFileNames = files.unordered.join('",' + eol + '\t\t  "');
+                var unorderFileNames = files.unordered.join('",' + newLine + '\t\t  "');
                 subitem = singleRequireTemplate({ filename: '"' + unorderFileNames + '"', subitem: subitem });
             }
             // Next the generated files
             // For these we will use just one require call
-            var generatedFileNames = files.generated.join('",' + eol + '\t\t  "');
+            var generatedFileNames = files.generated.join('",' + newLine + '\t\t  "');
             subitem = singleRequireTemplate({ filename: '"' + generatedFileNames + '"', subitem: subitem });
             // Build the subitem for ordered before items
             files.before = files.before.reverse();

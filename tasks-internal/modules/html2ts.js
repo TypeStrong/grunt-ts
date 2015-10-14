@@ -2,6 +2,8 @@
 var _ = require('lodash');
 var fs = require('fs');
 var path = require('path');
+var utils = require('./utils');
+var grunt = utils.grunt;
 /////////////////////////////////////////////////////////////////////
 // HTML -> TS
 ////////////////////////////////////////////////////////////////////
@@ -18,20 +20,35 @@ var escapeContent = function (content, quoteChar) {
 };
 // Remove bom when reading utf8 files
 function stripBOM(str) {
-    return 0xFEFF === str.charCodeAt(0) ? str.substring(1) : str;
+    return 0xFEFF === str.charCodeAt(0)
+        ? str.substring(1)
+        : str;
 }
-var htmlTemplate = _.template('module <%= modulename %> { export var <%= varname %> =  \'<%= content %>\' } ');
+function htmlInternalTemplate(lineEnding) {
+    return '/* tslint:disable:max-line-length */' + lineEnding +
+        'module <%= modulename %> {' + lineEnding +
+        '  export var <%= varname %> = \'<%= content %>\';' + lineEnding +
+        '}' + lineEnding;
+}
+;
 // Compile an HTML file to a TS file
 // Return the filename. This filename will be required by reference.ts
 function compileHTML(filename, options) {
+    grunt.log.verbose.writeln('Compiling HTML: ' + filename);
     var htmlContent = escapeContent(fs.readFileSync(filename).toString());
     htmlContent = stripBOM(htmlContent);
     // TODO: place a minification pipeline here if you want.
     var ext = path.extname(filename).replace('.', '');
     var extFreename = path.basename(filename, '.' + ext);
     var moduleName = options.moduleFunction({ ext: ext, filename: extFreename });
-    var varName = options.varFunction({ ext: ext, filename: extFreename }).replace('.', '_');
-    var fileContent = htmlTemplate({ modulename: moduleName, varname: varName, content: htmlContent });
+    var varName = options.varFunction({ ext: ext, filename: extFreename }).replace(/\./g, '_');
+    var fileContent;
+    if (!options.htmlOutputTemplate) {
+        fileContent = _.template(htmlInternalTemplate(options.eol))({ modulename: moduleName, varname: varName, content: htmlContent });
+    }
+    else {
+        fileContent = _.template(replaceNewLines(options.htmlOutputTemplate, options.eol))({ modulename: moduleName, varname: varName, content: htmlContent });
+    }
     // Write the content to a file
     var outputfile = getOutputFile(filename, options.htmlOutDir, options.flatten);
     mkdirParent(path.dirname(outputfile));
@@ -39,6 +56,10 @@ function compileHTML(filename, options) {
     return outputfile;
 }
 exports.compileHTML = compileHTML;
+// Replace user-supplied templates newlines with newlines appropriate for the current OS
+function replaceNewLines(input, newLines) {
+    return input.replace(/\r/g, '').replace(/\n/g, newLines);
+}
 function getOutputFile(filename, htmlOutDir, flatten) {
     var outputfile = filename;
     // NOTE If an htmlOutDir was specified
@@ -63,6 +84,7 @@ function getPath(dir) {
     return dir;
 }
 function mkdirParent(dirPath, mode) {
+    // NOTE Call the standard fs.mkdirSync
     try {
         fs.mkdirSync(dirPath, mode);
     }

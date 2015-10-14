@@ -3,6 +3,9 @@
 import _ = require('lodash');
 import fs = require('fs');
 import path = require('path');
+import utils = require('./utils');
+
+var grunt = utils.grunt;
 
 /////////////////////////////////////////////////////////////////////
 // HTML -> TS
@@ -26,18 +29,30 @@ function stripBOM(str) {
         : str;
 }
 
-var htmlTemplate = _.template('module <%= modulename %> { export var <%= varname %> =  \'<%= content %>\' } ');
+
+function htmlInternalTemplate(lineEnding: string) {
+  return '/* tslint:disable:max-line-length */' + lineEnding +
+    'module <%= modulename %> {' + lineEnding +
+    '  export var <%= varname %> = \'<%= content %>\';' + lineEnding +
+    '}' + lineEnding;
+  };
+
 
 export interface IHtml2TSOptions {
     moduleFunction: Function;
     varFunction: Function;
+    htmlOutputTemplate: string;
     htmlOutDir: string;
     flatten: boolean;
+    eol: string;
 }
 
 // Compile an HTML file to a TS file
 // Return the filename. This filename will be required by reference.ts
 export function compileHTML(filename: string, options: IHtml2TSOptions): string {
+
+    grunt.log.verbose.writeln('Compiling HTML: ' + filename);
+
     var htmlContent = escapeContent(fs.readFileSync(filename).toString());
     htmlContent = stripBOM(htmlContent);
     // TODO: place a minification pipeline here if you want.
@@ -46,9 +61,18 @@ export function compileHTML(filename: string, options: IHtml2TSOptions): string 
     var extFreename = path.basename(filename, '.' + ext);
 
     var moduleName = options.moduleFunction({ ext: ext, filename: extFreename });
-    var varName = options.varFunction({ ext: ext, filename: extFreename }).replace('.', '_');
+    var varName = options.varFunction({ ext: ext, filename: extFreename }).replace(/\./g, '_');
 
-    var fileContent = htmlTemplate({ modulename: moduleName, varname: varName, content: htmlContent });
+    var fileContent;
+    if (!options.htmlOutputTemplate) {
+        fileContent = _.template(
+          htmlInternalTemplate(options.eol)
+          )({ modulename: moduleName, varname: varName, content: htmlContent });
+    } else {
+        fileContent = _.template(
+          replaceNewLines(options.htmlOutputTemplate, options.eol)
+          )({ modulename: moduleName, varname: varName, content: htmlContent });
+    }
 
     // Write the content to a file
     var outputfile = getOutputFile(filename, options.htmlOutDir, options.flatten);
@@ -58,6 +82,12 @@ export function compileHTML(filename: string, options: IHtml2TSOptions): string 
     fs.writeFileSync(outputfile, fileContent);
     return outputfile;
 }
+
+// Replace user-supplied templates newlines with newlines appropriate for the current OS
+function replaceNewLines(input: string, newLines: string) {
+   return input.replace(/\r/g, '').replace(/\n/g, newLines);
+}
+
 
 function getOutputFile(filename: string, htmlOutDir: string, flatten: boolean): string {
     var outputfile = filename;

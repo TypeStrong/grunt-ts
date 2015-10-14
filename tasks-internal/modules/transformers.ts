@@ -19,7 +19,7 @@ var currentTargetDirs: string[];
 function getImports(currentFilePath: string, name: string, targetFiles: string[], targetDirs: string[], getIndexIfDir = true): string[] {
     var files = [];
 
-    // Test if any filename matches 
+    // Test if any filename matches
     var targetFile = _.find(targetFiles, (targetFile) => {
         return path.basename(targetFile) === name
             || path.basename(targetFile, '.d.ts') === name
@@ -39,7 +39,7 @@ function getImports(currentFilePath: string, name: string, targetFiles: string[]
     });
     if (targetDir) {
         var possibleIndexFilePath = path.join(targetDir, 'index.ts');
-        // If targetDir has an index file AND this is not that file then 
+        // If targetDir has an index file AND this is not that file then
         // use index.ts instead of all the files in the directory
         if (getIndexIfDir
             && fs.existsSync(possibleIndexFilePath)
@@ -52,7 +52,7 @@ function getImports(currentFilePath: string, name: string, targetFiles: string[]
                 // exclude current file
                 if (path.relative(currentFilePath, filename) === '') { return true; }
 
-                return path.extname(filename) // must have extension : do not exclude directories                
+                return path.extname(filename) // must have extension : do not exclude directories
                     && (!_str.endsWith(filename, '.ts') || _str.endsWith(filename, '.d.ts'))
                     && !fs.lstatSync(filename).isDirectory(); // for people that name directories with dots
             });
@@ -128,7 +128,7 @@ class BaseTransformer {
 // This is a separate class from BaseTransformer to make it easier to add non import/export transforms in the future
 class BaseImportExportTransformer extends BaseTransformer implements ITransformer {
 
-    private template: (data?: { filename: string; pathToFile: string }) => string;
+    private template: (data?: { filename: string; pathToFile: string; signatureGenerated?: string }) => string;
     private getIndexIfDir: boolean;
     private removeExtensionFromFilePath: boolean;
 
@@ -154,7 +154,7 @@ class BaseImportExportTransformer extends BaseTransformer implements ITransforme
             if (imports.length) {
                 _.forEach(imports, (completePathToFile) => {
                     var filename = requestedVariableName || path.basename(path.basename(completePathToFile, '.ts'), '.d');
-                    // If filename is index, we replace it with dirname: 
+                    // If filename is index, we replace it with dirname:
                     if (filename.toLowerCase() === 'index') {
                         filename = path.basename(path.dirname(completePathToFile));
                     }
@@ -186,12 +186,12 @@ class ImportTransformer extends BaseImportExportTransformer implements ITransfor
 }
 
 class ExportTransformer extends BaseImportExportTransformer implements ITransformer {
-    constructor() {
+    constructor(private eol: string) {
         // This code is same as import transformer
         // One difference : we do not short circuit to `index.ts` if found
         super('export', '<fileOrDirectoryName>[,<variableName>]',
             // workaround for https://github.com/Microsoft/TypeScript/issues/512
-            _.template('import <%=filename%>_file = require(\'<%= pathToFile %>\'); <%= signatureGenerated %>' + utils.eol +
+            _.template('import <%=filename%>_file = require(\'<%= pathToFile %>\'); <%= signatureGenerated %>' + eol +
                 'export var <%=filename%> = <%=filename%>_file;'), false, true);
     }
 }
@@ -218,14 +218,13 @@ class UnknownTransformer extends BaseTransformer implements ITransformer {
     }
 }
 
-// This code fixes the line encoding to be per os. 
+// This code fixes the line encoding to be per os.
 // I think it is the best option available at the moment.
 // I am open for suggestions
 export function transformFiles(
     changedFiles: string[],
     targetFiles: string[],
-    target: ITargetOptions,
-    task: ITaskOptions) {
+    options: IGruntTSOptions) {
 
     currentTargetDirs = getTargetFolders(targetFiles);
     currentTargetFiles = targetFiles;
@@ -234,7 +233,7 @@ export function transformFiles(
 
     var transformers: ITransformer[] = [
         new ImportTransformer(),
-        new ExportTransformer(),
+        new ExportTransformer((options.newLine || utils.eol)),
         new ReferenceTransformer(),
         new UnknownTransformer()
     ];
@@ -254,7 +253,7 @@ export function transformFiles(
 
             var line = lines[i];
 
-            //// Debugging 
+            //// Debugging
             // grunt.log.writeln('line'.green);
             // grunt.log.writeln(line);
 
@@ -270,7 +269,7 @@ export function transformFiles(
                     // The code gen directive line automatically qualifies
                     outputLines.push(line);
 
-                    // pass transform settings to transform (match[1] is the equals sign, ensure it exists but otherwise ignore it) 
+                    // pass transform settings to transform (match[1] is the equals sign, ensure it exists but otherwise ignore it)
                     outputLines.push.apply(outputLines, transformer.transform(fileToProcess, match[1] && match[2] && match[2].trim()));
                     return true;
                 }
