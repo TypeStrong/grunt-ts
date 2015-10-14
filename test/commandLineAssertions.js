@@ -1,6 +1,5 @@
 /// <reference path="../defs/tsd.d.ts"/>
 /// <reference path="../tasks/modules/interfaces.d.ts"/>
-/// <reference path="../defs/csproj2ts/csproj2ts.d.ts" />
 exports.decoratorMetadataPassed = function (strings, options) {
     return new Promise(function (resolve, reject) {
         if (options.emitDecoratorMetadata === true &&
