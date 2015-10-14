@@ -340,10 +340,6 @@ function addressAssociatedOptionsAndResolveConflicts(options: IGruntTSOptions) {
     options.sourceMap = false;
   }
 
-  if (options.inlineSources && options.sourceMap) {
-    options.errors.push('It is not permitted to use inlineSources and sourceMap together.  Use one or the other.');
-  }
-
   if (options.inlineSources && !options.sourceMap) {
     options.inlineSources = true;
     options.inlineSourceMap = true;
