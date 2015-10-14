@@ -40,6 +40,10 @@ exports.TypeScriptDefaults = {
     additionalFlags: '',
     templateCache: null,
     targetName: '',
+    jsx: null,
+    moduleResolution: null,
+    experimentalAsyncFunctions: null,
+    rootDir: null,
     warnings: [],
     errors: []
 };

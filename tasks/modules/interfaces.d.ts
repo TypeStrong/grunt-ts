@@ -73,6 +73,14 @@ interface ITaskOptions {
     noEmitHelpers: boolean;
     /** Represents a string literal to pass to compiler */
     additionalFlags: string;
+    /** Specify JSX code generation style: 'preserve' or 'react' */
+    jsx: string;
+    /** Specifies module resolution strategy: 'node' (Node.js) or 'classic' (TypeScript pre-1.6). */
+    moduleResolution: string;
+    /** Enables experimental support for ES7 async functions */
+    experimentalAsyncFunctions: string;
+    /** Sepecifies the root directory of input files.  Use to control the output directory structure with --outDir. */
+    rootDir: string;
 }
 
 interface IVisualStudioProjectSupport {
@@ -105,7 +113,7 @@ interface IGruntTSCompilationInfo extends grunt.file.IFilesConfig {
 }
 
 declare module 'strip-bom' {
-  var stripBom: Function;
+  var stripBom: (content: string) => string;
   export = stripBom;
 }
 
@@ -143,6 +151,7 @@ interface ICompilerOptions {
     locale?: string;
     mapRoot?: string;
     module?: string;
+    moduleResolution: string;
     newLine?: string;
     noEmit?: boolean;
     noEmitHelpers?: boolean;
@@ -153,6 +162,7 @@ interface ICompilerOptions {
     noLibCheck?: boolean;
     noResolve?: boolean;
     out?: string;
+    outFile?: string;
     outDir?: string;
     preserveConstEnums?: boolean;
     removeComments?: boolean;

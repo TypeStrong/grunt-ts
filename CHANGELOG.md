@@ -1,6 +1,7 @@
 # Releases
 
 ## Next
+* Upgraded to TypeScript 1.6.2 (thanks to @vp2177 and @JoshuaKGoldberg for sending early PRs, and for @awjreynolds, @Zjaaspoer, @DrColossos, @ravishivt, @logankd, and @Gouigouix for early encouragement.)
 
 ## v5.0.1 (2015-10-08)
 * FIX: 'htmlOutputTemplate' was not handled.  Thanks for the PR, @rolego (#291).

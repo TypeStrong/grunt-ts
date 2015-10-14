@@ -298,7 +298,7 @@ export function getOrGetFirst(getFrom: string | string[]) : string {
   return <string>getFrom;
 }
 
-export function escapePathIfRequired(path: string): string {
+export function enclosePathInQuotesIfRequired(path: string): string {
   if (!path || !path.indexOf) {
     return path;
   }

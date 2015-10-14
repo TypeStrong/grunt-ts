@@ -1,6 +1,5 @@
 /// <reference path="../defs/tsd.d.ts"/>
 /// <reference path="../tasks/modules/interfaces.d.ts"/>
-/// <reference path="../defs/csproj2ts/csproj2ts.d.ts" />
 
 
 export const decoratorMetadataPassed : ICompilePromise = (strings, options) => {
@@ -505,5 +504,83 @@ export const warnbothcomments: ICompilePromise = (strings, options) => {
       });
     }
     throw `expected to not see removeComments passed.`;
+  });
+};
+
+export const test_jsx: ICompilePromise = (strings, options) => {
+  return new Promise(function(resolve, reject) {
+
+    const command = strings[1].replace(/\\/g,'/');
+    const expected = '--jsx preserve';
+    if (command.indexOf(expected) > -1) {
+      resolve({
+        code: 0,
+        output: ""
+      });
+    }
+    throw `expected to see ${expected} in the command line and didn't.  Got this: ${command}`;
+  });
+};
+
+export const test_moduleResolution: ICompilePromise = (strings, options) => {
+  return new Promise(function(resolve, reject) {
+
+    const command = strings[1].replace(/\\/g,'/');
+    const expected = '--moduleResolution classic';
+    if (command.indexOf(expected) > -1) {
+      resolve({
+        code: 0,
+        output: ""
+      });
+    }
+    throw `expected to see ${expected} in the command line and didn't.  Got this: ${command}`;
+  });
+};
+
+export const test_experimentalAsyncFunctions: ICompilePromise = (strings, options) => {
+  return new Promise(function(resolve, reject) {
+
+    const command = strings[1].replace(/\\/g,'/');
+    const expected = '--experimentalAsyncFunctions';
+    if (command.indexOf(expected) > -1) {
+      resolve({
+        code: 0,
+        output: ""
+      });
+    }
+    throw `expected to see ${expected} in the command line and didn't.  Got this: ${command}`;
+  });
+};
+
+export const test_rootDir: ICompilePromise = (strings, options) => {
+  return new Promise(function(resolve, reject) {
+
+    const command = strings[1].replace(/\\/g,'/');
+    const expected = '--rootDir test/simple';
+    if (command.indexOf(expected) > -1) {
+      resolve({
+        code: 0,
+        output: ""
+      });
+    }
+    throw `expected to see ${expected} in the command line and didn't.  Got this: ${command}`;
+  });
+};
+
+export const test_directoriesWithSpaces: ICompilePromise = (strings, options) => {
+  return new Promise(function(resolve, reject) {
+
+    const command = strings[1].replace(/\\/g,'/');
+
+    if (command.indexOf(`--rootDir "test/rootDir with spaces"`) > -1 &&
+        command.indexOf(`--outDir "test/outDir with spaces"`) > -1 &&
+        command.indexOf(`--sourceRoot "test/sourceRoot with spaces"`) > -1 &&
+        command.indexOf(`--mapRoot "test/mapRoot with spaces"`) > -1) {
+      resolve({
+        code: 0,
+        output: ""
+      });
+    }
+    throw `expected to see rootDir, outDir, sourceRoot, and mapRoot with quoted values in the command line and didn't.  Got this: ${command}`;
   });
 };

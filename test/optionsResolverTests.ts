@@ -122,6 +122,18 @@ const config : {[name: string]: IGruntTargetOptions} = {
   "zoo": <any>{
     src: ["test/simple/ts/**/*.ts"]
   },
+  "use html templates": <any>{
+      options: {
+        htmlVarTemplate: 'markup',
+        htmlModuleTemplate: 'html',
+        htmlOutputTemplate: '/* tslint:disable:max-line-length */ \n\
+          export module <%= modulename %> {\n\
+              export var <%= varname %> = \'<%= content %>\';\n\
+          }\n',
+        htmlOutDir: 'html/generated',
+        htmlOutDirFlatten: true
+      }
+  }
 };
 
 function getConfig(name: string, asCopy = false) : IGruntTargetOptions {
@@ -186,19 +198,19 @@ export var tests : nodeunit.ITestGroup = {
   "Special processing Tests": {
     "path with spaces gets enclosed in double-quotes": (test: nodeunit.Test) => {
         test.expect(1);
-        const result = utils.escapePathIfRequired("this is a path/path.txt");
+        const result = utils.enclosePathInQuotesIfRequired("this is a path/path.txt");
         test.strictEqual(result, "\"this is a path/path.txt\"");
         test.done();
     },
     "path that is already enclosed in double-quotes is unchanged": (test: nodeunit.Test) => {
       test.expect(1);
-      const result = utils.escapePathIfRequired("\"this is a path/path.txt\"");
+      const result = utils.enclosePathInQuotesIfRequired("\"this is a path/path.txt\"");
       test.strictEqual(result, "\"this is a path/path.txt\"");
       test.done();
     },
     "path without spaces is unchanged": (test: nodeunit.Test) => {
       test.expect(1);
-      const result = utils.escapePathIfRequired("thisIsAPath/path.txt");
+      const result = utils.enclosePathInQuotesIfRequired("thisIsAPath/path.txt");
       test.strictEqual(result, "thisIsAPath/path.txt");
       test.done();
     },
@@ -217,10 +229,20 @@ export var tests : nodeunit.ITestGroup = {
           test.strictEqual(result.CompilationTasks[0].outDir, "\"./my folder\"");
           test.done();
         }).catch((err) => {test.ifError(err); test.done();});
+    },
+    "html features are resolved correctly": (test: nodeunit.Test) => {
+        test.expect(5);
+        const cfg = getConfig("use html templates");
+        const result = or.resolveAsync(null, cfg, null).then((result) => {
+          test.strictEqual(result.htmlModuleTemplate, "html");
+          test.strictEqual(result.htmlVarTemplate, "markup");
+          test.ok(result.htmlOutputTemplate.indexOf('export module <%= modulename %> {\n') > -1);
+          test.strictEqual(result.htmlOutDir, "html/generated");
+          test.strictEqual(result.htmlOutDirFlatten, true);
+          test.done();
+        }).catch((err) => {test.ifError(err); test.done();});
     }
   },
-
-
 
   "Precedence and defaults override Tests": {
     "The grunt-ts defaults come through when not specified": (test: nodeunit.Test) => {
@@ -293,7 +315,6 @@ export var tests : nodeunit.ITestGroup = {
     }
   },
 
-
   "Visual Studio `vs` Integration Tests": {
     "Visual Studio properties should override the grunt-ts defaults ONLY": (test: nodeunit.Test) => {
       test.expect(3);
@@ -354,7 +375,6 @@ export var tests : nodeunit.ITestGroup = {
     }
   },
 
-
   "tsconfig.json Integration Tests": {
     setUp: (callback) => {
         let jsonFiles = fs.readdirSync('test/tsconfig_artifact');
@@ -403,15 +423,16 @@ export var tests : nodeunit.ITestGroup = {
           test.done();
         });
     },
-    "Exception from blank file":  (test: nodeunit.Test) => {
+    "No exception from blank file":  (test: nodeunit.Test) => {
       test.expect(1);
+      const expectedMemo = 'expected blank file to NOT throw an exception (should be treated as contents = {}).';
       const cfg = getConfig("minimalist", true);
       cfg.tsconfig = './test/tsconfig/blank_tsconfig.json';
       const result = or.resolveAsync(null, cfg).then((result) => {
-        test.ok(false, 'expected exception from invalid file.');
+        test.ok(true, expectedMemo);
         test.done();
       }).catch((err) => {
-        test.ok(err.indexOf('Error parsing') > -1);
+        test.ok(false, expectedMemo);
         test.done();
       });
     },
@@ -453,19 +474,33 @@ export var tests : nodeunit.ITestGroup = {
           test.strictEqual(result.sourceMap, true);
           test.strictEqual(result.emitDecoratorMetadata, undefined, 'emitDecoratorMetadata is not specified in this tsconfig.json');
           test.strictEqual(result.CompilationTasks.length, 1);
-          test.strictEqual(result.CompilationTasks[0].outDir, './files');
+          test.strictEqual(result.CompilationTasks[0].outDir, 'test/tsconfig/files');
           test.strictEqual(result.CompilationTasks[0].out, undefined);
           test.done();
         }).catch((err) => {test.ifError(err); test.done();});
     },
-    "out comes through appropriately": (test: nodeunit.Test) => {
-        test.expect(3);
+    "out comes through with a warning and is NOT remapped relative to Gruntfile.js": (test: nodeunit.Test) => {
+        test.expect(5);
         const cfg = getConfig("minimalist", true);
         cfg.tsconfig = './test/tsconfig/test_simple_with_out.json';
 
         const result = or.resolveAsync(null, cfg).then((result) => {
           test.strictEqual(result.CompilationTasks.length, 1);
-          test.strictEqual(result.CompilationTasks[0].out, './files/this_is_the_out_file.js');
+          test.strictEqual(result.CompilationTasks[0].out, 'files/this_is_the_out_file.js');
+          test.strictEqual(result.CompilationTasks[0].outDir, undefined);
+          test.strictEqual(result.warnings.length, 1);
+          test.ok(result.warnings[0].indexOf('Using `out` in tsconfig.json can be unreliable') > -1);
+          test.done();
+        }).catch((err) => {test.ifError(err); test.done();});
+    },
+    "outFile comes through appropriately and is remapped relative to Gruntfile.js": (test: nodeunit.Test) => {
+        test.expect(3);
+        const cfg = getConfig("minimalist", true);
+        cfg.tsconfig = './test/tsconfig/test_simple_with_outFile.json';
+
+        const result = or.resolveAsync(null, cfg).then((result) => {
+          test.strictEqual(result.CompilationTasks.length, 1);
+          test.strictEqual(result.CompilationTasks[0].out, 'test/tsconfig/files/this_is_the_outFile_file.js');
           test.strictEqual(result.CompilationTasks[0].outDir, undefined);
           test.done();
         }).catch((err) => {test.ifError(err); test.done();});

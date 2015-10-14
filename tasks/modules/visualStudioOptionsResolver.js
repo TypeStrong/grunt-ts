@@ -117,16 +117,32 @@ function relativePathToVSProjectFolderFromGruntfile(settings) {
 function applyVSSettings(options, vsSettings) {
     // TODO: support TypeScript 1.5 VS options.
     var simpleVSSettingsToGruntTSMappings = {
+        'EmitBOM': 'emitBom',
+        'EmitDecoratorMetadata': 'emitDecoratorMetadata',
+        'ExperimentalAsyncFunctions': 'experimentalAsyncFunctions',
+        'ExperimentalDecorators': 'experimentalDecorators',
         'GeneratesDeclarations': 'declaration',
-        'NoEmitOnError': 'noEmitOnError',
+        'InlineSourceMap': 'inlineSourceMap',
+        'InlineSources': 'inlineSources',
+        'IsolatedModules': 'isolatedModules',
+        'JSXEmit': 'jsx',
         'MapRoot': 'mapRoot',
+        'ModuleKind': 'module',
+        'ModuleResolution': 'moduleResolution',
+        'NewLine': 'newLine',
+        'NoEmitOnError': 'noEmitOnError',
+        'NoEmitHelpers': 'NoEmitHelpers',
         'NoImplicitAny': 'noImplicitAny',
+        'NoLib': 'noLib',
         'NoResolve': 'noResolve',
+        // OutFile and OutDir are resolved elsewhere
         'PreserveConstEnums': 'preserveConstEnums',
         'RemoveComments': 'removeComments',
+        'RootDir': 'rootDir',
         'SourceMap': 'sourceMap',
         'SourceRoot': 'sourceRoot',
         'SuppressImplicitAnyIndexErrors': 'suppressImplicitAnyIndexErrors',
+        'SuppressExcessPropertyErrors': 'suppressExcessPropertyErrors',
         'Target': 'target'
     };
     for (var item in simpleVSSettingsToGruntTSMappings) {
@@ -144,13 +160,13 @@ function applyVSSettings(options, vsSettings) {
     if (utils.hasValue(vsSettings.OutDir) && vsSettings.OutDir !== '') {
         options.CompilationTasks.forEach(function (item) {
             var absolutePath = path.resolve(gruntfileToProject, vsSettings.OutDir);
-            item.outDir = utils.escapePathIfRequired(path.relative(path.resolve('.'), absolutePath).replace(new RegExp('\\' + path.sep, 'g'), '/'));
+            item.outDir = utils.enclosePathInQuotesIfRequired(path.relative(path.resolve('.'), absolutePath).replace(new RegExp('\\' + path.sep, 'g'), '/'));
         });
     }
     if (utils.hasValue(vsSettings.OutFile) && vsSettings.OutFile !== '') {
         options.CompilationTasks.forEach(function (item) {
             var absolutePath = path.resolve(gruntfileToProject, vsSettings.OutFile);
-            item.out = utils.escapePathIfRequired(path.relative(path.resolve('.'), absolutePath).replace(new RegExp('\\' + path.sep, 'g'), '/'));
+            item.out = utils.enclosePathInQuotesIfRequired(path.relative(path.resolve('.'), absolutePath).replace(new RegExp('\\' + path.sep, 'g'), '/'));
         });
     }
     return options;

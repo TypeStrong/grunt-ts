@@ -10,6 +10,7 @@ import * as utils from './utils';
 let templateProcessor: (templateString: string, options: any) => string = null;
 let globExpander: (globs: string[]) => string[] = null;
 let gruntfileGlobs : string[] = null;
+let absolutePathToTSConfig: string;
 
 export function resolveAsync(applyTo: IGruntTSOptions,
   taskOptions: ITargetOptions,
@@ -87,19 +88,41 @@ export function resolveAsync(applyTo: IGruntTSOptions,
       }
 
       try {
-        var projectSpec: ITSConfigFile = JSON.parse(stripBom(projectFileTextContent));
+        var projectSpec: ITSConfigFile;
+        const content = stripBom(projectFileTextContent);
+        if (content.trim() === '') {
+          projectSpec = {};
+        } else {
+          projectSpec = JSON.parse(content);
+        }
       } catch (ex) {
-        return reject('Error parsing "' + projectFile + '".  It may not be valid JSON in UTF-8.  ' +
-          'The shortest possible file contents that will "work" with grunt-ts is: {}');
+        return reject('Error parsing "' + projectFile + '".  It may not be valid JSON in UTF-8.');
       }
 
+      applyTo = warnOnBadConfiguration(applyTo, projectSpec);
       applyTo = applyCompilerOptions(applyTo, projectSpec);
-      applyTo = resolve_out_and_outDir(applyTo, projectSpec);
+      applyTo = resolve_output_locations(applyTo, projectSpec);
     }
 
     resolve(applyTo);
   });
 }
+
+
+function warnOnBadConfiguration(options: IGruntTSOptions, projectSpec: ITSConfigFile) {
+  if (projectSpec.compilerOptions) {
+    if (projectSpec.compilerOptions.out && projectSpec.compilerOptions.outFile) {
+      options.warnings.push('Warning: `out` and `outFile` should not be used together in tsconfig.json.');
+    }
+    if (projectSpec.compilerOptions.out) {
+      options.warnings.push('Warning: Using `out` in tsconfig.json can be unreliable because it will output relative' +
+        ' to the tsc working directory.  It is better to use `outFile` which is always relative to tsconfig.json, ' +
+        ' but this requires TypeScript 1.6 or higher.');
+    }
+  }
+  return options;
+}
+
 
 function getGlobs(taskOptions: ITargetOptions, targetOptions: ITargetOptions) {
   let globs = null;
@@ -112,17 +135,27 @@ function getGlobs(taskOptions: ITargetOptions, targetOptions: ITargetOptions) {
   return globs;
 }
 
-function resolve_out_and_outDir(options: IGruntTSOptions, projectSpec: ITSConfigFile) {
+
+function resolve_output_locations(options: IGruntTSOptions, projectSpec: ITSConfigFile) {
   if (options.CompilationTasks
       && options.CompilationTasks.length > 0
       && projectSpec
       && projectSpec.compilerOptions) {
     options.CompilationTasks.forEach((compilationTask) => {
         if (projectSpec.compilerOptions.out) {
-          compilationTask.out = projectSpec.compilerOptions.out;
+          compilationTask.out = path.normalize(
+            projectSpec.compilerOptions.out
+          ).replace(/\\/g, '/');
+        }
+        if (projectSpec.compilerOptions.outFile) {
+          compilationTask.out = path.normalize(path.join(
+            relativePathFromGruntfileToTSConfig(),
+            projectSpec.compilerOptions.outFile)).replace(/\\/g, '/');
         }
         if (projectSpec.compilerOptions.outDir) {
-          compilationTask.outDir = projectSpec.compilerOptions.outDir;
+          compilationTask.outDir = path.normalize(path.join(
+            relativePathFromGruntfileToTSConfig(),
+            projectSpec.compilerOptions.outDir)).replace(/\\/g, '/');
         }
     });
   }
@@ -174,20 +207,28 @@ function applyCompilerOptions(applyTo: IGruntTSOptions, projectSpec: ITSConfigFi
   const tsconfig: ITSConfigSupport = applyTo.tsconfig;
 
   if (!tsconfig.ignoreSettings && co) {
-    const tsconfigMappingToGruntTSProperty = ['declaration', 'emitDecoratorMetadata',
-      'experimentalDecorators', 'isolatedModules',
-      'inlineSourceMap', 'inlineSources', 'mapRoot', 'module', 'newLine', 'noEmit',
+    const sameNameInTSConfigAndGruntTS = ['declaration', 'emitDecoratorMetadata',
+      'experimentalAsyncFunctions', 'experimentalDecorators', 'isolatedModules',
+      'inlineSourceMap', 'inlineSources', 'jsx', 'mapRoot', 'module',
+      'moduleResolution', 'newLine', 'noEmit',
       'noEmitHelpers', 'noEmitOnError', 'noImplicitAny', 'noLib', 'noResolve',
-      'out', 'outDir', 'preserveConstEnums', 'removeComments', 'sourceMap',
-      'sourceRoot', 'suppressImplicitAnyIndexErrors', 'target'];
+      'out', 'outDir', 'preserveConstEnums', 'removeComments', 'rootDir',
+      'sourceMap', 'sourceRoot', 'suppressImplicitAnyIndexErrors', 'target'];
 
-    tsconfigMappingToGruntTSProperty.forEach((propertyName) => {
-      if (propertyName in co) {
-        if (!(propertyName in result)) {
+    sameNameInTSConfigAndGruntTS.forEach(propertyName => {
+      if ((propertyName in co) && !(propertyName in result)) {
           result[propertyName] = co[propertyName];
-        }
       }
     });
+
+    // now copy the ones that don't have the same names.
+
+    // `outFile` was added in TypeScript 1.6 and is the same as out for command-line
+    // purposes except that `outFile` is relative to the tsconfig.json.
+    if (('outFile' in co) && !('out' in result)) {
+      result['out'] = co['outFile'];
+    }
+
   }
 
   if (!('updateFiles' in tsconfig)) {
@@ -199,18 +240,18 @@ function applyCompilerOptions(applyTo: IGruntTSOptions, projectSpec: ITSConfigFi
   }
 
   const src = applyTo.CompilationTasks[0].src;
-  const absolutePathToTSConfig = path.resolve(tsconfig.tsconfig, '..');
+  absolutePathToTSConfig = path.resolve(tsconfig.tsconfig, '..');
 
   if (tsconfig.overwriteFilesGlob) {
     if (!gruntfileGlobs) {
       throw new Error('The tsconfig option overwriteFilesGlob is set to true, but no glob was passed-in.');
     }
 
-    const relativePathFromGruntfileToTSConfig = path.relative('.', absolutePathToTSConfig).replace(/\\/g, '/');
+    const relPath = relativePathFromGruntfileToTSConfig();
     const gruntGlobsRelativeToTSConfig: string[] = [];
     for (let i = 0; i < gruntfileGlobs.length; i += 1) {
         gruntfileGlobs[i] = gruntfileGlobs[i].replace(/\\/g, '/');
-        gruntGlobsRelativeToTSConfig.push(path.relative(relativePathFromGruntfileToTSConfig, gruntfileGlobs[i]).replace(/\\/g, '/'));
+        gruntGlobsRelativeToTSConfig.push(path.relative(relPath, gruntfileGlobs[i]).replace(/\\/g, '/'));
     }
 
     if (_.difference(projectSpec.filesGlob, gruntGlobsRelativeToTSConfig).length > 0 ||
@@ -275,6 +316,13 @@ function applyCompilerOptions(applyTo: IGruntTSOptions, projectSpec: ITSConfigFi
   }
 
   return result;
+}
+
+function relativePathFromGruntfileToTSConfig() {
+  if (!absolutePathToTSConfig) {
+    throw 'attempt to get relative path to tsconfig.json before setting absolute path';
+  }
+  return path.relative('.', absolutePathToTSConfig).replace(/\\/g, '/');
 }
 
 
