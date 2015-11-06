@@ -18,7 +18,7 @@ const propertiesFromTarget = ['amdloader', 'html', 'htmlOutDir', 'htmlOutDirFlat
         'mapRoot', 'module', 'newLine', 'noEmit', 'noEmitHelpers', 'noEmitOnError', 'noImplicitAny', 'noResolve',
         'preserveConstEnums', 'removeComments', 'sourceRoot', 'sourceMap', 'suppressImplicitAnyIndexErrors', 'target',
         'verbose', 'jsx', 'moduleResolution', 'experimentalAsyncFunctions', 'rootDir'],
-      delayTemplateExpansion = ['htmlModuleTemplate', 'htmlVarTemplate'];
+      delayTemplateExpansion = ['htmlModuleTemplate', 'htmlVarTemplate','htmlOutputTemplate'];
 
 let templateProcessor: (templateString: string, options: any) => string = null;
 let globExpander: (globs: string[]) => string[] = null;

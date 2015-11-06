@@ -637,15 +637,16 @@ module.exports = function (grunt) {
             },
             test_htmlOutputTemplate: {
                 test: true,
-                options: {},
+                options: {
+                    htmlVarTemplate: 'html',
+                    htmlModuleTemplate: 'html.external',
+                    htmlOutputTemplate:'module <%= modulename %> {\n' +
+                    '    export var <%= varname %> = \'<%= content %>\';\n' +
+                    '}\n'
+                },
                 html: 'test/htmlExternal/**/*.html',
-                src: 'test/htmlExternal/**/*.ts',
-                htmlVarTemplate: 'markup',
-                htmlModuleTemplate: 'html',
-                htmlOutputTemplate: '/* tslint:disable:max-line-length */ \n' +
-                'export module <%= modulename %> {\n' +
-                '    export var <%= varname %> = \'<%= content %>\';\n' +
-                '}\n'
+                src: 'test/htmlExternal/**/*.ts'
+                
             },
             decoratorMetadataPassed: {
                 test: true,
