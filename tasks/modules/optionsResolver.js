@@ -13,7 +13,7 @@ var propertiesFromTarget = ['amdloader', 'html', 'htmlOutDir', 'htmlOutDirFlatte
     'htmlOutputTemplate', 'htmlOutDirFlatten', 'htmlVarTemplate', 'inlineSourceMap', 'inlineSources', 'isolatedModules',
     'mapRoot', 'module', 'newLine', 'noEmit', 'noEmitHelpers', 'noEmitOnError', 'noImplicitAny', 'noResolve',
     'preserveConstEnums', 'removeComments', 'sourceRoot', 'sourceMap', 'suppressImplicitAnyIndexErrors', 'target',
-    'verbose', 'jsx', 'moduleResolution', 'experimentalAsyncFunctions', 'rootDir'], delayTemplateExpansion = ['htmlModuleTemplate', 'htmlVarTemplate'];
+    'verbose', 'jsx', 'moduleResolution', 'experimentalAsyncFunctions', 'rootDir'], delayTemplateExpansion = ['htmlModuleTemplate', 'htmlOutputTemplate', 'htmlVarTemplate'];
 var templateProcessor = null;
 var globExpander = null;
 function noopTemplateProcessor(templateString, options) {
