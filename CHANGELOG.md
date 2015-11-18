@@ -2,12 +2,12 @@
 
 ## Next
 
-## v5.1.1
+## v5.1.1 (2015-11-17)
 * FIX: Fixes to htmlOutputTemplate.  Thanks so much to @rolego, @sethx, and @johnman for the help.
 * DOCS: tweak to html2ts docs to clarify and perhaps fix old merge conflict.
 * FIX: Resolve inappropriate warning if target is called `src` and uses `files` (Thanks, @vilmosioo (#305)).
 
-## v5.1.0
+## v5.1.0 (2015-10-14)
 * FEAT: Upgraded to TypeScript 1.6.2 (thanks to @vp2177 and @JoshuaKGoldberg for sending early PRs, and for @awjreynolds, @Zjaaspoer, @DrColossos, @ravishivt, @logankd, and @Gouigouix for early encouragement.)
   * Added support for `--moduleResolution`, `--jsx`, `--experimentalAsyncFunctions`, `--suppressExcessPropertyErrors`, `--rootDir`.
   * Added `outFile` support to `tsconfig.json` (same function as `out`, but always relative to `tsconfig.json` file.)
