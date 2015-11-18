@@ -407,7 +407,6 @@ exports.tests = {
                 ignoreSettings: true
             };
             var result = or.resolveAsync(null, cfg).then(function (result) {
-                // test.ok(true);
                 test.strictEqual(result.target, 'es5');
                 test.strictEqual(result.module, undefined);
                 test.done();

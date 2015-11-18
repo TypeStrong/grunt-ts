@@ -423,7 +423,6 @@ export var tests : nodeunit.ITestGroup = {
           ignoreSettings: true
         };
         const result = or.resolveAsync(null, cfg).then((result) => {
-          // test.ok(true);
           test.strictEqual(result.target, 'es5');
           test.strictEqual(result.module, undefined);
           test.done();

@@ -646,7 +646,7 @@ module.exports = function (grunt) {
                 },
                 html: 'test/htmlExternal/**/*.html',
                 src: 'test/htmlExternal/**/*.ts'
-                
+
             },
             decoratorMetadataPassed: {
                 test: true,
