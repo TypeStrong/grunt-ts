@@ -2,6 +2,11 @@
 
 ## Next
 
+## v5.1.1
+* FIX: Fixes to htmlOutputTemplate.  Thanks so much to @rolego, @sethx, and @johnman for the help.
+* DOCS: tweak to html2ts docs to clarify and perhaps fix old merge conflict.
+
+
 ## v5.1.0
 * FEAT: Upgraded to TypeScript 1.6.2 (thanks to @vp2177 and @JoshuaKGoldberg for sending early PRs, and for @awjreynolds, @Zjaaspoer, @DrColossos, @ravishivt, @logankd, and @Gouigouix for early encouragement.)
   * Added support for `--moduleResolution`, `--jsx`, `--experimentalAsyncFunctions`, `--suppressExcessPropertyErrors`, `--rootDir`.

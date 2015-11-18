@@ -75,25 +75,21 @@ grunt.initConfig({
 
 we can then do the following in our .ts file:
 
-````typescript
+```typescript
 //import the external module
 import myTemplate = require('module');
-
-...
 
 //consume it
 var templateString = myTemplate.markup.html
 
-````
+```
 
 
-If this appears as excessive object wrapping, the simplest form for htmlOutputTemplate is:
-````javascript
-/* tslint:disable:max-line-length */' + '\n' +
-export var <%= modulename %>='<%= content %>';
-````
+If this appears as excessive object wrapping, the simplest form for htmlOutputTemplate is likely:
 
-export var %filename%='%content%';"
+```javascript
+   "export var <%= modulename %>='<%= content %>';"
+```
 
 #### Going further
 Primarily designed for html files, this feature can be used with any static file.
