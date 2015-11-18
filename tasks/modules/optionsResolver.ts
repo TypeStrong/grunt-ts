@@ -129,7 +129,8 @@ function resolveAndWarnOnConfigurationIssues(task: ITargetOptions,
 
     function getAdditionalWarnings(task: any, target: any, targetName: string) {
       const additionalWarnings = [];
-      if (((task && task.src) || (target && target.src)) &&
+
+      if (((task && task.src && targetName !== 'src') || (target && target.src)) &&
           ((task && task.files) || (target && target.files))) {
         additionalWarnings.push(`Warning: In task "${targetName}", either "files" or "src" should be used - not both.`);
       }
@@ -138,7 +139,6 @@ function resolveAndWarnOnConfigurationIssues(task: ITargetOptions,
           ((task && task.files) || (target && target.files))) {
         additionalWarnings.push(`Warning: In task "${targetName}", either "files" or "vs" should be used - not both.`);
       }
-
 
       if (usingDestArray(task) || usingDestArray(target)) {
         additionalWarnings.push(`Warning: target "${targetName}" has an array specified for the files.dest property.` +

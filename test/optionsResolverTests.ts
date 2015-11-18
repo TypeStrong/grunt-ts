@@ -88,6 +88,12 @@ const config : {[name: string]: IGruntTargetOptions} = {
   "reference set to undefined": <any>{
     reference: undefined
   },
+  "files minimalist": <any>{
+    files: [{
+      src: "source/**/*.ts",
+      dest: "build"
+    }]
+  },
   "vs minimalist": <any>{
     vs: "test/vsproj/testproject.csproj"
   },
@@ -190,6 +196,18 @@ export var tests : nodeunit.ITestGroup = {
           let allWarnings = result.warnings.join('\n');
           test.ok(allWarnings.indexOf('Property "sourcemap" in target "" is possibly in the wrong place and will be ignored.  It is expected on the options object.') > -1);
           test.ok(allWarnings.indexOf('It is also the wrong case and should be sourceMap') > -1);
+          test.done();
+        }).catch((err) => {test.ifError(err); test.done();});
+    },
+    "No warning on target named src that uses files": (test: nodeunit.Test) => {
+        test.expect(1);
+
+        const cfg = getConfig("files minimalist", true);
+        const fakeTask: any = {src: {}};
+        const result = or.resolveAsync(fakeTask, cfg, "src").then((result) => {
+          let allWarnings = result.warnings.join('\n');
+          console.log(allWarnings);
+          test.strictEqual(allWarnings.length, 0, "expected no warnings.");
           test.done();
         }).catch((err) => {test.ifError(err); test.done();});
     }

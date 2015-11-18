@@ -101,7 +101,7 @@ function resolveAndWarnOnConfigurationIssues(task, target, targetName) {
     return { errors: errors, warnings: warnings };
     function getAdditionalWarnings(task, target, targetName) {
         var additionalWarnings = [];
-        if (((task && task.src) || (target && target.src)) &&
+        if (((task && task.src && targetName !== 'src') || (target && target.src)) &&
             ((task && task.files) || (target && target.files))) {
             additionalWarnings.push("Warning: In task \"" + targetName + "\", either \"files\" or \"src\" should be used - not both.");
         }

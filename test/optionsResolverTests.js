@@ -82,6 +82,12 @@ var config = {
     "reference set to undefined": {
         reference: undefined
     },
+    "files minimalist": {
+        files: [{
+                src: "source/**/*.ts",
+                dest: "build"
+            }]
+    },
     "vs minimalist": {
         vs: "test/vsproj/testproject.csproj"
     },
@@ -181,6 +187,17 @@ exports.tests = {
                 var allWarnings = result.warnings.join('\n');
                 test.ok(allWarnings.indexOf('Property "sourcemap" in target "" is possibly in the wrong place and will be ignored.  It is expected on the options object.') > -1);
                 test.ok(allWarnings.indexOf('It is also the wrong case and should be sourceMap') > -1);
+                test.done();
+            }).catch(function (err) { test.ifError(err); test.done(); });
+        },
+        "No warning on target named src that uses files": function (test) {
+            test.expect(1);
+            var cfg = getConfig("files minimalist", true);
+            var fakeTask = { src: {} };
+            var result = or.resolveAsync(fakeTask, cfg, "src").then(function (result) {
+                var allWarnings = result.warnings.join('\n');
+                console.log(allWarnings);
+                test.strictEqual(allWarnings.length, 0, "expected no warnings.");
                 test.done();
             }).catch(function (err) { test.ifError(err); test.done(); });
         }
