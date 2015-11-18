@@ -5,7 +5,7 @@
 ## v5.1.1
 * FIX: Fixes to htmlOutputTemplate.  Thanks so much to @rolego, @sethx, and @johnman for the help.
 * DOCS: tweak to html2ts docs to clarify and perhaps fix old merge conflict.
-
+* FIX: Resolve inappropriate warning if target is called `src` and uses `files` (Thanks, @vilmosioo (#305)).
 
 ## v5.1.0
 * FEAT: Upgraded to TypeScript 1.6.2 (thanks to @vp2177 and @JoshuaKGoldberg for sending early PRs, and for @awjreynolds, @Zjaaspoer, @DrColossos, @ravishivt, @logankd, and @Gouigouix for early encouragement.)
@@ -13,7 +13,7 @@
   * Added `outFile` support to `tsconfig.json` (same function as `out`, but always relative to `tsconfig.json` file.)
   * Support all TypeScript 1.6 features from Visual Studio/MSBuild (via upgrade to csproj2ts v0.0.6).
 * FIX: Fixed bug where `outDir` in `tsconfig.json` was not treated as being relative to the `tsconfig.json` file.
-* FIX: New tests for "HTML" features (Thanks again, @rolego (#297).
+* FIX: New tests for "HTML" features (Thanks again, @rolego (#297)).
 * FIX: Blank `tsconfig.json` should not be an error according to the spec, so this was changed to be same as `{}`.
 * DOCS: New documentation for several "HTML" features - `htmlOutDir` and `htmlOutDirFlatten`.
 
