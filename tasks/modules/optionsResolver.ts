@@ -17,7 +17,7 @@ const propertiesFromTarget = ['amdloader', 'html', 'htmlOutDir', 'htmlOutDirFlat
         'htmlOutputTemplate', 'htmlOutDirFlatten', 'htmlVarTemplate', 'inlineSourceMap', 'inlineSources', 'isolatedModules',
         'mapRoot', 'module', 'newLine', 'noEmit', 'noEmitHelpers', 'noEmitOnError', 'noImplicitAny', 'noResolve',
         'preserveConstEnums', 'removeComments', 'sourceRoot', 'sourceMap', 'suppressImplicitAnyIndexErrors', 'target',
-        'verbose', 'jsx', 'moduleResolution', 'experimentalAsyncFunctions', 'rootDir'],
+        'verbose', 'jsx', 'moduleResolution', 'experimentalAsyncFunctions', 'rootDir', 'emitGruntEvents'],
       delayTemplateExpansion = ['htmlModuleTemplate', 'htmlVarTemplate', 'htmlOutputTemplate'];
 
 let templateProcessor: (templateString: string, options: any) => string = null;
@@ -413,6 +413,10 @@ function applyGruntTSDefaults(options: IGruntTSOptions) {
 
   if (!('removeComments' in options) && !('comments' in options)) {
     options.removeComments = GruntTSDefaults.removeComments;
+  }
+
+  if (!('failOnTypeErrors' in options)) {
+    options.failOnTypeErrors = GruntTSDefaults.failOnTypeErrors;
   }
 
   return options;

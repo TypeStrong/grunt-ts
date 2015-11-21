@@ -2,7 +2,7 @@
 
 import * as utils from './utils';
 
-export const TypeScriptDefaults: IGruntTSOptions = {
+const TypeScriptDefaults: IGruntTSOptions = {
     allowBool: false,
     allowImportModule: false,
     amdloader: null,
@@ -29,7 +29,8 @@ export const TypeScriptDefaults: IGruntTSOptions = {
     htmlOutputTemplate: null,
     htmlOutDir: null,
     htmlOutDirFlatten: null,
-    failOnTypeErrors: true,
+    failOnTypeErrors: null,
+    emitGruntEvents: null,
     noEmitOnError: false,
     preserveConstEnums: false,
     suppressImplicitAnyIndexErrors: false,
@@ -61,5 +62,7 @@ function applyGruntTSDefaults(options: IGruntTSOptions) {
   options.htmlOutDirFlatten = false;
   options.fast = 'watch';
   options.removeComments = true;
+  options.failOnTypeErrors = true;
+  options.emitGruntEvents = false;
   return options;
 }

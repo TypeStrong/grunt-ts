@@ -18,6 +18,7 @@ var templateCacheModule = require('./modules/templateCache');
 var transformers = require('./modules/transformers');
 var optionsResolver = require('../tasks/modules/optionsResolver');
 var asyncSeries = utils.asyncSeries, timeIt = utils.timeIt;
+var fail_event = 'grunt-ts.failure';
 function pluginFn(grunt) {
     /////////////////////////////////////////////////////////////////////
     // The grunt task
@@ -43,6 +44,9 @@ function pluginFn(grunt) {
                     grunt.log.writeln(error.red);
                 });
                 if (options.errors.length > 0) {
+                    if (options.emitGruntEvents) {
+                        grunt.event.emit(fail_event);
+                    }
                     done(false);
                     return;
                 }
@@ -209,6 +213,9 @@ function pluginFn(grunt) {
                         return isSuccessfulBuild;
                     }).catch(function (err) {
                         grunt.log.writeln(('Error: ' + err).red);
+                        if (options.emitGruntEvents) {
+                            grunt.event.emit(fail_event);
+                        }
                         return false;
                     });
                 }
@@ -229,14 +236,6 @@ function pluginFn(grunt) {
                         });
                     }
                     else {
-                        // todo: fix this.
-                        // if (_.isArray(options.files)) {
-                        //     filesToCompile = grunt.file.expand(files[filesCompilationIndex].src);
-                        // } else if (options.files[target.dest]) {
-                        //     filesToCompile = grunt.file.expand(files[target.dest]);
-                        // } else {
-                        //     filesToCompile = grunt.file.expand([(<{ src: string }><any>options.files).src]);
-                        // }
                         filesCompilationIndex += 1;
                     }
                     // ignore directories, and clear the files of output.d.ts and baseDirFile
@@ -371,6 +370,9 @@ function pluginFn(grunt) {
                     if (res.some(function (success) {
                         return !success;
                     })) {
+                        if (options.emitGruntEvents) {
+                            grunt.event.emit(fail_event);
+                        }
                         done(false);
                     }
                     else {

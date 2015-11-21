@@ -21,6 +21,7 @@ import * as templateCacheModule from './modules/templateCache';
 import * as transformers from './modules/transformers';
 import * as optionsResolver from '../tasks/modules/optionsResolver';
 const {asyncSeries, timeIt} = utils;
+const fail_event = 'grunt-ts.failure';
 
 function pluginFn(grunt: IGrunt) {
 
@@ -60,6 +61,9 @@ function pluginFn(grunt: IGrunt) {
             });
 
             if (options.errors.length > 0) {
+              if (options.emitGruntEvents) {
+                  grunt.event.emit(fail_event);
+              }
               done(false);
               return;
             }
@@ -221,7 +225,6 @@ function pluginFn(grunt: IGrunt) {
                             }
 
                             grunt.log.writeln('');
-
                             if (isOnlyTypeErrors && !options.failOnTypeErrors) {
                                 grunt.log.write(('>> ').green);
                                 grunt.log.writeln('Type errors only.');
@@ -253,6 +256,9 @@ function pluginFn(grunt: IGrunt) {
                         return isSuccessfulBuild;
                     }).catch(function(err) {
                       grunt.log.writeln(('Error: ' + err).red);
+                      if (options.emitGruntEvents) {
+                        grunt.event.emit(fail_event);
+                      }
                       return false;
                     });
                 }
@@ -278,14 +284,6 @@ function pluginFn(grunt: IGrunt) {
                         });
 
                     } else {
-                        // todo: fix this.
-                        // if (_.isArray(options.files)) {
-                        //     filesToCompile = grunt.file.expand(files[filesCompilationIndex].src);
-                        // } else if (options.files[target.dest]) {
-                        //     filesToCompile = grunt.file.expand(files[target.dest]);
-                        // } else {
-                        //     filesToCompile = grunt.file.expand([(<{ src: string }><any>options.files).src]);
-                        // }
                         filesCompilationIndex += 1;
                     }
 
@@ -451,6 +449,9 @@ function pluginFn(grunt: IGrunt) {
                     if (res.some((success: boolean) => {
                         return !success;
                     })) {
+                        if (options.emitGruntEvents) {
+                          grunt.event.emit(fail_event);
+                        }
                         done(false);
                     }
                     else {

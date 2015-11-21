@@ -13,7 +13,7 @@ var propertiesFromTarget = ['amdloader', 'html', 'htmlOutDir', 'htmlOutDirFlatte
     'htmlOutputTemplate', 'htmlOutDirFlatten', 'htmlVarTemplate', 'inlineSourceMap', 'inlineSources', 'isolatedModules',
     'mapRoot', 'module', 'newLine', 'noEmit', 'noEmitHelpers', 'noEmitOnError', 'noImplicitAny', 'noResolve',
     'preserveConstEnums', 'removeComments', 'sourceRoot', 'sourceMap', 'suppressImplicitAnyIndexErrors', 'target',
-    'verbose', 'jsx', 'moduleResolution', 'experimentalAsyncFunctions', 'rootDir'], delayTemplateExpansion = ['htmlModuleTemplate', 'htmlVarTemplate', 'htmlOutputTemplate'];
+    'verbose', 'jsx', 'moduleResolution', 'experimentalAsyncFunctions', 'rootDir', 'emitGruntEvents'], delayTemplateExpansion = ['htmlModuleTemplate', 'htmlVarTemplate', 'htmlOutputTemplate'];
 var templateProcessor = null;
 var globExpander = null;
 function noopTemplateProcessor(templateString, options) {
@@ -347,6 +347,9 @@ function applyGruntTSDefaults(options) {
     }
     if (!('removeComments' in options) && !('comments' in options)) {
         options.removeComments = defaults_1.GruntTSDefaults.removeComments;
+    }
+    if (!('failOnTypeErrors' in options)) {
+        options.failOnTypeErrors = defaults_1.GruntTSDefaults.failOnTypeErrors;
     }
     return options;
 }

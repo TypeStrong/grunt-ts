@@ -81,6 +81,8 @@ interface ITaskOptions {
     experimentalAsyncFunctions: string;
     /** Sepecifies the root directory of input files.  Use to control the output directory structure with --outDir. */
     rootDir: string;
+    /** grunt-ts setting to emit events in Grunt */
+    emitGruntEvents: boolean;
 }
 
 interface IVisualStudioProjectSupport {

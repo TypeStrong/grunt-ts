@@ -1,6 +1,6 @@
 'use strict';
 var utils = require('./utils');
-exports.TypeScriptDefaults = {
+var TypeScriptDefaults = {
     allowBool: false,
     allowImportModule: false,
     amdloader: null,
@@ -27,7 +27,8 @@ exports.TypeScriptDefaults = {
     htmlOutputTemplate: null,
     htmlOutDir: null,
     htmlOutDirFlatten: null,
-    failOnTypeErrors: true,
+    failOnTypeErrors: null,
+    emitGruntEvents: null,
     noEmitOnError: false,
     preserveConstEnums: false,
     suppressImplicitAnyIndexErrors: false,
@@ -47,7 +48,7 @@ exports.TypeScriptDefaults = {
     warnings: [],
     errors: []
 };
-exports.GruntTSDefaults = applyGruntTSDefaults(exports.TypeScriptDefaults);
+exports.GruntTSDefaults = applyGruntTSDefaults(TypeScriptDefaults);
 function applyGruntTSDefaults(options) {
     options.sourceMap = true;
     options.target = 'es5';
@@ -56,6 +57,8 @@ function applyGruntTSDefaults(options) {
     options.htmlOutDirFlatten = false;
     options.fast = 'watch';
     options.removeComments = true;
+    options.failOnTypeErrors = true;
+    options.emitGruntEvents = false;
     return options;
 }
 //# sourceMappingURL=defaults.js.map

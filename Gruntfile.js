@@ -394,6 +394,9 @@ module.exports = function (grunt) {
                 fail: true,
                 html: ['test/html/**/*.tpl.html'],
                 out: 'test/html/out.js',
+                options: {
+                    emitGruntEvents: true
+                }
             },
             htmltest: {
                 test: true,
@@ -585,7 +588,8 @@ module.exports = function (grunt) {
                 baseDir: 'test/fail/ts',
                 // watch: 'test',
                 options: {                  // overide the main options for this target
-                    sourceMap: false
+                    sourceMap: false,
+                    emitGruntEvents: true
                 }
             },
             test_failOnTypeErrors: {
@@ -593,7 +597,8 @@ module.exports = function (grunt) {
                 src: ['test/failontypeerror/**/*.ts'],
                 outDir: 'test/failontypeerror/js',
                 options: {
-                    failOnTypeErrors: true
+                    failOnTypeErrors: true,
+                    emitGruntEvents: true
                 }
             },
             files_testfailedcompilation: {
@@ -607,7 +612,8 @@ module.exports = function (grunt) {
                     dest: 'test/files_testfailedcompilation/b/out.js'
                 }],
                 options: {
-                    fast: 'never'
+                    fast: 'never',
+                    emitGruntEvents: true
                 }
             },
             withemptymodule: {
@@ -621,7 +627,8 @@ module.exports = function (grunt) {
             withwrongmodule: {
                 fail: true,
                 options: {
-                    module: 'nothing'
+                    module: 'nothing',
+                    emitGruntEvents: true
                 },
                 src: 'test/withwrongmodule/ts/*.ts',
                 outDir: 'test/withwrongmodule/js'
@@ -895,13 +902,29 @@ module.exports = function (grunt) {
         return memo;
     }, []));
 
-    // Collect test tasks
-    grunt.registerTask('test_fail', grunt.util._.reduce(grunt.config.get('ts'), function (memo, task, name) {
-        if (task.fail) {
-            memo.push('ts:' + name);
-        }
-        return memo;
-    }, []));
+    (function() {
+        // Collect fail tasks
+        var grunt_ts_total_failures = 0,
+          failTasks = grunt.util._.reduce(grunt.config.get('ts'), function (memo, task, name) {
+            if (task.fail) {
+                memo.push('ts:' + name);
+            }
+            return memo;
+        }, []);
+        grunt.registerTask('test_fail', failTasks);
+        grunt.event.on('grunt-ts.failure', function() {
+            grunt_ts_total_failures += 1;
+        });
+        grunt.registerTask('validate_failure_count', 'Counts failure events emitted by grunt-ts', function() {
+            console.log('Expected ' + failTasks.length + ' task failures, got ' +
+                grunt_ts_total_failures + ' failures.');
+            if (failTasks.length === 0) {
+                console.log('Expected more than zero failures.');
+                return false;
+            }
+            return (grunt_ts_total_failures === failTasks.length);
+        });
+    }());
 
     // Loading it for testing since we have in a local 'tasks' folder
     grunt.loadTasks('tasks');
@@ -922,7 +945,7 @@ module.exports = function (grunt) {
     grunt.registerTask('build', ['prep', 'ts-internal', 'tslint:source']);
 
     // Test
-    grunt.registerTask('fail', ['continueOn', 'test_fail', 'continueOff']);
+    grunt.registerTask('fail', ['continueOn', 'test_fail', 'continueOff', 'validate_failure_count']);
     grunt.registerTask('test', ['stageFiles', 'test_all', 'fail', 'nodeunit:fast', 'nodeunit:slow',
       'tslint:transformedHtml', 'clean:testPost']);
 

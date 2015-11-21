@@ -99,6 +99,7 @@ For file ordering, look at [JavaScript Generation](#javascript-generation).
 |[compiler](#compiler)|option|`string` - path to custom compiler|
 |[declaration](#declaration)|option|`true`, `false` (default) - indicates that definition files should be emitted.|
 |[emitDecoratorMetadata](#emitdecoratormetadata)|option|`true`, `false` (default) - set to true to emit metadata for ES7 decorators (will enable experimentalDecorators)|
+|[emitGruntEvents](#emitgruntevents)|option|`true`, `false` (default) - set to true to raise an event in Grunt upon failed builds.|
 |[experimentalAsyncFunctions](#experimentalasyncfunctions)|option|`true`, `false` (default) - set to true to enable support for ES7 async functions (in ES6 mode only)|
 |[experimentalDecorators](#experimentaldecorators)|option|`true`, `false` (default) - set to true to enable support for ES7 decorators|
 |[failOnTypeErrors](#failontypeerrors)|option|`true` (default), `false` - fail Grunt pipeline if there is a type error.  (See also [noEmitOnError](#noemithelpers))|
@@ -518,6 +519,32 @@ grunt.initConfig({
   }
 });
 ````
+
+#### emitGruntEvents
+
+````javascript
+true | false (default)
+````
+
+Set to true to emit events in Grunt upon significant events in grunt-ts.  This is used by the task `validate_failure_count` in the Gruntfile.js of grunt-ts itself.  Currently, the only supported event is `grunt-ts.failure` which will be raised upon a failed build if `emitGruntEvents` is true.  This is only available in grunt-ts 5.2.0 or higher.
+
+```javascript
+grunt.initConfig({
+  ts: {
+    options: {
+      emitGruntEvents: true
+    }
+  }
+});
+```
+
+Example usage:
+
+```javascript
+grunt.event.on('grunt-ts.failure', function() {
+    console.log('It failed!!!!!!');
+});
+```
 
 #### experimentalAsyncFunctions
 
