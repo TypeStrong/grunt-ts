@@ -604,12 +604,12 @@ module.exports = function (grunt) {
             files_testfailedcompilation: {
                 fail: true,                  // a designed to fail target
                 files: [{
-                    src: ['test/files_testfailedcompilation/a/**/*.ts'],
-                    dest: 'test/files_testfailedcompilation/a/out.js'
+                    src: ['test/files_testFailedCompilation/a/**/*.ts'],
+                    dest: 'test/files_testFailedCompilation/a/out.js'
                 },
                 {
-                    src: ['test/files_testfailedcompilation/b/**/*.ts'],
-                    dest: 'test/files_testfailedcompilation/b/out.js'
+                    src: ['test/files_testFailedCompilation/b/**/*.ts'],
+                    dest: 'test/files_testFailedCompilation/b/out.js'
                 }],
                 options: {
                     fast: 'never',
