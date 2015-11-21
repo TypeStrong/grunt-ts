@@ -351,6 +351,9 @@ function applyGruntTSDefaults(options) {
     if (!('failOnTypeErrors' in options)) {
         options.failOnTypeErrors = defaults_1.GruntTSDefaults.failOnTypeErrors;
     }
+    if (!('emitGruntEvents' in options)) {
+        options.emitGruntEvents = defaults_1.GruntTSDefaults.emitGruntEvents;
+    }
     return options;
 }
 //# sourceMappingURL=optionsResolver.js.map

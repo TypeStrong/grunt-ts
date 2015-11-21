@@ -419,5 +419,9 @@ function applyGruntTSDefaults(options: IGruntTSOptions) {
     options.failOnTypeErrors = GruntTSDefaults.failOnTypeErrors;
   }
 
+  if (!('emitGruntEvents' in options)) {
+    options.emitGruntEvents = GruntTSDefaults.emitGruntEvents;
+  }
+
   return options;
 }
