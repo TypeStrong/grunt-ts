@@ -200,7 +200,7 @@ export function compileAllFiles(options: IGruntTSOptions, compilationInfo: IGrun
       if (options.inlineSourceMap) {
           args.push('--inlineSourceMap');
       }
-      if (options.newLine && !utils.newLineIsRedundant(options.newLine)) {
+      if (options.newLine) {
           args.push('--newLine', options.newLine);
       }
       if (options.isolatedModules) {
