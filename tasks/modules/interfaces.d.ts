@@ -34,7 +34,7 @@ interface ITaskOptions {
     emitDecoratorMetadata: boolean;
     experimentalDecorators: boolean;
     mapRoot: string;
-    /** amd | commonjs | umd | system  */
+    /** amd | commonjs | umd | system | es6 | es2015  */
     module: string;
     noImplicitAny: boolean;
     noResolve: boolean;
