@@ -593,8 +593,6 @@ function simpleCommandLineCheck(lookFor: string) {
     return new Promise(function(resolve, reject) {
   
       const command = strings[1].replace(/\\/g,'/');
-      console.log("test: got here and testing command line for " + lookFor);
-      console.log("test: command line is " + command);
       if (command.indexOf(lookFor) > -1) {
         resolve({
           code: 0,
