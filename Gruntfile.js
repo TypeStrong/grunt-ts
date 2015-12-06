@@ -247,7 +247,8 @@ module.exports = function (grunt) {
                     'test/files_ObjectFormat/b.js': ['test/multifile/b/**/*.ts', 'test/simple/ts/**/*.ts']
                 },
                 options: {
-                    fast: 'never'
+                    fast: 'never',
+                    comments: true
                 }
             },
             abtest: {
@@ -415,7 +416,7 @@ module.exports = function (grunt) {
                 options: {
                     htmlModuleTemplate: '<%= filename %>_<%= ext %>_module',
                     htmlVarTemplate: '<%= filename %>_<%= ext %>_variable',
-                    comments: false
+                    comments: true
                 },
             },
             htmlWithHtmlOutDirTest: {
@@ -492,15 +493,17 @@ module.exports = function (grunt) {
                 outDir: 'test/transform/js',
                 options: {
                     fast: 'never',
-                    module: 'commonjs'
+                    module: 'commonjs',
+                    comments: true
                 }
             },
             refTransform: {
                 test: true,
                 src: ['test/references-transform/**/*.ts','test/references*.d.ts'],
                 options: {
-                    fast: 'always',
-                    noImplicitAny: true
+                    fast: 'never',
+                    noImplicitAny: true,
+                    comments: true
                 }
             },
             customcompiler: {

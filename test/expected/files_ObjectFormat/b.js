@@ -17,7 +17,9 @@ var B = (function (_super) {
     return B;
 })(C);
 /// <reference path="c.ts" />
+//grunt-start
 /// <reference path="b.ts" />
+//grunt-end
 /// <reference path="a.ts" /> 
 /// <reference path="reference.ts"/>
 var A = (function (_super) {
