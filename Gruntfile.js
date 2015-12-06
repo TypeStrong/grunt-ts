@@ -21,6 +21,7 @@ module.exports = function (grunt) {
                 'test/htmlExternal/html.external.html.ts',
                 'tscommand-*.txt',
                 '!test/commandLineAssertions.js',
+                '!test/optionsResolverTests.js',
                 'test/**/*.orig'
             ],
             testPost: [
