@@ -526,6 +526,10 @@ exports.test_directoriesWithSpaces = function (strings, options) {
 };
 exports.test_noLib = simpleCommandLineCheck("--noLib");
 exports.test_emitBOM = simpleCommandLineCheck("--emitBOM");
+exports.test_locale = simpleCommandLineCheck("--locale ja-jp");
+exports.test_suppressExcessPropertyErrors = simpleCommandLineCheck("--suppressExcessPropertyErrors");
+exports.test_stripInternal = simpleCommandLineCheck("--stripInternal");
+exports.test_allowSyntheticDefaultImports = simpleCommandLineCheck("--allowSyntheticDefaultImports");
 function simpleCommandLineCheck(lookFor) {
     var result = function (strings, options) {
         return new Promise(function (resolve, reject) {

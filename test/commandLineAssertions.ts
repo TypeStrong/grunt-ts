@@ -587,6 +587,10 @@ export const test_directoriesWithSpaces: ICompilePromise = (strings, options) =>
 
 export const test_noLib = simpleCommandLineCheck("--noLib");
 export const test_emitBOM = simpleCommandLineCheck("--emitBOM");
+export const test_locale = simpleCommandLineCheck("--locale ja-jp");
+export const test_suppressExcessPropertyErrors = simpleCommandLineCheck("--suppressExcessPropertyErrors");
+export const test_stripInternal = simpleCommandLineCheck("--stripInternal");
+export const test_allowSyntheticDefaultImports = simpleCommandLineCheck("--allowSyntheticDefaultImports");
 
 function simpleCommandLineCheck(lookFor: string) {
   const result: ICompilePromise = (strings, options) => {

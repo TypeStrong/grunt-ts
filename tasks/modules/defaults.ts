@@ -5,6 +5,7 @@ import * as utils from './utils';
 const TypeScriptDefaults: IGruntTSOptions = {
     allowBool: false,
     allowImportModule: false,
+    allowSyntheticDefaultImports: null,
     amdloader: null,
     compile: true,
     declaration: false,
@@ -33,7 +34,9 @@ const TypeScriptDefaults: IGruntTSOptions = {
     emitGruntEvents: null,
     noEmitOnError: false,
     preserveConstEnums: false,
+    suppressExcessPropertyErrors: false,
     suppressImplicitAnyIndexErrors: false,
+    stripInternal: false,
     noEmit: false,
     noLib: false,
     emitBOM: false,
@@ -45,6 +48,7 @@ const TypeScriptDefaults: IGruntTSOptions = {
     additionalFlags: '',
     templateCache: null,
     targetName: '',
+    locale: null,
     jsx: null,
     moduleResolution: null,
     experimentalAsyncFunctions: null,
@@ -68,3 +72,4 @@ function applyGruntTSDefaults(options: IGruntTSOptions) {
   options.emitGruntEvents = false;
   return options;
 }
+

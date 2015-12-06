@@ -866,6 +866,38 @@ module.exports = function (grunt) {
                 options: {
                     emitBOM: true
                 }
+            },
+            test_locale: {
+                test: true,
+                testExecute: commandLineAssertions.test_locale,
+                src: 'test/simple/ts/zoo.ts',
+                options: {
+                    locale: 'ja-jp'
+                }
+            },
+            test_suppressExcessPropertyErrors: {
+                test: true,
+                testExecute: commandLineAssertions.test_suppressExcessPropertyErrors,
+                src: 'test/simple/ts/zoo.ts',
+                options: {
+                    suppressExcessPropertyErrors: true
+                }
+            },
+            test_stripInternal: {
+                test: true,
+                testExecute: commandLineAssertions.test_stripInternal,
+                src: 'test/simple/ts/zoo.ts',
+                options: {
+                    stripInternal: true
+                }
+            },
+            test_allowSyntheticDefaultImports: {
+                test: true,
+                testExecute: commandLineAssertions.test_allowSyntheticDefaultImports,
+                src: 'test/simple/ts/zoo.ts',
+                options: {
+                    allowSyntheticDefaultImports: true
+                }
             }
         }
     });

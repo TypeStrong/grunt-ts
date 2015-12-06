@@ -198,6 +198,18 @@ function compileAllFiles(options, compilationInfo) {
         if (options.emitBOM) {
             args.push('--emitBOM');
         }
+        if (options.locale) {
+            args.push('--locale', options.locale);
+        }
+        if (options.suppressExcessPropertyErrors) {
+            args.push('--suppressExcessPropertyErrors');
+        }
+        if (options.stripInternal) {
+            args.push('--stripInternal');
+        }
+        if (options.allowSyntheticDefaultImports) {
+            args.push('--allowSyntheticDefaultImports');
+        }
         args.push('--target', options.target.toUpperCase());
         if (options.module) {
             var moduleOptionString = ('' + options.module).toLowerCase();

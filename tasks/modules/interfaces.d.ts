@@ -87,6 +87,14 @@ interface ITaskOptions {
     noLib: boolean;
     /** emitBOM - indicates if emitted files should include a Byte Order Mark */
     emitBOM: boolean;
+    /** locale - pass a culture string like "en" or "ja-jp" for locale-specific error messages (requires error file in same folder as tsc) */
+    locale: string;
+    /** Disables strict object literal assignment checking */
+    suppressExcessPropertyErrors: boolean;
+    /** Does not emit objects marked as internal */
+    stripInternal: boolean;
+    /** Assumes a defalt export as the whole module if one is not specified, or as the only export if only one export is specified */
+    allowSyntheticDefaultImports: boolean;
 }
 
 interface IVisualStudioProjectSupport {
