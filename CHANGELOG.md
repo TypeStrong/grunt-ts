@@ -2,6 +2,11 @@
 
 ## Next
 
+## v5.3.0-beta.2 (2015-12-06)
+* FEAT: Updated to TypeScript 1.7 and revised all integration tests to account for its behavior (generally, the change to how `removeComments` works).
+* FEAT: Added support for `--noLib`, `--emitBOM`, `--locale`, `--suppressExcessPropertyErrors`, `--stripInternal`, and `--allowSyntheticDefaultImports`.
+* FEAT: Added support for `es6` and `es2015` as module options.
+
 ## v5.3.0-beta.1 (2015-12-06)
 * FIX: Improved detection of if newLine parameter is redundant for TSC.  This should make the functionality work more consistently if `grunt.util.linefeed` is used.  Thanks to @Maks3w for the report.
 
