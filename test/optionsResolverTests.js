@@ -196,7 +196,6 @@ exports.tests = {
             var fakeTask = { src: {} };
             var result = or.resolveAsync(fakeTask, cfg, "src").then(function (result) {
                 var allWarnings = result.warnings.join('\n');
-                console.log(allWarnings);
                 test.strictEqual(allWarnings.length, 0, "expected no warnings.");
                 test.done();
             }).catch(function (err) { test.ifError(err); test.done(); });

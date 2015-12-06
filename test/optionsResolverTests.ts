@@ -206,7 +206,6 @@ export var tests : nodeunit.ITestGroup = {
         const fakeTask: any = {src: {}};
         const result = or.resolveAsync(fakeTask, cfg, "src").then((result) => {
           let allWarnings = result.warnings.join('\n');
-          console.log(allWarnings);
           test.strictEqual(allWarnings.length, 0, "expected no warnings.");
           test.done();
         }).catch((err) => {test.ifError(err); test.done();});
