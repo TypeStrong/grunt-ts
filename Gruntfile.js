@@ -922,22 +922,22 @@ module.exports = function (grunt) {
         // Collect fail tasks
         var grunt_ts_total_failures = 0,
           failTasks = grunt.util._.reduce(grunt.config.get('ts'), function (memo, task, name) {
-            if (task.fail) {
-                memo.push('ts:' + name);
-            }
-            return memo;
-        }, []),
+                if (task.fail) {
+                    memo.push('ts:' + name);
+                }
+                return memo;
+            }, []),
           fastIntegrationTests = grunt.util._.reduce(grunt.config.get('ts'), function (memo, task, name) {
-              if (task.test && task.testExecute) {
-                  memo.push('ts:' + name)
-              }
-              return memo;
-          }, []);
+                if (task.test && task.testExecute) {
+                    memo.push('ts:' + name);
+                }
+                return memo;
+            }, []);
         grunt.registerTask('test_fail', failTasks);
         grunt.registerTask('test_fastIntegration', fastIntegrationTests);
         grunt.event.on('grunt-ts.failure', function() {
-            grunt_ts_total_failures += 1;
-        });
+                grunt_ts_total_failures += 1;
+            });
         grunt.registerTask('validate_failure_count', 'Counts failure events emitted by grunt-ts', function() {
             console.log('Expected ' + failTasks.length + ' task failures, got ' +
                 grunt_ts_total_failures + ' failures.');
@@ -971,8 +971,6 @@ module.exports = function (grunt) {
     grunt.registerTask('fail', ['continueOn', 'test_fail', 'continueOff', 'validate_failure_count']);
     grunt.registerTask('test', ['stageFiles', 'test_all', 'fail', 'nodeunit:fast', 'nodeunit:slow',
       'tslint:transformedHtml', 'clean:testPost']);
-    grunt.registerTask('testfast',
-        taskToBuildGruntTsAndThenRunOtherTasks(['ts-internal:test', 'stageFiles','test_fastIntegration', 'nodeunit:fast']));
 
     // Release
     grunt.registerTask('release', ['build', 'test', 'report-time-elapsed']);
@@ -1040,6 +1038,12 @@ module.exports = function (grunt) {
             runTask(tasksToRun[0], getNextTaskFunction());
         };
     }
+    
+    
+    grunt.registerTask('testfast', taskToBuildGruntTsAndThenRunOtherTasks(
+            ['ts-internal:test', 'stageFiles','test_fastIntegration', 'nodeunit:fast']
+            ));
+
 
     grunt.registerTask('run', taskToBuildGruntTsAndThenRunOtherTasks(tasksToTest));
 

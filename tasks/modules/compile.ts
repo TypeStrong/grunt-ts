@@ -225,10 +225,10 @@ export function compileAllFiles(options: IGruntTSOptions, compilationInfo: IGrun
           args.push('--rootDir', options.rootDir);
       }
       if (options.noLib) {
-          args.push('--noLib')
+          args.push('--noLib');
       }
       if (options.emitBOM) {
-          args.push('--emitBOM')
+          args.push('--emitBOM');
       }
 
       args.push('--target', options.target.toUpperCase());
