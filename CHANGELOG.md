@@ -2,6 +2,9 @@
 
 ## Next
 
+## v5.3.0-beta.1 (2015-12-06)
+* FIX: Improved detection of if newLine parameter is redundant for TSC.  This should make the functionality work more consistently if `grunt.util.linefeed` is used.
+
 ## v5.2.0 (2015-11-21)
 * FIX: Grunt pipeline will once again halt by default in the presence of type errors.  This was a regression in 5.0.0.  Thanks to @mironx, @niondir, and @johnman for the report and assistance.  We've added assertions for the count of failed build events in the grunt-ts `release` test cycle, so a regression like this should hopefully not happen again.
 * FEAT: Added new option `emitGruntEvents`.  In the event of a build failure, grunt-ts will now raise an event `grunt-ts.failure` if `emitGruntEvents` is `true`.  See the [docs](README.md#emitgruntevents) for more detail and an example.  This defaults to `false`, so it's opt-in and there is no change to the existing grunt-ts default behavior.

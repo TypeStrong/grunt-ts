@@ -248,6 +248,30 @@ exports.tests = {
                 test.strictEqual(result.htmlOutDirFlatten, true);
                 test.done();
             }).catch(function (err) { test.ifError(err); test.done(); });
+        },
+        "On Windows, CRLF is redundant": function (test) {
+            test.expect(1);
+            var result = utils.newLineIsRedundantForTsc("CRLF", { EOL: "\r\n" });
+            test.strictEqual(result, true);
+            test.done();
+        },
+        "On Windows, LF is NOT redundant": function (test) {
+            test.expect(1);
+            var result = utils.newLineIsRedundantForTsc("LF", { EOL: "\r\n" });
+            test.strictEqual(result, false);
+            test.done();
+        },
+        "On UNIX, CRLF is NOT redundant": function (test) {
+            test.expect(1);
+            var result = utils.newLineIsRedundantForTsc("CRLF", { EOL: "\n" });
+            test.strictEqual(result, false);
+            test.done();
+        },
+        "On UNIX, LF is redundant": function (test) {
+            test.expect(1);
+            var result = utils.newLineIsRedundantForTsc("LF", { EOL: "\n" });
+            test.strictEqual(result, true);
+            test.done();
         }
     },
     "Precedence and defaults override Tests": {

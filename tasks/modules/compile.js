@@ -168,7 +168,7 @@ function compileAllFiles(options, compilationInfo) {
         if (options.inlineSourceMap) {
             args.push('--inlineSourceMap');
         }
-        if (options.newLine && !utils.newLineIsRedundant(options.newLine)) {
+        if (options.newLine && !utils.newLineIsRedundantForTsc(options.newLine)) {
             args.push('--newLine', options.newLine);
         }
         if (options.isolatedModules) {

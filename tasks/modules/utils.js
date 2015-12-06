@@ -1,16 +1,18 @@
 /// <reference path="../../defs/tsd.d.ts"/>
 var path = require('path');
 var fs = require('fs');
+var os = require('os');
 var util = require('util');
 var _ = require('lodash');
 var es6_promise_1 = require('es6-promise');
 exports.grunt = require('grunt');
 exports.eol = exports.grunt.util.linefeed;
-function newLineIsRedundant(newLineParameter) {
-    return ((newLineParameter === 'CRLF' && exports.grunt.util.linefeed === '\r\n') ||
-        (newLineParameter === 'LF' && exports.grunt.util.linefeed === '\n'));
+function newLineIsRedundantForTsc(newLineParameter, operatingSystem) {
+    if (operatingSystem === void 0) { operatingSystem = os; }
+    return ((newLineParameter === 'CRLF' && operatingSystem.EOL === '\r\n') ||
+        (newLineParameter === 'LF' && operatingSystem.EOL === '\n'));
 }
-exports.newLineIsRedundant = newLineIsRedundant;
+exports.newLineIsRedundantForTsc = newLineIsRedundantForTsc;
 function newLineActualAsParameter(actualNewLineChars) {
     if (actualNewLineChars) {
         return actualNewLineChars.replace(/\n/g, 'LF').replace(/\r/g, 'CR');
