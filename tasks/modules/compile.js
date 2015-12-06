@@ -192,6 +192,12 @@ function compileAllFiles(options, compilationInfo) {
         if (options.rootDir) {
             args.push('--rootDir', options.rootDir);
         }
+        if (options.noLib) {
+            args.push('--noLib');
+        }
+        if (options.emitBOM) {
+            args.push('--emitBOM');
+        }
         args.push('--target', options.target.toUpperCase());
         if (options.module) {
             var moduleOptionString = ('' + options.module).toLowerCase();

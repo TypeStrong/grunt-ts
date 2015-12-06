@@ -846,6 +846,22 @@ module.exports = function (grunt) {
                     sourceRoot: 'test/sourceRoot with spaces',
                     mapRoot: 'test/mapRoot with spaces'
                 }
+            },
+            test_noLib: {
+                test: true,
+                testExecute: commandLineAssertions.test_noLib,
+                src: 'test/simple/ts/zoo.ts',
+                options: {
+                    noLib: true
+                }
+            },
+            test_emitBOM: {
+                test: true,
+                testExecute: commandLineAssertions.test_emitBOM,
+                src: 'test/simple/ts/zoo.ts',
+                options: {
+                    emitBOM: true
+                }
             }
         }
     });

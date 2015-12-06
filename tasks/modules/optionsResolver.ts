@@ -12,10 +12,10 @@ import {resolveAsync as resolveTSConfigAsync} from './tsconfig';
 
 const propertiesFromTarget = ['amdloader', 'html', 'htmlOutDir', 'htmlOutDirFlatten', 'reference', 'testExecute', 'tsconfig',
         'templateCache', 'vs', 'watch'],
-      propertiesFromTargetOptions = ['additionalFlags', 'comments', 'compile', 'compiler', 'declaration',
+      propertiesFromTargetOptions = ['additionalFlags', 'comments', 'compile', 'compiler', 'declaration', 'emitBOM',
         'emitDecoratorMetadata', 'experimentalDecorators', 'failOnTypeErrors', 'fast', 'htmlModuleTemplate', 'htmlOutDir',
         'htmlOutputTemplate', 'htmlOutDirFlatten', 'htmlVarTemplate', 'inlineSourceMap', 'inlineSources', 'isolatedModules',
-        'mapRoot', 'module', 'newLine', 'noEmit', 'noEmitHelpers', 'noEmitOnError', 'noImplicitAny', 'noResolve',
+        'mapRoot', 'module', 'newLine', 'noEmit', 'noEmitHelpers', 'noEmitOnError', 'noImplicitAny', 'noLib', 'noResolve',
         'preserveConstEnums', 'removeComments', 'sourceRoot', 'sourceMap', 'suppressImplicitAnyIndexErrors', 'target',
         'verbose', 'jsx', 'moduleResolution', 'experimentalAsyncFunctions', 'rootDir', 'emitGruntEvents'],
       delayTemplateExpansion = ['htmlModuleTemplate', 'htmlVarTemplate', 'htmlOutputTemplate'];

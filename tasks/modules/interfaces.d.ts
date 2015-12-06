@@ -83,6 +83,10 @@ interface ITaskOptions {
     rootDir: string;
     /** grunt-ts setting to emit events in Grunt */
     emitGruntEvents: boolean;
+    /** noLib - do not auto-include the lib.d.ts file in the compilation context */
+    noLib: boolean;
+    /** emitBOM - indicates if emitted files should include a Byte Order Mark */
+    emitBOM: boolean;
 }
 
 interface IVisualStudioProjectSupport {

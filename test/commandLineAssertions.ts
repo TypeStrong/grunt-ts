@@ -584,3 +584,26 @@ export const test_directoriesWithSpaces: ICompilePromise = (strings, options) =>
     throw `expected to see rootDir, outDir, sourceRoot, and mapRoot with quoted values in the command line and didn't.  Got this: ${command}`;
   });
 };
+
+export const test_noLib = simpleCommandLineCheck("--noLib");
+export const test_emitBOM = simpleCommandLineCheck("--emitBOM");
+
+function simpleCommandLineCheck(lookFor: string) {
+  const result: ICompilePromise = (strings, options) => {
+    return new Promise(function(resolve, reject) {
+  
+      const command = strings[1].replace(/\\/g,'/');
+      console.log("test: got here and testing command line for " + lookFor);
+      console.log("test: command line is " + command);
+      if (command.indexOf(lookFor) > -1) {
+        resolve({
+          code: 0,
+          output: ""
+        });
+      }
+      throw `expected to see ${lookFor} on the command line and didn't.  Got this: ${command}`;
+    });
+  };
+  return result;
+}
+

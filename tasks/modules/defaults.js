@@ -33,6 +33,8 @@ var TypeScriptDefaults = {
     preserveConstEnums: false,
     suppressImplicitAnyIndexErrors: false,
     noEmit: false,
+    noLib: false,
+    emitBOM: false,
     inlineSources: false,
     inlineSourceMap: false,
     newLine: utils.eol,

@@ -524,4 +524,23 @@ exports.test_directoriesWithSpaces = function (strings, options) {
         throw "expected to see rootDir, outDir, sourceRoot, and mapRoot with quoted values in the command line and didn't.  Got this: " + command;
     });
 };
+exports.test_noLib = simpleCommandLineCheck("--noLib");
+exports.test_emitBOM = simpleCommandLineCheck("--emitBOM");
+function simpleCommandLineCheck(lookFor) {
+    var result = function (strings, options) {
+        return new Promise(function (resolve, reject) {
+            var command = strings[1].replace(/\\/g, '/');
+            console.log("test: got here and testing command line for " + lookFor);
+            console.log("test: command line is " + command);
+            if (command.indexOf(lookFor) > -1) {
+                resolve({
+                    code: 0,
+                    output: ""
+                });
+            }
+            throw "expected to see " + lookFor + " on the command line and didn't.  Got this: " + command;
+        });
+    };
+    return result;
+}
 //# sourceMappingURL=commandLineAssertions.js.map
