@@ -910,8 +910,15 @@ module.exports = function (grunt) {
                 memo.push('ts:' + name);
             }
             return memo;
-        }, []);
+        }, []),
+          fastIntegrationTests = grunt.util._.reduce(grunt.config.get('ts'), function (memo, task, name) {
+              if (task.test && task.testExecute) {
+                  memo.push('ts:' + name)
+              }
+              return memo;
+          }, []);
         grunt.registerTask('test_fail', failTasks);
+        grunt.registerTask('test_fastIntegration', fastIntegrationTests);
         grunt.event.on('grunt-ts.failure', function() {
             grunt_ts_total_failures += 1;
         });
@@ -948,6 +955,8 @@ module.exports = function (grunt) {
     grunt.registerTask('fail', ['continueOn', 'test_fail', 'continueOff', 'validate_failure_count']);
     grunt.registerTask('test', ['stageFiles', 'test_all', 'fail', 'nodeunit:fast', 'nodeunit:slow',
       'tslint:transformedHtml', 'clean:testPost']);
+    grunt.registerTask('testfast',
+        taskToBuildGruntTsAndThenRunOtherTasks(['ts-internal:test', 'stageFiles','test_fastIntegration', 'nodeunit:fast']));
 
     // Release
     grunt.registerTask('release', ['build', 'test', 'report-time-elapsed']);
@@ -965,54 +974,58 @@ module.exports = function (grunt) {
     var tasksToTest = ['ts:vsproj_test'];
 
     grunt.registerTask('dev', ['run', 'watch']);
+    
+    
+    function taskToBuildGruntTsAndThenRunOtherTasks(tasksToRun) {
+        return function() {
 
-    grunt.registerTask('run', function () {
-
-        // Clear the console and move to 0 0
-        // http://stackoverflow.com/a/14976765/390330
-        console.log('\u001b[2J\u001b[0;0H');
-        console.log('>>>>>>>>>>> Cleared console >>>>>>>>>>> \n\n'.grey);
-
-        var done = this.async();
-
-        // Using a simple chain of ts:internal followed by ts:yourtest would not have run the updated grunt-ts
-        // We are spawn to ensure that `ts:` is reloaded after compile
-        function runTask(taskName, callback) {
-            grunt.util.spawn({
-                cmd: 'grunt',
-                args: [taskName]
-            }, function (err, output) {
-                if (err) {
-                    console.log(output.stderr || output.stdout);
-                    done(err);
+            // Clear the console and move to 0 0
+            // http://stackoverflow.com/a/14976765/390330
+            console.log('\u001b[2J\u001b[0;0H');
+            console.log('>>>>>>>>>>> Cleared console >>>>>>>>>>> \n\n'.grey);
+    
+            var done = this.async();
+    
+            // Using a simple chain of ts:internal followed by ts:yourtest would not have run the updated grunt-ts
+            // We are spawn to ensure that `ts:` is reloaded after compile
+            function runTask(taskName, callback) {
+                grunt.util.spawn({
+                    cmd: 'grunt',
+                    args: [taskName]
+                }, function (err, output) {
+                    if (err) {
+                        console.log(output.stderr || output.stdout);
+                        done(err);
+                    }
+                    else {
+                        console.log(output.stdout);
+                        console.log('\n'); // looks better
+                        callback();
+                    }
+                });
+            }
+    
+            // Add build task
+            tasksToRun.unshift('ts-internal:build');
+    
+            // Now execute
+            var currentIndex = 0;
+            function getNextTaskFunction() {
+                currentIndex++;
+                if (currentIndex === tasksToRun.length) {
+                    return done;
                 }
                 else {
-                    console.log(output.stdout);
-                    console.log('\n'); // looks better
-                    callback();
+                    return function () {
+                        runTask(tasksToRun[currentIndex], getNextTaskFunction());
+                    };
                 }
-            });
-        }
-
-        // Add build task
-        tasksToTest.unshift('ts-internal:build');
-
-        // Now execute
-        var currentIndex = 0;
-        function getNextTaskFunction() {
-            currentIndex++;
-            if (currentIndex === tasksToTest.length) {
-                return done;
             }
-            else {
-                return function () {
-                    runTask(tasksToTest[currentIndex], getNextTaskFunction());
-                };
-            }
-        }
-        runTask(tasksToTest[0], getNextTaskFunction());
+            runTask(tasksToRun[0], getNextTaskFunction());
+        };
+    }
 
-    });
+    grunt.registerTask('run', taskToBuildGruntTsAndThenRunOtherTasks(tasksToTest));
 
     grunt.registerTask('report-time-elapsed','Reports the time elapsed since gruntStartedTimestamp', function() {
         var seconds = ((new Date().getTime()) - gruntStartedTimestamp) / 1000;
