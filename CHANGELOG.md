@@ -1,6 +1,7 @@
 # Releases
 
 ## Next
+* FIX: amdloader will now work for [`.tsx` extension as well](https://github.com/TypeStrong/grunt-ts/pull/274) [reapplied](https://github.com/TypeStrong/grunt-ts/pull/314)
 
 ## v5.3.0-beta.1 (2015-12-06)
 * FIX: Improved detection of if newLine parameter is redundant for TSC.  This should make the functionality work more consistently if `grunt.util.linefeed` is used.  Thanks to @Maks3w for the report.
