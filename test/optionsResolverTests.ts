@@ -353,6 +353,30 @@ export var tests : nodeunit.ITestGroup = {
           test.strictEqual(result.sourceMap, true);
           test.done();
         }).catch((err) => {test.ifError(err); test.done();});
+    },
+    "outDir works in combination with tsconfig": (test: nodeunit.Test) => {
+      // as reported by @gilamran in https://github.com/TypeStrong/grunt-ts/issues/312
+      const config = <any>{
+        options: {
+          target: 'es5'
+        },
+        build: {
+          outDir: '.tmp',
+          tsconfig: {
+            tsconfig: 'test/tsconfig/blank_tsconfig.json',
+            ignoreFiles: true,
+            ignoreSettings: false,
+            overwriteFilesGlob: false,
+            updateFiles: true,
+            passThrough: false
+          }
+        }
+      };
+      const result = or.resolveAsync(config, config.build, "build").then((result) => {
+        test.strictEqual(result.target, "es5");
+        test.strictEqual(result.CompilationTasks[0].outDir, ".tmp");
+        test.done();
+      }).catch((err) => {test.ifError(err); test.done();});
     }
   },
 
@@ -451,17 +475,15 @@ export var tests : nodeunit.ITestGroup = {
           test.done();
         }).catch((err) => {test.ifError(err); test.done();});
     },
-    "Exception from invalid file": (test: nodeunit.Test) => {
-        test.expect(1);
+    "Error from invalid file": (test: nodeunit.Test) => {
+        test.expect(2);
         const cfg = getConfig("minimalist", true);
         cfg.tsconfig = './test/tsconfig/invalid_tsconfig.json';
         const result = or.resolveAsync(null, cfg).then((result) => {
-          test.ok(false, 'expected exception from invalid file.');
+          test.strictEqual(result.errors.length, 1);
+          test.ok(result.errors[0].indexOf("Error parsing") >= 0, "Expected error parsing");
           test.done();
-        }).catch((err) => {
-          test.ok(err.indexOf('Error parsing') > -1);
-          test.done();
-        });
+        }).catch((err) => {test.ifError(err); test.done();});
     },
     "No exception from blank file":  (test: nodeunit.Test) => {
       test.expect(1);
@@ -486,17 +508,15 @@ export var tests : nodeunit.ITestGroup = {
       }).catch((err) => {test.ifError(err); test.done();});
     },
     "Exception from missing file": (test: nodeunit.Test) => {
-        test.expect(2);
+        test.expect(3);
         const cfg = getConfig("minimalist", true);
         cfg.tsconfig = './test/tsconfig/does_not_exist_tsconfig.json';
         const result = or.resolveAsync(null, cfg).then((result) => {
-          test.ok(false, 'expected exception from missing file.');
+          test.strictEqual(result.errors.length, 1);
+          test.ok(result.errors[0].indexOf('ENOENT') > -1);
+          test.ok(result.errors[0].indexOf('does_not_exist_tsconfig.json') > -1);
           test.done();
-        }).catch((err) => {
-          test.strictEqual(err.code, 'ENOENT');
-          test.ok(err.path && err.path.indexOf('does_not_exist_tsconfig.json') > -1)
-          test.done();
-        });
+        }).catch((err) => {test.ifError(err); test.done();});
     },
     "config entries come through appropriately": (test: nodeunit.Test) => {
         test.expect(12);

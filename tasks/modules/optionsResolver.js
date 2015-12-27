@@ -29,6 +29,7 @@ function resolveAsync(rawTaskOptions, rawTargetOptions, targetName, files, theTe
     if (files === void 0) { files = []; }
     if (theTemplateProcessor === void 0) { theTemplateProcessor = null; }
     if (theGlobExpander === void 0) { theGlobExpander = null; }
+    var result = emptyOptionsResolveResult();
     return new es6_promise_1.Promise(function (resolve, reject) {
         if (theTemplateProcessor && typeof theTemplateProcessor === 'function') {
             templateProcessor = theTemplateProcessor;
@@ -44,7 +45,6 @@ function resolveAsync(rawTaskOptions, rawTargetOptions, targetName, files, theTe
         }
         fixMissingOptions(rawTaskOptions);
         fixMissingOptions(rawTargetOptions);
-        var result = emptyOptionsResolveResult();
         {
             var _a = resolveAndWarnOnConfigurationIssues(rawTaskOptions, rawTargetOptions, targetName), errors = _a.errors, warnings = _a.warnings;
             (_b = result.errors).push.apply(_b, errors);
@@ -52,7 +52,7 @@ function resolveAsync(rawTaskOptions, rawTargetOptions, targetName, files, theTe
         }
         result = applyGruntOptions(result, rawTaskOptions);
         result = applyGruntOptions(result, rawTargetOptions);
-        result = copyCompilationTasks(result, files);
+        result = copyCompilationTasks(result, files, resolveOutputOptions(rawTaskOptions, rawTargetOptions));
         visualStudioOptionsResolver_1.resolveVSOptionsAsync(result, rawTaskOptions, rawTargetOptions, templateProcessor).then(function (result) {
             tsconfig_1.resolveAsync(result, rawTaskOptions, rawTargetOptions, templateProcessor, globExpander).then(function (result) {
                 result = addressAssociatedOptionsAndResolveConflicts(result);
@@ -64,16 +64,31 @@ function resolveAsync(rawTaskOptions, rawTargetOptions, targetName, files, theTe
                     result.targetName = targetName;
                 }
                 return resolve(result);
-            }).catch(function (error) {
-                return reject(error);
+            }).catch(function (tsConfigError) {
+                result.errors.push('tsconfig error: ' + JSON.stringify(tsConfigError));
+                return resolve(result);
             });
-        }).catch(function (error) {
-            return reject(error);
+        }).catch(function (vsConfigError) {
+            result.errors.push('Visual Studio config issue: ' + JSON.stringify(vsConfigError));
+            return resolve(result);
         });
         var _b, _c;
     });
 }
 exports.resolveAsync = resolveAsync;
+function resolveOutputOptions(rawTaskOptions, rawTargetOptions) {
+    var result = {};
+    var props = ['outDir', 'out'];
+    var options = [rawTaskOptions, rawTargetOptions];
+    options.forEach(function (opt) {
+        props.forEach(function (prop) {
+            if (opt && (prop in opt)) {
+                result[prop] = opt[prop];
+            }
+        });
+    });
+    return result;
+}
 function fixMissingOptions(config) {
     if (config && !config.options) {
         config.options = {};
@@ -238,11 +253,23 @@ function applyGruntOptions(applyTo, gruntOptions) {
     }
     return applyTo;
 }
-function copyCompilationTasks(options, files) {
+function copyCompilationTasks(options, files, outputInfo) {
     if (!utils.hasValue(options.CompilationTasks)) {
         options.CompilationTasks = [];
     }
-    if (!utils.hasValue(files)) {
+    if (!utils.hasValue(files) || files.length === 0) {
+        if (options.CompilationTasks.length === 0 && (('outDir' in outputInfo) || ('out' in outputInfo))) {
+            var newCompilationTask = {
+                src: []
+            };
+            if ('outDir' in outputInfo) {
+                newCompilationTask.outDir = outputInfo.outDir;
+            }
+            if ('out' in outputInfo) {
+                newCompilationTask.outDir = outputInfo.outDir;
+            }
+            options.CompilationTasks.push(newCompilationTask);
+        }
         return options;
     }
     for (var i = 0; i < files.length; i += 1) {
@@ -308,10 +335,15 @@ function addressAssociatedOptionsAndResolveConflicts(options) {
         options.removeComments = !!options.removeComments;
         options.comments = !options.removeComments;
     }
-    if ('html' in options && options.CompilationTasks.length === 0) {
-        options.errors.push("ERROR: option `html` provided without specifying corresponding TypeScript source files to " +
-            "compile.  The transform will not occur unless grunt-ts also expects to compile these files.");
-    }
+    // Can't support this error until #255 is resolved.
+    // https://github.com/TypeStrong/grunt-ts/issues/255
+    // if ('html' in options &&
+    //   (options.CompilationTasks.length === 0 ||
+    //     !_.some(options.CompilationTasks,
+    //       item => (item.src.length > 0)))) {
+    //   options.errors.push(`ERROR: option \`html\` provided without corresponding TypeScript source files to ` +
+    //   `compile.  The transform will not occur unless grunt-ts also expects to compile these files.`);
+    // }
     options.CompilationTasks.forEach(function (compileTask) {
         if (compileTask.out && compileTask.outDir) {
             console.log(JSON.stringify(compileTask));

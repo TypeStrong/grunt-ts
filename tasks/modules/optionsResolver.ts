@@ -41,6 +41,7 @@ export function resolveAsync(rawTaskOptions: ITargetOptions,
                         theTemplateProcessor: (templateString: string, options: any) => string = null,
                         theGlobExpander: (globs: string[]) => string[] = null): Promise<IGruntTSOptions> {
 
+  let result = emptyOptionsResolveResult();
   return new Promise<IGruntTSOptions>((resolve, reject) => {
 
 
@@ -59,7 +60,6 @@ export function resolveAsync(rawTaskOptions: ITargetOptions,
     fixMissingOptions(rawTaskOptions);
     fixMissingOptions(rawTargetOptions);
 
-    let result = emptyOptionsResolveResult();
     {
       const {errors, warnings} = resolveAndWarnOnConfigurationIssues(rawTaskOptions, rawTargetOptions, targetName);
       result.errors.push(...errors);
@@ -67,7 +67,7 @@ export function resolveAsync(rawTaskOptions: ITargetOptions,
     }
     result = applyGruntOptions(result, rawTaskOptions);
     result = applyGruntOptions(result, rawTargetOptions);
-    result = copyCompilationTasks(result, files);
+    result = copyCompilationTasks(result, files, resolveOutputOptions(rawTaskOptions, rawTargetOptions));
 
     resolveVSOptionsAsync(result, rawTaskOptions, rawTargetOptions, templateProcessor).then((result) => {
     resolveTSConfigAsync(result, rawTaskOptions, rawTargetOptions, templateProcessor, globExpander).then((result) => {
@@ -83,13 +83,33 @@ export function resolveAsync(rawTaskOptions: ITargetOptions,
       }
 
       return resolve(result);
-    }).catch((error) => {
-      return reject(error);
+    }).catch((tsConfigError) => {
+      result.errors.push('tsconfig error: ' + JSON.stringify(tsConfigError));
+      return resolve(result);
     });
-    }).catch((error) => {
-      return reject(error);
+    }).catch((vsConfigError) => {
+      result.errors.push('Visual Studio config issue: ' + JSON.stringify(vsConfigError));
+      return resolve(result);
     });
   });
+}
+
+function resolveOutputOptions(rawTaskOptions:
+  IGruntTargetOptions, rawTargetOptions: IGruntTargetOptions) {
+    const result: {outDir?: string, out?: string} = {};
+
+    const props = ['outDir', 'out'];
+    const options = [rawTaskOptions, rawTargetOptions];
+
+    options.forEach((opt) => {
+      props.forEach((prop) => {
+        if (opt && (prop in opt)) {
+          result[prop] = opt[prop];
+        }
+      });
+    });
+
+    return result;
 }
 
 function fixMissingOptions(config: ITargetOptions) {
@@ -284,12 +304,24 @@ function applyGruntOptions(applyTo: IGruntTSOptions, gruntOptions: ITargetOption
     return applyTo;
 }
 
-function copyCompilationTasks(options: IGruntTSOptions, files: IGruntTSCompilationInfo[]) {
+function copyCompilationTasks(options: IGruntTSOptions, files: IGruntTSCompilationInfo[], outputInfo: {outDir?: string, out?: string}) {
 
   if (!utils.hasValue(options.CompilationTasks)) {
     options.CompilationTasks = [];
   }
-  if (!utils.hasValue(files)) {
+  if (!utils.hasValue(files) || files.length === 0) {
+    if (options.CompilationTasks.length === 0 && (('outDir' in outputInfo) || ('out' in outputInfo))) {
+      const newCompilationTask : IGruntTSCompilationInfo = {
+        src: []
+      };
+      if ('outDir' in outputInfo) {
+        newCompilationTask.outDir = outputInfo.outDir;
+      }
+      if ('out' in outputInfo) {
+        newCompilationTask.outDir = outputInfo.outDir;
+      }
+      options.CompilationTasks.push(newCompilationTask);
+    }
     return options;
   }
   for (let i = 0; i < files.length; i += 1) {
@@ -360,10 +392,15 @@ function addressAssociatedOptionsAndResolveConflicts(options: IGruntTSOptions) {
     options.comments = !options.removeComments;
   }
 
-  if ('html' in options && options.CompilationTasks.length === 0) {
-    options.errors.push(`ERROR: option \`html\` provided without specifying corresponding TypeScript source files to ` +
-    `compile.  The transform will not occur unless grunt-ts also expects to compile these files.`);
-  }
+  // Can't support this error until #255 is resolved.
+  // https://github.com/TypeStrong/grunt-ts/issues/255
+  // if ('html' in options &&
+  //   (options.CompilationTasks.length === 0 ||
+  //     !_.some(options.CompilationTasks,
+  //       item => (item.src.length > 0)))) {
+  //   options.errors.push(`ERROR: option \`html\` provided without corresponding TypeScript source files to ` +
+  //   `compile.  The transform will not occur unless grunt-ts also expects to compile these files.`);
+  // }
 
   options.CompilationTasks.forEach(compileTask => {
     if (compileTask.out && compileTask.outDir) {
