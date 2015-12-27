@@ -2,6 +2,11 @@
 
 ## Next
 
+## v5.3.0-beta.3 (2015-12-26)
+* FIX: Use of `outDir` in the Gruntfile now works when otherwise getting the configuration from tsconfig.json. (Thanks, @gilamran (#312)).
+* NOTE: No longer warns when `html` is used without a source.  This needs to wait on #255.
+* FIX: Certain conditions (such as the specified tsconfig.json not found or VS project resolution errors) caused grunt-ts to hard-quit during options resolution.  These are now properly surfaced as errors, and the main quit path will be followed.
+
 ## v5.3.0-beta.2 (2015-12-06)
 * FEAT: Updated to TypeScript 1.7 and revised all integration tests to account for its behavior (generally, the change to how `removeComments` works).
 * FEAT: Added support for `--noLib`, `--emitBOM`, `--locale`, `--suppressExcessPropertyErrors`, `--stripInternal`, and `--allowSyntheticDefaultImports`.
