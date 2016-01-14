@@ -399,15 +399,13 @@ function addressAssociatedOptionsAndResolveConflicts(options: IGruntTSOptions) {
     options.comments = !options.removeComments;
   }
 
-  // Can't support this error until #255 is resolved.
-  // https://github.com/TypeStrong/grunt-ts/issues/255
-  // if ('html' in options &&
-  //   (options.CompilationTasks.length === 0 ||
-  //     !_.some(options.CompilationTasks,
-  //       item => (item.src.length > 0)))) {
-  //   options.errors.push(`ERROR: option \`html\` provided without corresponding TypeScript source files to ` +
-  //   `compile.  The transform will not occur unless grunt-ts also expects to compile these files.`);
-  // }
+  if ('html' in options &&
+      (options.CompilationTasks.length === 0 ||
+      !_.some(options.CompilationTasks, item => ((item.src || []).length > 0 || (item.glob || []).length > 0)))) {
+
+        options.errors.push(`ERROR: option "html" provided without corresponding TypeScript source files or glob to ` +
+        `compile.  The transform will not occur unless grunt-ts also expects to compile some files.`);
+  }
 
   options.CompilationTasks.forEach(compileTask => {
     if (compileTask.out && compileTask.outDir) {

@@ -392,15 +392,14 @@ module.exports = function (grunt) {
                     removeComments: false,
                 },
             },
-            // Can't support this error until #255 is resolved.
-            // htmlSpecifiedButNoTypeScriptSource_ShouldError: {
-            //     fail: true,
-            //     html: ['test/html/**/*.tpl.html'],
-            //     out: 'test/html/out.js',
-            //     options: {
-            //         emitGruntEvents: true
-            //     }
-            // },
+            htmlSpecifiedButNoTypeScriptSource_ShouldError: {
+                fail: true,
+                html: ['test/html/**/*.tpl.html'],
+                out: 'test/html/out.js',
+                options: {
+                    emitGruntEvents: true
+                }
+            },
             htmltest: {
                 test: true,
                 src: ['test/html/**/*.ts'],
