@@ -311,7 +311,8 @@ function pluginFn(grunt: IGrunt) {
                         let htmlFiles = grunt.file.expand(options.html);
                         generatedFiles = _.map(htmlFiles, (filename) => html2tsModule.compileHTML(filename, html2tsOptions));
                         generatedFiles.forEach((fileName) => {
-                          if (grunt.file.isMatch(currentFiles.glob, fileName)) {
+                          if (filesToCompile.indexOf(fileName) === -1 &&
+                            grunt.file.isMatch(currentFiles.glob, fileName)) {
                             filesToCompile.push(fileName);
                           }
                         });
