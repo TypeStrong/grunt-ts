@@ -2,6 +2,10 @@
 
 ## Next
 
+## v5.3.0-beta.4 (2016-01-14)
+* FIX: Transformed HTML files will be automatically added to the compilation context if they match the glob (#255).
+* FIX: resolved issue in v5.3.0-beta.3 - will now error again if `html` is specified without an `src` or a glob.
+
 ## v5.3.0-beta.3 (2015-12-26)
 * FIX: Use of `outDir` in the Gruntfile now works when otherwise getting the configuration from tsconfig.json. (Thanks, @gilamran (#312)).
 * NOTE: No longer warns when `html` is used without a source.  This needs to wait on #255.
