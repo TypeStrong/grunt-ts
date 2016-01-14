@@ -409,7 +409,6 @@ function addressAssociatedOptionsAndResolveConflicts(options: IGruntTSOptions) {
 
   options.CompilationTasks.forEach(compileTask => {
     if (compileTask.out && compileTask.outDir) {
-      console.log(JSON.stringify(compileTask));
       options.warnings.push(
         'The parameter `out` is incompatible with `outDir`; pass one or the other - not both.  Ignoring `out` and using `outDir`.'
       );
