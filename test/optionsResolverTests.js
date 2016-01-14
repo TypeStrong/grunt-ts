@@ -199,6 +199,16 @@ exports.tests = {
                 test.strictEqual(allWarnings.length, 0, "expected no warnings.");
                 test.done();
             }).catch(function (err) { test.ifError(err); test.done(); });
+        },
+        "Warning when using grunt-ts keyword as target name": function (test) {
+            test.expect(2);
+            var cfg = getConfig("minimalist", true);
+            var result = or.resolveAsync(null, cfg, "watch").then(function (result) {
+                test.strictEqual(result.warnings.length, 1, "expected one warning.");
+                var allWarnings = result.warnings.join('\n');
+                test.ok(allWarnings.indexOf("keyword \"watch\"") > -1, "expected warning about keyword watch");
+                test.done();
+            }).catch(function (err) { test.ifError(err); test.done(); });
         }
     },
     "Special processing Tests": {

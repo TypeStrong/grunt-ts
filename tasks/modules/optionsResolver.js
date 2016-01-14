@@ -117,6 +117,10 @@ function resolveAndWarnOnConfigurationIssues(task, target, targetName) {
     return { errors: errors, warnings: warnings };
     function getAdditionalWarnings(task, target, targetName) {
         var additionalWarnings = [];
+        if (propertiesFromTarget.indexOf(targetName) >= 0) {
+            additionalWarnings.push(("Warning: Using the grunt-ts keyword \"" + targetName + "\" as a target name may cause ") +
+                "incorrect behavior or errors.");
+        }
         if (((task && task.src && targetName !== 'src') || (target && target.src)) &&
             ((task && task.files) || (target && target.files))) {
             additionalWarnings.push("Warning: In task \"" + targetName + "\", either \"files\" or \"src\" should be used - not both.");

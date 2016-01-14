@@ -209,6 +209,17 @@ export var tests : nodeunit.ITestGroup = {
           test.strictEqual(allWarnings.length, 0, "expected no warnings.");
           test.done();
         }).catch((err) => {test.ifError(err); test.done();});
+    },
+    "Warning when using grunt-ts keyword as target name": (test: nodeunit.Test) => {
+        test.expect(2);
+
+        const cfg = getConfig("minimalist", true);
+        const result = or.resolveAsync(null, cfg, "watch").then((result) => {
+          test.strictEqual(result.warnings.length, 1, "expected one warning.");
+          let allWarnings = result.warnings.join('\n');
+          test.ok(allWarnings.indexOf(`keyword "watch"`) > -1, "expected warning about keyword watch");
+          test.done();
+        }).catch((err) => {test.ifError(err); test.done();});
     }
   },
 
