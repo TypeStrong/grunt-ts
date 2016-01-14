@@ -899,6 +899,12 @@ module.exports = function (grunt) {
                 options: {
                     allowSyntheticDefaultImports: true
                 }
+            },
+            test_htmlTemplateGlob: {
+                test: false, // called manually by test_htmlTemplateResultAddedToGlobs.
+                files: [{ src: ['test/htmlTemplateGlob/**/t*.ts']},
+                    { src: ['test/htmlTemplateGlob/**/o*.ts'] }],
+                html: ['test/htmlTemplateGlob/**/*.html']
             }
         }
     });
@@ -953,7 +959,7 @@ module.exports = function (grunt) {
             memo.push('ts:' + name);
         }
         return memo;
-    }, []));
+    }, ['test_htmlTemplateResultAddedToGlobs']));
 
     (function() {
         // Collect fail tasks
@@ -1012,6 +1018,64 @@ module.exports = function (grunt) {
     // Release
     grunt.registerTask('release', ['build', 'test', 'report-time-elapsed']);
     grunt.registerTask('default', ['release']);
+
+    (function(){
+        var test_htmlTemplateResultAddedToGlobs_shouldExist = [
+            'test/htmlTemplateGlob/test.html.ts',
+            'test/htmlTemplateGlob/test.html.js',
+            'test/htmlTemplateGlob/test.html.js.map',
+            'test/htmlTemplateGlob/doNotTranspile.html.ts'
+        ];
+        var test_htmlTemplateResultAddedToGlobs_shouldNotExist = [
+            'test/htmlTemplateGlob/doNotTranspile.html.js',
+            'test/htmlTemplateGlob/doNotTranspile.html.js.map'
+        ];
+
+        grunt.registerTask('test_htmlTemplateResultAddedToGlobs',
+            'integration test to prove that new TS files created by HTML evaluation are included on the' +
+            'first run.',  function() {
+
+            [test_htmlTemplateResultAddedToGlobs_shouldExist,
+              test_htmlTemplateResultAddedToGlobs_shouldNotExist].forEach(
+                function (array) {
+                    array.forEach(function (fileName) {
+                        if (grunt.file.exists(fileName)) {
+                            grunt.file.delete(fileName);
+                        }
+                    });
+                }
+            );
+
+            grunt.task.run('ts:test_htmlTemplateGlob');
+            grunt.task.run('test_htmlTemplateResultAddedToGlobsAssert');
+        });
+
+        grunt.registerTask('test_htmlTemplateResultAddedToGlobsAssert',
+            'integration test to prove that new TS files created by HTML evaluation are included on the' +
+            'first run.',  function() {
+            var validatedFileCount = 0, result = true;
+            test_htmlTemplateResultAddedToGlobs_shouldExist.forEach(
+              function (fileName) {
+                if (!grunt.file.exists(fileName)) {
+                    console.log('Expected file "' + fileName + '" to exist.');
+                    result = false;
+                } else {
+                    validatedFileCount += 1;
+                }
+            });
+            test_htmlTemplateResultAddedToGlobs_shouldNotExist.forEach(
+              function (fileName) {
+                if (grunt.file.exists(fileName)) {
+                    console.log('Expected file "' + fileName + '" to not exist.');
+                    result = false;
+                } else {
+                    validatedFileCount += 1;
+                }
+            });
+            return result && (validatedFileCount === 6);
+        });
+    }());
+
 
     //////////////////////////////////////////////
     // Dev

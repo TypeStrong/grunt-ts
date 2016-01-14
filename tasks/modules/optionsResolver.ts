@@ -325,10 +325,17 @@ function copyCompilationTasks(options: IGruntTSOptions, resolvedFiles: IGruntTSC
     return options;
   }
   for (let i = 0; i < resolvedFiles.length; i += 1) {
+    let glob: string[];
+    const orig = (<{orig?: {src?: string[] | string}}>resolvedFiles[i]).orig;
+    if (orig && ('src' in orig)) {
+      glob = [].concat(orig.src);
+    }
+
     let compilationSet = {
       src: _.map(resolvedFiles[i].src, (fileName) => utils.enclosePathInQuotesIfRequired(fileName)),
       out: utils.enclosePathInQuotesIfRequired(resolvedFiles[i].out),
-      outDir: utils.enclosePathInQuotesIfRequired(resolvedFiles[i].outDir)
+      outDir: utils.enclosePathInQuotesIfRequired(resolvedFiles[i].outDir),
+      glob
     };
     if ('dest' in resolvedFiles[i] && resolvedFiles[i].dest) {
       let dest: string;

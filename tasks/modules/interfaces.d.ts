@@ -124,6 +124,7 @@ interface IGruntTSCompilationInfo extends grunt.file.IFilesConfig {
   outDir?: string;
   out?: string;
   src?: string[];
+  glob?: string[];
 }
 
 declare module 'strip-bom' {

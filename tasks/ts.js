@@ -221,7 +221,7 @@ function pluginFn(grunt) {
                 }
                 // Find out which files to compile, codegen etc.
                 // Then calls the appropriate functions + compile function on those files
-                function filterFilesAndCompile() {
+                function filterFilesTransformAndCompile() {
                     var filesToCompile = [];
                     if (currentFiles.src || options.vs) {
                         _.map(currentFiles.src, function (file) {
@@ -258,6 +258,11 @@ function pluginFn(grunt) {
                         };
                         var htmlFiles = grunt.file.expand(options.html);
                         generatedFiles = _.map(htmlFiles, function (filename) { return html2tsModule.compileHTML(filename, html2tsOptions); });
+                        generatedFiles.forEach(function (fileName) {
+                            if (grunt.file.isMatch(currentFiles.glob, fileName)) {
+                                filesToCompile.push(fileName);
+                            }
+                        });
                     }
                     ///// Template cache
                     // Note: The template cache files do not go into generated files.
@@ -345,7 +350,7 @@ function pluginFn(grunt) {
                 // Reset the time for last compile call
                 lastCompile = new Date().getTime();
                 // Run initial compile
-                return filterFilesAndCompile();
+                return filterFilesTransformAndCompile();
                 // local event to handle file event
                 function handleFileEvent(filepath, displaystr, addedOrChanged) {
                     if (addedOrChanged === void 0) { addedOrChanged = false; }
@@ -362,7 +367,7 @@ function pluginFn(grunt) {
                     }
                     // Log and run the debounced version.
                     grunt.log.writeln((displaystr + ' >>' + filepath).yellow);
-                    filterFilesAndCompile();
+                    filterFilesTransformAndCompile();
                 }
             }).then(function (res) {
                 // Ignore res? (either logs or throws)
