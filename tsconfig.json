@@ -45,5 +45,8 @@
         "test/references-transform-library.d.ts",
         "test/test.ts"
     ],
-    "exclude": []
+    "exclude": [],
+    "atom": {
+        "rewriteTsconfig": false
+    }
 }
