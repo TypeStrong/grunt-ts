@@ -28,14 +28,14 @@ function pluginFn(grunt) {
         var filesCompilationIndex = 0;
         var done, options;
         {
-            var currentTask = this;
-            var files = currentTask.files;
+            var currentGruntTask = this;
+            var resolvedFiles = currentGruntTask.files;
             // make async
-            done = currentTask.async();
+            done = currentGruntTask.async();
             // get unprocessed templates from configuration
-            var rawTaskConfig = (grunt.config.getRaw(currentTask.name) || {});
-            var rawTargetConfig = (grunt.config.getRaw(currentTask.name + '.' + currentTask.target) || {});
-            optionsResolver.resolveAsync(rawTaskConfig, rawTargetConfig, currentTask.target, files, grunt.template.process, grunt.file.expand).then(function (result) {
+            var rawTaskConfig = (grunt.config.getRaw(currentGruntTask.name) || {});
+            var rawTargetConfig = (grunt.config.getRaw(currentGruntTask.name + '.' + currentGruntTask.target) || {});
+            optionsResolver.resolveAsync(rawTaskConfig, rawTargetConfig, currentGruntTask.target, resolvedFiles, grunt.template.process, grunt.file.expand).then(function (result) {
                 options = result;
                 options.warnings.forEach(function (warning) {
                     grunt.log.writeln(warning.magenta);

@@ -24,9 +24,9 @@ function emptyGlobExpander(globs) {
     return [];
 }
 emptyGlobExpander.isStub = true;
-function resolveAsync(rawTaskOptions, rawTargetOptions, targetName, files, theTemplateProcessor, theGlobExpander) {
+function resolveAsync(rawTaskOptions, rawTargetOptions, targetName, resolvedFiles, theTemplateProcessor, theGlobExpander) {
     if (targetName === void 0) { targetName = ''; }
-    if (files === void 0) { files = []; }
+    if (resolvedFiles === void 0) { resolvedFiles = []; }
     if (theTemplateProcessor === void 0) { theTemplateProcessor = null; }
     if (theGlobExpander === void 0) { theGlobExpander = null; }
     var result = emptyOptionsResolveResult();
@@ -52,7 +52,7 @@ function resolveAsync(rawTaskOptions, rawTargetOptions, targetName, files, theTe
         }
         result = applyGruntOptions(result, rawTaskOptions);
         result = applyGruntOptions(result, rawTargetOptions);
-        result = copyCompilationTasks(result, files, resolveOutputOptions(rawTaskOptions, rawTargetOptions));
+        result = copyCompilationTasks(result, resolvedFiles, resolveOutputOptions(rawTaskOptions, rawTargetOptions));
         visualStudioOptionsResolver_1.resolveVSOptionsAsync(result, rawTaskOptions, rawTargetOptions, templateProcessor).then(function (result) {
             tsconfig_1.resolveAsync(result, rawTaskOptions, rawTargetOptions, templateProcessor, globExpander).then(function (result) {
                 result = addressAssociatedOptionsAndResolveConflicts(result);
@@ -224,8 +224,8 @@ function resolveAndWarnOnConfigurationIssues(task, target, targetName) {
 }
 function applyGruntOptions(applyTo, gruntOptions) {
     if (gruntOptions) {
-        for (var _i = 0; _i < propertiesFromTarget.length; _i++) {
-            var propertyName = propertiesFromTarget[_i];
+        for (var _i = 0, propertiesFromTarget_1 = propertiesFromTarget; _i < propertiesFromTarget_1.length; _i++) {
+            var propertyName = propertiesFromTarget_1[_i];
             if (propertyName in gruntOptions && propertyName !== 'vs') {
                 if (typeof gruntOptions[propertyName] === 'string' && utils.hasValue(gruntOptions[propertyName]) &&
                     delayTemplateExpansion.indexOf(propertyName) === -1) {
@@ -237,8 +237,8 @@ function applyGruntOptions(applyTo, gruntOptions) {
             }
         }
         if (gruntOptions.options) {
-            for (var _a = 0; _a < propertiesFromTargetOptions.length; _a++) {
-                var propertyName = propertiesFromTargetOptions[_a];
+            for (var _a = 0, propertiesFromTargetOptions_1 = propertiesFromTargetOptions; _a < propertiesFromTargetOptions_1.length; _a++) {
+                var propertyName = propertiesFromTargetOptions_1[_a];
                 if (propertyName in gruntOptions.options) {
                     if (typeof gruntOptions.options[propertyName] === 'string' && utils.hasValue(gruntOptions.options[propertyName]) &&
                         delayTemplateExpansion.indexOf(propertyName) === -1) {
@@ -253,11 +253,11 @@ function applyGruntOptions(applyTo, gruntOptions) {
     }
     return applyTo;
 }
-function copyCompilationTasks(options, files, outputInfo) {
+function copyCompilationTasks(options, resolvedFiles, outputInfo) {
     if (!utils.hasValue(options.CompilationTasks)) {
         options.CompilationTasks = [];
     }
-    if (!utils.hasValue(files) || files.length === 0) {
+    if (!utils.hasValue(resolvedFiles) || resolvedFiles.length === 0) {
         if (options.CompilationTasks.length === 0 && (('outDir' in outputInfo) || ('out' in outputInfo))) {
             var newCompilationTask = {
                 src: []
@@ -272,20 +272,20 @@ function copyCompilationTasks(options, files, outputInfo) {
         }
         return options;
     }
-    for (var i = 0; i < files.length; i += 1) {
+    for (var i = 0; i < resolvedFiles.length; i += 1) {
         var compilationSet = {
-            src: _.map(files[i].src, function (fileName) { return utils.enclosePathInQuotesIfRequired(fileName); }),
-            out: utils.enclosePathInQuotesIfRequired(files[i].out),
-            outDir: utils.enclosePathInQuotesIfRequired(files[i].outDir)
+            src: _.map(resolvedFiles[i].src, function (fileName) { return utils.enclosePathInQuotesIfRequired(fileName); }),
+            out: utils.enclosePathInQuotesIfRequired(resolvedFiles[i].out),
+            outDir: utils.enclosePathInQuotesIfRequired(resolvedFiles[i].outDir)
         };
-        if ('dest' in files[i] && files[i].dest) {
+        if ('dest' in resolvedFiles[i] && resolvedFiles[i].dest) {
             var dest = void 0;
-            if (_.isArray(files[i].dest)) {
+            if (_.isArray(resolvedFiles[i].dest)) {
                 // using an array for dest is not supported.  Only take first element.
-                dest = files[i].dest[0];
+                dest = resolvedFiles[i].dest[0];
             }
             else {
-                dest = files[i].dest;
+                dest = resolvedFiles[i].dest;
             }
             if (utils.isJavaScriptFile(dest)) {
                 compilationSet.out = dest;

@@ -37,7 +37,7 @@ function emptyGlobExpander(globs: string[]): string[] {
 export function resolveAsync(rawTaskOptions: ITargetOptions,
                         rawTargetOptions: ITargetOptions,
                         targetName = '',
-                        files: IGruntTSCompilationInfo[] = [],
+                        resolvedFiles: IGruntTSCompilationInfo[] = [],
                         theTemplateProcessor: (templateString: string, options: any) => string = null,
                         theGlobExpander: (globs: string[]) => string[] = null): Promise<IGruntTSOptions> {
 
@@ -67,7 +67,7 @@ export function resolveAsync(rawTaskOptions: ITargetOptions,
     }
     result = applyGruntOptions(result, rawTaskOptions);
     result = applyGruntOptions(result, rawTargetOptions);
-    result = copyCompilationTasks(result, files, resolveOutputOptions(rawTaskOptions, rawTargetOptions));
+    result = copyCompilationTasks(result, resolvedFiles, resolveOutputOptions(rawTaskOptions, rawTargetOptions));
 
     resolveVSOptionsAsync(result, rawTaskOptions, rawTargetOptions, templateProcessor).then((result) => {
     resolveTSConfigAsync(result, rawTaskOptions, rawTargetOptions, templateProcessor, globExpander).then((result) => {
@@ -304,12 +304,12 @@ function applyGruntOptions(applyTo: IGruntTSOptions, gruntOptions: ITargetOption
     return applyTo;
 }
 
-function copyCompilationTasks(options: IGruntTSOptions, files: IGruntTSCompilationInfo[], outputInfo: {outDir?: string, out?: string}) {
+function copyCompilationTasks(options: IGruntTSOptions, resolvedFiles: IGruntTSCompilationInfo[], outputInfo: {outDir?: string, out?: string}) {
 
   if (!utils.hasValue(options.CompilationTasks)) {
     options.CompilationTasks = [];
   }
-  if (!utils.hasValue(files) || files.length === 0) {
+  if (!utils.hasValue(resolvedFiles) || resolvedFiles.length === 0) {
     if (options.CompilationTasks.length === 0 && (('outDir' in outputInfo) || ('out' in outputInfo))) {
       const newCompilationTask : IGruntTSCompilationInfo = {
         src: []
@@ -324,19 +324,19 @@ function copyCompilationTasks(options: IGruntTSOptions, files: IGruntTSCompilati
     }
     return options;
   }
-  for (let i = 0; i < files.length; i += 1) {
+  for (let i = 0; i < resolvedFiles.length; i += 1) {
     let compilationSet = {
-      src: _.map(files[i].src, (fileName) => utils.enclosePathInQuotesIfRequired(fileName)),
-      out: utils.enclosePathInQuotesIfRequired(files[i].out),
-      outDir: utils.enclosePathInQuotesIfRequired(files[i].outDir)
+      src: _.map(resolvedFiles[i].src, (fileName) => utils.enclosePathInQuotesIfRequired(fileName)),
+      out: utils.enclosePathInQuotesIfRequired(resolvedFiles[i].out),
+      outDir: utils.enclosePathInQuotesIfRequired(resolvedFiles[i].outDir)
     };
-    if ('dest' in files[i] && files[i].dest) {
+    if ('dest' in resolvedFiles[i] && resolvedFiles[i].dest) {
       let dest: string;
-      if (_.isArray(files[i].dest)) {
+      if (_.isArray(resolvedFiles[i].dest)) {
         // using an array for dest is not supported.  Only take first element.
-        dest = files[i].dest[0];
+        dest = resolvedFiles[i].dest[0];
       } else {
-        dest = files[i].dest;
+        dest = resolvedFiles[i].dest;
       }
       if (utils.isJavaScriptFile(dest)) {
         compilationSet.out = dest;

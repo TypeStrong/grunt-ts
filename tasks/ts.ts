@@ -37,18 +37,18 @@ function pluginFn(grunt: IGrunt) {
           options: IGruntTSOptions;
 
         {
-          const currentTask: grunt.task.IMultiTask<ITargetOptions> = this;
-          const files: IGruntTSCompilationInfo[] = currentTask.files;
+          const currentGruntTask: grunt.task.IMultiTask<ITargetOptions> = this;
+          const resolvedFiles: IGruntTSCompilationInfo[] = currentGruntTask.files;
           // make async
-          done = currentTask.async();
+          done = currentGruntTask.async();
 
           // get unprocessed templates from configuration
           let rawTaskConfig =
-             <ITargetOptions>(grunt.config.getRaw(currentTask.name) || {});
+             <ITargetOptions>(grunt.config.getRaw(currentGruntTask.name) || {});
           let rawTargetConfig =
-            <ITargetOptions>(grunt.config.getRaw(currentTask.name + '.' + currentTask.target) || {});
+            <ITargetOptions>(grunt.config.getRaw(currentGruntTask.name + '.' + currentGruntTask.target) || {});
 
-          optionsResolver.resolveAsync(rawTaskConfig, rawTargetConfig, currentTask.target, files,
+          optionsResolver.resolveAsync(rawTaskConfig, rawTargetConfig, currentGruntTask.target, resolvedFiles,
               grunt.template.process, grunt.file.expand).then((result) => {
             options = result;
 
