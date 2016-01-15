@@ -597,7 +597,6 @@ export var tests : nodeunit.ITestGroup = {
 
         test.done();
       }).catch((err) => {test.ifError(err); test.done();});
-    }
   },
   "simple tsconfig with file path works": (test: nodeunit.Test) => {
     test.expect(13);
@@ -727,5 +726,5 @@ export var tests : nodeunit.ITestGroup = {
         test.done();
     }).catch((err) => {test.ifError(err); test.done();});
   }
-
+  }
 };
