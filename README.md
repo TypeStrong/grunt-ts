@@ -7,7 +7,7 @@
 Grunt-ts is an npm package that handles TypeScript compilation work in GruntJS build scripts.  It provides a [Grunt-compatible wrapper](#support-for-tsc-switches) for the `tsc` command-line compiler, and provides some [additional functionality](#grunt-ts-gruntfilejs-options) that improves the TypeScript development workflow. Grunt-ts supports compiling against [tsconfig.json](#tsconfig) or even a [Visual Studio project](#vs) directly.  Grunt-ts is itself written in [TypeScript](./tasks/ts.ts).
 
 ### Latest Changes
-Latest release is `5.2.0`, which supports TypeScript 1.6 and contains bugfixes.
+Latest release is `5.3.0`, which supports TypeScript 1.7 and contains some enhancements and bugfixes.
 
 [Full changelog is here](CHANGELOG.md).
 
@@ -59,6 +59,7 @@ Grunt-ts provides explicit support for most `tsc` switches.  Any arbitrary switc
 
 |`tsc` switch|name in grunt-ts|description|
 |:----:|:----:|:-----|
+|--allowSyntheticDefaultImports|[allowSyntheticDefaultImports](#allowsyntheticdefaultimports)|Allows use "default" ES6 module import syntax with pre-ES6 libraries that don't have a default (on by default with SystemJS)|
 |--declaration|[declaration](#declaration)|Generates a `.d.ts` definitions file for compiled TypeScript files|
 |--emitDecoratorMetadata|[emitDecoratorMetadata](#emitdecoratormetadata)|Emit metadata for type/parameter decorators.|
 |--experimentalAsyncFunctions|[experimentalAsyncFunctions](#experimentalasyncfunctions)|Enables experimental support for ES7 async functions|
@@ -67,6 +68,7 @@ Grunt-ts provides explicit support for most `tsc` switches.  Any arbitrary switc
 |--inlineSources|[inlineSources](#inlinesources)|Emit the TypeScript source alongside the sourcemaps within a single file; requires `--inlineSourceMap` to be set.|
 |--isolatedModules|[isolatedModules](#isolatedmodules)|Ensures that the output is safe to only emit single files by making cases that break single-file transpilation an error|
 |--jsx|[jsx](#jsx)|Specifies the JSX code generation style: 'preserve' or 'react'|
+|--locale|[locale](#locale)|Specify locale for error messages.|
 |--mapRoot LOCATION|[mapRoot](#maproot)|Specifies the location where debugger should locate map files instead of generated locations.|
 |--module KIND|[module](#module)|Specify module style for code generation|
 |--moduleResolution KIND|[moduleResolution](#moduleresolution)|Specifies module resolution strategy: 'node' (Node.js) or 'classic' (TypeScript pre-1.6).|
@@ -75,6 +77,7 @@ Grunt-ts provides explicit support for most `tsc` switches.  Any arbitrary switc
 |--noEmitHelpers|[noEmitHelpers](#noemithelpers)|Do not generate custom helper functions like `__extends` in compiled output.|
 |--noEmitOnError|[noEmitOnError](#noemitonerror)|Do not emit JavaScript if there is a compilation error|
 |--noImplicitAny|[noImplicitAny](#noimplicitany)|Warn on expressions and declarations with an implied `any` type.|
+|--noLib|[noLib](#nolib)|Do not automatically include lib.d.ts is compilation context.|
 |--noResolve|[noResolve](#noresolve)|Do not add triple-slash references or module import targets to the compilation context.|
 |--out FILE|[out](#out)|Concatenate and emit output to a single file.|
 |--outDir DIRECTORY|[outDir](#outdir)|Redirect output structure to the directory.|
@@ -83,6 +86,8 @@ Grunt-ts provides explicit support for most `tsc` switches.  Any arbitrary switc
 |--rootDir|[rootDir](#rootdir)|Allows override of common root folder calculated by `--outDir`.|
 |--sourceMap|[sourceMap](#sourcemap)|Generates corresponding `.map` file|
 |--sourceRoot LOCATION|[sourceRoot](#sourceroot)|Specifies the location where debugger should locate TypeScript files instead of source locations.|
+|--stripInternal|[stripInternal](#stripinternal)|does not emit members marked as @internal.|
+|--suppressExcessPropertyErrors|[suppressExcessPropertyErrors](#suppressexcesspropertyerrors)|Disables strict object literal assignment checking (experimental).|
 |--suppressImplicitAnyIndexErrors|[suppressImplicitAnyIndexErrors](#suppressimplicitanyindexerrors)|Specifies the location where debugger should locate TypeScript files instead of source locations.|
 |--target VERSION|[target](#target)|Specify ECMAScript target version: `'es3'`, `'es5'`, or `'es6'`|
 
@@ -94,6 +99,7 @@ For file ordering, look at [JavaScript Generation](#javascript-generation).
 |grunt-ts property|where to define|description|
 |:----|:----|:-----|
 |[additionalFlags](#additionalflags)|option|`string` - allows passing arbitrary strings to the compiler.  This is intended to enable compatibility with features not supported directly by grunt-ts.|
+|[allowSyntheticDefaultImports](#allowsyntheticdefaultimports)|option|`true`, `false` (default) - Allows use "default" ES6 module import syntax with pre-ES6 libraries that don't have a default (on by default with SystemJS and not required to specify).|
 |[comments](#comments)|option|`true`, `false` (default) - include comments in emitted JS.|
 |[compile](#compile)|option|`true` (default), `false` - compile TypeScript code.|
 |[compiler](#compiler)|option|`string` - path to custom compiler|
@@ -114,6 +120,7 @@ For file ordering, look at [JavaScript Generation](#javascript-generation).
 |[inlineSources](#inlinesources)|option|`true`, `false` (default) Emit the TypeScript source alongside the sourcemaps within a single file; If enabled, will automatically enable `inlineSourceMap` and `sourceMap`.|
 |[isolatedModules](#isolatedmodules)|option|`true`, `false` (default) Ensures that the output is safe to only emit single files by making cases that break single-file transpilation an error.|
 |[jsx](#jsx)|option|`'preserve'`, `'react'`, (TypeScript default is `'react'`).  If `'preserve'`, TypeScript will emit `.jsx`; if `'react'`, TypeScript will transpile and emit `.js` files.|
+|[locale](#locale)|option|`string` - specify locale for error messages|
 |[mapRoot](#maproot)|option|`string` - root for referencing `.js.map` files in JS|
 |[module](#module)|option|default to be nothing, If you want to set it you set it to either `'amd'` or `'commonjs'`|
 |[moduleResolution](#moduleresolution)|option|`'classic'` or `'node'`.  This was introduced in TypeScript 1.6.  The default is `'node'` if not passed.  [More details here](https://github.com/Microsoft/TypeScript/wiki/What%27s-new-in-TypeScript#adjustments-in-module-resolution-logic).|
@@ -122,6 +129,7 @@ For file ordering, look at [JavaScript Generation](#javascript-generation).
 |[noEmitHelpers](#noemithelpers)|option|`true`, `false` (default) - If passed as `true`, TypeScript will not generate custom helper functions like `__extends` in compiled output|
 |[noEmitOnError](#noemithelpers)|option|`true`, `false` (default) - If passed as `true`, TypeScript will not emit JS if there is an error (see also [failOnTypeErrors](#failontypeerrors))|
 |[noImplicitAny](#noimplicitany)|option|`true`, `false` (default) - enable for stricter type checking|
+|[noLib](#nolib)|option|`true`, `false` (default) - do not automatically include lib.d.ts in compilation context|
 |[noResolve](#noresolve)|option|`true`, `false` (default) - for deprecated version of TypeScript|
 |[options](#grunt-ts-target-options)|target||
 |[out](#out)|target|`string` - instruct `tsc` to concatenate output to this file.|
@@ -132,6 +140,8 @@ For file ordering, look at [JavaScript Generation](#javascript-generation).
 |[rootDir](#rootdir)|option|`string` - Allows override of common root folder calculated by `--outDir`.|
 |[sourceRoot](#sourceroot)|option|`string` - root for referencing TS files in `.js.map`|
 |[sourceMap](#sourcemap)|option|`true` (default), `false` - indicates if source maps should be generated (`.js.map`)|
+|[stripInternal](#stripinternal)|option|`true`, `false` (default) - does not emit members marked as @internal.|
+|[suppressExcessPropertyErrors](#suppressexcesspropertyerrors)|option|`false` (default), `true` - indicates if TypeScript should disable strict object literal assignment checking (experimental)|
 |[suppressImplicitAnyIndexErrors](#suppressimplicitanyindexerrors)|option|`false` (default), `true` - indicates if TypeScript should allow access to properties of an object by string indexer when `--noImplicitAny` is active, even if TypeScript doesn't know about them.|
 |[src](#src)|target|`string` or `string[]` - glob of TypeScript files to compile.|
 |[target](#target)|option|`'es5'` (default), `'es3'`, or `'es6'` - targeted ECMAScript version|
@@ -249,11 +259,6 @@ grunt.initConfig({
 
 This section allows global configuration for the grunt-ts task.  All [target-specific options](#grunt-ts-target-options) are supported.  If a target also has options set, the target's options override the global task options.
 
-<!--
-#### nolib
-
-Specify this option if you do not want the lib.d.ts to be loaded by the TypeScript compiler.
--->
 
 #### out
 
@@ -400,6 +405,23 @@ grunt.initConfig({
     default: {
       options: {
         additionalFlags: '--autoFixBugs --gruntTs "is awesome!"'
+      }
+    }
+  }
+});
+````
+
+#### allowSyntheticDefaultImports
+
+Allows use of ES6 "default" import syntax with pre-ES6 modules when not using SystemJS.  If using module format "amd", "commonjs" or "umd", the following import syntax for jQuery will give the error "Module 'jquery' has no default export" when exporting to "amd", "commonjs", or "umd" format: `import * as $ from 'jquery';`.  In that case, passing allowSyntheticDefaultImports will eliminate this error.  NOTE: This is the default behavior when SystemJS module format is used (`module: "system"`).  This switch (and behavior) requires TypeScript 1.8 or higher.  See [this issue](https://github.com/Microsoft/TypeScript/issues/5285) for more details.
+
+````javascript
+grunt.initConfig({
+  ts: {
+    default: {
+      options: {
+        allowSyntheticDefaultImports: true,
+        module: 'umd'
       }
     }
   }
@@ -808,6 +830,21 @@ grunt.initConfig({
 });
 ````
 
+#### locale
+
+Specify culture string for error messages - will pass the `--locale` switch.  Requires appropriate TypeScript error messages file to be present (see TypeScript documentation for more details).
+
+````javascript
+grunt.initConfig({
+  ts: {
+    default: {
+      options: {
+        locale: "ja-jp"
+      }
+    }
+  }
+});
+````
 
 #### mapRoot
 
@@ -829,7 +866,7 @@ grunt.initConfig({
 #### module
 
 ````javascript
-"amd" (default) | "commonjs" | "system" | "umd" | "es6" | "es2015" | ""
+"amd" | "commonjs" | "system" | "umd" | "es6" | "es2015" | "" (default)
 ````
 
 Specifies if TypeScript should emit AMD, CommonJS, SystemJS, "ES6", or UMD-style external modules.  Has no effect if internal modules are used.  Note - this should not be used in combination with `out` [prior to TypeScript 1.8](https://github.com/Microsoft/TypeScript/wiki/What%27s-new-in-TypeScript#option-to-concatenate-amd-and-system-modules-into-a-single-output-file) because the TypeScript compiler does not support concatenation of external modules; consider using a module bundler like WebPack, Browserify, or Require's r.js to concatenate external modules.
@@ -966,6 +1003,26 @@ grunt.initConfig({
 });
 ````
 
+#### noLib
+
+````javascript
+true | false (default)
+````
+
+Specify this option if you do not want the lib.d.ts to be loaded by the TypeScript compiler.  Generally this is used to allow you to manually specify your own lib.d.ts.
+
+````javascript
+grunt.initConfig({
+  ts: {
+    default: {
+      options: {
+        noLib: true
+      }
+    }
+  }
+});
+````
+
 #### noResolve
 
 ````javascript
@@ -1076,6 +1133,47 @@ grunt.initConfig({
 });
 ````
 
+#### stripInternal
+
+Use stripInternal to prevent the emit of members marked as @internal via a comment.  For example:
+
+```typescript
+/* @internal */
+export class MyClass {
+}
+```
+
+````javascript
+grunt.initConfig({
+  ts: {
+    default: {
+      options: {
+        sourceRoot: "/dev"
+      }
+    }
+  }
+});
+````
+
+#### suppressExcessPropertyErrors
+
+````javascript
+true | false (default)
+````
+
+Set to true to disable strict object literal assignment checking (experimental).  See https://github.com/Microsoft/TypeScript/pull/4484 for more details.
+
+````javascript
+grunt.initConfig({
+  ts: {
+    default: {
+      options: {
+        suppressExcessPropertyErrors: true
+      }
+    }
+  }
+});
+````
 
 #### suppressImplicitAnyIndexErrors
 
