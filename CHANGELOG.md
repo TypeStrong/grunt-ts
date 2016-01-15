@@ -2,6 +2,9 @@
 
 ## Next
 
+## v5.3.0-beta.5 (2016-01-14)
+* FIX: Will now provide a warning when a grunt-ts task-level keyword is used as a target name (#319) - thanks for the report @jounii.
+
 ## v5.3.0-beta.4 (2016-01-14)
 * FIX: Transformed HTML files will be automatically added to the compilation context if they match the glob (#255).
 * FIX: resolved issue in v5.3.0-beta.3 - will now error again if `html` is specified without an `src` or a glob.
