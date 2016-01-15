@@ -2,6 +2,9 @@
 
 ## Next
 
+## v5.3.1 (2016-01-15)
+* FIX: Will now properly add default tsconfig.json path if omitted when using object style (#302) - thanks for the report @nsgundy.
+
 ## v5.3.0 (2016-01-15)
 * FEAT: Updated to natively support and include TypeScript 1.7.
 * FEAT: Added support for `--noLib`, `--emitBOM`, `--locale`, `--suppressExcessPropertyErrors`, `--stripInternal`, and `--allowSyntheticDefaultImports`.
