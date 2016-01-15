@@ -646,6 +646,26 @@ module.exports = function (grunt) {
                 src: 'test/withwrongmodule/ts/*.ts',
                 out: 'test/usingOutWithExternalModules/result.js'
             },
+            test_rootDir_shallow: {
+                test: true,
+                options: {
+                    module: 'umd',
+                    fast: 'never',
+                    rootDir: 'test/baseDir/1/src'
+                },
+                src: 'test/baseDir/1/src/deepSrc/**/*.ts',
+                outDir: 'test/baseDir/1/built/built'
+            },
+            test_rootDir_deep: {
+                test: true,
+                options: {
+                    module: 'umd',
+                    fast: 'never',
+                    rootDir: 'test/baseDir/1/src/deepSrc'
+                },
+                src: 'test/baseDir/1/src/deepSrc/**/*.ts',
+                outDir: 'test/baseDir/1/built/builtDeep'
+            },
             test_htmlOutputTemplate: {
                 test: true,
                 options: {
