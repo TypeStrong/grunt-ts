@@ -672,6 +672,27 @@ export var tests : nodeunit.ITestGroup = {
       test.done();
     }).catch((err) => {test.ifError(err); test.done();});
   },
+  "paths written to filesGlob are resolved first": (test: nodeunit.Test) => {
+    test.expect(2);
+    let cfg: any = getConfig("minimalist", true);
+    cfg.src = ['./<%= grunt.pathsFilesGlobProperty %>/**/*.ts'];
+    cfg.tsconfig = {
+      tsconfig: 'test/tsconfig/simple_filesGlob_tsconfig.json',
+      ignoreFiles: false,
+      updateFiles: true,
+      overwriteFilesGlob: true
+    };
+    (<any>grunt).pathsFilesGlobProperty = "test123";
+    const result = or.resolveAsync(null, cfg, "myTarget", null, grunt.template.process, grunt.file.expand).then((result) => {
+
+      const resultingTSConfig = utils.readAndParseJSONFromFileSync((<ITSConfigSupport>cfg.tsconfig).tsconfig);
+      test.strictEqual(resultingTSConfig.filesGlob.length, 1, "expected one element.");
+      test.strictEqual(resultingTSConfig.filesGlob[0], "../../test123/**/*.ts", "expected one element.");
+      delete (<any>grunt).pathsFilesGlobProperty;
+      test.done();
+
+    }).catch((err) => {test.ifError(err); delete (<any>grunt).pathsFilesGlobProperty; test.done();});
+  },
   "if no files and no exclude, *.ts and *.tsx will be included and files not added.": (test: nodeunit.Test) => {
     test.expect(3);
     const cfg = getConfig("minimalist", true);
