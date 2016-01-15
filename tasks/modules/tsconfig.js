@@ -73,7 +73,6 @@ function resolveAsync(applyTo, taskOptions, targetOptions, theTemplateProcessor,
                 else {
                     return reject('Error reading "' + projectFile + '": ' + JSON.stringify(ex));
                 }
-                return reject(ex);
             }
             try {
                 var projectSpec;
@@ -112,10 +111,10 @@ function warnOnBadConfiguration(options, projectSpec) {
 function getGlobs(taskOptions, targetOptions) {
     var globs = null;
     if (taskOptions && taskOptions.src) {
-        globs = taskOptions.src;
+        globs = _.map(taskOptions.src.slice(), function (item) { return templateProcessor(item, {}); });
     }
     if (targetOptions && targetOptions.src) {
-        globs = targetOptions.src;
+        globs = _.map(targetOptions.src.slice(), function (item) { return templateProcessor(item, {}); });
     }
     return globs;
 }

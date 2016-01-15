@@ -21,6 +21,7 @@ module.exports = function (grunt) {
                 'test/htmlExternal/html.external.html.ts',
                 'tscommand-*.txt',
                 '!test/commandLineAssertions.js',
+                '!test/optionsResolverTests.js',
                 'test/**/*.orig'
             ],
             testPost: [
@@ -246,7 +247,8 @@ module.exports = function (grunt) {
                     'test/files_ObjectFormat/b.js': ['test/multifile/b/**/*.ts', 'test/simple/ts/**/*.ts']
                 },
                 options: {
-                    fast: 'never'
+                    fast: 'never',
+                    comments: true
                 }
             },
             abtest: {
@@ -414,7 +416,7 @@ module.exports = function (grunt) {
                 options: {
                     htmlModuleTemplate: '<%= filename %>_<%= ext %>_module',
                     htmlVarTemplate: '<%= filename %>_<%= ext %>_variable',
-                    comments: false
+                    comments: true
                 },
             },
             htmlWithHtmlOutDirTest: {
@@ -491,15 +493,17 @@ module.exports = function (grunt) {
                 outDir: 'test/transform/js',
                 options: {
                     fast: 'never',
-                    module: 'commonjs'
+                    module: 'commonjs',
+                    comments: true
                 }
             },
             refTransform: {
                 test: true,
                 src: ['test/references-transform/**/*.ts','test/references*.d.ts'],
                 options: {
-                    fast: 'always',
-                    noImplicitAny: true
+                    fast: 'never',
+                    noImplicitAny: true,
+                    comments: true
                 }
             },
             customcompiler: {
@@ -846,6 +850,60 @@ module.exports = function (grunt) {
                     sourceRoot: 'test/sourceRoot with spaces',
                     mapRoot: 'test/mapRoot with spaces'
                 }
+            },
+            test_noLib: {
+                test: true,
+                testExecute: commandLineAssertions.test_noLib,
+                src: 'test/simple/ts/zoo.ts',
+                options: {
+                    noLib: true
+                }
+            },
+            test_emitBOM: {
+                test: true,
+                testExecute: commandLineAssertions.test_emitBOM,
+                src: 'test/simple/ts/zoo.ts',
+                options: {
+                    emitBOM: true
+                }
+            },
+            test_locale: {
+                test: true,
+                testExecute: commandLineAssertions.test_locale,
+                src: 'test/simple/ts/zoo.ts',
+                options: {
+                    locale: 'ja-jp'
+                }
+            },
+            test_suppressExcessPropertyErrors: {
+                test: true,
+                testExecute: commandLineAssertions.test_suppressExcessPropertyErrors,
+                src: 'test/simple/ts/zoo.ts',
+                options: {
+                    suppressExcessPropertyErrors: true
+                }
+            },
+            test_stripInternal: {
+                test: true,
+                testExecute: commandLineAssertions.test_stripInternal,
+                src: 'test/simple/ts/zoo.ts',
+                options: {
+                    stripInternal: true
+                }
+            },
+            test_allowSyntheticDefaultImports: {
+                test: true,
+                testExecute: commandLineAssertions.test_allowSyntheticDefaultImports,
+                src: 'test/simple/ts/zoo.ts',
+                options: {
+                    allowSyntheticDefaultImports: true
+                }
+            },
+            test_htmlTemplateGlob: {
+                test: false, // called manually by test_htmlTemplateResultAddedToGlobs.
+                files: [{ src: ['test/htmlTemplateGlob/**/t*.ts']},
+                    { src: ['test/htmlTemplateGlob/**/o*.ts'] }],
+                html: ['test/htmlTemplateGlob/**/*.html']
             }
         }
     });
@@ -900,21 +958,28 @@ module.exports = function (grunt) {
             memo.push('ts:' + name);
         }
         return memo;
-    }, []));
+    }, ['test_htmlTemplateResultAddedToGlobs']));
 
     (function() {
         // Collect fail tasks
         var grunt_ts_total_failures = 0,
           failTasks = grunt.util._.reduce(grunt.config.get('ts'), function (memo, task, name) {
-            if (task.fail) {
-                memo.push('ts:' + name);
-            }
-            return memo;
-        }, []);
+                if (task.fail) {
+                    memo.push('ts:' + name);
+                }
+                return memo;
+            }, []),
+          fastIntegrationTests = grunt.util._.reduce(grunt.config.get('ts'), function (memo, task, name) {
+                if (task.test && task.testExecute) {
+                    memo.push('ts:' + name);
+                }
+                return memo;
+            }, []);
         grunt.registerTask('test_fail', failTasks);
+        grunt.registerTask('test_fastIntegration', fastIntegrationTests);
         grunt.event.on('grunt-ts.failure', function() {
-            grunt_ts_total_failures += 1;
-        });
+                grunt_ts_total_failures += 1;
+            });
         grunt.registerTask('validate_failure_count', 'Counts failure events emitted by grunt-ts', function() {
             console.log('Expected ' + failTasks.length + ' task failures, got ' +
                 grunt_ts_total_failures + ' failures.');
@@ -953,6 +1018,64 @@ module.exports = function (grunt) {
     grunt.registerTask('release', ['build', 'test', 'report-time-elapsed']);
     grunt.registerTask('default', ['release']);
 
+    (function(){
+        var test_htmlTemplateResultAddedToGlobs_shouldExist = [
+            'test/htmlTemplateGlob/test.html.ts',
+            'test/htmlTemplateGlob/test.html.js',
+            'test/htmlTemplateGlob/test.html.js.map',
+            'test/htmlTemplateGlob/doNotTranspile.html.ts'
+        ];
+        var test_htmlTemplateResultAddedToGlobs_shouldNotExist = [
+            'test/htmlTemplateGlob/doNotTranspile.html.js',
+            'test/htmlTemplateGlob/doNotTranspile.html.js.map'
+        ];
+
+        grunt.registerTask('test_htmlTemplateResultAddedToGlobs',
+            'integration test to prove that new TS files created by HTML evaluation are included on the' +
+            'first run.',  function() {
+
+            [test_htmlTemplateResultAddedToGlobs_shouldExist,
+              test_htmlTemplateResultAddedToGlobs_shouldNotExist].forEach(
+                function (array) {
+                    array.forEach(function (fileName) {
+                        if (grunt.file.exists(fileName)) {
+                            grunt.file.delete(fileName);
+                        }
+                    });
+                }
+            );
+
+            grunt.task.run('ts:test_htmlTemplateGlob');
+            grunt.task.run('test_htmlTemplateResultAddedToGlobsAssert');
+        });
+
+        grunt.registerTask('test_htmlTemplateResultAddedToGlobsAssert',
+            'integration test to prove that new TS files created by HTML evaluation are included on the' +
+            'first run.',  function() {
+            var validatedFileCount = 0, result = true;
+            test_htmlTemplateResultAddedToGlobs_shouldExist.forEach(
+              function (fileName) {
+                if (!grunt.file.exists(fileName)) {
+                    console.log('Expected file "' + fileName + '" to exist.');
+                    result = false;
+                } else {
+                    validatedFileCount += 1;
+                }
+            });
+            test_htmlTemplateResultAddedToGlobs_shouldNotExist.forEach(
+              function (fileName) {
+                if (grunt.file.exists(fileName)) {
+                    console.log('Expected file "' + fileName + '" to not exist.');
+                    result = false;
+                } else {
+                    validatedFileCount += 1;
+                }
+            });
+            return result && (validatedFileCount === 6);
+        });
+    }());
+
+
     //////////////////////////////////////////////
     // Dev
     //
@@ -966,53 +1089,62 @@ module.exports = function (grunt) {
 
     grunt.registerTask('dev', ['run', 'watch']);
 
-    grunt.registerTask('run', function () {
+    function taskToBuildGruntTsAndThenRunOtherTasks(tasksToRun) {
+        return function() {
 
-        // Clear the console and move to 0 0
-        // http://stackoverflow.com/a/14976765/390330
-        console.log('\u001b[2J\u001b[0;0H');
-        console.log('>>>>>>>>>>> Cleared console >>>>>>>>>>> \n\n'.grey);
+            // Clear the console and move to 0 0
+            // http://stackoverflow.com/a/14976765/390330
+            console.log('\u001b[2J\u001b[0;0H');
+            console.log('>>>>>>>>>>> Cleared console >>>>>>>>>>> \n\n'.grey);
 
-        var done = this.async();
+            var done = this.async();
 
-        // Using a simple chain of ts:internal followed by ts:yourtest would not have run the updated grunt-ts
-        // We are spawn to ensure that `ts:` is reloaded after compile
-        function runTask(taskName, callback) {
-            grunt.util.spawn({
-                cmd: 'grunt',
-                args: [taskName]
-            }, function (err, output) {
-                if (err) {
-                    console.log(output.stderr || output.stdout);
-                    done(err);
+            // Using a simple chain of ts:internal followed by ts:yourtest would not have run the updated grunt-ts
+            // We are spawn to ensure that `ts:` is reloaded after compile
+            function runTask(taskName, callback) {
+                grunt.util.spawn({
+                    cmd: 'grunt',
+                    args: [taskName]
+                }, function (err, output) {
+                    if (err) {
+                        console.log(output.stderr || output.stdout);
+                        done(err);
+                    }
+                    else {
+                        console.log(output.stdout);
+                        console.log('\n'); // looks better
+                        callback();
+                    }
+                });
+            }
+
+            // Add build task
+            tasksToRun.unshift('ts-internal:build');
+
+            // Now execute
+            var currentIndex = 0;
+            function getNextTaskFunction() {
+                currentIndex++;
+                if (currentIndex === tasksToRun.length) {
+                    return done;
                 }
                 else {
-                    console.log(output.stdout);
-                    console.log('\n'); // looks better
-                    callback();
+                    return function () {
+                        runTask(tasksToRun[currentIndex], getNextTaskFunction());
+                    };
                 }
-            });
-        }
-
-        // Add build task
-        tasksToTest.unshift('ts-internal:build');
-
-        // Now execute
-        var currentIndex = 0;
-        function getNextTaskFunction() {
-            currentIndex++;
-            if (currentIndex === tasksToTest.length) {
-                return done;
             }
-            else {
-                return function () {
-                    runTask(tasksToTest[currentIndex], getNextTaskFunction());
-                };
-            }
-        }
-        runTask(tasksToTest[0], getNextTaskFunction());
+            runTask(tasksToRun[0], getNextTaskFunction());
+        };
+    }
 
-    });
+
+    grunt.registerTask('testfast', taskToBuildGruntTsAndThenRunOtherTasks(
+            ['ts-internal:test', 'stageFiles','test_fastIntegration', 'nodeunit:fast']
+            ));
+
+
+    grunt.registerTask('run', taskToBuildGruntTsAndThenRunOtherTasks(tasksToTest));
 
     grunt.registerTask('report-time-elapsed','Reports the time elapsed since gruntStartedTimestamp', function() {
         var seconds = ((new Date().getTime()) - gruntStartedTimestamp) / 1000;

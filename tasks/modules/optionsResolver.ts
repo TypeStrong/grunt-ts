@@ -12,12 +12,13 @@ import {resolveAsync as resolveTSConfigAsync} from './tsconfig';
 
 const propertiesFromTarget = ['amdloader', 'html', 'htmlOutDir', 'htmlOutDirFlatten', 'reference', 'testExecute', 'tsconfig',
         'templateCache', 'vs', 'watch'],
-      propertiesFromTargetOptions = ['additionalFlags', 'comments', 'compile', 'compiler', 'declaration',
-        'emitDecoratorMetadata', 'experimentalDecorators', 'failOnTypeErrors', 'fast', 'htmlModuleTemplate', 'htmlOutDir',
-        'htmlOutputTemplate', 'htmlOutDirFlatten', 'htmlVarTemplate', 'inlineSourceMap', 'inlineSources', 'isolatedModules',
-        'mapRoot', 'module', 'newLine', 'noEmit', 'noEmitHelpers', 'noEmitOnError', 'noImplicitAny', 'noResolve',
-        'preserveConstEnums', 'removeComments', 'sourceRoot', 'sourceMap', 'suppressImplicitAnyIndexErrors', 'target',
-        'verbose', 'jsx', 'moduleResolution', 'experimentalAsyncFunctions', 'rootDir', 'emitGruntEvents'],
+      propertiesFromTargetOptions = ['additionalFlags', 'allowSyntheticDefaultImports', 'comments', 'compile', 'compiler', 'declaration',
+        'emitBOM', 'emitDecoratorMetadata', 'experimentalDecorators', 'failOnTypeErrors', 'fast', 'htmlModuleTemplate', 'htmlOutDir',
+        'htmlOutputTemplate', 'htmlOutDirFlatten', 'htmlVarTemplate', 'inlineSourceMap', 'inlineSources', 'isolatedModules', 'locale',
+        'mapRoot', 'module', 'newLine', 'noEmit', 'noEmitHelpers', 'noEmitOnError', 'noImplicitAny', 'noLib', 'noResolve',
+        'preserveConstEnums', 'removeComments', 'sourceRoot', 'sourceMap', 'stripInternal', 'suppressExcessPropertyErrors',
+        'suppressImplicitAnyIndexErrors', 'target', 'verbose', 'jsx', 'moduleResolution', 'experimentalAsyncFunctions', 'rootDir',
+        'emitGruntEvents'],
       delayTemplateExpansion = ['htmlModuleTemplate', 'htmlVarTemplate', 'htmlOutputTemplate'];
 
 let templateProcessor: (templateString: string, options: any) => string = null;
@@ -36,10 +37,11 @@ function emptyGlobExpander(globs: string[]): string[] {
 export function resolveAsync(rawTaskOptions: ITargetOptions,
                         rawTargetOptions: ITargetOptions,
                         targetName = '',
-                        files: IGruntTSCompilationInfo[] = [],
+                        resolvedFiles: IGruntTSCompilationInfo[] = [],
                         theTemplateProcessor: (templateString: string, options: any) => string = null,
                         theGlobExpander: (globs: string[]) => string[] = null): Promise<IGruntTSOptions> {
 
+  let result = emptyOptionsResolveResult();
   return new Promise<IGruntTSOptions>((resolve, reject) => {
 
 
@@ -58,7 +60,6 @@ export function resolveAsync(rawTaskOptions: ITargetOptions,
     fixMissingOptions(rawTaskOptions);
     fixMissingOptions(rawTargetOptions);
 
-    let result = emptyOptionsResolveResult();
     {
       const {errors, warnings} = resolveAndWarnOnConfigurationIssues(rawTaskOptions, rawTargetOptions, targetName);
       result.errors.push(...errors);
@@ -66,7 +67,7 @@ export function resolveAsync(rawTaskOptions: ITargetOptions,
     }
     result = applyGruntOptions(result, rawTaskOptions);
     result = applyGruntOptions(result, rawTargetOptions);
-    result = copyCompilationTasks(result, files);
+    result = copyCompilationTasks(result, resolvedFiles, resolveOutputOptions(rawTaskOptions, rawTargetOptions));
 
     resolveVSOptionsAsync(result, rawTaskOptions, rawTargetOptions, templateProcessor).then((result) => {
     resolveTSConfigAsync(result, rawTaskOptions, rawTargetOptions, templateProcessor, globExpander).then((result) => {
@@ -82,13 +83,33 @@ export function resolveAsync(rawTaskOptions: ITargetOptions,
       }
 
       return resolve(result);
-    }).catch((error) => {
-      return reject(error);
+    }).catch((tsConfigError) => {
+      result.errors.push('tsconfig error: ' + JSON.stringify(tsConfigError));
+      return resolve(result);
     });
-    }).catch((error) => {
-      return reject(error);
+    }).catch((vsConfigError) => {
+      result.errors.push('Visual Studio config issue: ' + JSON.stringify(vsConfigError));
+      return resolve(result);
     });
   });
+}
+
+function resolveOutputOptions(rawTaskOptions:
+  IGruntTargetOptions, rawTargetOptions: IGruntTargetOptions) {
+    const result: {outDir?: string, out?: string} = {};
+
+    const props = ['outDir', 'out'];
+    const options = [rawTaskOptions, rawTargetOptions];
+
+    options.forEach((opt) => {
+      props.forEach((prop) => {
+        if (opt && (prop in opt)) {
+          result[prop] = opt[prop];
+        }
+      });
+    });
+
+    return result;
 }
 
 function fixMissingOptions(config: ITargetOptions) {
@@ -129,6 +150,11 @@ function resolveAndWarnOnConfigurationIssues(task: ITargetOptions,
 
     function getAdditionalWarnings(task: any, target: any, targetName: string) {
       const additionalWarnings = [];
+
+      if (propertiesFromTarget.indexOf(targetName) >= 0) {
+        additionalWarnings.push(`Warning: Using the grunt-ts keyword "${targetName}" as a target name may cause ` +
+        `incorrect behavior or errors.`);
+      }
 
       if (((task && task.src && targetName !== 'src') || (target && target.src)) &&
           ((task && task.files) || (target && target.files))) {
@@ -283,27 +309,46 @@ function applyGruntOptions(applyTo: IGruntTSOptions, gruntOptions: ITargetOption
     return applyTo;
 }
 
-function copyCompilationTasks(options: IGruntTSOptions, files: IGruntTSCompilationInfo[]) {
+function copyCompilationTasks(options: IGruntTSOptions, resolvedFiles: IGruntTSCompilationInfo[], outputInfo: {outDir?: string, out?: string}) {
 
   if (!utils.hasValue(options.CompilationTasks)) {
     options.CompilationTasks = [];
   }
-  if (!utils.hasValue(files)) {
+  if (!utils.hasValue(resolvedFiles) || resolvedFiles.length === 0) {
+    if (options.CompilationTasks.length === 0 && (('outDir' in outputInfo) || ('out' in outputInfo))) {
+      const newCompilationTask : IGruntTSCompilationInfo = {
+        src: []
+      };
+      if ('outDir' in outputInfo) {
+        newCompilationTask.outDir = outputInfo.outDir;
+      }
+      if ('out' in outputInfo) {
+        newCompilationTask.outDir = outputInfo.outDir;
+      }
+      options.CompilationTasks.push(newCompilationTask);
+    }
     return options;
   }
-  for (let i = 0; i < files.length; i += 1) {
+  for (let i = 0; i < resolvedFiles.length; i += 1) {
+    let glob: string[];
+    const orig = (<{orig?: {src?: string[] | string}}>resolvedFiles[i]).orig;
+    if (orig && ('src' in orig)) {
+      glob = [].concat(orig.src);
+    }
+
     let compilationSet = {
-      src: _.map(files[i].src, (fileName) => utils.enclosePathInQuotesIfRequired(fileName)),
-      out: utils.enclosePathInQuotesIfRequired(files[i].out),
-      outDir: utils.enclosePathInQuotesIfRequired(files[i].outDir)
+      src: _.map(resolvedFiles[i].src, (fileName) => utils.enclosePathInQuotesIfRequired(fileName)),
+      out: utils.enclosePathInQuotesIfRequired(resolvedFiles[i].out),
+      outDir: utils.enclosePathInQuotesIfRequired(resolvedFiles[i].outDir),
+      glob
     };
-    if ('dest' in files[i] && files[i].dest) {
+    if ('dest' in resolvedFiles[i] && resolvedFiles[i].dest) {
       let dest: string;
-      if (_.isArray(files[i].dest)) {
+      if (_.isArray(resolvedFiles[i].dest)) {
         // using an array for dest is not supported.  Only take first element.
-        dest = files[i].dest[0];
+        dest = resolvedFiles[i].dest[0];
       } else {
-        dest = files[i].dest;
+        dest = resolvedFiles[i].dest;
       }
       if (utils.isJavaScriptFile(dest)) {
         compilationSet.out = dest;
@@ -359,14 +404,16 @@ function addressAssociatedOptionsAndResolveConflicts(options: IGruntTSOptions) {
     options.comments = !options.removeComments;
   }
 
-  if ('html' in options && options.CompilationTasks.length === 0) {
-    options.errors.push(`ERROR: option \`html\` provided without specifying corresponding TypeScript source files to ` +
-    `compile.  The transform will not occur unless grunt-ts also expects to compile these files.`);
+  if ('html' in options &&
+      (options.CompilationTasks.length === 0 ||
+      !_.some(options.CompilationTasks, item => ((item.src || []).length > 0 || (item.glob || []).length > 0)))) {
+
+        options.errors.push(`ERROR: option "html" provided without corresponding TypeScript source files or glob to ` +
+        `compile.  The transform will not occur unless grunt-ts also expects to compile some files.`);
   }
 
   options.CompilationTasks.forEach(compileTask => {
     if (compileTask.out && compileTask.outDir) {
-      console.log(JSON.stringify(compileTask));
       options.warnings.push(
         'The parameter `out` is incompatible with `outDir`; pass one or the other - not both.  Ignoring `out` and using `outDir`.'
       );

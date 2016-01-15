@@ -206,8 +206,18 @@ export var tests : nodeunit.ITestGroup = {
         const fakeTask: any = {src: {}};
         const result = or.resolveAsync(fakeTask, cfg, "src").then((result) => {
           let allWarnings = result.warnings.join('\n');
-          console.log(allWarnings);
           test.strictEqual(allWarnings.length, 0, "expected no warnings.");
+          test.done();
+        }).catch((err) => {test.ifError(err); test.done();});
+    },
+    "Warning when using grunt-ts keyword as target name": (test: nodeunit.Test) => {
+        test.expect(2);
+
+        const cfg = getConfig("minimalist", true);
+        const result = or.resolveAsync(null, cfg, "watch").then((result) => {
+          test.strictEqual(result.warnings.length, 1, "expected one warning.");
+          let allWarnings = result.warnings.join('\n');
+          test.ok(allWarnings.indexOf(`keyword "watch"`) > -1, "expected warning about keyword watch");
           test.done();
         }).catch((err) => {test.ifError(err); test.done();});
     }
@@ -259,31 +269,31 @@ export var tests : nodeunit.ITestGroup = {
           test.strictEqual(result.htmlOutDirFlatten, true);
           test.done();
         }).catch((err) => {test.ifError(err); test.done();});
-     },
+    },
     "On Windows, CRLF is redundant": (test: nodeunit.Test) => {
-      test.expect(1);
-      const result = utils.newLineIsRedundantForTsc("CRLF", {EOL: "\r\n"});
-      test.strictEqual(result, true);
-      test.done();
+        test.expect(1);
+        const result = utils.newLineIsRedundantForTsc("CRLF", {EOL: "\r\n"});
+        test.strictEqual(result, true);
+        test.done();
     },
     "On Windows, LF is NOT redundant": (test: nodeunit.Test) => {
-      test.expect(1);
-      const result = utils.newLineIsRedundantForTsc("LF", {EOL: "\r\n"});
-      test.strictEqual(result, false);
-      test.done();
-    },
-    "On UNIX, CRLF is NOT redundant": (test: nodeunit.Test) => {
-      test.expect(1);
-      const result = utils.newLineIsRedundantForTsc("CRLF", {EOL: "\n"});
-      test.strictEqual(result, false);
-      test.done();
-    },
-    "On UNIX, LF is redundant": (test: nodeunit.Test) => {
-      test.expect(1);
-      const result = utils.newLineIsRedundantForTsc("LF", {EOL: "\n"});
-      test.strictEqual(result, true);
-      test.done();
-    }
+        test.expect(1);
+        const result = utils.newLineIsRedundantForTsc("LF", {EOL: "\r\n"});
+        test.strictEqual(result, false);
+        test.done();
+      },
+      "On UNIX, CRLF is NOT redundant": (test: nodeunit.Test) => {
+        test.expect(1);
+        const result = utils.newLineIsRedundantForTsc("CRLF", {EOL: "\n"});
+        test.strictEqual(result, false);
+        test.done();
+      },
+      "On UNIX, LF is redundant": (test: nodeunit.Test) => {
+        test.expect(1);
+        const result = utils.newLineIsRedundantForTsc("LF", {EOL: "\n"});
+        test.strictEqual(result, true);
+        test.done();
+      }
   },
 
   "Precedence and defaults override Tests": {
@@ -354,6 +364,30 @@ export var tests : nodeunit.ITestGroup = {
           test.strictEqual(result.sourceMap, true);
           test.done();
         }).catch((err) => {test.ifError(err); test.done();});
+    },
+    "outDir works in combination with tsconfig": (test: nodeunit.Test) => {
+      // as reported by @gilamran in https://github.com/TypeStrong/grunt-ts/issues/312
+      const config = <any>{
+        options: {
+          target: 'es5'
+        },
+        build: {
+          outDir: '.tmp',
+          tsconfig: {
+            tsconfig: 'test/tsconfig/blank_tsconfig.json',
+            ignoreFiles: true,
+            ignoreSettings: false,
+            overwriteFilesGlob: false,
+            updateFiles: true,
+            passThrough: false
+          }
+        }
+      };
+      const result = or.resolveAsync(config, config.build, "build").then((result) => {
+        test.strictEqual(result.target, "es5");
+        test.strictEqual(result.CompilationTasks[0].outDir, ".tmp");
+        test.done();
+      }).catch((err) => {test.ifError(err); test.done();});
     }
   },
 
@@ -452,17 +486,15 @@ export var tests : nodeunit.ITestGroup = {
           test.done();
         }).catch((err) => {test.ifError(err); test.done();});
     },
-    "Exception from invalid file": (test: nodeunit.Test) => {
-        test.expect(1);
+    "Error from invalid file": (test: nodeunit.Test) => {
+        test.expect(2);
         const cfg = getConfig("minimalist", true);
         cfg.tsconfig = './test/tsconfig/invalid_tsconfig.json';
         const result = or.resolveAsync(null, cfg).then((result) => {
-          test.ok(false, 'expected exception from invalid file.');
+          test.strictEqual(result.errors.length, 1);
+          test.ok(result.errors[0].indexOf("Error parsing") >= 0, "Expected error parsing");
           test.done();
-        }).catch((err) => {
-          test.ok(err.indexOf('Error parsing') > -1);
-          test.done();
-        });
+        }).catch((err) => {test.ifError(err); test.done();});
     },
     "No exception from blank file":  (test: nodeunit.Test) => {
       test.expect(1);
@@ -487,17 +519,15 @@ export var tests : nodeunit.ITestGroup = {
       }).catch((err) => {test.ifError(err); test.done();});
     },
     "Exception from missing file": (test: nodeunit.Test) => {
-        test.expect(2);
+        test.expect(3);
         const cfg = getConfig("minimalist", true);
         cfg.tsconfig = './test/tsconfig/does_not_exist_tsconfig.json';
         const result = or.resolveAsync(null, cfg).then((result) => {
-          test.ok(false, 'expected exception from missing file.');
+          test.strictEqual(result.errors.length, 1);
+          test.ok(result.errors[0].indexOf('ENOENT') > -1);
+          test.ok(result.errors[0].indexOf('does_not_exist_tsconfig.json') > -1);
           test.done();
-        }).catch((err) => {
-          test.strictEqual(err.code, 'ENOENT');
-          test.ok(err.path && err.path.indexOf('does_not_exist_tsconfig.json') > -1)
-          test.done();
-        });
+        }).catch((err) => {test.ifError(err); test.done();});
     },
     "config entries come through appropriately": (test: nodeunit.Test) => {
         test.expect(12);
@@ -567,7 +597,6 @@ export var tests : nodeunit.ITestGroup = {
 
         test.done();
       }).catch((err) => {test.ifError(err); test.done();});
-    }
   },
   "simple tsconfig with file path works": (test: nodeunit.Test) => {
     test.expect(13);
@@ -643,6 +672,29 @@ export var tests : nodeunit.ITestGroup = {
       test.done();
     }).catch((err) => {test.ifError(err); test.done();});
   },
+  "paths written to filesGlob are resolved first": (test: nodeunit.Test) => {
+    test.expect(4);
+    let cfg: any = getConfig("minimalist", true);
+    cfg.src = ['./test/<%= grunt.pathsFilesGlobProperty %>/a*.ts'];
+    cfg.tsconfig = {
+      tsconfig: 'test/tsconfig/simple_filesGlob_tsconfig.json',
+      ignoreFiles: false,
+      updateFiles: true,
+      overwriteFilesGlob: true
+    };
+    (<any>grunt).pathsFilesGlobProperty = "abtest";
+    const result = or.resolveAsync(null, cfg, "myTarget", null, grunt.template.process, grunt.file.expand).then((result) => {
+
+      const resultingTSConfig = utils.readAndParseJSONFromFileSync((<ITSConfigSupport>cfg.tsconfig).tsconfig);
+      test.strictEqual(resultingTSConfig.filesGlob.length, 1, "expected one element.");
+      test.strictEqual(resultingTSConfig.filesGlob[0], "../abtest/a*.ts", "expected modified glob (relative path).");
+      test.strictEqual(resultingTSConfig.files.length, 1, "expected one element.");
+      test.strictEqual(resultingTSConfig.files[0], "../abtest/a.ts", "expected file (at relative path).");
+      delete (<any>grunt).pathsFilesGlobProperty;
+      test.done();
+
+    }).catch((err) => {test.ifError(err); delete (<any>grunt).pathsFilesGlobProperty; test.done();});
+  },
   "if no files and no exclude, *.ts and *.tsx will be included and files not added.": (test: nodeunit.Test) => {
     test.expect(3);
     const cfg = getConfig("minimalist", true);
@@ -697,5 +749,5 @@ export var tests : nodeunit.ITestGroup = {
         test.done();
     }).catch((err) => {test.ifError(err); test.done();});
   }
-
+  }
 };

@@ -84,7 +84,6 @@ export function resolveAsync(applyTo: IGruntTSOptions,
         } else {
             return reject('Error reading "' + projectFile + '": ' + JSON.stringify(ex));
         }
-        return reject(ex);
       }
 
       try {
@@ -127,10 +126,10 @@ function warnOnBadConfiguration(options: IGruntTSOptions, projectSpec: ITSConfig
 function getGlobs(taskOptions: ITargetOptions, targetOptions: ITargetOptions) {
   let globs = null;
   if (taskOptions && (<any>taskOptions).src) {
-    globs = (<any>taskOptions).src;
+    globs = _.map([...(<any>taskOptions).src], item => templateProcessor(item, {}));
   }
   if (targetOptions && (<any>targetOptions).src) {
-    globs = (<any>targetOptions).src;
+    globs = _.map([...(<any>targetOptions).src], item => templateProcessor(item, {}));
   }
   return globs;
 }

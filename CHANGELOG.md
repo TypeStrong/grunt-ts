@@ -2,6 +2,26 @@
 
 ## Next
 
+## v5.3.0-beta.6 (2016-01-15)
+* FIX: Will now resolve templates prior to updating the globs in a tsconfig.json file (#303) - thanks for the report @nsgundy.
+
+## v5.3.0-beta.5 (2016-01-14)
+* FIX: Will now provide a warning when a grunt-ts task-level keyword is used as a target name (#319) - thanks for the report @jounii.
+
+## v5.3.0-beta.4 (2016-01-14)
+* FIX: Transformed HTML files will be automatically added to the compilation context if they match the glob (#255).
+* FIX: resolved issue in v5.3.0-beta.3 - will now error again if `html` is specified without an `src` or a glob.
+
+## v5.3.0-beta.3 (2015-12-26)
+* FIX: Use of `outDir` in the Gruntfile now works when otherwise getting the configuration from tsconfig.json. (Thanks, @gilamran (#312)).
+* NOTE: No longer warns when `html` is used without a source.  This needs to wait on #255.
+* FIX: Certain conditions (such as the specified tsconfig.json not found or VS project resolution errors) caused grunt-ts to hard-quit during options resolution.  These are now properly surfaced as errors, and the main quit path will be followed.
+
+## v5.3.0-beta.2 (2015-12-06)
+* FEAT: Updated to TypeScript 1.7 and revised all integration tests to account for its behavior (generally, the change to how `removeComments` works).
+* FEAT: Added support for `--noLib`, `--emitBOM`, `--locale`, `--suppressExcessPropertyErrors`, `--stripInternal`, and `--allowSyntheticDefaultImports`.
+* FEAT: Added support for `es6` and `es2015` as module options.
+
 ## v5.3.0-beta.1 (2015-12-06)
 * FIX: Improved detection of if newLine parameter is redundant for TSC.  This should make the functionality work more consistently if `grunt.util.linefeed` is used.  Thanks to @Maks3w for the report.
 

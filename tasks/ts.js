@@ -28,14 +28,14 @@ function pluginFn(grunt) {
         var filesCompilationIndex = 0;
         var done, options;
         {
-            var currentTask = this;
-            var files = currentTask.files;
+            var currentGruntTask = this;
+            var resolvedFiles = currentGruntTask.files;
             // make async
-            done = currentTask.async();
+            done = currentGruntTask.async();
             // get unprocessed templates from configuration
-            var rawTaskConfig = (grunt.config.getRaw(currentTask.name) || {});
-            var rawTargetConfig = (grunt.config.getRaw(currentTask.name + '.' + currentTask.target) || {});
-            optionsResolver.resolveAsync(rawTaskConfig, rawTargetConfig, currentTask.target, files, grunt.template.process, grunt.file.expand).then(function (result) {
+            var rawTaskConfig = (grunt.config.getRaw(currentGruntTask.name) || {});
+            var rawTargetConfig = (grunt.config.getRaw(currentGruntTask.name + '.' + currentGruntTask.target) || {});
+            optionsResolver.resolveAsync(rawTaskConfig, rawTargetConfig, currentGruntTask.target, resolvedFiles, grunt.template.process, grunt.file.expand).then(function (result) {
                 options = result;
                 options.warnings.forEach(function (warning) {
                     grunt.log.writeln(warning.magenta);
@@ -221,7 +221,7 @@ function pluginFn(grunt) {
                 }
                 // Find out which files to compile, codegen etc.
                 // Then calls the appropriate functions + compile function on those files
-                function filterFilesAndCompile() {
+                function filterFilesTransformAndCompile() {
                     var filesToCompile = [];
                     if (currentFiles.src || options.vs) {
                         _.map(currentFiles.src, function (file) {
@@ -258,6 +258,12 @@ function pluginFn(grunt) {
                         };
                         var htmlFiles = grunt.file.expand(options.html);
                         generatedFiles = _.map(htmlFiles, function (filename) { return html2tsModule.compileHTML(filename, html2tsOptions); });
+                        generatedFiles.forEach(function (fileName) {
+                            if (filesToCompile.indexOf(fileName) === -1 &&
+                                grunt.file.isMatch(currentFiles.glob, fileName)) {
+                                filesToCompile.push(fileName);
+                            }
+                        });
                     }
                     ///// Template cache
                     // Note: The template cache files do not go into generated files.
@@ -345,7 +351,7 @@ function pluginFn(grunt) {
                 // Reset the time for last compile call
                 lastCompile = new Date().getTime();
                 // Run initial compile
-                return filterFilesAndCompile();
+                return filterFilesTransformAndCompile();
                 // local event to handle file event
                 function handleFileEvent(filepath, displaystr, addedOrChanged) {
                     if (addedOrChanged === void 0) { addedOrChanged = false; }
@@ -362,7 +368,7 @@ function pluginFn(grunt) {
                     }
                     // Log and run the debounced version.
                     grunt.log.writeln((displaystr + ' >>' + filepath).yellow);
-                    filterFilesAndCompile();
+                    filterFilesTransformAndCompile();
                 }
             }).then(function (res) {
                 // Ignore res? (either logs or throws)
