@@ -73,7 +73,6 @@ function resolveAsync(applyTo, taskOptions, targetOptions, theTemplateProcessor,
                 else {
                     return reject('Error reading "' + projectFile + '": ' + JSON.stringify(ex));
                 }
-                return reject(ex);
             }
             try {
                 var projectSpec;

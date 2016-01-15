@@ -84,7 +84,6 @@ export function resolveAsync(applyTo: IGruntTSOptions,
         } else {
             return reject('Error reading "' + projectFile + '": ' + JSON.stringify(ex));
         }
-        return reject(ex);
       }
 
       try {
