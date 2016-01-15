@@ -673,21 +673,23 @@ export var tests : nodeunit.ITestGroup = {
     }).catch((err) => {test.ifError(err); test.done();});
   },
   "paths written to filesGlob are resolved first": (test: nodeunit.Test) => {
-    test.expect(2);
+    test.expect(4);
     let cfg: any = getConfig("minimalist", true);
-    cfg.src = ['./<%= grunt.pathsFilesGlobProperty %>/**/*.ts'];
+    cfg.src = ['./test/<%= grunt.pathsFilesGlobProperty %>/a*.ts'];
     cfg.tsconfig = {
       tsconfig: 'test/tsconfig/simple_filesGlob_tsconfig.json',
       ignoreFiles: false,
       updateFiles: true,
       overwriteFilesGlob: true
     };
-    (<any>grunt).pathsFilesGlobProperty = "test123";
+    (<any>grunt).pathsFilesGlobProperty = "abtest";
     const result = or.resolveAsync(null, cfg, "myTarget", null, grunt.template.process, grunt.file.expand).then((result) => {
 
       const resultingTSConfig = utils.readAndParseJSONFromFileSync((<ITSConfigSupport>cfg.tsconfig).tsconfig);
       test.strictEqual(resultingTSConfig.filesGlob.length, 1, "expected one element.");
-      test.strictEqual(resultingTSConfig.filesGlob[0], "../../test123/**/*.ts", "expected one element.");
+      test.strictEqual(resultingTSConfig.filesGlob[0], "../abtest/a*.ts", "expected modified glob (relative path).");
+      test.strictEqual(resultingTSConfig.files.length, 1, "expected one element.");
+      test.strictEqual(resultingTSConfig.files[0], "../abtest/a.ts", "expected file (at relative path).");
       delete (<any>grunt).pathsFilesGlobProperty;
       test.done();
 
