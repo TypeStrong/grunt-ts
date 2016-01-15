@@ -157,6 +157,10 @@ function getTSConfigSettings(raw) {
                 tsconfig: tsconfigName
             };
         }
+        if (!('tsconfig' in raw.tsconfig) &&
+            !raw.tsconfig.passThrough) {
+            raw.tsconfig.tsconfig = 'tsconfig.json';
+        }
         return raw.tsconfig;
     }
     catch (ex) {

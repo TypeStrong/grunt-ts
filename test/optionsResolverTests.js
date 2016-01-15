@@ -696,6 +696,21 @@ exports.tests = {
                 test.strictEqual(resultingTSConfig.files.length, 1, 'expected a single item in the files array');
                 test.done();
             }).catch(function (err) { test.ifError(err); test.done(); });
+        },
+        "omitting tsconfig property of tsconfig object defaults to 'tsconfig.json'": function (test) {
+            test.expect(4);
+            var cfg = {
+                tsconfig: {
+                    overwriteFilesGlob: false
+                }
+            };
+            var result = or.resolveAsync(null, cfg).then(function (result) {
+                test.strictEqual(result.tsconfig.tsconfig, "tsconfig.json", "expected default to be set.");
+                test.ok(result.CompilationTasks.length > 0, "expected some compilation tasks from default tsconfig.json");
+                test.strictEqual(result.errors.length, 0, "expected zero errors.");
+                test.strictEqual(result.warnings.length, 0, "expected zero warnings.");
+                test.done();
+            }).catch(function (err) { test.ifError(err); test.done(); });
         }
     }
 };

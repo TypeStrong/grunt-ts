@@ -748,6 +748,22 @@ export var tests : nodeunit.ITestGroup = {
 
         test.done();
     }).catch((err) => {test.ifError(err); test.done();});
+  },
+  "omitting tsconfig property of tsconfig object defaults to 'tsconfig.json'": (test: nodeunit.Test) => {
+    test.expect(4);
+    const cfg: any = {
+      tsconfig: {
+        overwriteFilesGlob: false
+      }
+    };
+    const result = or.resolveAsync(null, cfg).then((result) => {
+      test.strictEqual((<ITSConfigSupport>result.tsconfig).tsconfig, "tsconfig.json", "expected default to be set.");
+
+      test.ok(result.CompilationTasks.length > 0, "expected some compilation tasks from default tsconfig.json");
+      test.strictEqual(result.errors.length, 0, "expected zero errors.");
+      test.strictEqual(result.warnings.length, 0, "expected zero warnings.");
+      test.done();
+    }).catch((err) => {test.ifError(err); test.done();});
   }
   }
 };

@@ -185,6 +185,10 @@ function getTSConfigSettings(raw: ITargetOptions): ITSConfigSupport {
         tsconfig: tsconfigName
       };
     }
+    if (!('tsconfig' in <ITSConfigSupport>raw.tsconfig) &&
+        !(<ITSConfigSupport>raw.tsconfig).passThrough) {
+      (<ITSConfigSupport>raw.tsconfig).tsconfig = 'tsconfig.json';
+    }
     return raw.tsconfig;
   } catch (ex) {
     if (ex.code === 'ENOENT') {
