@@ -574,108 +574,127 @@ exports.tests = {
                 test.ok(result.CompilationTasks[0].src.indexOf('tasks/modules/compile.ts') > -1);
                 test.done();
             }).catch(function (err) { test.ifError(err); test.done(); });
+        },
+        "simple tsconfig with file path works": function (test) {
+            test.expect(13);
+            var result = or.resolveAsync(null, getConfig("tsconfig has specific file")).then(function (result) {
+                test.strictEqual(result.tsconfig.tsconfig, 'test/tsconfig/test_simple_tsconfig.json');
+                test.strictEqual(result.target, 'es6');
+                test.strictEqual(result.module, 'amd');
+                test.strictEqual(result.declaration, true);
+                test.strictEqual(result.noImplicitAny, true);
+                test.strictEqual(result.removeComments, false);
+                test.strictEqual(result.preserveConstEnums, false);
+                test.strictEqual(result.suppressImplicitAnyIndexErrors, true);
+                test.strictEqual(result.sourceMap, false);
+                test.strictEqual(result.emitDecoratorMetadata, true);
+                test.strictEqual(result.experimentalDecorators, true);
+                test.strictEqual(result.CompilationTasks[0].src.length, 1);
+                test.ok(result.CompilationTasks[0].src.indexOf('test/tsconfig/files/validtsconfig.ts') === 0);
+                test.done();
+            }).catch(function (err) { test.ifError(err); test.done(); });
+        },
+        "src appends to files from tsconfig": function (test) {
+            test.expect(3);
+            var cfg = getConfig("tsconfig has specific file");
+            var files = [{ src: ['test/simple/ts/zoo.ts'] }];
+            var result = or.resolveAsync(null, getConfig("tsconfig has specific file"), null, files).then(function (result) {
+                test.strictEqual(result.CompilationTasks[0].src.length, 2);
+                test.ok(result.CompilationTasks[0].src.indexOf('test/tsconfig/files/validtsconfig.ts') > -1);
+                test.ok(result.CompilationTasks[0].src.indexOf('test/simple/ts/zoo.ts') > -1);
+                test.done();
+            }).catch(function (err) { test.ifError(err); test.done(); });
+        },
+        "target settings override tsconfig": function (test) {
+            test.expect(2);
+            var cfg = getConfig("tsconfig has specific file", true);
+            cfg.options.target = 'es3';
+            var result = or.resolveAsync(null, cfg).then(function (result) {
+                test.strictEqual(result.target, 'es3', 'this setting on the grunt-ts target options overrides the tsconfig');
+                test.strictEqual(result.removeComments, false, 'this setting is not specified in the options so tsconfig wins over grunt-ts defaults');
+                test.done();
+            }).catch(function (err) { test.ifError(err); test.done(); });
+        },
+        "If files and exclude, files will be used and exclude will be ignored.": function (test) {
+            test.expect(1);
+            var result = or.resolveAsync(null, getConfig("tsconfig has specific file")).then(function (result) {
+                test.ok(result.CompilationTasks[0].src.indexOf('test/tsconfig/otherFiles/other.ts') === -1);
+                test.done();
+            }).catch(function (err) { test.ifError(err); test.done(); });
+        },
+        "if no files, but exclude, *.ts and *.tsx will be included except for the excluded files and folders": function (test) {
+            test.expect(3);
+            var cfg = getConfig("tsconfig test exclude");
+            var result = or.resolveAsync(null, cfg, "", null, null, grunt.file.expand).then(function (result) {
+                test.ok(result.CompilationTasks[0].src.indexOf('test/tsconfig/otherFiles/other.ts') === 0);
+                test.ok(result.CompilationTasks[0].src.indexOf('test/tsconfig/files/validconfig.ts') === -1);
+                var resultingTSConfig = utils.readAndParseJSONFromFileSync(cfg.tsconfig);
+                test.ok(!('files' in resultingTSConfig), 'expected that grunt-ts would not add a files element.');
+                test.done();
+            }).catch(function (err) { test.ifError(err); test.done(); });
+        },
+        "paths written to filesGlob are resolved first": function (test) {
+            test.expect(2);
+            var cfg = getConfig("minimalist", true);
+            cfg.src = ['./<%= grunt.pathsFilesGlobProperty %>/**/*.ts'];
+            cfg.tsconfig = {
+                tsconfig: 'test/tsconfig/simple_filesGlob_tsconfig.json',
+                ignoreFiles: false,
+                updateFiles: true,
+                overwriteFilesGlob: true
+            };
+            grunt.pathsFilesGlobProperty = "test123";
+            var result = or.resolveAsync(null, cfg, "myTarget", null, grunt.template.process, grunt.file.expand).then(function (result) {
+                var resultingTSConfig = utils.readAndParseJSONFromFileSync(cfg.tsconfig.tsconfig);
+                test.strictEqual(resultingTSConfig.filesGlob.length, 1, "expected one element.");
+                test.strictEqual(resultingTSConfig.filesGlob[0], "../../test123/**/*.ts", "expected one element.");
+                delete grunt.pathsFilesGlobProperty;
+                test.done();
+            }).catch(function (err) { test.ifError(err); delete grunt.pathsFilesGlobProperty; test.done(); });
+        },
+        "if no files and no exclude, *.ts and *.tsx will be included and files not added.": function (test) {
+            test.expect(3);
+            var cfg = getConfig("minimalist", true);
+            cfg.tsconfig = './test/tsconfig/empty_object_literal_tsconfig.json';
+            var result = or.resolveAsync(null, cfg, "", null, null, grunt.file.expand).then(function (result) {
+                var resultingTSConfig = utils.readAndParseJSONFromFileSync(cfg.tsconfig);
+                test.ok(result.CompilationTasks[0].src.indexOf('test/tsconfig/otherFiles/other.ts') >= 0, 'expected other.ts');
+                test.ok(result.CompilationTasks[0].src.indexOf('test/tsconfig/files/validtsconfig.ts') >= 0, 'expexted validconfig.ts');
+                test.ok(!('files' in resultingTSConfig), 'expected that grunt-ts would not add a files element.');
+                test.done();
+            }).catch(function (err) { test.ifError(err); test.done(); });
+        },
+        "globs are evaluated and files maintained by default": function (test) {
+            test.expect(5);
+            var cfg = getConfig("minimalist", true);
+            cfg.tsconfig = './test/tsconfig/simple_filesGlob_tsconfig.json';
+            var result = or.resolveAsync(null, cfg, "", null, null, grunt.file.expand).then(function (result) {
+                test.ok(result.CompilationTasks[0].src.indexOf('test/tsconfig/otherFiles/other.ts') >= 0);
+                test.ok(result.CompilationTasks[0].src.indexOf('test/tsconfig/files/validtsconfig.ts') >= 0);
+                var resultingTSConfig = utils.readAndParseJSONFromFileSync(cfg.tsconfig);
+                test.strictEqual(resultingTSConfig.files.length, 2, 'Expected two files.');
+                test.ok(resultingTSConfig.files.indexOf('otherFiles/other.ts') >= 0);
+                test.ok(resultingTSConfig.files.indexOf('files/validtsconfig.ts') >= 0);
+                test.done();
+            }).catch(function (err) { test.ifError(err); test.done(); });
+        },
+        "option overwriteFilesGlob updates the filesGlob and the new glob results are included": function (test) {
+            test.expect(5);
+            var cfg = getConfig("zoo", true);
+            cfg.tsconfig = {
+                tsconfig: './test/tsconfig/simple_filesGlob_tsconfig.json',
+                overwriteFilesGlob: true
+            };
+            var result = or.resolveAsync(null, cfg, "", null, null, grunt.file.expand).then(function (result) {
+                test.ok(result.CompilationTasks[0].src.indexOf('test/simple/ts/zoo.ts') >= 0, 'expected to find zoo.ts');
+                test.strictEqual(result.CompilationTasks[0].src.length, 1);
+                var resultingTSConfig = utils.readAndParseJSONFromFileSync(cfg.tsconfig.tsconfig);
+                test.strictEqual(resultingTSConfig.filesGlob[0], '../simple/ts/**/*.ts');
+                test.ok(resultingTSConfig.files.indexOf('../simple/ts/zoo.ts') >= 0);
+                test.strictEqual(resultingTSConfig.files.length, 1, 'expected a single item in the files array');
+                test.done();
+            }).catch(function (err) { test.ifError(err); test.done(); });
         }
-    },
-    "simple tsconfig with file path works": function (test) {
-        test.expect(13);
-        var result = or.resolveAsync(null, getConfig("tsconfig has specific file")).then(function (result) {
-            test.strictEqual(result.tsconfig.tsconfig, 'test/tsconfig/test_simple_tsconfig.json');
-            test.strictEqual(result.target, 'es6');
-            test.strictEqual(result.module, 'amd');
-            test.strictEqual(result.declaration, true);
-            test.strictEqual(result.noImplicitAny, true);
-            test.strictEqual(result.removeComments, false);
-            test.strictEqual(result.preserveConstEnums, false);
-            test.strictEqual(result.suppressImplicitAnyIndexErrors, true);
-            test.strictEqual(result.sourceMap, false);
-            test.strictEqual(result.emitDecoratorMetadata, true);
-            test.strictEqual(result.experimentalDecorators, true);
-            test.strictEqual(result.CompilationTasks[0].src.length, 1);
-            test.ok(result.CompilationTasks[0].src.indexOf('test/tsconfig/files/validtsconfig.ts') === 0);
-            test.done();
-        }).catch(function (err) { test.ifError(err); test.done(); });
-    },
-    "src appends to files from tsconfig": function (test) {
-        test.expect(3);
-        var cfg = getConfig("tsconfig has specific file");
-        var files = [{ src: ['test/simple/ts/zoo.ts'] }];
-        var result = or.resolveAsync(null, getConfig("tsconfig has specific file"), null, files).then(function (result) {
-            test.strictEqual(result.CompilationTasks[0].src.length, 2);
-            test.ok(result.CompilationTasks[0].src.indexOf('test/tsconfig/files/validtsconfig.ts') > -1);
-            test.ok(result.CompilationTasks[0].src.indexOf('test/simple/ts/zoo.ts') > -1);
-            test.done();
-        }).catch(function (err) { test.ifError(err); test.done(); });
-    },
-    "target settings override tsconfig": function (test) {
-        test.expect(2);
-        var cfg = getConfig("tsconfig has specific file", true);
-        cfg.options.target = 'es3';
-        var result = or.resolveAsync(null, cfg).then(function (result) {
-            test.strictEqual(result.target, 'es3', 'this setting on the grunt-ts target options overrides the tsconfig');
-            test.strictEqual(result.removeComments, false, 'this setting is not specified in the options so tsconfig wins over grunt-ts defaults');
-            test.done();
-        }).catch(function (err) { test.ifError(err); test.done(); });
-    },
-    "If files and exclude, files will be used and exclude will be ignored.": function (test) {
-        test.expect(1);
-        var result = or.resolveAsync(null, getConfig("tsconfig has specific file")).then(function (result) {
-            test.ok(result.CompilationTasks[0].src.indexOf('test/tsconfig/otherFiles/other.ts') === -1);
-            test.done();
-        }).catch(function (err) { test.ifError(err); test.done(); });
-    },
-    "if no files, but exclude, *.ts and *.tsx will be included except for the excluded files and folders": function (test) {
-        test.expect(3);
-        var cfg = getConfig("tsconfig test exclude");
-        var result = or.resolveAsync(null, cfg, "", null, null, grunt.file.expand).then(function (result) {
-            test.ok(result.CompilationTasks[0].src.indexOf('test/tsconfig/otherFiles/other.ts') === 0);
-            test.ok(result.CompilationTasks[0].src.indexOf('test/tsconfig/files/validconfig.ts') === -1);
-            var resultingTSConfig = utils.readAndParseJSONFromFileSync(cfg.tsconfig);
-            test.ok(!('files' in resultingTSConfig), 'expected that grunt-ts would not add a files element.');
-            test.done();
-        }).catch(function (err) { test.ifError(err); test.done(); });
-    },
-    "if no files and no exclude, *.ts and *.tsx will be included and files not added.": function (test) {
-        test.expect(3);
-        var cfg = getConfig("minimalist", true);
-        cfg.tsconfig = './test/tsconfig/empty_object_literal_tsconfig.json';
-        var result = or.resolveAsync(null, cfg, "", null, null, grunt.file.expand).then(function (result) {
-            var resultingTSConfig = utils.readAndParseJSONFromFileSync(cfg.tsconfig);
-            test.ok(result.CompilationTasks[0].src.indexOf('test/tsconfig/otherFiles/other.ts') >= 0, 'expected other.ts');
-            test.ok(result.CompilationTasks[0].src.indexOf('test/tsconfig/files/validtsconfig.ts') >= 0, 'expexted validconfig.ts');
-            test.ok(!('files' in resultingTSConfig), 'expected that grunt-ts would not add a files element.');
-            test.done();
-        }).catch(function (err) { test.ifError(err); test.done(); });
-    },
-    "globs are evaluated and files maintained by default": function (test) {
-        test.expect(5);
-        var cfg = getConfig("minimalist", true);
-        cfg.tsconfig = './test/tsconfig/simple_filesGlob_tsconfig.json';
-        var result = or.resolveAsync(null, cfg, "", null, null, grunt.file.expand).then(function (result) {
-            test.ok(result.CompilationTasks[0].src.indexOf('test/tsconfig/otherFiles/other.ts') >= 0);
-            test.ok(result.CompilationTasks[0].src.indexOf('test/tsconfig/files/validtsconfig.ts') >= 0);
-            var resultingTSConfig = utils.readAndParseJSONFromFileSync(cfg.tsconfig);
-            test.strictEqual(resultingTSConfig.files.length, 2, 'Expected two files.');
-            test.ok(resultingTSConfig.files.indexOf('otherFiles/other.ts') >= 0);
-            test.ok(resultingTSConfig.files.indexOf('files/validtsconfig.ts') >= 0);
-            test.done();
-        }).catch(function (err) { test.ifError(err); test.done(); });
-    },
-    "option overwriteFilesGlob updates the filesGlob and the new glob results are included": function (test) {
-        test.expect(5);
-        var cfg = getConfig("zoo", true);
-        cfg.tsconfig = {
-            tsconfig: './test/tsconfig/simple_filesGlob_tsconfig.json',
-            overwriteFilesGlob: true
-        };
-        var result = or.resolveAsync(null, cfg, "", null, null, grunt.file.expand).then(function (result) {
-            test.ok(result.CompilationTasks[0].src.indexOf('test/simple/ts/zoo.ts') >= 0, 'expected to find zoo.ts');
-            test.strictEqual(result.CompilationTasks[0].src.length, 1);
-            var resultingTSConfig = utils.readAndParseJSONFromFileSync(cfg.tsconfig.tsconfig);
-            test.strictEqual(resultingTSConfig.filesGlob[0], '../simple/ts/**/*.ts');
-            test.ok(resultingTSConfig.files.indexOf('../simple/ts/zoo.ts') >= 0);
-            test.strictEqual(resultingTSConfig.files.length, 1, 'expected a single item in the files array');
-            test.done();
-        }).catch(function (err) { test.ifError(err); test.done(); });
     }
 };
 //# sourceMappingURL=optionsResolverTests.js.map
