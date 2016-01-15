@@ -269,31 +269,31 @@ export var tests : nodeunit.ITestGroup = {
           test.strictEqual(result.htmlOutDirFlatten, true);
           test.done();
         }).catch((err) => {test.ifError(err); test.done();});
-     },
+    },
     "On Windows, CRLF is redundant": (test: nodeunit.Test) => {
-      test.expect(1);
-      const result = utils.newLineIsRedundantForTsc("CRLF", {EOL: "\r\n"});
-      test.strictEqual(result, true);
-      test.done();
+        test.expect(1);
+        const result = utils.newLineIsRedundantForTsc("CRLF", {EOL: "\r\n"});
+        test.strictEqual(result, true);
+        test.done();
     },
     "On Windows, LF is NOT redundant": (test: nodeunit.Test) => {
-      test.expect(1);
-      const result = utils.newLineIsRedundantForTsc("LF", {EOL: "\r\n"});
-      test.strictEqual(result, false);
-      test.done();
-    },
-    "On UNIX, CRLF is NOT redundant": (test: nodeunit.Test) => {
-      test.expect(1);
-      const result = utils.newLineIsRedundantForTsc("CRLF", {EOL: "\n"});
-      test.strictEqual(result, false);
-      test.done();
-    },
-    "On UNIX, LF is redundant": (test: nodeunit.Test) => {
-      test.expect(1);
-      const result = utils.newLineIsRedundantForTsc("LF", {EOL: "\n"});
-      test.strictEqual(result, true);
-      test.done();
-    }
+        test.expect(1);
+        const result = utils.newLineIsRedundantForTsc("LF", {EOL: "\r\n"});
+        test.strictEqual(result, false);
+        test.done();
+      },
+      "On UNIX, CRLF is NOT redundant": (test: nodeunit.Test) => {
+        test.expect(1);
+        const result = utils.newLineIsRedundantForTsc("CRLF", {EOL: "\n"});
+        test.strictEqual(result, false);
+        test.done();
+      },
+      "On UNIX, LF is redundant": (test: nodeunit.Test) => {
+        test.expect(1);
+        const result = utils.newLineIsRedundantForTsc("LF", {EOL: "\n"});
+        test.strictEqual(result, true);
+        test.done();
+      }
   },
 
   "Precedence and defaults override Tests": {
