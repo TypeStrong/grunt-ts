@@ -2,6 +2,9 @@
 
 ## Next
 
+## v5.3.0-beta.6 (2016-01-15)
+* FIX: Will now resolve templates prior to updating the globs in a tsconfig.json file (#303) - thanks for the report @nsgundy.
+
 ## v5.3.0-beta.5 (2016-01-14)
 * FIX: Will now provide a warning when a grunt-ts task-level keyword is used as a target name (#319) - thanks for the report @jounii.
 
