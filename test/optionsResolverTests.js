@@ -209,6 +209,18 @@ exports.tests = {
                 test.ok(allWarnings.indexOf("keyword \"watch\"") > -1, "expected warning about keyword watch");
                 test.done();
             }).catch(function (err) { test.ifError(err); test.done(); });
+        },
+        "Works OK when using grunt keyword (src) as target name": function (test) {
+            test.expect(3);
+            var cfg = getConfig("minimalist", true);
+            var tsTaskCfg = { "src": cfg };
+            var files = [{ src: ['test/gruntkeyword.ts'] }];
+            var result = or.resolveAsync(tsTaskCfg, cfg, "src", files).then(function (result) {
+                test.strictEqual(result.warnings.length, 0, "expected zero warnings.");
+                test.strictEqual(result.errors.length, 0, "expected zero errors.");
+                test.strictEqual(result.CompilationTasks[0].src.join(""), "test/gruntkeyword.ts", "expected just the test file");
+                test.done();
+            }).catch(function (err) { test.ifError(err); test.done(); });
         }
     },
     "Special processing Tests": {

@@ -125,13 +125,19 @@ function warnOnBadConfiguration(options: IGruntTSOptions, projectSpec: ITSConfig
 
 function getGlobs(taskOptions: ITargetOptions, targetOptions: ITargetOptions) {
   let globs = null;
-  if (taskOptions && (<any>taskOptions).src) {
+
+  if (taskOptions && isStringOrArray((<any>taskOptions).src)) {
     globs = _.map([...(<any>taskOptions).src], item => templateProcessor(item, {}));
   }
-  if (targetOptions && (<any>targetOptions).src) {
+  if (targetOptions && isStringOrArray((<any>targetOptions).src)) {
     globs = _.map([...(<any>targetOptions).src], item => templateProcessor(item, {}));
   }
+
   return globs;
+
+  function isStringOrArray(thing: any) {
+    return (_.isArray(thing) || _.isString(thing));
+  }
 }
 
 

@@ -220,6 +220,20 @@ export var tests : nodeunit.ITestGroup = {
           test.ok(allWarnings.indexOf(`keyword "watch"`) > -1, "expected warning about keyword watch");
           test.done();
         }).catch((err) => {test.ifError(err); test.done();});
+    },
+    "Works OK when using grunt keyword (src) as target name": (test: nodeunit.Test) => {
+        test.expect(3);
+
+        const cfg = getConfig("minimalist", true);
+        const tsTaskCfg: any = { "src": cfg };
+        const files: IGruntTSCompilationInfo[] = [{src: ['test/gruntkeyword.ts']}];
+
+        const result = or.resolveAsync(tsTaskCfg, cfg, "src", files).then((result) => {
+          test.strictEqual(result.warnings.length, 0, "expected zero warnings.");
+          test.strictEqual(result.errors.length, 0, "expected zero errors.");
+          test.strictEqual(result.CompilationTasks[0].src.join(""), "test/gruntkeyword.ts", "expected just the test file");
+          test.done();
+        }).catch((err) => {test.ifError(err); test.done();});
     }
   },
 

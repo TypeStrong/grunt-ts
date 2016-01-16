@@ -110,13 +110,16 @@ function warnOnBadConfiguration(options, projectSpec) {
 }
 function getGlobs(taskOptions, targetOptions) {
     var globs = null;
-    if (taskOptions && taskOptions.src) {
+    if (taskOptions && isStringOrArray(taskOptions.src)) {
         globs = _.map(taskOptions.src.slice(), function (item) { return templateProcessor(item, {}); });
     }
-    if (targetOptions && targetOptions.src) {
+    if (targetOptions && isStringOrArray(targetOptions.src)) {
         globs = _.map(targetOptions.src.slice(), function (item) { return templateProcessor(item, {}); });
     }
     return globs;
+    function isStringOrArray(thing) {
+        return (_.isArray(thing) || _.isString(thing));
+    }
 }
 function resolve_output_locations(options, projectSpec) {
     if (options.CompilationTasks
