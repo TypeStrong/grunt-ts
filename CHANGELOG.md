@@ -2,6 +2,9 @@
 
 ## Next
 
+## v5.3.2 (2016-01-15)
+* FIX: Should not crash in presence of target named "src" (#321) - thanks for the report @ravishivt and @riggerthegeek.
+
 ## v5.3.1 (2016-01-15)
 * FIX: Will now properly add default tsconfig.json path if omitted when using object style (#302) - thanks for the report @nsgundy.
 
