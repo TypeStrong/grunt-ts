@@ -886,7 +886,7 @@ grunt.initConfig({
 #### moduleResolution
 
 ````javascript
-"node" (default) | "classic"
+"node" | "classic" (default)
 ````
 
 New in TypeScript 1.6.  TypeScript is gaining support for resolving definition files using rules similar to common JavaScript module loaders.  The first new one is support for CommonJS used by NodeJS, which is why this parameter is called `"node"`  The `"node"` setting performs an extra check to see if a definition file exists in the `node_modules/modulename` folder if a TypeScript definition can't be found for an imported module.  if this is not desired, set this setting to "classic".
