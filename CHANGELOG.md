@@ -1,6 +1,7 @@
 # Releases
 
 ## Next
+* DOCS: Update to `--moduleResolution` README section to show fluctuating default behaviour - by @thull
 
 ## v5.3.2 (2016-01-15)
 * FIX: Should not crash in presence of target named "src" (#321) - thanks for the report @ravishivt and @riggerthegeek.
