@@ -313,7 +313,7 @@ function compileAllFiles(options, compilationInfo) {
     }
     // Execute command
     return executeNode(command, options).then(function (result) {
-        if (options.fast !== 'never' && result.code === 0) {
+        if (options.fast !== 'never' && (result.code === 0 || !options.failOnTypeErrors && result.code === 2)) {
             resetChangedFiles(newFiles, options.targetName);
         }
         result.fileCount = files.length;
