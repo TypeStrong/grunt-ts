@@ -12,7 +12,7 @@
 * FEAT: Updated to natively support and include TypeScript 1.7.
 * FEAT: Added support for `--noLib`, `--emitBOM`, `--locale`, `--suppressExcessPropertyErrors`, `--stripInternal`, and `--allowSyntheticDefaultImports`.
 * FEAT: Added support for `es6` and `es2015` as module options.
-* FIX: Revised all integration tests to account for its behavior (generally, the change to how `removeComments` works with /// references).
+* FIX: Revised all integration test "expected" artifacts to account for TypeScript 1.7 behavior (generally, the change to how `removeComments` works with /// references).
 * FIX: Will now resolve templates prior to updating the globs in a tsconfig.json file (#303) - thanks for the report @nsgundy.
 * FIX: Will now provide a warning when a grunt-ts task-level keyword (such as "watch") is used as a target name (#319) - thanks for the report @jounii.
 * FIX: Transformed HTML files will be automatically added to the compilation context if they match a glob (#255).
