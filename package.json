@@ -3,13 +3,13 @@
   "name": "grunt-ts",
   "description": "Compile and manage your TypeScript project",
   "version": "5.3.2",
-  "homepage": "https://github.com/grunt-ts/grunt-ts",
+  "homepage": "https://github.com/TypeStrong/grunt-ts",
   "repository": {
     "type": "git",
-    "url": "git@github.com:grunt-ts/grunt-ts.git"
+    "url": "git@github.com:TypeStrong/grunt-ts.git"
   },
   "bugs": {
-    "url": "https://github.com/grunt-ts/grunt-ts/issues"
+    "url": "https://github.com/TypeStrong/grunt-ts/issues"
   },
   "license": "MIT",
   "main": "grunt.js",
@@ -50,7 +50,7 @@
     "underscore.string": "2.3.3"
   },
   "peerDependencies": {
-    "grunt": "~0.4.0"
+    "grunt": ">=0.4.0"
   },
   "devDependencies": {
     "grunt": "~0.4.0",
