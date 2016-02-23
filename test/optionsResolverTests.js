@@ -676,9 +676,9 @@ exports.tests = {
             var result = or.resolveAsync(null, cfg, "", null, null, grunt.file.expand).then(function (result) {
                 var resultingTSConfig = utils.readAndParseJSONFromFileSync(cfg.tsconfig);
                 test.ok(result.CompilationTasks[0].src.indexOf('test/tsconfig/otherFiles/this.ts') >= 0, 'expected this.ts');
-                test.ok(result.CompilationTasks[0].src.indexOf('test/tsconfig/otherFiles/that.ts') >= 0, 'expexted that.ts');
+                test.ok(result.CompilationTasks[0].src.indexOf('test/tsconfig/otherFiles/that.ts') >= 0, 'expected that.ts');
                 test.ok(result.CompilationTasks[0].src.indexOf('test/tsconfig/otherFiles/other.ts') >= 0, 'expected other.ts');
-                test.ok(result.CompilationTasks[0].src.indexOf('test/tsconfig/files/validtsconfig.ts') >= 0, 'expexted validconfig.ts');
+                test.ok(result.CompilationTasks[0].src.indexOf('test/tsconfig/files/validtsconfig.ts') >= 0, 'expected validconfig.ts');
                 test.ok(!('files' in resultingTSConfig), 'expected that grunt-ts would not add a files element.');
                 test.done();
             }).catch(function (err) { test.ifError(err); test.done(); });
