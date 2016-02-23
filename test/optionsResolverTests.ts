@@ -728,7 +728,7 @@ export var tests : nodeunit.ITestGroup = {
     }).catch((err) => {test.ifError(err); test.done();});
   },
   "globs are evaluated and files maintained by default": (test: nodeunit.Test) => {
-    test.expect(7);
+    test.expect(9);
     const cfg = getConfig("minimalist", true);
     cfg.tsconfig = './test/tsconfig/simple_filesGlob_tsconfig.json';
     const result = or.resolveAsync(null, cfg, "", null, null, grunt.file.expand).then((result) => {
@@ -741,6 +741,8 @@ export var tests : nodeunit.ITestGroup = {
         const resultingTSConfig = utils.readAndParseJSONFromFileSync(<string>cfg.tsconfig);
 
         test.strictEqual(resultingTSConfig.files.length, 4, 'Expected four files.');
+        test.ok(resultingTSConfig.files.indexOf('otherFiles/this.ts') >= 0);
+        test.ok(resultingTSConfig.files.indexOf('otherFiles/that.ts') >= 0);
         test.ok(resultingTSConfig.files.indexOf('otherFiles/other.ts') >= 0);
         test.ok(resultingTSConfig.files.indexOf('files/validtsconfig.ts') >= 0);
 
