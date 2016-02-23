@@ -242,32 +242,18 @@ function applyCompilerOptions(applyTo, projectSpec) {
     else {
         if (!globExpander.isStub) {
             var virtualGlob = [];
-            if (projectSpec.exclude && _.isArray(projectSpec.exclude)) {
-                virtualGlob.push(path.resolve(absolutePathToTSConfig, './*.ts'));
-                virtualGlob.push(path.resolve(absolutePathToTSConfig, './*.tsx'));
-                var tsconfigExcludedDirectories = [];
-                projectSpec.exclude.forEach(function (exc) {
-                    tsconfigExcludedDirectories.push(path.normalize(path.join(absolutePathToTSConfig, exc)));
-                });
-                fs.readdirSync(absolutePathToTSConfig).forEach(function (item) {
-                    var filePath = path.normalize(path.join(absolutePathToTSConfig, item));
-                    if (fs.statSync(filePath).isDirectory()) {
-                        if (tsconfigExcludedDirectories.indexOf(filePath) === -1) {
-                            virtualGlob.push(path.resolve(absolutePathToTSConfig, item, './**/*.ts'));
-                            virtualGlob.push(path.resolve(absolutePathToTSConfig, item, './**/*.tsx'));
-                        }
-                    }
-                });
+            virtualGlob.push(path.resolve(absolutePathToTSConfig, './**/*.ts'));
+            virtualGlob.push(path.resolve(absolutePathToTSConfig, './**/*.tsx'));
+            var excludedPaths_1 = [];
+            if (_.isArray(projectSpec.exclude)) {
+                excludedPaths_1 = projectSpec.exclude.map(function (filepath) { return utils.makeRelativePath(absolutePathToTSConfig, path.resolve(absolutePathToTSConfig, filepath)); });
             }
-            else {
-                virtualGlob.push(path.resolve(absolutePathToTSConfig, './**/*.ts'));
-                virtualGlob.push(path.resolve(absolutePathToTSConfig, './**/*.tsx'));
-            }
-            var files = globExpander(virtualGlob);
-            // make files relative to the tsconfig.json file
-            for (var i = 0; i < files.length; i += 1) {
-                files[i] = path.relative(absolutePathToTSConfig, files[i]).replace(/\\/g, '/');
-            }
+            var files = globExpander(virtualGlob)
+                .map(function (filepath) { return utils.makeRelativePath(absolutePathToTSConfig, filepath); })
+                .filter(function (filepath) {
+                return excludedPaths_1.indexOf(filepath) === -1
+                    && !excludedPaths_1.some(function (s) { return filepath.indexOf(s + "/") === 0; });
+            });
             projectSpec.files = files;
             if (projectSpec.filesGlob) {
                 saveTSConfigSync(tsconfig.tsconfig, projectSpec);

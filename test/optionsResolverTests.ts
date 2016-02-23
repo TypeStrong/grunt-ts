@@ -673,11 +673,12 @@ export var tests : nodeunit.ITestGroup = {
     }).catch((err) => {test.ifError(err); test.done();});
   },
   "if no files, but exclude, *.ts and *.tsx will be included except for the excluded files and folders": (test: nodeunit.Test) => {
-    test.expect(3);
+    test.expect(5);
     const cfg = getConfig("tsconfig test exclude");
     const result = or.resolveAsync(null, cfg, "", null, null, grunt.file.expand).then((result) => {
-
-      test.ok(result.CompilationTasks[0].src.indexOf('test/tsconfig/otherFiles/other.ts') === 0);
+      test.ok(result.CompilationTasks[0].src.indexOf('test/tsconfig/otherFiles/other.ts') > -1);
+      test.ok(result.CompilationTasks[0].src.indexOf('test/tsconfig/otherFiles/this.ts') === -1);
+      test.ok(result.CompilationTasks[0].src.indexOf('test/tsconfig/otherFiles/that.ts') > -1);
       test.ok(result.CompilationTasks[0].src.indexOf('test/tsconfig/files/validconfig.ts') === -1);
 
       const resultingTSConfig = utils.readAndParseJSONFromFileSync(<string>cfg.tsconfig);
@@ -710,13 +711,15 @@ export var tests : nodeunit.ITestGroup = {
     }).catch((err) => {test.ifError(err); delete (<any>grunt).pathsFilesGlobProperty; test.done();});
   },
   "if no files and no exclude, *.ts and *.tsx will be included and files not added.": (test: nodeunit.Test) => {
-    test.expect(3);
+    test.expect(5);
     const cfg = getConfig("minimalist", true);
     cfg.tsconfig = './test/tsconfig/empty_object_literal_tsconfig.json';
     const result = or.resolveAsync(null, cfg, "", null, null, grunt.file.expand).then((result) => {
 
         const resultingTSConfig = utils.readAndParseJSONFromFileSync(<string>cfg.tsconfig);
 
+        test.ok(result.CompilationTasks[0].src.indexOf('test/tsconfig/otherFiles/this.ts') >= 0, 'expected this.ts');
+        test.ok(result.CompilationTasks[0].src.indexOf('test/tsconfig/otherFiles/that.ts') >= 0, 'expexted that.ts');
         test.ok(result.CompilationTasks[0].src.indexOf('test/tsconfig/otherFiles/other.ts') >= 0, 'expected other.ts');
         test.ok(result.CompilationTasks[0].src.indexOf('test/tsconfig/files/validtsconfig.ts') >= 0, 'expexted validconfig.ts');
         test.ok(!('files' in resultingTSConfig), 'expected that grunt-ts would not add a files element.');
@@ -725,17 +728,19 @@ export var tests : nodeunit.ITestGroup = {
     }).catch((err) => {test.ifError(err); test.done();});
   },
   "globs are evaluated and files maintained by default": (test: nodeunit.Test) => {
-    test.expect(5);
+    test.expect(7);
     const cfg = getConfig("minimalist", true);
     cfg.tsconfig = './test/tsconfig/simple_filesGlob_tsconfig.json';
     const result = or.resolveAsync(null, cfg, "", null, null, grunt.file.expand).then((result) => {
 
+        test.ok(result.CompilationTasks[0].src.indexOf('test/tsconfig/otherFiles/this.ts') >= 0);
+        test.ok(result.CompilationTasks[0].src.indexOf('test/tsconfig/otherFiles/that.ts') >= 0);
         test.ok(result.CompilationTasks[0].src.indexOf('test/tsconfig/otherFiles/other.ts') >= 0);
         test.ok(result.CompilationTasks[0].src.indexOf('test/tsconfig/files/validtsconfig.ts') >= 0);
 
         const resultingTSConfig = utils.readAndParseJSONFromFileSync(<string>cfg.tsconfig);
 
-        test.strictEqual(resultingTSConfig.files.length, 2, 'Expected two files.');
+        test.strictEqual(resultingTSConfig.files.length, 4, 'Expected four files.');
         test.ok(resultingTSConfig.files.indexOf('otherFiles/other.ts') >= 0);
         test.ok(resultingTSConfig.files.indexOf('files/validtsconfig.ts') >= 0);
 
