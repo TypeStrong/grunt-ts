@@ -286,36 +286,19 @@ function applyCompilerOptions(applyTo: IGruntTSOptions, projectSpec: ITSConfigFi
     if (!(<any>globExpander).isStub) {
 
       const virtualGlob: string[] = [];
-
-      if (projectSpec.exclude && _.isArray(projectSpec.exclude)) {
-        virtualGlob.push(path.resolve(absolutePathToTSConfig, './*.ts'));
-        virtualGlob.push(path.resolve(absolutePathToTSConfig, './*.tsx'));
-
-        const tsconfigExcludedDirectories: string[] = [];
-        projectSpec.exclude.forEach(exc => {
-          tsconfigExcludedDirectories.push(path.normalize(path.join(absolutePathToTSConfig, exc)));
-        });
-        fs.readdirSync(absolutePathToTSConfig).forEach(item => {
-            const filePath = path.normalize(path.join(absolutePathToTSConfig, item));
-            if (fs.statSync(filePath).isDirectory()) {
-              if (tsconfigExcludedDirectories.indexOf(filePath) === -1) {
-                virtualGlob.push(path.resolve(absolutePathToTSConfig, item, './**/*.ts'));
-                virtualGlob.push(path.resolve(absolutePathToTSConfig, item, './**/*.tsx'));
-              }
-            }
-        });
-      } else {
-        virtualGlob.push(path.resolve(absolutePathToTSConfig, './**/*.ts'));
-        virtualGlob.push(path.resolve(absolutePathToTSConfig, './**/*.tsx'));
+      virtualGlob.push(path.resolve(absolutePathToTSConfig, './**/*.ts'));
+      virtualGlob.push(path.resolve(absolutePathToTSConfig, './**/*.tsx'));
+      let excludedPaths: string[] = [];
+      if (_.isArray(projectSpec.exclude)) {
+        excludedPaths = projectSpec.exclude.map(filepath => utils.makeRelativePath(absolutePathToTSConfig, path.resolve(absolutePathToTSConfig, filepath)));
       }
-
-      const files = globExpander(virtualGlob);
-
-      // make files relative to the tsconfig.json file
-      for (let i = 0; i < files.length; i += 1) {
-        files[i] = path.relative(absolutePathToTSConfig, files[i]).replace(/\\/g, '/');
-      }
-
+      const files =
+        globExpander(virtualGlob)
+        .map(filepath => utils.makeRelativePath(absolutePathToTSConfig, filepath))
+        .filter(filepath =>
+            excludedPaths.indexOf(filepath) === -1
+        && !excludedPaths.some(s => filepath.indexOf(`${s}/`)===0)
+        );
       projectSpec.files = files;
       if (projectSpec.filesGlob) {
         saveTSConfigSync(tsconfig.tsconfig, projectSpec);
