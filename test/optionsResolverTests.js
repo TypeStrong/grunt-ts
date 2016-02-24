@@ -1,5 +1,4 @@
 /// <reference path="../defs/tsd.d.ts" />
-"use strict";
 var fs = require('fs');
 var path = require('path');
 var or = require('../tasks/modules/optionsResolver');

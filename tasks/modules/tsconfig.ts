@@ -290,14 +290,15 @@ function applyCompilerOptions(applyTo: IGruntTSOptions, projectSpec: ITSConfigFi
       virtualGlob.push(path.resolve(absolutePathToTSConfig, './**/*.tsx'));
       let excludedPaths: string[] = [];
       if (_.isArray(projectSpec.exclude)) {
-        excludedPaths = projectSpec.exclude.map(filepath => utils.makeRelativePath(absolutePathToTSConfig, path.resolve(absolutePathToTSConfig, filepath)));
+        excludedPaths = projectSpec.exclude.map(filepath =>
+          utils.makeRelativePath(absolutePathToTSConfig, path.resolve(absolutePathToTSConfig, filepath)));
       }
       const files =
         globExpander(virtualGlob)
         .map(filepath => utils.makeRelativePath(absolutePathToTSConfig, filepath))
         .filter(filepath =>
             excludedPaths.indexOf(filepath) === -1
-        && !excludedPaths.some(s => filepath.indexOf(`${s}/`)===0)
+        && !excludedPaths.some(s => filepath.indexOf(`${s}/`) === 0)
         );
       projectSpec.files = files;
       if (projectSpec.filesGlob) {

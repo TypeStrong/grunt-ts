@@ -1,6 +1,7 @@
 # Releases
 
 ## Next
+* FIX: tsconfig.json exclude support for files (not just directories).  Thanks very much to first-time contributor @errorx666 for the PR!  (#285, #336)
 
 ## v5.3.2 (2016-01-15)
 * FIX: Should not crash in presence of target named "src" (#321) - thanks for the report @ravishivt and @riggerthegeek.

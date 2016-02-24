@@ -244,15 +244,17 @@ function applyCompilerOptions(applyTo, projectSpec) {
             var virtualGlob = [];
             virtualGlob.push(path.resolve(absolutePathToTSConfig, './**/*.ts'));
             virtualGlob.push(path.resolve(absolutePathToTSConfig, './**/*.tsx'));
-            var excludedPaths_1 = [];
+            var excludedPaths = [];
             if (_.isArray(projectSpec.exclude)) {
-                excludedPaths_1 = projectSpec.exclude.map(function (filepath) { return utils.makeRelativePath(absolutePathToTSConfig, path.resolve(absolutePathToTSConfig, filepath)); });
+                excludedPaths = projectSpec.exclude.map(function (filepath) {
+                    return utils.makeRelativePath(absolutePathToTSConfig, path.resolve(absolutePathToTSConfig, filepath));
+                });
             }
             var files = globExpander(virtualGlob)
                 .map(function (filepath) { return utils.makeRelativePath(absolutePathToTSConfig, filepath); })
                 .filter(function (filepath) {
-                return excludedPaths_1.indexOf(filepath) === -1
-                    && !excludedPaths_1.some(function (s) { return filepath.indexOf(s + "/") === 0; });
+                return excludedPaths.indexOf(filepath) === -1
+                    && !excludedPaths.some(function (s) { return filepath.indexOf(s + "/") === 0; });
             });
             projectSpec.files = files;
             if (projectSpec.filesGlob) {
