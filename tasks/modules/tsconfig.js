@@ -240,28 +240,25 @@ function applyCompilerOptions(applyTo, projectSpec) {
         addUniqueRelativeFilesToSrc(projectSpec.files, src, absolutePathToTSConfig);
     }
     else {
-        if (!globExpander.isStub) {
-            var virtualGlob = [];
-            virtualGlob.push(path.resolve(absolutePathToTSConfig, './**/*.ts'));
-            virtualGlob.push(path.resolve(absolutePathToTSConfig, './**/*.tsx'));
-            var excludedPaths = [];
-            if (_.isArray(projectSpec.exclude)) {
-                excludedPaths = projectSpec.exclude.map(function (filepath) {
-                    return utils.makeRelativePath(absolutePathToTSConfig, path.resolve(absolutePathToTSConfig, filepath));
-                });
-            }
-            var files = globExpander(virtualGlob)
-                .map(function (filepath) { return utils.makeRelativePath(absolutePathToTSConfig, filepath); })
-                .filter(function (filepath) {
-                return excludedPaths.indexOf(filepath) === -1
-                    && !excludedPaths.some(function (s) { return filepath.indexOf(s + "/") === 0; });
+        var validPattern = /\.tsx?$/i;
+        var excludedPaths = [];
+        if (_.isArray(projectSpec.exclude)) {
+            excludedPaths = projectSpec.exclude.map(function (filepath) {
+                return utils.makeRelativePath(absolutePathToTSConfig, path.resolve(absolutePathToTSConfig, filepath));
             });
-            projectSpec.files = files;
-            if (projectSpec.filesGlob) {
-                saveTSConfigSync(tsconfig.tsconfig, projectSpec);
-            }
-            addUniqueRelativeFilesToSrc(files, src, absolutePathToTSConfig);
         }
+        var files = utils.getFiles(absolutePathToTSConfig, function (filepath) {
+            return excludedPaths.indexOf(utils.makeRelativePath(absolutePathToTSConfig, filepath)) > -1
+                || (fs.statSync(filepath).isFile()
+                    && !validPattern.test(filepath));
+        }).map(function (filepath) {
+            return utils.makeRelativePath(absolutePathToTSConfig, filepath);
+        });
+        projectSpec.files = files;
+        if (projectSpec.filesGlob) {
+            saveTSConfigSync(tsconfig.tsconfig, projectSpec);
+        }
+        addUniqueRelativeFilesToSrc(files, src, absolutePathToTSConfig);
     }
     return result;
 }
