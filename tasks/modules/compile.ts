@@ -355,7 +355,7 @@ export function compileAllFiles(options: IGruntTSOptions, compilationInfo: IGrun
     // Execute command
     return executeNode(command, options).then((result: ICompileResult) => {
 
-        if (options.fast !== 'never' && result.code === 0) {
+        if (options.fast !== 'never' && (result.code === 0 || !options.failOnTypeErrors && result.code === 2)) {
             resetChangedFiles(newFiles, options.targetName);
         }
 
