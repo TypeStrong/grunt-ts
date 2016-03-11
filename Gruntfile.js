@@ -419,6 +419,18 @@ module.exports = function (grunt) {
                     comments: true
                 },
             },
+            htmltestSnakeModuleName: {
+                test: true,
+                src: ['test/htmlSnakeModuleName/**/*.ts'],
+                html: ['test/htmlSnakeModuleName/**/*.tpl.html'],
+                reference: 'test/htmlSnakeModuleName/reference.ts',
+                out: 'test/htmlSnakeModuleName/out.js',
+                options: {
+                    htmlModuleTemplate: '<%= filename %>_<%= ext %>_module',
+                    htmlVarTemplate: '<%= filename %>_<%= ext %>_variable',
+                    comments: true
+                },
+            },
             htmlWithHtmlOutDirTest: {
                 test: true,
                 src: ['test/htmlOutDir/reference.ts','test/htmlOutDir/src/bar.ts',
