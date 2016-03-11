@@ -2,8 +2,25 @@
 
 ## Next
 * FIX: amdloader will now work for [`.tsx` extension as well](https://github.com/TypeStrong/grunt-ts/pull/274) [reapplied](https://github.com/TypeStrong/grunt-ts/pull/314)
+* FIX: tsconfig.json exclude support for files (not just directories).  Thanks very much to first-time contributor @errorx666 for the PR!  Includes PR #337 which keeps exclude performance fast.  (#285, #336)
+* FIX: the HTML feature now supports file names with dashes - they will be converted to the underscore character.  Many thanks to first-time contributor @xenit-raven for the PR!  (#324)
 
-## v5.3.0-beta.1 (2015-12-06)
+## v5.3.2 (2016-01-15)
+* FIX: Should not crash in presence of target named "src" (#321) - thanks for the report @ravishivt and @riggerthegeek.
+
+## v5.3.1 (2016-01-15)
+* FIX: Will now properly add default tsconfig.json path if omitted when using object style (#302) - thanks for the report @nsgundy.
+
+## v5.3.0 (2016-01-15)
+* FEAT: Updated to natively support and include TypeScript 1.7.
+* FEAT: Added support for `--noLib`, `--emitBOM`, `--locale`, `--suppressExcessPropertyErrors`, `--stripInternal`, and `--allowSyntheticDefaultImports`.
+* FEAT: Added support for `es6` and `es2015` as module options.
+* FIX: Revised all integration test "expected" artifacts to account for TypeScript 1.7 behavior (generally, the change to how `removeComments` works with /// references).
+* FIX: Will now resolve templates prior to updating the globs in a tsconfig.json file (#303) - thanks for the report @nsgundy.
+* FIX: Will now provide a warning when a grunt-ts task-level keyword (such as "watch") is used as a target name (#319) - thanks for the report @jounii.
+* FIX: Transformed HTML files will be automatically added to the compilation context if they match a glob (#255).
+* FIX: Use of `outDir` in the Gruntfile now works when otherwise getting the configuration from tsconfig.json. (Thanks, @gilamran (#312)).
+* FIX: Certain conditions (such as the specified tsconfig.json not found or VS project resolution errors) caused grunt-ts to hard-quit during options resolution.  These are now properly surfaced as errors, and the main quit path will be followed.
 * FIX: Improved detection of if newLine parameter is redundant for TSC.  This should make the functionality work more consistently if `grunt.util.linefeed` is used.  Thanks to @Maks3w for the report.
 
 ## v5.2.0 (2015-11-21)

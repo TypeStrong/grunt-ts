@@ -8,12 +8,13 @@ var es6_promise_1 = require('es6-promise');
 var visualStudioOptionsResolver_1 = require('./visualStudioOptionsResolver');
 var tsconfig_1 = require('./tsconfig');
 var propertiesFromTarget = ['amdloader', 'html', 'htmlOutDir', 'htmlOutDirFlatten', 'reference', 'testExecute', 'tsconfig',
-    'templateCache', 'vs', 'watch'], propertiesFromTargetOptions = ['additionalFlags', 'comments', 'compile', 'compiler', 'declaration',
-    'emitDecoratorMetadata', 'experimentalDecorators', 'failOnTypeErrors', 'fast', 'htmlModuleTemplate', 'htmlOutDir',
-    'htmlOutputTemplate', 'htmlOutDirFlatten', 'htmlVarTemplate', 'inlineSourceMap', 'inlineSources', 'isolatedModules',
-    'mapRoot', 'module', 'newLine', 'noEmit', 'noEmitHelpers', 'noEmitOnError', 'noImplicitAny', 'noResolve',
-    'preserveConstEnums', 'removeComments', 'sourceRoot', 'sourceMap', 'suppressImplicitAnyIndexErrors', 'target',
-    'verbose', 'jsx', 'moduleResolution', 'experimentalAsyncFunctions', 'rootDir', 'emitGruntEvents'], delayTemplateExpansion = ['htmlModuleTemplate', 'htmlVarTemplate', 'htmlOutputTemplate'];
+    'templateCache', 'vs', 'watch'], propertiesFromTargetOptions = ['additionalFlags', 'allowSyntheticDefaultImports', 'comments', 'compile', 'compiler', 'declaration',
+    'emitBOM', 'emitDecoratorMetadata', 'experimentalDecorators', 'failOnTypeErrors', 'fast', 'htmlModuleTemplate', 'htmlOutDir',
+    'htmlOutputTemplate', 'htmlOutDirFlatten', 'htmlVarTemplate', 'inlineSourceMap', 'inlineSources', 'isolatedModules', 'locale',
+    'mapRoot', 'module', 'newLine', 'noEmit', 'noEmitHelpers', 'noEmitOnError', 'noImplicitAny', 'noLib', 'noResolve',
+    'preserveConstEnums', 'removeComments', 'sourceRoot', 'sourceMap', 'stripInternal', 'suppressExcessPropertyErrors',
+    'suppressImplicitAnyIndexErrors', 'target', 'verbose', 'jsx', 'moduleResolution', 'experimentalAsyncFunctions', 'rootDir',
+    'emitGruntEvents'], delayTemplateExpansion = ['htmlModuleTemplate', 'htmlVarTemplate', 'htmlOutputTemplate'];
 var templateProcessor = null;
 var globExpander = null;
 function noopTemplateProcessor(templateString, options) {
@@ -23,11 +24,12 @@ function emptyGlobExpander(globs) {
     return [];
 }
 emptyGlobExpander.isStub = true;
-function resolveAsync(rawTaskOptions, rawTargetOptions, targetName, files, theTemplateProcessor, theGlobExpander) {
+function resolveAsync(rawTaskOptions, rawTargetOptions, targetName, resolvedFiles, theTemplateProcessor, theGlobExpander) {
     if (targetName === void 0) { targetName = ''; }
-    if (files === void 0) { files = []; }
+    if (resolvedFiles === void 0) { resolvedFiles = []; }
     if (theTemplateProcessor === void 0) { theTemplateProcessor = null; }
     if (theGlobExpander === void 0) { theGlobExpander = null; }
+    var result = emptyOptionsResolveResult();
     return new es6_promise_1.Promise(function (resolve, reject) {
         if (theTemplateProcessor && typeof theTemplateProcessor === 'function') {
             templateProcessor = theTemplateProcessor;
@@ -43,7 +45,6 @@ function resolveAsync(rawTaskOptions, rawTargetOptions, targetName, files, theTe
         }
         fixMissingOptions(rawTaskOptions);
         fixMissingOptions(rawTargetOptions);
-        var result = emptyOptionsResolveResult();
         {
             var _a = resolveAndWarnOnConfigurationIssues(rawTaskOptions, rawTargetOptions, targetName), errors = _a.errors, warnings = _a.warnings;
             (_b = result.errors).push.apply(_b, errors);
@@ -51,7 +52,7 @@ function resolveAsync(rawTaskOptions, rawTargetOptions, targetName, files, theTe
         }
         result = applyGruntOptions(result, rawTaskOptions);
         result = applyGruntOptions(result, rawTargetOptions);
-        result = copyCompilationTasks(result, files);
+        result = copyCompilationTasks(result, resolvedFiles, resolveOutputOptions(rawTaskOptions, rawTargetOptions));
         visualStudioOptionsResolver_1.resolveVSOptionsAsync(result, rawTaskOptions, rawTargetOptions, templateProcessor).then(function (result) {
             tsconfig_1.resolveAsync(result, rawTaskOptions, rawTargetOptions, templateProcessor, globExpander).then(function (result) {
                 result = addressAssociatedOptionsAndResolveConflicts(result);
@@ -63,16 +64,31 @@ function resolveAsync(rawTaskOptions, rawTargetOptions, targetName, files, theTe
                     result.targetName = targetName;
                 }
                 return resolve(result);
-            }).catch(function (error) {
-                return reject(error);
+            }).catch(function (tsConfigError) {
+                result.errors.push('tsconfig error: ' + JSON.stringify(tsConfigError));
+                return resolve(result);
             });
-        }).catch(function (error) {
-            return reject(error);
+        }).catch(function (vsConfigError) {
+            result.errors.push('Visual Studio config issue: ' + JSON.stringify(vsConfigError));
+            return resolve(result);
         });
         var _b, _c;
     });
 }
 exports.resolveAsync = resolveAsync;
+function resolveOutputOptions(rawTaskOptions, rawTargetOptions) {
+    var result = {};
+    var props = ['outDir', 'out'];
+    var options = [rawTaskOptions, rawTargetOptions];
+    options.forEach(function (opt) {
+        props.forEach(function (prop) {
+            if (opt && (prop in opt)) {
+                result[prop] = opt[prop];
+            }
+        });
+    });
+    return result;
+}
 function fixMissingOptions(config) {
     if (config && !config.options) {
         config.options = {};
@@ -101,6 +117,10 @@ function resolveAndWarnOnConfigurationIssues(task, target, targetName) {
     return { errors: errors, warnings: warnings };
     function getAdditionalWarnings(task, target, targetName) {
         var additionalWarnings = [];
+        if (propertiesFromTarget.indexOf(targetName) >= 0) {
+            additionalWarnings.push(("Warning: Using the grunt-ts keyword \"" + targetName + "\" as a target name may cause ") +
+                "incorrect behavior or errors.");
+        }
         if (((task && task.src && targetName !== 'src') || (target && target.src)) &&
             ((task && task.files) || (target && target.files))) {
             additionalWarnings.push("Warning: In task \"" + targetName + "\", either \"files\" or \"src\" should be used - not both.");
@@ -237,27 +257,45 @@ function applyGruntOptions(applyTo, gruntOptions) {
     }
     return applyTo;
 }
-function copyCompilationTasks(options, files) {
+function copyCompilationTasks(options, resolvedFiles, outputInfo) {
     if (!utils.hasValue(options.CompilationTasks)) {
         options.CompilationTasks = [];
     }
-    if (!utils.hasValue(files)) {
+    if (!utils.hasValue(resolvedFiles) || resolvedFiles.length === 0) {
+        if (options.CompilationTasks.length === 0 && (('outDir' in outputInfo) || ('out' in outputInfo))) {
+            var newCompilationTask = {
+                src: []
+            };
+            if ('outDir' in outputInfo) {
+                newCompilationTask.outDir = outputInfo.outDir;
+            }
+            if ('out' in outputInfo) {
+                newCompilationTask.outDir = outputInfo.outDir;
+            }
+            options.CompilationTasks.push(newCompilationTask);
+        }
         return options;
     }
-    for (var i = 0; i < files.length; i += 1) {
+    for (var i = 0; i < resolvedFiles.length; i += 1) {
+        var glob = void 0;
+        var orig = resolvedFiles[i].orig;
+        if (orig && ('src' in orig)) {
+            glob = [].concat(orig.src);
+        }
         var compilationSet = {
-            src: _.map(files[i].src, function (fileName) { return utils.enclosePathInQuotesIfRequired(fileName); }),
-            out: utils.enclosePathInQuotesIfRequired(files[i].out),
-            outDir: utils.enclosePathInQuotesIfRequired(files[i].outDir)
+            src: _.map(resolvedFiles[i].src, function (fileName) { return utils.enclosePathInQuotesIfRequired(fileName); }),
+            out: utils.enclosePathInQuotesIfRequired(resolvedFiles[i].out),
+            outDir: utils.enclosePathInQuotesIfRequired(resolvedFiles[i].outDir),
+            glob: glob
         };
-        if ('dest' in files[i] && files[i].dest) {
+        if ('dest' in resolvedFiles[i] && resolvedFiles[i].dest) {
             var dest = void 0;
-            if (_.isArray(files[i].dest)) {
+            if (_.isArray(resolvedFiles[i].dest)) {
                 // using an array for dest is not supported.  Only take first element.
-                dest = files[i].dest[0];
+                dest = resolvedFiles[i].dest[0];
             }
             else {
-                dest = files[i].dest;
+                dest = resolvedFiles[i].dest;
             }
             if (utils.isJavaScriptFile(dest)) {
                 compilationSet.out = dest;
@@ -307,13 +345,14 @@ function addressAssociatedOptionsAndResolveConflicts(options) {
         options.removeComments = !!options.removeComments;
         options.comments = !options.removeComments;
     }
-    if ('html' in options && options.CompilationTasks.length === 0) {
-        options.errors.push("ERROR: option `html` provided without specifying corresponding TypeScript source files to " +
-            "compile.  The transform will not occur unless grunt-ts also expects to compile these files.");
+    if ('html' in options &&
+        (options.CompilationTasks.length === 0 ||
+            !_.some(options.CompilationTasks, function (item) { return ((item.src || []).length > 0 || (item.glob || []).length > 0); }))) {
+        options.errors.push("ERROR: option \"html\" provided without corresponding TypeScript source files or glob to " +
+            "compile.  The transform will not occur unless grunt-ts also expects to compile some files.");
     }
     options.CompilationTasks.forEach(function (compileTask) {
         if (compileTask.out && compileTask.outDir) {
-            console.log(JSON.stringify(compileTask));
             options.warnings.push('The parameter `out` is incompatible with `outDir`; pass one or the other - not both.  Ignoring `out` and using `outDir`.');
             compileTask.out = '';
         }

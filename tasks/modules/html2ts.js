@@ -18,6 +18,12 @@ var escapeContent = function (content, quoteChar) {
     var nlReplace = '';
     return content.replace(quoteRegexp, '\\' + quoteChar).replace(/\r?\n/g, nlReplace);
 };
+// Convert a string to camelCase
+// Inspired by http://jamesroberts.name/blog/2010/02/22/string-functions-for-javascript-trim-to-camel-case-to-dashed-and-to-underscore/
+// Solves the issue of serving a module name that includes dashes
+var toCamel = function (str) {
+    return str.replace(/(\-[a-z])/g, function ($1) { return $1.toUpperCase().replace('-', ''); });
+};
 // Remove bom when reading utf8 files
 function stripBOM(str) {
     return 0xFEFF === str.charCodeAt(0)
@@ -40,8 +46,8 @@ function compileHTML(filename, options) {
     // TODO: place a minification pipeline here if you want.
     var ext = path.extname(filename).replace('.', '');
     var extFreename = path.basename(filename, '.' + ext);
-    var moduleName = options.moduleFunction({ ext: ext, filename: extFreename });
-    var varName = options.varFunction({ ext: ext, filename: extFreename }).replace(/\./g, '_');
+    var moduleName = toCamel(options.moduleFunction({ ext: ext, filename: extFreename }));
+    var varName = toCamel(options.varFunction({ ext: ext, filename: extFreename }).replace(/\./g, '_'));
     var fileContent;
     if (!options.htmlOutputTemplate) {
         fileContent = _.template(htmlInternalTemplate(options.eol))({ modulename: moduleName, varname: varName, content: htmlContent });

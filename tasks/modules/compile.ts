@@ -224,15 +224,33 @@ export function compileAllFiles(options: IGruntTSOptions, compilationInfo: IGrun
       if (options.rootDir) {
           args.push('--rootDir', options.rootDir);
       }
+      if (options.noLib) {
+          args.push('--noLib');
+      }
+      if (options.emitBOM) {
+          args.push('--emitBOM');
+      }
+      if (options.locale) {
+          args.push('--locale', options.locale);
+      }
+      if (options.suppressExcessPropertyErrors) {
+          args.push('--suppressExcessPropertyErrors');
+      }
+      if (options.stripInternal) {
+          args.push('--stripInternal');
+      }
+      if (options.allowSyntheticDefaultImports) {
+          args.push('--allowSyntheticDefaultImports');
+      }
 
       args.push('--target', options.target.toUpperCase());
 
       if (options.module) {
      	  let moduleOptionString: string = ('' + options.module).toLowerCase();
-      	if ('amd|commonjs|system|umd'.indexOf(moduleOptionString) > -1) {
+      	if ('amd|commonjs|system|umd|es6|es2015'.indexOf(moduleOptionString) > -1) {
               args.push('--module', moduleOptionString);
       	} else {
-  	        console.warn('WARNING: Option "module" only supports "amd" | "commonjs" | "system" | "umd" '.magenta);
+  	        console.warn('WARNING: Option "module" only supports "amd" | "commonjs" | "system" | "umd" | "es6" | "es2015" '.magenta);
       	}
       }
 
@@ -337,7 +355,7 @@ export function compileAllFiles(options: IGruntTSOptions, compilationInfo: IGrun
     // Execute command
     return executeNode(command, options).then((result: ICompileResult) => {
 
-        if (options.fast !== 'never' && result.code === 0) {
+        if (options.fast !== 'never' && (result.code === 0 || !options.failOnTypeErrors && result.code === 2)) {
             resetChangedFiles(newFiles, options.targetName);
         }
 

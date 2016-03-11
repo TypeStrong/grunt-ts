@@ -16,6 +16,7 @@
         "experimentalDecorators": true
     },
     "exclude": [
-      "./files"
+      "./files",
+      "./otherFiles/this.ts"
     ]
 }

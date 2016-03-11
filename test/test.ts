@@ -80,6 +80,7 @@ export var tests : nodeunit.ITestGroup = {
     html2ts: function (test) {
         testDirectory(test, 'html');
         testDirectory(test, 'htmlTemplate');
+        testDirectory(test, 'htmlSnakeModuleName');
         test.done();
     },
     index: function (test) {

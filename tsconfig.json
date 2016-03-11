@@ -1,5 +1,5 @@
 {
-    "version": "1.6.2",
+    "version": "1.7.3",
     "compilerOptions": {
         "target": "es5",
         "module": "commonjs",
@@ -45,5 +45,8 @@
         "test/references-transform-library.d.ts",
         "test/test.ts"
     ],
-    "exclude": []
+    "exclude": [],
+    "atom": {
+        "rewriteTsconfig": false
+    }
 }
