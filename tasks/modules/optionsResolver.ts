@@ -10,7 +10,7 @@ import {Promise} from 'es6-promise';
 import {resolveVSOptionsAsync} from './visualStudioOptionsResolver';
 import {resolveAsync as resolveTSConfigAsync} from './tsconfig';
 
-const propertiesFromTarget = ['amdloader', 'html', 'htmlOutDir', 'htmlOutDirFlatten', 'reference', 'testExecute', 'tsconfig',
+const propertiesFromTarget = ['amdloader', 'baseDir', 'html', 'htmlOutDir', 'htmlOutDirFlatten', 'reference', 'testExecute', 'tsconfig',
         'templateCache', 'vs', 'watch'],
       propertiesFromTargetOptions = ['additionalFlags', 'allowSyntheticDefaultImports', 'comments', 'compile', 'compiler', 'declaration',
         'emitBOM', 'emitDecoratorMetadata', 'experimentalDecorators', 'failOnTypeErrors', 'fast', 'htmlModuleTemplate', 'htmlOutDir',

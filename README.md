@@ -100,6 +100,7 @@ For file ordering, look at [JavaScript Generation](#javascript-generation).
 |:----|:----|:-----|
 |[additionalFlags](#additionalflags)|option|`string` - allows passing arbitrary strings to the compiler.  This is intended to enable compatibility with features not supported directly by grunt-ts.|
 |[allowSyntheticDefaultImports](#allowsyntheticdefaultimports)|option|`true`, `false` (default) - Allows use "default" ES6 module import syntax with pre-ES6 libraries that don't have a default (on by default with SystemJS and not required to specify).|
+|[baseDir](#basedir)|option|`string` - Sets root directory for maintaining source structure when using outDir and fast together|
 |[comments](#comments)|option|`true`, `false` (default) - include comments in emitted JS.|
 |[compile](#compile)|option|`true` (default), `false` - compile TypeScript code.|
 |[compiler](#compiler)|option|`string` - path to custom compiler|
@@ -422,6 +423,24 @@ grunt.initConfig({
       options: {
         allowSyntheticDefaultImports: true,
         module: 'umd'
+      }
+    }
+  }
+});
+````
+
+#### baseDir
+
+When using fast compile with outDir, tsc won't guarantee the output directory structure will match the source structure. Setting baseDir helps to ensure the original source structure is mapped to the output directory.
+
+````javascript
+grunt.initConfig({
+  ts: {
+    default: {
+      outDir: 'dist',
+      options: {
+        baseDir: 'src',
+        fast: always
       }
     }
   }
