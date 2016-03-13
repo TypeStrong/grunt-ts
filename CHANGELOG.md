@@ -1,8 +1,8 @@
 # Releases
 
 ## Next
-* DOCS: Update to `--moduleResolution` README section to show fluctuating default behaviour - by @thull
 * FIX: tsconfig.json exclude support for files (not just directories).  Thanks very much to first-time contributor @errorx666 for the PR!  Includes PR #337 which keeps exclude performance fast.  (#285, #336)
+* DOCS: Update to `--moduleResolution` README section to show fluctuating default behaviour - by @thull
 * FIX: the HTML feature now supports file names with dashes - they will be converted to the underscore character.  Many thanks to first-time contributor @xenit-raven for the PR!  (#324)
 
 ## v5.3.2 (2016-01-15)
