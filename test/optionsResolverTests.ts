@@ -467,16 +467,38 @@ export var tests : nodeunit.ITestGroup = {
 
   "tsconfig.json Integration Tests": {
     setUp: (callback) => {
-        let jsonFiles = fs.readdirSync('test/tsconfig_artifact');
-        jsonFiles.forEach(file => {
-          if (utils.endsWith(file, '.json')) {
-            utils.copyFileSync(
-              path.join('./test/tsconfig_artifact',file),
-              path.join('./test/tsconfig',file)
-            );
-          };
-        });
-        callback();
+        const processFiles = (err, files: string[]) => {
+          let count = 0;
+          files.forEach(file => {
+            if (utils.endsWith(file, '.json')) {
+                utils.copyFile(
+                  path.join('./test/tsconfig_artifact',file),
+                  path.join('./test/tsconfig',file), (err?: Error) => {
+                    if (err) {
+                      console.log(err);
+                      throw err;
+                    }
+                    count += 1;
+                    if (count === files.length) {
+                      callback();
+                    }
+                  }
+                );
+            } else {
+              count += 1;
+              if (count === files.length) {
+                callback();
+              }
+            };
+          })
+        }
+
+        try {
+          fs.readdir('test/tsconfig_artifact', processFiles);
+        } catch(ex) {
+          console.log(ex);
+          callback(ex);
+        }
   	},
     "Can get config from a valid file": (test: nodeunit.Test) => {
         test.expect(1);
