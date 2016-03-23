@@ -114,8 +114,8 @@ function updateAmdLoader(referenceFile, files, loaderFile, loaderPath, outDir, n
                 files = _.map(files, function (file) {
                     // Remove common path and replace with absolute outDir
                     file = file.replace(commonPath, outDir);
-                    // remove ts extension '.ts':
-                    file = file.substr(0, file.length - 3);
+                    // remove extension '.ts' / '.tsx':
+                    file = file.substr(0, file.lastIndexOf('.'));
                     // Make relative to amd loader
                     file = utils.makeRelativePath(loaderPath, file);
                     // Prepend "./" to prevent "basePath" requirejs setting from interferring:
