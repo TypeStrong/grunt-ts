@@ -5,6 +5,7 @@
 * FIX: tsconfig.json exclude support for files (not just directories).  Thanks very much to first-time contributor @errorx666 for the PR!  Includes PR #337 which keeps exclude performance fast.  (#285, #336)
 * DOCS: Update to `--moduleResolution` README section to show fluctuating default behaviour - by @thull
 * FIX: the HTML feature now supports file names with dashes - they will be converted to the underscore character.  Many thanks to first-time contributor @xenit-raven for the PR!  (#324)
+* FIX: Updated to `csproj2ts` v0.0.7 which supports Visual Studio 2015 projects (Thanks for the report and PR from first-time contributor @OClement ) .  Also now supports compiling on Mac which I'm sort of shocked it didn't but that's why we test things, isn't it?  Thanks for the report and PR (to `csproj2ts`) from first-time contributor @manfield ! (#345)
 
 ## v5.3.2 (2016-01-15)
 * FIX: Should not crash in presence of target named "src" (#321) - thanks for the report @ravishivt and @riggerthegeek.
