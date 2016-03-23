@@ -341,6 +341,16 @@ export var tests : nodeunit.ITestGroup = {
           test.done();
         }).catch((err) => {test.ifError(err); test.done();});
     },
+    "The `baseDir` option is picked-up if passed": (test: nodeunit.Test) => {
+        test.expect(1);
+        const config = getConfig("minimalist", true);
+        config.outDir = 'dist';
+        config.baseDir = 'src';
+        const result = or.resolveAsync(null, config).then((result) => {
+          test.strictEqual(result.baseDir, 'src');
+          test.done();
+        }).catch((err) => {test.ifError(err); test.done();});
+    },
     "Task options should override grunt-ts defaults if not specified in the target options": (test: nodeunit.Test) => {
         test.expect(2);
         const result = or.resolveAsync(getConfig("has ES6 and no sourceMap"), getConfig("minimalist")).then((result) => {

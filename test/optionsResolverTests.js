@@ -326,6 +326,16 @@ exports.tests = {
                 test.done();
             }).catch(function (err) { test.ifError(err); test.done(); });
         },
+        "The `baseDir` option is picked-up if passed": function (test) {
+            test.expect(1);
+            var config = getConfig("minimalist", true);
+            config.outDir = 'dist';
+            config.baseDir = 'src';
+            var result = or.resolveAsync(null, config).then(function (result) {
+                test.strictEqual(result.baseDir, 'src');
+                test.done();
+            }).catch(function (err) { test.ifError(err); test.done(); });
+        },
         "Task options should override grunt-ts defaults if not specified in the target options": function (test) {
             test.expect(2);
             var result = or.resolveAsync(getConfig("has ES6 and no sourceMap"), getConfig("minimalist")).then(function (result) {
