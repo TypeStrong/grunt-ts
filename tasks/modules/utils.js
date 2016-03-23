@@ -349,6 +349,18 @@ function copyFileSync(srcFile, destFile, encoding) {
     fs.writeFileSync(destFile, content, encoding);
 }
 exports.copyFileSync = copyFileSync;
+function copyFile(srcFile, destFile, callback, encoding) {
+    if (encoding === void 0) { encoding = 'utf8'; }
+    fs.readFile(srcFile, encoding, function (err, data) {
+        fs.writeFile(destFile, data, encoding, function (err) {
+            if (err) {
+                return callback(err);
+            }
+            return callback();
+        });
+    });
+}
+exports.copyFile = copyFile;
 function readAndParseJSONFromFileSync(fileName, encoding) {
     if (encoding === void 0) { encoding = 'utf8'; }
     var textContent, result;

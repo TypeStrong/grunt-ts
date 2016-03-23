@@ -371,6 +371,17 @@ export function copyFileSync(srcFile: string, destFile: string, encoding = 'utf8
   fs.writeFileSync(destFile, content, encoding);
 }
 
+export function copyFile(srcFile: string, destFile: string, callback: (err?: Error) => any, encoding = 'utf8') {
+  fs.readFile(srcFile, encoding, (err, data) => {
+    fs.writeFile(destFile, data, encoding, (err) => {
+      if (err) {
+        return callback(err);
+      }
+      return callback();
+    });
+  });
+}
+
 export function readAndParseJSONFromFileSync(fileName: string, encoding = 'utf8') : any {
 
   let textContent: string, result: any;
