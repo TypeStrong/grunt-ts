@@ -228,8 +228,8 @@ function resolveAndWarnOnConfigurationIssues(task, target, targetName) {
 }
 function applyGruntOptions(applyTo, gruntOptions) {
     if (gruntOptions) {
-        for (var _i = 0; _i < propertiesFromTarget.length; _i++) {
-            var propertyName = propertiesFromTarget[_i];
+        for (var _i = 0, propertiesFromTarget_1 = propertiesFromTarget; _i < propertiesFromTarget_1.length; _i++) {
+            var propertyName = propertiesFromTarget_1[_i];
             if (propertyName in gruntOptions && propertyName !== 'vs') {
                 if (typeof gruntOptions[propertyName] === 'string' && utils.hasValue(gruntOptions[propertyName]) &&
                     delayTemplateExpansion.indexOf(propertyName) === -1) {
@@ -241,8 +241,8 @@ function applyGruntOptions(applyTo, gruntOptions) {
             }
         }
         if (gruntOptions.options) {
-            for (var _a = 0; _a < propertiesFromTargetOptions.length; _a++) {
-                var propertyName = propertiesFromTargetOptions[_a];
+            for (var _a = 0, propertiesFromTargetOptions_1 = propertiesFromTargetOptions; _a < propertiesFromTargetOptions_1.length; _a++) {
+                var propertyName = propertiesFromTargetOptions_1[_a];
                 if (propertyName in gruntOptions.options) {
                     if (typeof gruntOptions.options[propertyName] === 'string' && utils.hasValue(gruntOptions.options[propertyName]) &&
                         delayTemplateExpansion.indexOf(propertyName) === -1) {

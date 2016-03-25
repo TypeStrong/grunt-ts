@@ -240,17 +240,17 @@ function applyCompilerOptions(applyTo, projectSpec) {
         addUniqueRelativeFilesToSrc(projectSpec.files, src, absolutePathToTSConfig);
     }
     else {
-        var validPattern = /\.tsx?$/i;
-        var excludedPaths = [];
+        var validPattern_1 = /\.tsx?$/i;
+        var excludedPaths_1 = [];
         if (_.isArray(projectSpec.exclude)) {
-            excludedPaths = projectSpec.exclude.map(function (filepath) {
+            excludedPaths_1 = projectSpec.exclude.map(function (filepath) {
                 return utils.makeRelativePath(absolutePathToTSConfig, path.resolve(absolutePathToTSConfig, filepath));
             });
         }
         var files = utils.getFiles(absolutePathToTSConfig, function (filepath) {
-            return excludedPaths.indexOf(utils.makeRelativePath(absolutePathToTSConfig, filepath)) > -1
+            return excludedPaths_1.indexOf(utils.makeRelativePath(absolutePathToTSConfig, filepath)) > -1
                 || (fs.statSync(filepath).isFile()
-                    && !validPattern.test(filepath));
+                    && !validPattern_1.test(filepath));
         }).map(function (filepath) {
             return utils.makeRelativePath(absolutePathToTSConfig, filepath);
         });

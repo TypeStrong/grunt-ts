@@ -11,7 +11,7 @@ var Animal = (function () {
         alert(this.name + " moved " + meters + "m.");
     };
     return Animal;
-})();
+}());
 var Snake = (function (_super) {
     __extends(Snake, _super);
     function Snake(name) {
@@ -22,7 +22,7 @@ var Snake = (function (_super) {
         _super.prototype.move.call(this, 5);
     };
     return Snake;
-})(Animal);
+}(Animal));
 var Horse = (function (_super) {
     __extends(Horse, _super);
     function Horse(name) {
@@ -33,7 +33,7 @@ var Horse = (function (_super) {
         _super.prototype.move.call(this, 45);
     };
     return Horse;
-})(Animal);
+}(Animal));
 var sam = new Snake("Sammy the Python");
 var tom = new Horse("Tommy the Palomino");
 sam.move();

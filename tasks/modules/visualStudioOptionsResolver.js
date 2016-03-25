@@ -94,15 +94,15 @@ function applyVSOptions(options, vsSettings) {
         if (options.CompilationTasks.length === 0) {
             options.CompilationTasks.push({ src: [] });
         }
-        var src = options.CompilationTasks[0].src;
-        var absolutePathToVSProjectFolder = path.resolve(vsSettings.VSProjectDetails.ProjectFileName, '..');
-        var gruntfileFolder = path.resolve('.');
+        var src_1 = options.CompilationTasks[0].src;
+        var absolutePathToVSProjectFolder_1 = path.resolve(vsSettings.VSProjectDetails.ProjectFileName, '..');
+        var gruntfileFolder_1 = path.resolve('.');
         _.map(_.uniq(vsSettings.files), function (file) {
-            var absolutePathToFile = path.normalize(path.join(absolutePathToVSProjectFolder, file));
-            var relativePathToFileFromGruntfile = path.relative(gruntfileFolder, absolutePathToFile).replace(new RegExp('\\' + path.sep, 'g'), '/');
-            if (src.indexOf(absolutePathToFile) === -1 &&
-                src.indexOf(relativePathToFileFromGruntfile) === -1) {
-                src.push(relativePathToFileFromGruntfile);
+            var absolutePathToFile = path.normalize(path.join(absolutePathToVSProjectFolder_1, file));
+            var relativePathToFileFromGruntfile = path.relative(gruntfileFolder_1, absolutePathToFile).replace(new RegExp('\\' + path.sep, 'g'), '/');
+            if (src_1.indexOf(absolutePathToFile) === -1 &&
+                src_1.indexOf(relativePathToFileFromGruntfile) === -1) {
+                src_1.push(relativePathToFileFromGruntfile);
             }
         });
     }

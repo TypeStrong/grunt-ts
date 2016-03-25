@@ -1,4 +1,5 @@
 /// <reference path="../defs/tsd.d.ts" />
+"use strict";
 var grunt = require('grunt');
 var utils = require('../tasks/modules/utils');
 var _ = require('lodash');

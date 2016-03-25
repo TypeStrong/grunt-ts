@@ -1,5 +1,6 @@
 /// <reference path="../defs/tsd.d.ts"/>
 /// <reference path="../tasks/modules/interfaces.d.ts"/>
+"use strict";
 exports.decoratorMetadataPassed = function (strings, options) {
     return new Promise(function (resolve, reject) {
         if (options.emitDecoratorMetadata === true &&
