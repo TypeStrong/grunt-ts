@@ -10,15 +10,21 @@ import {Promise} from 'es6-promise';
 import {resolveVSOptionsAsync} from './visualStudioOptionsResolver';
 import {resolveAsync as resolveTSConfigAsync} from './tsconfig';
 
+// Compiler Options documentation:
+// https://github.com/Microsoft/TypeScript-Handbook/blob/master/pages/Compiler%20Options.md
+
 const propertiesFromTarget = ['amdloader', 'baseDir', 'html', 'htmlOutDir', 'htmlOutDirFlatten', 'reference', 'testExecute', 'tsconfig',
         'templateCache', 'vs', 'watch'],
+        // purposefully not supported: help, version, charset, diagnostics, listFiles
+        // supported via other code: out, outDir, outFile, project
       propertiesFromTargetOptions = ['additionalFlags', 'allowSyntheticDefaultImports', 'comments', 'compile', 'compiler', 'declaration',
         'emitBOM', 'emitDecoratorMetadata', 'experimentalDecorators', 'failOnTypeErrors', 'fast', 'htmlModuleTemplate', 'htmlOutDir',
         'htmlOutputTemplate', 'htmlOutDirFlatten', 'htmlVarTemplate', 'inlineSourceMap', 'inlineSources', 'isolatedModules', 'locale',
         'mapRoot', 'module', 'newLine', 'noEmit', 'noEmitHelpers', 'noEmitOnError', 'noImplicitAny', 'noLib', 'noResolve',
         'preserveConstEnums', 'removeComments', 'sourceRoot', 'sourceMap', 'stripInternal', 'suppressExcessPropertyErrors',
         'suppressImplicitAnyIndexErrors', 'target', 'verbose', 'jsx', 'moduleResolution', 'experimentalAsyncFunctions', 'rootDir',
-        'emitGruntEvents'],
+        'emitGruntEvents', 'reactNamespace', 'skipDefaultLibCheck', 'pretty', 'allowUnusedLabels', 'noImplicitReturns',
+        'noFallthroughCasesInSwitch', 'allowUnreachableCode', 'forceConsistentCasingInFileNames', 'allowJs', 'noImplicitUseStrict'],
       delayTemplateExpansion = ['htmlModuleTemplate', 'htmlVarTemplate', 'htmlOutputTemplate'];
 
 let templateProcessor: (templateString: string, options: any) => string = null;

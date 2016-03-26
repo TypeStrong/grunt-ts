@@ -1,5 +1,6 @@
 'use strict';
 var utils = require('./utils');
+var _ = require('lodash');
 var TypeScriptDefaults = {
     allowBool: false,
     allowImportModule: false,
@@ -50,12 +51,23 @@ var TypeScriptDefaults = {
     jsx: null,
     moduleResolution: null,
     experimentalAsyncFunctions: null,
+    reactNamespace: null,
+    skipDefaultLibCheck: null,
+    pretty: false,
+    allowUnusedLabels: false,
+    noImplicitReturns: false,
+    noFallthroughCasesInSwitch: false,
+    allowUnreachableCode: false,
+    forceConsistentCasingInFileNames: false,
+    allowJs: false,
+    noImplicitUseStrict: false,
     rootDir: null,
     warnings: [],
     errors: []
 };
-exports.GruntTSDefaults = applyGruntTSDefaults(TypeScriptDefaults);
+exports.GruntTSDefaults = applyGruntTSDefaults(_.clone(TypeScriptDefaults));
 function applyGruntTSDefaults(options) {
+    // this function applies defaults where grunt-ts differs from TypeScript
     options.sourceMap = true;
     options.target = 'es5';
     options.htmlModuleTemplate = '<%= filename %>';

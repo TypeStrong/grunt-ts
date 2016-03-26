@@ -243,6 +243,36 @@ export function compileAllFiles(options: IGruntTSOptions, compilationInfo: IGrun
       if (options.allowSyntheticDefaultImports) {
           args.push('--allowSyntheticDefaultImports');
       }
+      if (options.reactNamespace) {
+          args.push('--reactNamespace', options.reactNamespace);
+      }
+      if (options.skipDefaultLibCheck) {
+          args.push('--skipDefaultLibCheck');
+      }
+      if (options.pretty) {
+          args.push('--pretty');
+      }
+      if (options.allowUnusedLabels) {
+          args.push('--allowUnusedLabels');
+      }
+      if (options.noImplicitReturns) {
+          args.push('--noImplicitReturns');
+      }
+      if (options.noFallthroughCasesInSwitch) {
+          args.push('--noFallthroughCasesInSwitch');
+      }
+      if (options.allowUnreachableCode) {
+          args.push('--allowUnreachableCode');
+      }
+      if (options.forceConsistentCasingInFileNames) {
+          args.push('--forceConsistentCasingInFileNames');
+      }
+      if (options.allowJs) {
+          args.push('--allowJs');
+      }
+      if (options.noImplicitUseStrict) {
+          args.push('--noImplicitUseStrict');
+      }
 
       args.push('--target', options.target.toUpperCase());
 

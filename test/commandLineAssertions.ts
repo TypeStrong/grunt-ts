@@ -585,6 +585,32 @@ export const test_directoriesWithSpaces: ICompilePromise = (strings, options) =>
   });
 };
 
+export const new_TypeScript_1_8_Features: ICompilePromise = (strings, options) => {
+  return new Promise(function(resolve, reject) {
+
+    const command = strings[1].replace(/\\/g,'/');
+
+    if (command.indexOf(`--reactNamespace myReact`) > -1 &&
+        command.indexOf(`--skipDefaultLibCheck`) > -1 &&
+        command.indexOf(`--pretty`) > -1 &&
+        command.indexOf(`--allowUnusedLabels`) > -1 &&
+        command.indexOf(`--noImplicitReturns`) > -1 &&
+        command.indexOf(`--noFallthroughCasesInSwitch`) > -1 &&
+        command.indexOf(`--allowUnreachableCode`) > -1 &&
+        command.indexOf(`--forceConsistentCasingInFileNames`) > -1 &&
+        command.indexOf(`--allowJs`) > -1 &&
+        command.indexOf(`--noImplicitUseStrict`) > -1) {
+      resolve({
+        code: 0,
+        output: ""
+      });
+    }
+    throw `expected to see all of the new TypeScript 1.8 values in the command line and didn't.  Got this: ${command}`;
+  });
+};
+
+
+
 export const test_noLib = simpleCommandLineCheck("--noLib");
 export const test_emitBOM = simpleCommandLineCheck("--emitBOM");
 export const test_locale = simpleCommandLineCheck("--locale ja-jp");
@@ -595,7 +621,7 @@ export const test_allowSyntheticDefaultImports = simpleCommandLineCheck("--allow
 function simpleCommandLineCheck(lookFor: string) {
   const result: ICompilePromise = (strings, options) => {
     return new Promise(function(resolve, reject) {
-  
+
       const command = strings[1].replace(/\\/g,'/');
       if (command.indexOf(lookFor) > -1) {
         resolve({
@@ -608,4 +634,3 @@ function simpleCommandLineCheck(lookFor: string) {
   };
   return result;
 }
-

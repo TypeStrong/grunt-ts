@@ -675,6 +675,23 @@ module.exports = function (grunt) {
                 src: 'test/htmlExternal/**/*.ts'
 
             },
+            new_TypeScript_1_8_Features: {
+                test: true,
+                testExecute: commandLineAssertions.new_TypeScript_1_8_Features,
+                src: 'test/simple/ts/**/*.ts',
+                options: {
+                    reactNamespace: 'myReact',
+                    skipDefaultLibCheck: true,
+                    pretty: true,
+                    allowUnusedLabels: true,
+                    noImplicitReturns: true,
+                    noFallthroughCasesInSwitch: true,
+                    allowUnreachableCode: true,
+                    forceConsistentCasingInFileNames: true,
+                    allowJs: true,
+                    noImplicitUseStrict: true
+                }
+            },
             decoratorMetadataPassed: {
                 test: true,
                 testExecute: commandLineAssertions.decoratorMetadataPassed,

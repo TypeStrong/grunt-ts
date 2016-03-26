@@ -7,14 +7,20 @@ var _ = require('lodash');
 var es6_promise_1 = require('es6-promise');
 var visualStudioOptionsResolver_1 = require('./visualStudioOptionsResolver');
 var tsconfig_1 = require('./tsconfig');
+// Compiler Options documentation:
+// https://github.com/Microsoft/TypeScript-Handbook/blob/master/pages/Compiler%20Options.md
 var propertiesFromTarget = ['amdloader', 'baseDir', 'html', 'htmlOutDir', 'htmlOutDirFlatten', 'reference', 'testExecute', 'tsconfig',
-    'templateCache', 'vs', 'watch'], propertiesFromTargetOptions = ['additionalFlags', 'allowSyntheticDefaultImports', 'comments', 'compile', 'compiler', 'declaration',
+    'templateCache', 'vs', 'watch'], 
+// purposefully not supported: help, version, charset, diagnostics, listFiles
+// supported via other code: out, outDir, outFile, project
+propertiesFromTargetOptions = ['additionalFlags', 'allowSyntheticDefaultImports', 'comments', 'compile', 'compiler', 'declaration',
     'emitBOM', 'emitDecoratorMetadata', 'experimentalDecorators', 'failOnTypeErrors', 'fast', 'htmlModuleTemplate', 'htmlOutDir',
     'htmlOutputTemplate', 'htmlOutDirFlatten', 'htmlVarTemplate', 'inlineSourceMap', 'inlineSources', 'isolatedModules', 'locale',
     'mapRoot', 'module', 'newLine', 'noEmit', 'noEmitHelpers', 'noEmitOnError', 'noImplicitAny', 'noLib', 'noResolve',
     'preserveConstEnums', 'removeComments', 'sourceRoot', 'sourceMap', 'stripInternal', 'suppressExcessPropertyErrors',
     'suppressImplicitAnyIndexErrors', 'target', 'verbose', 'jsx', 'moduleResolution', 'experimentalAsyncFunctions', 'rootDir',
-    'emitGruntEvents'], delayTemplateExpansion = ['htmlModuleTemplate', 'htmlVarTemplate', 'htmlOutputTemplate'];
+    'emitGruntEvents', 'reactNamespace', 'skipDefaultLibCheck', 'pretty', 'allowUnusedLabels', 'noImplicitReturns',
+    'noFallthroughCasesInSwitch', 'allowUnreachableCode', 'forceConsistentCasingInFileNames', 'allowJs', 'noImplicitUseStrict'], delayTemplateExpansion = ['htmlModuleTemplate', 'htmlVarTemplate', 'htmlOutputTemplate'];
 var templateProcessor = null;
 var globExpander = null;
 function noopTemplateProcessor(templateString, options) {
