@@ -1171,8 +1171,17 @@ module.exports = function (grunt) {
 
     grunt.registerTask('stageFiles','Ensures that certain files that are cleaned will be present for the tests.',
       function() {
+        var done = this.async();
         try {
-            utils.copyFileSync('test/tsconfig_artifact/tsconfig-grunt-ts.json','test/tsconfig/tsconfig-grunt-ts.json');
+            utils.copyFile('test/tsconfig_artifact/tsconfig-grunt-ts.json','test/tsconfig/tsconfig-grunt-ts.json',
+            function (err) {
+                if (err) {
+                    grunt.log.writeln(err);
+                    done(false);
+                }
+                done();
+            }
+          );
         } catch (ex) {
             console.log(ex);
             return false;
