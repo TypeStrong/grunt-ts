@@ -83,6 +83,11 @@ function getTsc(binPath: string): string {
     return path.join(binPath, 'tsc');
 }
 
+export function compileResultMeansFastCacheShouldBeRefreshed(options: IGruntTSOptions, result: ICompileResult) {
+  return (options.fast !== 'never' &&
+    (result.code === 0 || (result.code === 2 && !options.failOnTypeErrors)));
+}
+
 export function compileAllFiles(options: IGruntTSOptions, compilationInfo: IGruntTSCompilationInfo): Promise<ICompileResult> {
 
     let targetFiles: string[] = compilationInfo.src;
@@ -355,7 +360,7 @@ export function compileAllFiles(options: IGruntTSOptions, compilationInfo: IGrun
     // Execute command
     return executeNode(command, options).then((result: ICompileResult) => {
 
-        if (options.fast !== 'never' && (result.code === 0 || !options.failOnTypeErrors && result.code === 2)) {
+        if (compileResultMeansFastCacheShouldBeRefreshed(options, result)) {
             resetChangedFiles(newFiles, options.targetName);
         }
 

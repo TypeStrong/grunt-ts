@@ -22,6 +22,7 @@ module.exports = function (grunt) {
                 'tscommand-*.txt',
                 '!test/commandLineAssertions.js',
                 '!test/optionsResolverTests.js',
+                '!test/compilerTests.js',
                 'test/**/*.orig'
             ],
             testPost: [
@@ -63,12 +64,15 @@ module.exports = function (grunt) {
                 src: ['tasks/**/*.ts']
             },
             test: {
-                src: ['test/test.ts', 'test/commandLineAssertions.ts', 'test/optionsResolverTests.ts']
+                src: ['test/test.ts',
+                  'test/commandLineAssertions.ts',
+                  'test/optionsResolverTests.ts',
+                  'test/compilerTests.ts']
             }
         },
         nodeunit: {
             slow: ['test/test.js'],
-            fast: ['test/optionsResolverTests.js']
+            fast: ['test/optionsResolverTests.js', 'test/compilerTests.js']
         },
         watch: {
             dev: {
