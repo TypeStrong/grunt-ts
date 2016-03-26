@@ -128,9 +128,6 @@ function compileAllFiles(options, compilationInfo) {
     }
     // Quote the files to compile. Needed for command line parsing by tsc
     files = _.map(files, function (item) { return ("\"" + path.resolve(item) + "\""); });
-    // if (outFile) {
-    //   outFile = `"${path.resolve(outFile)}"`;
-    // }
     var args = files.slice(0);
     var tsconfig = options.tsconfig;
     if (tsconfig && tsconfig.passThrough) {
@@ -232,6 +229,9 @@ function compileAllFiles(options, compilationInfo) {
             args.push('--outDir', compilationInfo.outDir);
         }
         if (compilationInfo.out) {
+            // We only pass --out instead of --outFile for backward-compatability reasons.
+            // It is the same for purposes of the command-line (the subtle difference is handled in the tsconfig code
+            //  and the value of --outFile is copied to --out).
             args.push('--out', compilationInfo.out);
         }
         if (compilationInfo.dest && (!compilationInfo.out) && (!compilationInfo.outDir)) {

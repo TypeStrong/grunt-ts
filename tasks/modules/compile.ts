@@ -159,10 +159,6 @@ export function compileAllFiles(options: IGruntTSOptions, compilationInfo: IGrun
     // Quote the files to compile. Needed for command line parsing by tsc
     files = _.map(files, (item) => `"${path.resolve(item)}"`);
 
-    // if (outFile) {
-    //   outFile = `"${path.resolve(outFile)}"`;
-    // }
-
     var args: string[] = files.slice(0);
     const tsconfig: ITSConfigSupport = options.tsconfig;
 
@@ -267,6 +263,9 @@ export function compileAllFiles(options: IGruntTSOptions, compilationInfo: IGrun
       }
 
       if (compilationInfo.out) {
+          // We only pass --out instead of --outFile for backward-compatability reasons.
+          // It is the same for purposes of the command-line (the subtle difference is handled in the tsconfig code
+          //  and the value of --outFile is copied to --out).
           args.push('--out', compilationInfo.out);
       }
 
