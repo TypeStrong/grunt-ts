@@ -64,6 +64,11 @@ function getTsc(binPath) {
     exports.grunt.log.writeln('Using tsc v' + pkg.version);
     return path.join(binPath, 'tsc');
 }
+function compileResultMeansFastCacheShouldBeRefreshed(options, result) {
+    return (options.fast !== 'never' &&
+        (result.code === 0 || (result.code === 2 && !options.failOnTypeErrors)));
+}
+exports.compileResultMeansFastCacheShouldBeRefreshed = compileResultMeansFastCacheShouldBeRefreshed;
 function compileAllFiles(options, compilationInfo) {
     var targetFiles = compilationInfo.src;
     // Make a local copy so we can modify files without having external side effects
@@ -313,7 +318,7 @@ function compileAllFiles(options, compilationInfo) {
     }
     // Execute command
     return executeNode(command, options).then(function (result) {
-        if (options.fast !== 'never' && (result.code === 0 || !options.failOnTypeErrors && result.code === 2)) {
+        if (compileResultMeansFastCacheShouldBeRefreshed(options, result)) {
             resetChangedFiles(newFiles, options.targetName);
         }
         result.fileCount = files.length;

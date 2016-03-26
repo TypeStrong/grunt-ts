@@ -15,7 +15,7 @@
     <IISExpressAnonymousAuthentication />
     <IISExpressWindowsAuthentication />
     <IISExpressUseClassicPipelineMode />
-    <TypeScriptToolsVersion>1.4</TypeScriptToolsVersion>
+    <TypeScriptToolsVersion>1.7</TypeScriptToolsVersion>
   </PropertyGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">12.0</VisualStudioVersion>
@@ -71,6 +71,8 @@
     <TypeScriptCompile Include="tasks\modules\utils.ts" />
     <TypeScriptCompile Include="tasks\ts.ts" />
     <TypeScriptCompile Include="test\commandLineAssertions.ts" />
+    <TypeScriptCompile Include="test\compilerTests.ts" />
+    <TypeScriptCompile Include="test\optionsResolverTests.ts" />
     <TypeScriptCompile Include="test\test.ts" />
   </ItemGroup>
   <ItemGroup>

@@ -24,6 +24,7 @@ test/definitelytypedtest/reference.ts
 !test/expected/**/*.map
 !test/commandLineAssertions.js
 !test/optionsResolverTests.js
+!test/compilerTests.js
 .tscache/
 !test/tsconfig/*.json
 bin/
