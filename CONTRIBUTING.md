@@ -24,7 +24,7 @@ New features and performance improvements will be considered if they are of broa
   * Then update `tasks/modules/compile.ts` to pass the new switches.  Mostly this will be checking for the presence of the option and pushing to the args variable inside `compileAllFiles()`.
   * Add a test for the new switches inside the `Gruntfile.js`.  A good example is `new_TypeScript_1_8_Features`.  The important thing is the `testExecute` property.  Add a new function in commandLineAssertions.ts with the same name as the one you specified in testExecute.
   * Update tsconfig support
-  * Update VS support
+  * Update VS support - The csproj2ts project needs to be updated.  Then update the dependency in the grunt-ts package.json file and run `npm install`. Once that is complete, update the `simpleVSSettingsToGruntTSMappings` array in `tasks/modules/visualStudioOptionsResolver.ts`.  Finally, add one or more of the new Visual Studio properties to the `test/vsproj/testproject.csproj` file and also to the "Visual Studio properties come across as expected" test in `optionsResolverTests.ts`.
   * Add tests
   * Update the internal compiler.
   * Add documentation

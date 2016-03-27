@@ -411,6 +411,15 @@ export var tests : nodeunit.ITestGroup = {
   },
 
   "Visual Studio `vs` Integration Tests": {
+    "Visual Studio properties come across as expected": (test: nodeunit.Test) => {
+      test.expect(1);
+      const cfg = getConfig("vs minimalist");
+      cfg.options = <any>{sourceMap : false};
+      const result = or.resolveAsync(null, cfg).then((result) => {
+        test.strictEqual(result.allowSyntheticDefaultImports, true)
+        test.done();
+      }).catch((err) => {test.ifError(err); test.done();});
+    },
     "Visual Studio properties should override the grunt-ts defaults ONLY": (test: nodeunit.Test) => {
       test.expect(3);
       const cfg = getConfig("vs minimalist");

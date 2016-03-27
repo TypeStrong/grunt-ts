@@ -396,6 +396,15 @@ exports.tests = {
         }
     },
     "Visual Studio `vs` Integration Tests": {
+        "Visual Studio properties come across as expected": function (test) {
+            test.expect(1);
+            var cfg = getConfig("vs minimalist");
+            cfg.options = { sourceMap: false };
+            var result = or.resolveAsync(null, cfg).then(function (result) {
+                test.strictEqual(result.allowSyntheticDefaultImports, true);
+                test.done();
+            }).catch(function (err) { test.ifError(err); test.done(); });
+        },
         "Visual Studio properties should override the grunt-ts defaults ONLY": function (test) {
             test.expect(3);
             var cfg = getConfig("vs minimalist");

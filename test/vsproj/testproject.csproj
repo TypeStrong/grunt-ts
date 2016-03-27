@@ -46,6 +46,7 @@
     <TypeScriptSourceMap>true</TypeScriptSourceMap>
     <TypeScriptModuleKind>commonjs</TypeScriptModuleKind>
     <TypeScriptOutDir>vsproj_test</TypeScriptOutDir>
+    <TypeScriptAllowSyntheticDefaultImports>true</TypeScriptAllowSyntheticDefaultImports>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)' == 'Release'">
     <TypeScriptRemoveComments>true</TypeScriptRemoveComments>
