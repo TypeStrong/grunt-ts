@@ -23,7 +23,8 @@ module.exports = function (grunt) {
                 '!test/commandLineAssertions.js',
                 '!test/optionsResolverTests.js',
                 '!test/compilerTests.js',
-                'test/**/*.orig'
+                'test/**/*.orig',
+                '!test/allowJs/allowJsLibrary.js'
             ],
             testPost: [
                 'src/a.js',

@@ -13,6 +13,7 @@ test/**/*.js
 test/**/*.html.ts
 !test/expected/htmlExternal/*.ts
 test/html/reference.ts
+!test/allowJs/allowJsLibrary.js
 
 test/definitelytypedtest/reference.ts
 /tscommand*.tmp.txt
