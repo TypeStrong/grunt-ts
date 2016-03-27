@@ -180,17 +180,58 @@ function getTSConfigSettings(raw) {
     }
 }
 function applyCompilerOptions(applyTo, projectSpec) {
-    var result = applyTo || {};
-    var co = projectSpec.compilerOptions;
-    var tsconfig = applyTo.tsconfig;
+    var result = applyTo || {}, co = projectSpec.compilerOptions, tsconfig = applyTo.tsconfig;
     if (!tsconfig.ignoreSettings && co) {
-        var sameNameInTSConfigAndGruntTS = ['declaration', 'emitDecoratorMetadata',
-            'experimentalAsyncFunctions', 'experimentalDecorators', 'isolatedModules',
-            'inlineSourceMap', 'inlineSources', 'jsx', 'mapRoot', 'module',
-            'moduleResolution', 'newLine', 'noEmit',
-            'noEmitHelpers', 'noEmitOnError', 'noImplicitAny', 'noLib', 'noResolve',
-            'out', 'outDir', 'preserveConstEnums', 'removeComments', 'rootDir',
-            'sourceMap', 'sourceRoot', 'suppressImplicitAnyIndexErrors', 'target'];
+        // Go here for the tsconfig.json documentation:
+        // https://github.com/Microsoft/TypeScript-Handbook/blob/master/pages/tsconfig.json.md
+        // There is a link to http://json.schemastore.org/tsconfig
+        var sameNameInTSConfigAndGruntTS = [
+            'allowJs',
+            'allowSyntheticDefaultImports',
+            'allowUnreachableCode',
+            'allowUnusedLabels',
+            // we do not support charset as we assume input files are UTF-8.
+            'declaration',
+            'emitBOM',
+            'emitDecoratorMetadata',
+            'experimentalAsyncFunctions',
+            'experimentalDecorators',
+            'forceConsistentCasingInFileNames',
+            'isolatedModules',
+            'inlineSourceMap',
+            'inlineSources',
+            'jsx',
+            // we do not support listFiles.
+            'locale',
+            'mapRoot',
+            'module',
+            'moduleResolution',
+            'newLine',
+            'noEmit',
+            'noEmitHelpers',
+            'noEmitOnError',
+            'noFallthroughCasesInSwitch',
+            'noImplicitAny',
+            'noImplicitReturns',
+            'noImplicitUseStrict',
+            'noLib',
+            'noResolve',
+            'out',
+            'outDir',
+            // outFile is handled below.
+            'preserveConstEnums',
+            'pretty',
+            'reactNamespace',
+            'removeComments',
+            'rootDir',
+            'skipDefaultLibCheck',
+            'sourceMap',
+            'sourceRoot',
+            'stripInternal',
+            'suppressExcessPropertyIndexErrors',
+            'suppressImplicitAnyIndexErrors',
+            'target'
+        ];
         sameNameInTSConfigAndGruntTS.forEach(function (propertyName) {
             if ((propertyName in co) && !(propertyName in result)) {
                 result[propertyName] = co[propertyName];
@@ -215,8 +256,7 @@ function applyCompilerOptions(applyTo, projectSpec) {
         if (!gruntfileGlobs) {
             throw new Error('The tsconfig option overwriteFilesGlob is set to true, but no glob was passed-in.');
         }
-        var relPath = relativePathFromGruntfileToTSConfig();
-        var gruntGlobsRelativeToTSConfig = [];
+        var relPath = relativePathFromGruntfileToTSConfig(), gruntGlobsRelativeToTSConfig = [];
         for (var i = 0; i < gruntfileGlobs.length; i += 1) {
             gruntfileGlobs[i] = gruntfileGlobs[i].replace(/\\/g, '/');
             gruntGlobsRelativeToTSConfig.push(path.relative(relPath, gruntfileGlobs[i]).replace(/\\/g, '/'));

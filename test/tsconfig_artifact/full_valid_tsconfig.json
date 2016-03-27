@@ -10,7 +10,8 @@
         "preserveConstEnums": false,
         "suppressImplicitAnyIndexErrors": true,
         "sourceMap": true,
-        "outDir": "./files"
+        "outDir": "./files",
+        "allowSyntheticDefaultImports": true
     },
     "filesGlob": [
         "./defs/**/*.ts",
