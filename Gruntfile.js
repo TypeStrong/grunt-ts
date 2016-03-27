@@ -674,7 +674,6 @@ module.exports = function (grunt) {
                 },
                 html: 'test/htmlExternal/**/*.html',
                 src: 'test/htmlExternal/**/*.ts'
-
             },
             new_TypeScript_1_8_Features: {
                 test: true,
@@ -691,6 +690,17 @@ module.exports = function (grunt) {
                     forceConsistentCasingInFileNames: true,
                     allowJs: true,
                     noImplicitUseStrict: true
+                }
+            },
+            allowJs_CompileWorks: {
+                test: true,
+                src: ['test/allowJs/allowJsConsumer.ts',
+                  'test/allowJs/allowJsLibrary.js'],
+                out: 'test/allowJs/result.js',
+                options: {
+                    allowJs: true,
+                    noEmitOnError: true,
+                    module: 'system'
                 }
             },
             decoratorMetadataPassed: {

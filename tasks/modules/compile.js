@@ -6,6 +6,7 @@ var fs = require('fs');
 var _ = require('lodash');
 var utils = require('./utils');
 var cache = require('./cacheUtils');
+var semver = require('semver');
 var es6_promise_1 = require('es6-promise');
 exports.grunt = require('grunt');
 ///////////////////////////
@@ -60,8 +61,6 @@ function resolveTypeScriptBinPath() {
     return path.join(ownRoot, binSub);
 }
 function getTsc(binPath) {
-    var pkg = JSON.parse(fs.readFileSync(path.resolve(binPath, '..', 'package.json')).toString());
-    exports.grunt.log.writeln('Using tsc v' + pkg.version);
     return path.join(binPath, 'tsc');
 }
 function compileResultMeansFastCacheShouldBeRefreshed(options, result) {
@@ -128,8 +127,21 @@ function compileAllFiles(options, compilationInfo) {
     }
     // Quote the files to compile. Needed for command line parsing by tsc
     files = _.map(files, function (item) { return ("\"" + path.resolve(item) + "\""); });
-    var args = files.slice(0);
+    var args = files.slice(0), tsc, tscVersion = '';
     var tsconfig = options.tsconfig;
+    if (options.compiler) {
+        // Custom compiler (task.compiler)
+        exports.grunt.log.writeln('Using the custom compiler : ' + options.compiler);
+        tsc = options.compiler;
+        tscVersion = '';
+    }
+    else {
+        // the bundled OR npm module based compiler
+        var tscPath = resolveTypeScriptBinPath();
+        tsc = getTsc(tscPath);
+        tscVersion = getTscVersion(tscPath);
+        exports.grunt.log.writeln('Using tsc v' + tscVersion);
+    }
     if (tsconfig && tsconfig.passThrough) {
         args.push('--project', tsconfig.tsconfig);
     }
@@ -291,9 +303,19 @@ function compileAllFiles(options, compilationInfo) {
             }
         }
         if (args.indexOf('--out') > -1 && args.indexOf('--module') > -1) {
-            console.warn(('WARNING: TypeScript does not allow external modules to be concatenated with' +
-                ' --out. Any exported code may be truncated.  See TypeScript issue #1544 for' +
-                ' more details.').magenta);
+            if (semver.satisfies(tscVersion, '>=1.8.0')) {
+                if ((options.module === 'system' || options.module === 'amd')) {
+                }
+                else {
+                    console.warn(('WARNING: TypeScript 1.8+ requires "module" to be set to' +
+                        'system or amd for concatenation of external modules to work.').magenta);
+                }
+            }
+            else {
+                console.warn(('WARNING: TypeScript < 1.8 does not allow external modules to be concatenated with' +
+                    ' --out. Any exported code may be truncated.  See TypeScript issue #1544 for' +
+                    ' more details.').magenta);
+            }
         }
         if (options.sourceRoot) {
             args.push('--sourceRoot', options.sourceRoot);
@@ -305,14 +327,9 @@ function compileAllFiles(options, compilationInfo) {
     if (options.additionalFlags) {
         args.push(options.additionalFlags);
     }
-    // Locate a compiler
-    var tsc;
-    if (options.compiler) {
-        exports.grunt.log.writeln('Using the custom compiler : ' + options.compiler);
-        tsc = options.compiler;
-    }
-    else {
-        tsc = getTsc(resolveTypeScriptBinPath());
+    function getTscVersion(tscPath) {
+        var pkg = JSON.parse(fs.readFileSync(path.resolve(tscPath, '..', 'package.json')).toString());
+        return '' + pkg.version;
     }
     // To debug the tsc command
     if (options.verbose) {

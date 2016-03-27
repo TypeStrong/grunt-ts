@@ -177,6 +177,11 @@ function resolveAndWarnOnConfigurationIssues(task: ITargetOptions,
             `  This is not supported.  Taking first element and ignoring the rest.`);
       }
 
+      if ((task && task.outFile) || (target && target.outFile)) {
+        additionalWarnings.push(`Warning: target "${targetName}" is using "outFile".  This is not supported by` +
+          ` grunt-ts via the Gruntfile - it's only relevant when present in tsconfig.json file.  Use "out" instead.`);
+      }
+
       return additionalWarnings;
 
       function usingDestArray(task) {
