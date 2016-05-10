@@ -916,6 +916,11 @@ module.exports = function (grunt) {
                 files: [{ src: ['test/htmlTemplateGlob/**/t*.ts']},
                     { src: ['test/htmlTemplateGlob/**/o*.ts'] }],
                 html: ['test/htmlTemplateGlob/**/*.html']
+            },
+            test_nestedSources: {
+                test: true,
+                src: [[['test/simple/ts/zoo.ts']]],
+                outDir: 'test/nestedSources/'
             }
         }
     });
