@@ -111,14 +111,17 @@ function warnOnBadConfiguration(options, projectSpec) {
 function getGlobs(taskOptions, targetOptions) {
     var globs = null;
     if (taskOptions && isStringOrArray(taskOptions.src)) {
-        globs = _.map(taskOptions.src.slice(), function (item) { return templateProcessor(item, {}); });
+        globs = _.map(getFlatCloneOf([taskOptions.src]), function (item) { return templateProcessor(item, {}); });
     }
     if (targetOptions && isStringOrArray(targetOptions.src)) {
-        globs = _.map(targetOptions.src.slice(), function (item) { return templateProcessor(item, {}); });
+        globs = _.map(getFlatCloneOf([targetOptions.src]), function (item) { return templateProcessor(item, {}); });
     }
     return globs;
     function isStringOrArray(thing) {
         return (_.isArray(thing) || _.isString(thing));
+    }
+    function getFlatCloneOf(array) {
+        return _.flatten(array).slice();
     }
 }
 function resolve_output_locations(options, projectSpec) {

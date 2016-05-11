@@ -127,10 +127,10 @@ function getGlobs(taskOptions: ITargetOptions, targetOptions: ITargetOptions) {
   let globs = null;
 
   if (taskOptions && isStringOrArray((<any>taskOptions).src)) {
-    globs = _.map([...(<any>taskOptions).src], item => templateProcessor(item, {}));
+    globs = _.map(getFlatCloneOf([(<any>taskOptions).src]), item => templateProcessor(item, {}));
   }
   if (targetOptions && isStringOrArray((<any>targetOptions).src)) {
-    globs = _.map([...(<any>targetOptions).src], item => templateProcessor(item, {}));
+    globs = _.map(getFlatCloneOf([(<any>targetOptions).src]), item => templateProcessor(item, {}));
   }
 
   return globs;
@@ -138,8 +138,11 @@ function getGlobs(taskOptions: ITargetOptions, targetOptions: ITargetOptions) {
   function isStringOrArray(thing: any) {
     return (_.isArray(thing) || _.isString(thing));
   }
-}
 
+  function getFlatCloneOf(array: Array<any>) {
+    return [...(<any>_.flatten(array))];
+  }
+}
 
 function resolve_output_locations(options: IGruntTSOptions, projectSpec: ITSConfigFile) {
   if (options.CompilationTasks

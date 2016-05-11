@@ -125,6 +125,10 @@ exports.tests = {
     htmlExternal: function (test) {
         testDirectory(test, 'htmlExternal');
         test.done();
+    },
+    nestedSources: function (test) {
+        testDirectory(test, 'nestedSources');
+        test.done();
     }
 };
 //# sourceMappingURL=test.js.map
