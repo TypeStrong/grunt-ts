@@ -1,4 +1,5 @@
 /// <reference path="../defs/tsd.d.ts" />
+"use strict";
 var grunt = require('grunt');
 var utils = require('../tasks/modules/utils');
 var _ = require('lodash');
@@ -52,6 +53,10 @@ exports.tests = {
     abtest: function (test) {
         testFile(test, 'abtest/reference.ts');
         testFile(test, 'abtest/out.js', true);
+        test.done();
+    },
+    allowJs: function (test) {
+        testDirectory(test, 'allowJs');
         test.done();
     },
     amdloader: function (test) {

@@ -366,11 +366,6 @@ export function asyncSeries<U, W>(items: U[], callPerItem: (item: U) => Promise<
     });
 }
 
-export function copyFileSync(srcFile: string, destFile: string, encoding = 'utf8') {
-  var content = fs.readFileSync(srcFile, encoding);
-  fs.writeFileSync(destFile, content, encoding);
-}
-
 export function copyFile(srcFile: string, destFile: string, callback: (err?: Error) => any, encoding = 'utf8') {
   fs.readFile(srcFile, encoding, (err, data) => {
     fs.writeFile(destFile, data, encoding, (err) => {

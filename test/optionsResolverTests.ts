@@ -6,7 +6,7 @@ import * as path from 'path';
 import * as or from '../tasks/modules/optionsResolver';
 import * as tsconfig from '../tasks/modules/tsconfig';
 import * as utils from '../tasks/modules/utils';
-
+import * as _ from 'lodash';
 
 let grunt: IGrunt = require('grunt');
 
@@ -142,13 +142,8 @@ const config : {[name: string]: IGruntTargetOptions} = {
   }
 };
 
-function getConfig(name: string, asCopy = false) : IGruntTargetOptions {
-  if (asCopy) {
-    // JSON serialize/deserialize is an easy way to copy rather than reference, but it will
-    // omit undefined properties.
-    return JSON.parse(JSON.stringify(config[name]));
-  }
-  return config[name];
+function getConfig(name: string) : IGruntTargetOptions {
+  return _.cloneDeep(config[name]);
 }
 
 export var tests : nodeunit.ITestGroup = {
@@ -202,7 +197,7 @@ export var tests : nodeunit.ITestGroup = {
     "No warning on target named src that uses files": (test: nodeunit.Test) => {
         test.expect(1);
 
-        const cfg = getConfig("files minimalist", true);
+        const cfg = getConfig("files minimalist");
         const fakeTask: any = {src: {}};
         const result = or.resolveAsync(fakeTask, cfg, "src").then((result) => {
           let allWarnings = result.warnings.join('\n');
@@ -213,7 +208,7 @@ export var tests : nodeunit.ITestGroup = {
     "Warning when using grunt-ts keyword as target name": (test: nodeunit.Test) => {
         test.expect(2);
 
-        const cfg = getConfig("minimalist", true);
+        const cfg = getConfig("minimalist");
         const result = or.resolveAsync(null, cfg, "watch").then((result) => {
           test.strictEqual(result.warnings.length, 1, "expected one warning.");
           let allWarnings = result.warnings.join('\n');
@@ -224,7 +219,7 @@ export var tests : nodeunit.ITestGroup = {
     "Works OK when using grunt keyword (src) as target name": (test: nodeunit.Test) => {
         test.expect(3);
 
-        const cfg = getConfig("minimalist", true);
+        const cfg = getConfig("minimalist");
         const tsTaskCfg: any = { "src": cfg };
         const files: IGruntTSCompilationInfo[] = [{src: ['test/gruntkeyword.ts']}];
 
@@ -343,7 +338,7 @@ export var tests : nodeunit.ITestGroup = {
     },
     "The `baseDir` option is picked-up if passed": (test: nodeunit.Test) => {
         test.expect(1);
-        const config = getConfig("minimalist", true);
+        const config = getConfig("minimalist");
         config.outDir = 'dist';
         config.baseDir = 'src';
         const result = or.resolveAsync(null, config).then((result) => {
@@ -416,9 +411,18 @@ export var tests : nodeunit.ITestGroup = {
   },
 
   "Visual Studio `vs` Integration Tests": {
+    "Visual Studio properties come across as expected": (test: nodeunit.Test) => {
+      test.expect(1);
+      const cfg = getConfig("vs minimalist");
+      cfg.options = <any>{sourceMap : false};
+      const result = or.resolveAsync(null, cfg).then((result) => {
+        test.strictEqual(result.allowSyntheticDefaultImports, true)
+        test.done();
+      }).catch((err) => {test.ifError(err); test.done();});
+    },
     "Visual Studio properties should override the grunt-ts defaults ONLY": (test: nodeunit.Test) => {
       test.expect(3);
-      const cfg = getConfig("vs minimalist", true);
+      const cfg = getConfig("vs minimalist");
       cfg.options = <any>{sourceMap : false};
       const result = or.resolveAsync(null, cfg).then((result) => {
         test.strictEqual(result.removeComments, false);
@@ -436,7 +440,7 @@ export var tests : nodeunit.ITestGroup = {
     },
     "Any options specified on the target should override the Visual Studio settings": (test: nodeunit.Test) => {
       test.expect(1);
-      const cfg = getConfig("vs Release", true);
+      const cfg = getConfig("vs Release");
       cfg.outDir = "this is the test outDir";
       const result = or.resolveAsync(null, cfg).then((result) => {
         test.strictEqual(result.CompilationTasks[0].outDir, "this is the test outDir");
@@ -445,7 +449,7 @@ export var tests : nodeunit.ITestGroup = {
     },
     "Any 'options' options specified on the target should override the Visual Studio settings": (test: nodeunit.Test) => {
       test.expect(1);
-      const cfg = getConfig("vs Release", true);
+      const cfg = getConfig("vs Release");
       cfg.options = <any>{removeComments: false};
       const result = or.resolveAsync(null, cfg).then((result) => {
         test.strictEqual(result.removeComments, false);
@@ -512,7 +516,7 @@ export var tests : nodeunit.ITestGroup = {
   	},
     "Can get config from a valid file": (test: nodeunit.Test) => {
         test.expect(1);
-        const cfg = getConfig("minimalist", true);
+        const cfg = getConfig("minimalist");
         cfg.tsconfig = './test/tsconfig/full_valid_tsconfig.json';
         const result = or.resolveAsync(null, cfg).then((result) => {
           test.ok(true);
@@ -521,7 +525,7 @@ export var tests : nodeunit.ITestGroup = {
     },
     "ignoreSettings works": (test: nodeunit.Test) => {
         test.expect(2);
-        const cfg = getConfig("minimalist", true);
+        const cfg = getConfig("minimalist");
         cfg.tsconfig = {
           tsconfig: './test/tsconfig/test_simple_tsconfig.json',
           ignoreSettings: true
@@ -534,7 +538,7 @@ export var tests : nodeunit.ITestGroup = {
     },
     "Error from invalid file": (test: nodeunit.Test) => {
         test.expect(2);
-        const cfg = getConfig("minimalist", true);
+        const cfg = getConfig("minimalist");
         cfg.tsconfig = './test/tsconfig/invalid_tsconfig.json';
         const result = or.resolveAsync(null, cfg).then((result) => {
           test.strictEqual(result.errors.length, 1);
@@ -545,7 +549,7 @@ export var tests : nodeunit.ITestGroup = {
     "No exception from blank file":  (test: nodeunit.Test) => {
       test.expect(1);
       const expectedMemo = 'expected blank file to NOT throw an exception (should be treated as contents = {}).';
-      const cfg = getConfig("minimalist", true);
+      const cfg = getConfig("minimalist");
       cfg.tsconfig = './test/tsconfig/blank_tsconfig.json';
       const result = or.resolveAsync(null, cfg).then((result) => {
         test.ok(true, expectedMemo);
@@ -557,7 +561,7 @@ export var tests : nodeunit.ITestGroup = {
     },
     "No exception from file with contents {}":  (test: nodeunit.Test) => {
       test.expect(1);
-      const cfg = getConfig("minimalist", true);
+      const cfg = getConfig("minimalist");
       cfg.tsconfig = './test/tsconfig/empty_object_literal_tsconfig.json';
       const result = or.resolveAsync(null, cfg, "", null, null, grunt.file.expand).then((result) => {
         test.ok(true);
@@ -566,7 +570,7 @@ export var tests : nodeunit.ITestGroup = {
     },
     "Exception from missing file": (test: nodeunit.Test) => {
         test.expect(3);
-        const cfg = getConfig("minimalist", true);
+        const cfg = getConfig("minimalist");
         cfg.tsconfig = './test/tsconfig/does_not_exist_tsconfig.json';
         const result = or.resolveAsync(null, cfg).then((result) => {
           test.strictEqual(result.errors.length, 1);
@@ -576,8 +580,8 @@ export var tests : nodeunit.ITestGroup = {
         }).catch((err) => {test.ifError(err); test.done();});
     },
     "config entries come through appropriately": (test: nodeunit.Test) => {
-        test.expect(12);
-        const cfg = getConfig("minimalist", true);
+        test.expect(13);
+        const cfg = getConfig("minimalist");
         cfg.tsconfig = './test/tsconfig/full_valid_tsconfig.json';
 
         const result = or.resolveAsync(null, cfg).then((result) => {
@@ -591,6 +595,7 @@ export var tests : nodeunit.ITestGroup = {
           test.strictEqual(result.sourceMap, true);
           test.strictEqual(result.emitDecoratorMetadata, undefined, 'emitDecoratorMetadata is not specified in this tsconfig.json');
           test.strictEqual(result.CompilationTasks.length, 1);
+          test.strictEqual(result.allowSyntheticDefaultImports, true);
           test.strictEqual(result.CompilationTasks[0].outDir, 'test/tsconfig/files');
           test.strictEqual(result.CompilationTasks[0].out, undefined);
           test.done();
@@ -598,7 +603,7 @@ export var tests : nodeunit.ITestGroup = {
     },
     "out comes through with a warning and is NOT remapped relative to Gruntfile.js": (test: nodeunit.Test) => {
         test.expect(5);
-        const cfg = getConfig("minimalist", true);
+        const cfg = getConfig("minimalist");
         cfg.tsconfig = './test/tsconfig/test_simple_with_out.json';
 
         const result = or.resolveAsync(null, cfg).then((result) => {
@@ -612,7 +617,7 @@ export var tests : nodeunit.ITestGroup = {
     },
     "outFile comes through appropriately and is remapped relative to Gruntfile.js": (test: nodeunit.Test) => {
         test.expect(3);
-        const cfg = getConfig("minimalist", true);
+        const cfg = getConfig("minimalist");
         cfg.tsconfig = './test/tsconfig/test_simple_with_outFile.json';
 
         const result = or.resolveAsync(null, cfg).then((result) => {
@@ -683,8 +688,10 @@ export var tests : nodeunit.ITestGroup = {
   },
   "target settings override tsconfig": (test: nodeunit.Test) => {
     test.expect(2);
-    let cfg = getConfig("tsconfig has specific file", true);
-    cfg.options.target = 'es3';
+    let cfg = getConfig("tsconfig has specific file");
+    cfg.options = <ITaskOptions>{
+      target: 'es3'
+    };
 
     const result = or.resolveAsync(null, cfg).then((result) => {
 
@@ -721,7 +728,7 @@ export var tests : nodeunit.ITestGroup = {
   },
   "paths written to filesGlob are resolved first": (test: nodeunit.Test) => {
     test.expect(4);
-    let cfg: any = getConfig("minimalist", true);
+    let cfg: any = getConfig("minimalist");
     cfg.src = ['./test/<%= grunt.pathsFilesGlobProperty %>/a*.ts'];
     cfg.tsconfig = {
       tsconfig: 'test/tsconfig/simple_filesGlob_tsconfig.json',
@@ -744,7 +751,7 @@ export var tests : nodeunit.ITestGroup = {
   },
   "if no files and no exclude, *.ts and *.tsx will be included and files not added.": (test: nodeunit.Test) => {
     test.expect(5);
-    const cfg = getConfig("minimalist", true);
+    const cfg = getConfig("minimalist");
     cfg.tsconfig = './test/tsconfig/empty_object_literal_tsconfig.json';
     const result = or.resolveAsync(null, cfg, "", null, null, grunt.file.expand).then((result) => {
 
@@ -761,7 +768,7 @@ export var tests : nodeunit.ITestGroup = {
   },
   "globs are evaluated and files maintained by default": (test: nodeunit.Test) => {
     test.expect(9);
-    const cfg = getConfig("minimalist", true);
+    const cfg = getConfig("minimalist");
     cfg.tsconfig = './test/tsconfig/simple_filesGlob_tsconfig.json';
     const result = or.resolveAsync(null, cfg, "", null, null, grunt.file.expand).then((result) => {
 
@@ -783,7 +790,7 @@ export var tests : nodeunit.ITestGroup = {
   },
   "option overwriteFilesGlob updates the filesGlob and the new glob results are included": (test: nodeunit.Test) => {
     test.expect(5);
-    const cfg = getConfig("zoo", true);
+    const cfg = getConfig("zoo");
     cfg.tsconfig = {
       tsconfig: './test/tsconfig/simple_filesGlob_tsconfig.json',
       overwriteFilesGlob: true

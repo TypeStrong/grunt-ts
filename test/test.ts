@@ -69,6 +69,10 @@ export var tests : nodeunit.ITestGroup = {
         testFile(test, 'abtest/out.js', true);
         test.done();
     },
+    allowJs: function (test) {
+        testDirectory(test, 'allowJs');
+        test.done();
+    },
     amdloader: function (test) {
         testDirectory(test, 'amdloader');
         test.done();

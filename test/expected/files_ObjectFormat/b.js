@@ -1,13 +1,13 @@
-var C = (function () {
-    function C() {
-    }
-    return C;
-})();
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
+var C = (function () {
+    function C() {
+    }
+    return C;
+}());
 /// <reference path="reference.ts"/>
 var B = (function (_super) {
     __extends(B, _super);
@@ -15,7 +15,7 @@ var B = (function (_super) {
         _super.apply(this, arguments);
     }
     return B;
-})(C);
+}(C));
 /// <reference path="c.ts" />
 //grunt-start
 /// <reference path="b.ts" />
@@ -28,7 +28,7 @@ var A = (function (_super) {
         _super.apply(this, arguments);
     }
     return A;
-})(B);
+}(B));
 var Animal = (function () {
     function Animal(name) {
         this.name = name;
@@ -37,7 +37,7 @@ var Animal = (function () {
         alert(this.name + " moved " + meters + "m.");
     };
     return Animal;
-})();
+}());
 var Snake = (function (_super) {
     __extends(Snake, _super);
     function Snake(name) {
@@ -48,7 +48,7 @@ var Snake = (function (_super) {
         _super.prototype.move.call(this, 5);
     };
     return Snake;
-})(Animal);
+}(Animal));
 var Horse = (function (_super) {
     __extends(Horse, _super);
     function Horse(name) {
@@ -59,7 +59,7 @@ var Horse = (function (_super) {
         _super.prototype.move.call(this, 45);
     };
     return Horse;
-})(Animal);
+}(Animal));
 var sam = new Snake("Sammy the Python");
 var tom = new Horse("Tommy the Palomino");
 sam.move();

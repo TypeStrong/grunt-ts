@@ -7,14 +7,20 @@ var _ = require('lodash');
 var es6_promise_1 = require('es6-promise');
 var visualStudioOptionsResolver_1 = require('./visualStudioOptionsResolver');
 var tsconfig_1 = require('./tsconfig');
+// Compiler Options documentation:
+// https://github.com/Microsoft/TypeScript-Handbook/blob/master/pages/Compiler%20Options.md
 var propertiesFromTarget = ['amdloader', 'baseDir', 'html', 'htmlOutDir', 'htmlOutDirFlatten', 'reference', 'testExecute', 'tsconfig',
-    'templateCache', 'vs', 'watch'], propertiesFromTargetOptions = ['additionalFlags', 'allowSyntheticDefaultImports', 'comments', 'compile', 'compiler', 'declaration',
+    'templateCache', 'vs', 'watch'], 
+// purposefully not supported: help, version, charset, diagnostics, listFiles
+// supported via other code: out, outDir, outFile, project
+propertiesFromTargetOptions = ['additionalFlags', 'allowSyntheticDefaultImports', 'comments', 'compile', 'compiler', 'declaration',
     'emitBOM', 'emitDecoratorMetadata', 'experimentalDecorators', 'failOnTypeErrors', 'fast', 'htmlModuleTemplate', 'htmlOutDir',
     'htmlOutputTemplate', 'htmlOutDirFlatten', 'htmlVarTemplate', 'inlineSourceMap', 'inlineSources', 'isolatedModules', 'locale',
     'mapRoot', 'module', 'newLine', 'noEmit', 'noEmitHelpers', 'noEmitOnError', 'noImplicitAny', 'noLib', 'noResolve',
     'preserveConstEnums', 'removeComments', 'sourceRoot', 'sourceMap', 'stripInternal', 'suppressExcessPropertyErrors',
     'suppressImplicitAnyIndexErrors', 'target', 'verbose', 'jsx', 'moduleResolution', 'experimentalAsyncFunctions', 'rootDir',
-    'emitGruntEvents'], delayTemplateExpansion = ['htmlModuleTemplate', 'htmlVarTemplate', 'htmlOutputTemplate'];
+    'emitGruntEvents', 'reactNamespace', 'skipDefaultLibCheck', 'pretty', 'allowUnusedLabels', 'noImplicitReturns',
+    'noFallthroughCasesInSwitch', 'allowUnreachableCode', 'forceConsistentCasingInFileNames', 'allowJs', 'noImplicitUseStrict'], delayTemplateExpansion = ['htmlModuleTemplate', 'htmlVarTemplate', 'htmlOutputTemplate'];
 var templateProcessor = null;
 var globExpander = null;
 function noopTemplateProcessor(templateString, options) {
@@ -133,6 +139,10 @@ function resolveAndWarnOnConfigurationIssues(task, target, targetName) {
             additionalWarnings.push(("Warning: target \"" + targetName + "\" has an array specified for the files.dest property.") +
                 "  This is not supported.  Taking first element and ignoring the rest.");
         }
+        if ((task && task.outFile) || (target && target.outFile)) {
+            additionalWarnings.push(("Warning: target \"" + targetName + "\" is using \"outFile\".  This is not supported by") +
+                " grunt-ts via the Gruntfile - it's only relevant when present in tsconfig.json file.  Use \"out\" instead.");
+        }
         return additionalWarnings;
         function usingDestArray(task) {
             var result = false;
@@ -228,8 +238,8 @@ function resolveAndWarnOnConfigurationIssues(task, target, targetName) {
 }
 function applyGruntOptions(applyTo, gruntOptions) {
     if (gruntOptions) {
-        for (var _i = 0; _i < propertiesFromTarget.length; _i++) {
-            var propertyName = propertiesFromTarget[_i];
+        for (var _i = 0, propertiesFromTarget_1 = propertiesFromTarget; _i < propertiesFromTarget_1.length; _i++) {
+            var propertyName = propertiesFromTarget_1[_i];
             if (propertyName in gruntOptions && propertyName !== 'vs') {
                 if (typeof gruntOptions[propertyName] === 'string' && utils.hasValue(gruntOptions[propertyName]) &&
                     delayTemplateExpansion.indexOf(propertyName) === -1) {
@@ -241,8 +251,8 @@ function applyGruntOptions(applyTo, gruntOptions) {
             }
         }
         if (gruntOptions.options) {
-            for (var _a = 0; _a < propertiesFromTargetOptions.length; _a++) {
-                var propertyName = propertiesFromTargetOptions[_a];
+            for (var _a = 0, propertiesFromTargetOptions_1 = propertiesFromTargetOptions; _a < propertiesFromTargetOptions_1.length; _a++) {
+                var propertyName = propertiesFromTargetOptions_1[_a];
                 if (propertyName in gruntOptions.options) {
                     if (typeof gruntOptions.options[propertyName] === 'string' && utils.hasValue(gruntOptions.options[propertyName]) &&
                         delayTemplateExpansion.indexOf(propertyName) === -1) {

@@ -1,3 +1,4 @@
+"use strict";
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -11,6 +12,6 @@ var B2 = (function (_super) {
     }
     B2.prototype.b2 = function () { return this.b1() + "b2"; };
     return B2;
-})(B1.B1);
+}(B1.B1));
 exports.B2 = B2;
 //# sourceMappingURL=b2.js.map

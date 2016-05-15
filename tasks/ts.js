@@ -248,7 +248,7 @@ function pluginFn(grunt) {
                     //    compile html files must be before reference file creation
                     var generatedFiles = [];
                     if (options.html) {
-                        var html2tsOptions = {
+                        var html2tsOptions_1 = {
                             moduleFunction: _.template(options.htmlModuleTemplate),
                             varFunction: _.template(options.htmlVarTemplate),
                             htmlOutputTemplate: options.htmlOutputTemplate,
@@ -257,7 +257,7 @@ function pluginFn(grunt) {
                             eol: (options.newLine || utils.eol)
                         };
                         var htmlFiles = grunt.file.expand(options.html);
-                        generatedFiles = _.map(htmlFiles, function (filename) { return html2tsModule.compileHTML(filename, html2tsOptions); });
+                        generatedFiles = _.map(htmlFiles, function (filename) { return html2tsModule.compileHTML(filename, html2tsOptions_1); });
                         generatedFiles.forEach(function (fileName) {
                             if (filesToCompile.indexOf(fileName) === -1 &&
                                 grunt.file.isMatch(currentFiles.glob, fileName)) {

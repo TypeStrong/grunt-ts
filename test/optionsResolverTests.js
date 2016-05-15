@@ -1,8 +1,10 @@
 /// <reference path="../defs/tsd.d.ts" />
+"use strict";
 var fs = require('fs');
 var path = require('path');
 var or = require('../tasks/modules/optionsResolver');
 var utils = require('../tasks/modules/utils');
+var _ = require('lodash');
 var grunt = require('grunt');
 var config = {
     "minimalist": {
@@ -135,14 +137,8 @@ var config = {
         }
     }
 };
-function getConfig(name, asCopy) {
-    if (asCopy === void 0) { asCopy = false; }
-    if (asCopy) {
-        // JSON serialize/deserialize is an easy way to copy rather than reference, but it will
-        // omit undefined properties.
-        return JSON.parse(JSON.stringify(config[name]));
-    }
-    return config[name];
+function getConfig(name) {
+    return _.cloneDeep(config[name]);
 }
 exports.tests = {
     "Warnings and Errors Tests": {
@@ -192,7 +188,7 @@ exports.tests = {
         },
         "No warning on target named src that uses files": function (test) {
             test.expect(1);
-            var cfg = getConfig("files minimalist", true);
+            var cfg = getConfig("files minimalist");
             var fakeTask = { src: {} };
             var result = or.resolveAsync(fakeTask, cfg, "src").then(function (result) {
                 var allWarnings = result.warnings.join('\n');
@@ -202,7 +198,7 @@ exports.tests = {
         },
         "Warning when using grunt-ts keyword as target name": function (test) {
             test.expect(2);
-            var cfg = getConfig("minimalist", true);
+            var cfg = getConfig("minimalist");
             var result = or.resolveAsync(null, cfg, "watch").then(function (result) {
                 test.strictEqual(result.warnings.length, 1, "expected one warning.");
                 var allWarnings = result.warnings.join('\n');
@@ -212,7 +208,7 @@ exports.tests = {
         },
         "Works OK when using grunt keyword (src) as target name": function (test) {
             test.expect(3);
-            var cfg = getConfig("minimalist", true);
+            var cfg = getConfig("minimalist");
             var tsTaskCfg = { "src": cfg };
             var files = [{ src: ['test/gruntkeyword.ts'] }];
             var result = or.resolveAsync(tsTaskCfg, cfg, "src", files).then(function (result) {
@@ -328,7 +324,7 @@ exports.tests = {
         },
         "The `baseDir` option is picked-up if passed": function (test) {
             test.expect(1);
-            var config = getConfig("minimalist", true);
+            var config = getConfig("minimalist");
             config.outDir = 'dist';
             config.baseDir = 'src';
             var result = or.resolveAsync(null, config).then(function (result) {
@@ -400,9 +396,18 @@ exports.tests = {
         }
     },
     "Visual Studio `vs` Integration Tests": {
+        "Visual Studio properties come across as expected": function (test) {
+            test.expect(1);
+            var cfg = getConfig("vs minimalist");
+            cfg.options = { sourceMap: false };
+            var result = or.resolveAsync(null, cfg).then(function (result) {
+                test.strictEqual(result.allowSyntheticDefaultImports, true);
+                test.done();
+            }).catch(function (err) { test.ifError(err); test.done(); });
+        },
         "Visual Studio properties should override the grunt-ts defaults ONLY": function (test) {
             test.expect(3);
-            var cfg = getConfig("vs minimalist", true);
+            var cfg = getConfig("vs minimalist");
             cfg.options = { sourceMap: false };
             var result = or.resolveAsync(null, cfg).then(function (result) {
                 test.strictEqual(result.removeComments, false);
@@ -420,7 +425,7 @@ exports.tests = {
         },
         "Any options specified on the target should override the Visual Studio settings": function (test) {
             test.expect(1);
-            var cfg = getConfig("vs Release", true);
+            var cfg = getConfig("vs Release");
             cfg.outDir = "this is the test outDir";
             var result = or.resolveAsync(null, cfg).then(function (result) {
                 test.strictEqual(result.CompilationTasks[0].outDir, "this is the test outDir");
@@ -429,7 +434,7 @@ exports.tests = {
         },
         "Any 'options' options specified on the target should override the Visual Studio settings": function (test) {
             test.expect(1);
-            var cfg = getConfig("vs Release", true);
+            var cfg = getConfig("vs Release");
             cfg.options = { removeComments: false };
             var result = or.resolveAsync(null, cfg).then(function (result) {
                 test.strictEqual(result.removeComments, false);
@@ -494,7 +499,7 @@ exports.tests = {
         },
         "Can get config from a valid file": function (test) {
             test.expect(1);
-            var cfg = getConfig("minimalist", true);
+            var cfg = getConfig("minimalist");
             cfg.tsconfig = './test/tsconfig/full_valid_tsconfig.json';
             var result = or.resolveAsync(null, cfg).then(function (result) {
                 test.ok(true);
@@ -503,7 +508,7 @@ exports.tests = {
         },
         "ignoreSettings works": function (test) {
             test.expect(2);
-            var cfg = getConfig("minimalist", true);
+            var cfg = getConfig("minimalist");
             cfg.tsconfig = {
                 tsconfig: './test/tsconfig/test_simple_tsconfig.json',
                 ignoreSettings: true
@@ -516,7 +521,7 @@ exports.tests = {
         },
         "Error from invalid file": function (test) {
             test.expect(2);
-            var cfg = getConfig("minimalist", true);
+            var cfg = getConfig("minimalist");
             cfg.tsconfig = './test/tsconfig/invalid_tsconfig.json';
             var result = or.resolveAsync(null, cfg).then(function (result) {
                 test.strictEqual(result.errors.length, 1);
@@ -527,7 +532,7 @@ exports.tests = {
         "No exception from blank file": function (test) {
             test.expect(1);
             var expectedMemo = 'expected blank file to NOT throw an exception (should be treated as contents = {}).';
-            var cfg = getConfig("minimalist", true);
+            var cfg = getConfig("minimalist");
             cfg.tsconfig = './test/tsconfig/blank_tsconfig.json';
             var result = or.resolveAsync(null, cfg).then(function (result) {
                 test.ok(true, expectedMemo);
@@ -539,7 +544,7 @@ exports.tests = {
         },
         "No exception from file with contents {}": function (test) {
             test.expect(1);
-            var cfg = getConfig("minimalist", true);
+            var cfg = getConfig("minimalist");
             cfg.tsconfig = './test/tsconfig/empty_object_literal_tsconfig.json';
             var result = or.resolveAsync(null, cfg, "", null, null, grunt.file.expand).then(function (result) {
                 test.ok(true);
@@ -548,7 +553,7 @@ exports.tests = {
         },
         "Exception from missing file": function (test) {
             test.expect(3);
-            var cfg = getConfig("minimalist", true);
+            var cfg = getConfig("minimalist");
             cfg.tsconfig = './test/tsconfig/does_not_exist_tsconfig.json';
             var result = or.resolveAsync(null, cfg).then(function (result) {
                 test.strictEqual(result.errors.length, 1);
@@ -558,8 +563,8 @@ exports.tests = {
             }).catch(function (err) { test.ifError(err); test.done(); });
         },
         "config entries come through appropriately": function (test) {
-            test.expect(12);
-            var cfg = getConfig("minimalist", true);
+            test.expect(13);
+            var cfg = getConfig("minimalist");
             cfg.tsconfig = './test/tsconfig/full_valid_tsconfig.json';
             var result = or.resolveAsync(null, cfg).then(function (result) {
                 test.strictEqual(result.target, 'es5');
@@ -572,6 +577,7 @@ exports.tests = {
                 test.strictEqual(result.sourceMap, true);
                 test.strictEqual(result.emitDecoratorMetadata, undefined, 'emitDecoratorMetadata is not specified in this tsconfig.json');
                 test.strictEqual(result.CompilationTasks.length, 1);
+                test.strictEqual(result.allowSyntheticDefaultImports, true);
                 test.strictEqual(result.CompilationTasks[0].outDir, 'test/tsconfig/files');
                 test.strictEqual(result.CompilationTasks[0].out, undefined);
                 test.done();
@@ -579,7 +585,7 @@ exports.tests = {
         },
         "out comes through with a warning and is NOT remapped relative to Gruntfile.js": function (test) {
             test.expect(5);
-            var cfg = getConfig("minimalist", true);
+            var cfg = getConfig("minimalist");
             cfg.tsconfig = './test/tsconfig/test_simple_with_out.json';
             var result = or.resolveAsync(null, cfg).then(function (result) {
                 test.strictEqual(result.CompilationTasks.length, 1);
@@ -592,7 +598,7 @@ exports.tests = {
         },
         "outFile comes through appropriately and is remapped relative to Gruntfile.js": function (test) {
             test.expect(3);
-            var cfg = getConfig("minimalist", true);
+            var cfg = getConfig("minimalist");
             cfg.tsconfig = './test/tsconfig/test_simple_with_outFile.json';
             var result = or.resolveAsync(null, cfg).then(function (result) {
                 test.strictEqual(result.CompilationTasks.length, 1);
@@ -652,8 +658,10 @@ exports.tests = {
         },
         "target settings override tsconfig": function (test) {
             test.expect(2);
-            var cfg = getConfig("tsconfig has specific file", true);
-            cfg.options.target = 'es3';
+            var cfg = getConfig("tsconfig has specific file");
+            cfg.options = {
+                target: 'es3'
+            };
             var result = or.resolveAsync(null, cfg).then(function (result) {
                 test.strictEqual(result.target, 'es3', 'this setting on the grunt-ts target options overrides the tsconfig');
                 test.strictEqual(result.removeComments, false, 'this setting is not specified in the options so tsconfig wins over grunt-ts defaults');
@@ -682,7 +690,7 @@ exports.tests = {
         },
         "paths written to filesGlob are resolved first": function (test) {
             test.expect(4);
-            var cfg = getConfig("minimalist", true);
+            var cfg = getConfig("minimalist");
             cfg.src = ['./test/<%= grunt.pathsFilesGlobProperty %>/a*.ts'];
             cfg.tsconfig = {
                 tsconfig: 'test/tsconfig/simple_filesGlob_tsconfig.json',
@@ -703,7 +711,7 @@ exports.tests = {
         },
         "if no files and no exclude, *.ts and *.tsx will be included and files not added.": function (test) {
             test.expect(5);
-            var cfg = getConfig("minimalist", true);
+            var cfg = getConfig("minimalist");
             cfg.tsconfig = './test/tsconfig/empty_object_literal_tsconfig.json';
             var result = or.resolveAsync(null, cfg, "", null, null, grunt.file.expand).then(function (result) {
                 var resultingTSConfig = utils.readAndParseJSONFromFileSync(cfg.tsconfig);
@@ -717,7 +725,7 @@ exports.tests = {
         },
         "globs are evaluated and files maintained by default": function (test) {
             test.expect(9);
-            var cfg = getConfig("minimalist", true);
+            var cfg = getConfig("minimalist");
             cfg.tsconfig = './test/tsconfig/simple_filesGlob_tsconfig.json';
             var result = or.resolveAsync(null, cfg, "", null, null, grunt.file.expand).then(function (result) {
                 test.ok(result.CompilationTasks[0].src.indexOf('test/tsconfig/otherFiles/this.ts') >= 0);
@@ -735,7 +743,7 @@ exports.tests = {
         },
         "option overwriteFilesGlob updates the filesGlob and the new glob results are included": function (test) {
             test.expect(5);
-            var cfg = getConfig("zoo", true);
+            var cfg = getConfig("zoo");
             cfg.tsconfig = {
                 tsconfig: './test/tsconfig/simple_filesGlob_tsconfig.json',
                 overwriteFilesGlob: true

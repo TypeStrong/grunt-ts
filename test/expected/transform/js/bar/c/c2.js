@@ -1,3 +1,4 @@
+"use strict";
 ///ts:import=a
 var a = require('../../foo/a/index'); ///ts:import:generated
 ///ts:import=b1

@@ -22,7 +22,9 @@ module.exports = function (grunt) {
                 'tscommand-*.txt',
                 '!test/commandLineAssertions.js',
                 '!test/optionsResolverTests.js',
-                'test/**/*.orig'
+                '!test/compilerTests.js',
+                'test/**/*.orig',
+                '!test/allowJs/allowJsLibrary.js'
             ],
             testPost: [
                 'src/a.js',
@@ -63,12 +65,15 @@ module.exports = function (grunt) {
                 src: ['tasks/**/*.ts']
             },
             test: {
-                src: ['test/test.ts', 'test/commandLineAssertions.ts', 'test/optionsResolverTests.ts']
+                src: ['test/test.ts',
+                  'test/commandLineAssertions.ts',
+                  'test/optionsResolverTests.ts',
+                  'test/compilerTests.ts']
             }
         },
         nodeunit: {
             slow: ['test/test.js'],
-            fast: ['test/optionsResolverTests.js']
+            fast: ['test/optionsResolverTests.js', 'test/compilerTests.js']
         },
         watch: {
             dev: {
@@ -669,7 +674,34 @@ module.exports = function (grunt) {
                 },
                 html: 'test/htmlExternal/**/*.html',
                 src: 'test/htmlExternal/**/*.ts'
-
+            },
+            new_TypeScript_1_8_Features: {
+                test: true,
+                testExecute: commandLineAssertions.new_TypeScript_1_8_Features,
+                src: 'test/simple/ts/**/*.ts',
+                options: {
+                    reactNamespace: 'myReact',
+                    skipDefaultLibCheck: true,
+                    pretty: true,
+                    allowUnusedLabels: true,
+                    noImplicitReturns: true,
+                    noFallthroughCasesInSwitch: true,
+                    allowUnreachableCode: true,
+                    forceConsistentCasingInFileNames: true,
+                    allowJs: true,
+                    noImplicitUseStrict: true
+                }
+            },
+            allowJs_CompileWorks: {
+                test: true,
+                src: ['test/allowJs/allowJsConsumer.ts',
+                  'test/allowJs/allowJsLibrary.js'],
+                out: 'test/allowJs/result.js',
+                options: {
+                    allowJs: true,
+                    noEmitOnError: true,
+                    module: 'system'
+                }
             },
             decoratorMetadataPassed: {
                 test: true,
@@ -1172,8 +1204,17 @@ module.exports = function (grunt) {
 
     grunt.registerTask('stageFiles','Ensures that certain files that are cleaned will be present for the tests.',
       function() {
+        var done = this.async();
         try {
-            utils.copyFileSync('test/tsconfig_artifact/tsconfig-grunt-ts.json','test/tsconfig/tsconfig-grunt-ts.json');
+            utils.copyFile('test/tsconfig_artifact/tsconfig-grunt-ts.json','test/tsconfig/tsconfig-grunt-ts.json',
+            function (err) {
+                if (err) {
+                    grunt.log.writeln(err);
+                    done(false);
+                }
+                done();
+            }
+          );
         } catch (ex) {
             console.log(ex);
             return false;

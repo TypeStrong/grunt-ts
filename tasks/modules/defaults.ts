@@ -1,6 +1,7 @@
 'use strict';
 
 import * as utils from './utils';
+import * as _ from 'lodash';
 
 const TypeScriptDefaults: IGruntTSOptions = {
     allowBool: false,
@@ -52,15 +53,26 @@ const TypeScriptDefaults: IGruntTSOptions = {
     jsx: null,
     moduleResolution: null,
     experimentalAsyncFunctions: null,
+    reactNamespace: null,
+    skipDefaultLibCheck: null,
+    pretty: false,
+    allowUnusedLabels: false,
+    noImplicitReturns: false,
+    noFallthroughCasesInSwitch: false,
+    allowUnreachableCode: false,
+    forceConsistentCasingInFileNames: false,
+    allowJs: false,
+    noImplicitUseStrict: false,
     rootDir: null,
     warnings: [],
     errors: []
 };
 
 
-export const GruntTSDefaults = applyGruntTSDefaults(TypeScriptDefaults);
+export const GruntTSDefaults = applyGruntTSDefaults(_.clone(TypeScriptDefaults));
 
 function applyGruntTSDefaults(options: IGruntTSOptions) {
+  // this function applies defaults where grunt-ts differs from TypeScript
   options.sourceMap = true;
   options.target = 'es5';
   options.htmlModuleTemplate = '<%= filename %>';
@@ -72,4 +84,3 @@ function applyGruntTSDefaults(options: IGruntTSOptions) {
   options.emitGruntEvents = false;
   return options;
 }
-

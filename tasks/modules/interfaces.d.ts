@@ -95,6 +95,26 @@ interface ITaskOptions {
     stripInternal: boolean;
     /** Assumes a defalt export as the whole module if one is not specified, or as the only export if only one export is specified */
     allowSyntheticDefaultImports: boolean;
+    /** Specifies the object invoked for createElement and __spread when targeting 'react' JSX emit. */
+    reactNamespace: string;
+    /** Treat a file as a default lib if it has '/// <reference no-default-lib="true"/> at the top */
+    skipDefaultLibCheck: boolean;
+    /** Stylize errors and messages using color and context. */
+    pretty: boolean;
+    /** Do not report errors on unused labels. */
+    allowUnusedLabels: boolean;
+    /** Report error when not all code paths in function return a value. */
+    noImplicitReturns: boolean;
+    /** Report errors for fallthrough cases in switch statement. */
+    noFallthroughCasesInSwitch: boolean;
+    /** Do not report errors on unreachable code. */
+    allowUnreachableCode: boolean;
+    /** Disallow inconsistently-cased references to the same file. */
+    forceConsistentCasingInFileNames: boolean;
+    /** Allow JavaScript files to be compiled. */
+    allowJs: boolean;
+    /** Do not emit  "use strict"  directives in module output. */
+    noImplicitUseStrict: boolean;
 }
 
 interface IVisualStudioProjectSupport {

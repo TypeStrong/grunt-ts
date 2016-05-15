@@ -1,5 +1,6 @@
 /// <reference path="../defs/tsd.d.ts"/>
 /// <reference path="../tasks/modules/interfaces.d.ts"/>
+"use strict";
 exports.decoratorMetadataPassed = function (strings, options) {
     return new Promise(function (resolve, reject) {
         if (options.emitDecoratorMetadata === true &&
@@ -522,6 +523,27 @@ exports.test_directoriesWithSpaces = function (strings, options) {
             });
         }
         throw "expected to see rootDir, outDir, sourceRoot, and mapRoot with quoted values in the command line and didn't.  Got this: " + command;
+    });
+};
+exports.new_TypeScript_1_8_Features = function (strings, options) {
+    return new Promise(function (resolve, reject) {
+        var command = strings[1].replace(/\\/g, '/');
+        if (command.indexOf("--reactNamespace myReact") > -1 &&
+            command.indexOf("--skipDefaultLibCheck") > -1 &&
+            command.indexOf("--pretty") > -1 &&
+            command.indexOf("--allowUnusedLabels") > -1 &&
+            command.indexOf("--noImplicitReturns") > -1 &&
+            command.indexOf("--noFallthroughCasesInSwitch") > -1 &&
+            command.indexOf("--allowUnreachableCode") > -1 &&
+            command.indexOf("--forceConsistentCasingInFileNames") > -1 &&
+            command.indexOf("--allowJs") > -1 &&
+            command.indexOf("--noImplicitUseStrict") > -1) {
+            resolve({
+                code: 0,
+                output: ""
+            });
+        }
+        throw "expected to see all of the new TypeScript 1.8 values in the command line and didn't.  Got this: " + command;
     });
 };
 exports.test_noLib = simpleCommandLineCheck("--noLib");

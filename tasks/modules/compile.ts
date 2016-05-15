@@ -3,13 +3,15 @@
 
 'use strict';
 
-import path = require('path');
-import fs = require('fs');
-import _ = require('lodash');
-import utils = require('./utils');
-import cache = require('./cacheUtils');
+import * as path from 'path';
+import * as fs from 'fs';
+import * as _ from 'lodash';
+import * as utils from './utils';
+import * as cache from './cacheUtils';
+import * as semver from 'semver';
 
 import {Promise} from 'es6-promise';
+
 export var grunt: IGrunt = require('grunt');
 
 ///////////////////////////
@@ -77,10 +79,12 @@ function resolveTypeScriptBinPath(): string {
 }
 
 function getTsc(binPath: string): string {
-    var pkg = JSON.parse(fs.readFileSync(path.resolve(binPath, '..', 'package.json')).toString());
-    grunt.log.writeln('Using tsc v' + pkg.version);
-
     return path.join(binPath, 'tsc');
+}
+
+export function compileResultMeansFastCacheShouldBeRefreshed(options: IGruntTSOptions, result: ICompileResult) {
+  return (options.fast !== 'never' &&
+    (result.code === 0 || (result.code === 2 && !options.failOnTypeErrors)));
 }
 
 export function compileAllFiles(options: IGruntTSOptions, compilationInfo: IGruntTSCompilationInfo): Promise<ICompileResult> {
@@ -154,12 +158,23 @@ export function compileAllFiles(options: IGruntTSOptions, compilationInfo: IGrun
     // Quote the files to compile. Needed for command line parsing by tsc
     files = _.map(files, (item) => `"${path.resolve(item)}"`);
 
-    // if (outFile) {
-    //   outFile = `"${path.resolve(outFile)}"`;
-    // }
-
-    var args: string[] = files.slice(0);
+    let args: string[] = files.slice(0),
+      tsc: string,
+      tscVersion: string = '';
     const tsconfig: ITSConfigSupport = options.tsconfig;
+
+    if (options.compiler) {
+        // Custom compiler (task.compiler)
+        grunt.log.writeln('Using the custom compiler : ' + options.compiler);
+        tsc = options.compiler;
+        tscVersion = '';
+    } else {
+        // the bundled OR npm module based compiler
+        const tscPath = resolveTypeScriptBinPath();
+        tsc = getTsc(tscPath);
+        tscVersion = getTscVersion(tscPath);
+        grunt.log.writeln('Using tsc v' + tscVersion);
+    }
 
     if (tsconfig && tsconfig.passThrough) {
       args.push('--project', tsconfig.tsconfig);
@@ -242,6 +257,36 @@ export function compileAllFiles(options: IGruntTSOptions, compilationInfo: IGrun
       if (options.allowSyntheticDefaultImports) {
           args.push('--allowSyntheticDefaultImports');
       }
+      if (options.reactNamespace) {
+          args.push('--reactNamespace', options.reactNamespace);
+      }
+      if (options.skipDefaultLibCheck) {
+          args.push('--skipDefaultLibCheck');
+      }
+      if (options.pretty) {
+          args.push('--pretty');
+      }
+      if (options.allowUnusedLabels) {
+          args.push('--allowUnusedLabels');
+      }
+      if (options.noImplicitReturns) {
+          args.push('--noImplicitReturns');
+      }
+      if (options.noFallthroughCasesInSwitch) {
+          args.push('--noFallthroughCasesInSwitch');
+      }
+      if (options.allowUnreachableCode) {
+          args.push('--allowUnreachableCode');
+      }
+      if (options.forceConsistentCasingInFileNames) {
+          args.push('--forceConsistentCasingInFileNames');
+      }
+      if (options.allowJs) {
+          args.push('--allowJs');
+      }
+      if (options.noImplicitUseStrict) {
+          args.push('--noImplicitUseStrict');
+      }
 
       args.push('--target', options.target.toUpperCase());
 
@@ -262,6 +307,9 @@ export function compileAllFiles(options: IGruntTSOptions, compilationInfo: IGrun
       }
 
       if (compilationInfo.out) {
+          // We only pass --out instead of --outFile for backward-compatability reasons.
+          // It is the same for purposes of the command-line (the subtle difference is handled in the tsconfig code
+          //  and the value of --outFile is copied to --out).
           args.push('--out', compilationInfo.out);
       }
 
@@ -291,9 +339,18 @@ export function compileAllFiles(options: IGruntTSOptions, compilationInfo: IGrun
       }
 
       if (args.indexOf('--out') > -1 && args.indexOf('--module') > -1) {
-          console.warn(('WARNING: TypeScript does not allow external modules to be concatenated with' +
-          ' --out. Any exported code may be truncated.  See TypeScript issue #1544 for' +
-          ' more details.').magenta);
+          if (semver.satisfies(tscVersion, '>=1.8.0')) {
+              if ((options.module === 'system' || options.module === 'amd')) {
+                // this is fine.
+              } else {
+                console.warn(('WARNING: TypeScript 1.8+ requires "module" to be set to' +
+                  'system or amd for concatenation of external modules to work.').magenta);
+              }
+          } else {
+            console.warn(('WARNING: TypeScript < 1.8 does not allow external modules to be concatenated with' +
+            ' --out. Any exported code may be truncated.  See TypeScript issue #1544 for' +
+            ' more details.').magenta);
+          }
       }
 
       if (options.sourceRoot) {
@@ -308,13 +365,9 @@ export function compileAllFiles(options: IGruntTSOptions, compilationInfo: IGrun
         args.push(options.additionalFlags);
     }
 
-    // Locate a compiler
-    let tsc: string;
-    if (options.compiler) { // Custom compiler (task.compiler)
-        grunt.log.writeln('Using the custom compiler : ' + options.compiler);
-        tsc = options.compiler;
-    } else { // the bundled OR npm module based compiler
-        tsc = getTsc(resolveTypeScriptBinPath());
+    function getTscVersion(tscPath: string) {
+      const pkg = JSON.parse(fs.readFileSync(path.resolve(tscPath, '..', 'package.json')).toString());
+      return '' + pkg.version;
     }
 
     // To debug the tsc command
@@ -355,7 +408,7 @@ export function compileAllFiles(options: IGruntTSOptions, compilationInfo: IGrun
     // Execute command
     return executeNode(command, options).then((result: ICompileResult) => {
 
-        if (options.fast !== 'never' && (result.code === 0 || !options.failOnTypeErrors && result.code === 2)) {
+        if (compileResultMeansFastCacheShouldBeRefreshed(options, result)) {
             resetChangedFiles(newFiles, options.targetName);
         }
 

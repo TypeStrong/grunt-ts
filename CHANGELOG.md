@@ -1,6 +1,9 @@
 # Releases
 
 ## Next
+* FEAT: Support TypeScript 1.8+ (coming soon)
+
+## v5.4.0 (2016-03-22)
 * FIX: amdloader will now work for [`.tsx` extension as well](https://github.com/TypeStrong/grunt-ts/pull/274) [reapplied](https://github.com/TypeStrong/grunt-ts/pull/314)
 * FIX: tsconfig.json exclude support for files (not just directories).  Thanks very much to first-time contributor @errorx666 for the PR!  Includes PR #337 which keeps exclude performance fast.  (#285, #336)
 * DOCS: Update to `--moduleResolution` README section to show fluctuating default behaviour - by @thull

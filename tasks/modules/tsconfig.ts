@@ -214,18 +214,64 @@ function getTSConfigSettings(raw: ITargetOptions): ITSConfigSupport {
 }
 
 function applyCompilerOptions(applyTo: IGruntTSOptions, projectSpec: ITSConfigFile) {
-  const result: IGruntTSOptions = applyTo || <any>{};
-  const co = projectSpec.compilerOptions;
-  const tsconfig: ITSConfigSupport = applyTo.tsconfig;
+  const result: IGruntTSOptions = applyTo || <any>{},
+    co = projectSpec.compilerOptions,
+    tsconfig: ITSConfigSupport = applyTo.tsconfig;
 
   if (!tsconfig.ignoreSettings && co) {
-    const sameNameInTSConfigAndGruntTS = ['declaration', 'emitDecoratorMetadata',
-      'experimentalAsyncFunctions', 'experimentalDecorators', 'isolatedModules',
-      'inlineSourceMap', 'inlineSources', 'jsx', 'mapRoot', 'module',
-      'moduleResolution', 'newLine', 'noEmit',
-      'noEmitHelpers', 'noEmitOnError', 'noImplicitAny', 'noLib', 'noResolve',
-      'out', 'outDir', 'preserveConstEnums', 'removeComments', 'rootDir',
-      'sourceMap', 'sourceRoot', 'suppressImplicitAnyIndexErrors', 'target'];
+
+    // Go here for the tsconfig.json documentation:
+    // https://github.com/Microsoft/TypeScript-Handbook/blob/master/pages/tsconfig.json.md
+    // There is a link to http://json.schemastore.org/tsconfig
+
+    const sameNameInTSConfigAndGruntTS = [
+      'allowJs',
+      'allowSyntheticDefaultImports',
+      'allowUnreachableCode',
+      'allowUnusedLabels',
+      // we do not support charset as we assume input files are UTF-8.
+      'declaration',
+      'emitBOM',
+      'emitDecoratorMetadata',
+      'experimentalAsyncFunctions',
+      'experimentalDecorators',
+      'forceConsistentCasingInFileNames',
+      'isolatedModules',
+      'inlineSourceMap',
+      'inlineSources',
+      'jsx',
+      // we do not support listFiles.
+      'locale',
+      'mapRoot',
+      'module',
+      'moduleResolution',
+      'newLine',
+      'noEmit',
+      'noEmitHelpers',
+      'noEmitOnError',
+      'noFallthroughCasesInSwitch',
+      'noImplicitAny',
+      'noImplicitReturns',
+      'noImplicitUseStrict',
+      'noLib',
+      'noResolve',
+      'out',
+      'outDir',
+      // outFile is handled below.
+      'preserveConstEnums',
+      'pretty',
+      'reactNamespace',
+      'removeComments',
+      'rootDir',
+      'skipDefaultLibCheck',
+      'sourceMap',
+      'sourceRoot',
+      'stripInternal',
+      'suppressExcessPropertyIndexErrors',
+      'suppressImplicitAnyIndexErrors',
+      'target'
+      // we do not support the native TypeScript watch.
+    ];
 
     sameNameInTSConfigAndGruntTS.forEach(propertyName => {
       if ((propertyName in co) && !(propertyName in result)) {
@@ -259,8 +305,9 @@ function applyCompilerOptions(applyTo: IGruntTSOptions, projectSpec: ITSConfigFi
       throw new Error('The tsconfig option overwriteFilesGlob is set to true, but no glob was passed-in.');
     }
 
-    const relPath = relativePathFromGruntfileToTSConfig();
-    const gruntGlobsRelativeToTSConfig: string[] = [];
+    const relPath = relativePathFromGruntfileToTSConfig(),
+      gruntGlobsRelativeToTSConfig: string[] = [];
+
     for (let i = 0; i < gruntfileGlobs.length; i += 1) {
         gruntfileGlobs[i] = gruntfileGlobs[i].replace(/\\/g, '/');
         gruntGlobsRelativeToTSConfig.push(path.relative(relPath, gruntfileGlobs[i]).replace(/\\/g, '/'));

@@ -1,4 +1,5 @@
 /// <reference path="../../defs/tsd.d.ts"/>
+"use strict";
 // Source based on : https://github.com/tschaub/grunt-newer/blob/master/lib/util.js
 var fs = require('fs');
 var _ = require('lodash');

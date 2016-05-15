@@ -1,3 +1,4 @@
+"use strict";
 ///ts:import=foo
 var foo = require('../../foo/index'); ///ts:import:generated
 // USE CLASSES FROM A/B:

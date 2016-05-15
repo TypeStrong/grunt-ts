@@ -1,5 +1,6 @@
 /// <reference path="../../defs/tsd.d.ts"/>
 /// <reference path="./interfaces.d.ts"/>
+"use strict";
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -104,7 +105,7 @@ var BaseTransformer = (function () {
     // and fails if it is not found.
     BaseTransformer.tsTransformerMatch = '^///\\s*ts:{0}(=?)(.*)';
     return BaseTransformer;
-})();
+}());
 // This is a separate class from BaseTransformer to make it easier to add non import/export transforms in the future
 var BaseImportExportTransformer = (function (_super) {
     __extends(BaseImportExportTransformer, _super);
@@ -147,14 +148,14 @@ var BaseImportExportTransformer = (function (_super) {
         return result;
     };
     return BaseImportExportTransformer;
-})(BaseTransformer);
+}(BaseTransformer));
 var ImportTransformer = (function (_super) {
     __extends(ImportTransformer, _super);
     function ImportTransformer() {
         _super.call(this, 'import', '<fileOrDirectoryName>[,<variableName>]', _.template('import <%=filename%> = require(\'<%= pathToFile %>\');'), true, true);
     }
     return ImportTransformer;
-})(BaseImportExportTransformer);
+}(BaseImportExportTransformer));
 var ExportTransformer = (function (_super) {
     __extends(ExportTransformer, _super);
     function ExportTransformer(eol) {
@@ -167,7 +168,7 @@ var ExportTransformer = (function (_super) {
         this.eol = eol;
     }
     return ExportTransformer;
-})(BaseImportExportTransformer);
+}(BaseImportExportTransformer));
 var ReferenceTransformer = (function (_super) {
     __extends(ReferenceTransformer, _super);
     function ReferenceTransformer() {
@@ -176,7 +177,7 @@ var ReferenceTransformer = (function (_super) {
         _super.call(this, 'ref', '<fileOrDirectoryName>', _.template('/// <reference path="<%= pathToFile %>"/>'), false, false);
     }
     return ReferenceTransformer;
-})(BaseImportExportTransformer);
+}(BaseImportExportTransformer));
 var UnknownTransformer = (function (_super) {
     __extends(UnknownTransformer, _super);
     function UnknownTransformer() {
@@ -189,7 +190,7 @@ var UnknownTransformer = (function (_super) {
         return [this.syntaxError];
     };
     return UnknownTransformer;
-})(BaseTransformer);
+}(BaseTransformer));
 // This code fixes the line encoding to be per os.
 // I think it is the best option available at the moment.
 // I am open for suggestions

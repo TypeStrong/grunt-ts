@@ -1,13 +1,13 @@
-var C = (function () {
-    function C() {
-    }
-    return C;
-})();
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
+var C = (function () {
+    function C() {
+    }
+    return C;
+}());
 /// <reference path="reference.ts"/>
 var B = (function (_super) {
     __extends(B, _super);
@@ -15,7 +15,7 @@ var B = (function (_super) {
         _super.apply(this, arguments);
     }
     return B;
-})(C);
+}(C));
 /// <reference path="c.ts" />
 //grunt-start
 /// <reference path="b.ts" />
@@ -28,5 +28,5 @@ var A = (function (_super) {
         _super.apply(this, arguments);
     }
     return A;
-})(B);
+}(B));
 //# sourceMappingURL=a.js.map

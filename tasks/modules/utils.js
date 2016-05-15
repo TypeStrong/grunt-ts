@@ -1,4 +1,5 @@
 /// <reference path="../../defs/tsd.d.ts"/>
+"use strict";
 var path = require('path');
 var fs = require('fs');
 var os = require('os');
@@ -343,12 +344,6 @@ function asyncSeries(items, callPerItem) {
     });
 }
 exports.asyncSeries = asyncSeries;
-function copyFileSync(srcFile, destFile, encoding) {
-    if (encoding === void 0) { encoding = 'utf8'; }
-    var content = fs.readFileSync(srcFile, encoding);
-    fs.writeFileSync(destFile, content, encoding);
-}
-exports.copyFileSync = copyFileSync;
 function copyFile(srcFile, destFile, callback, encoding) {
     if (encoding === void 0) { encoding = 'utf8'; }
     fs.readFile(srcFile, encoding, function (err, data) {
