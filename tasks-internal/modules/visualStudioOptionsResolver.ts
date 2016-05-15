@@ -139,12 +139,18 @@ function relativePathToVSProjectFolderFromGruntfile(settings: csproj2ts.TypeScri
 
 function applyVSSettings(options: IGruntTSOptions, vsSettings: csproj2ts.TypeScriptSettings) {
 
-  // TODO: support TypeScript 1.5 VS options.
+  // Visit this page for MSBuild documentation:
+  // https://github.com/Microsoft/TypeScript-Handbook/blob/master/pages/Compiler%20Options%20in%20MSBuild.md
+
   const simpleVSSettingsToGruntTSMappings = {
+    'AllowSyntheticDefaultImports': 'allowSyntheticDefaultImports',
+    'AllowUnusedLabels': 'allowUnusedLabels',
+    'AllowUnreachableCode': 'allowUnreachableCode',
     'EmitBOM': 'emitBom',
     'EmitDecoratorMetadata': 'emitDecoratorMetadata',
     'ExperimentalAsyncFunctions': 'experimentalAsyncFunctions',
     'ExperimentalDecorators': 'experimentalDecorators',
+    'ForceConsistentCasingInFileNames': 'forceConsistentCasingInFileNames',
     'GeneratesDeclarations': 'declaration',
     'InlineSourceMap': 'inlineSourceMap',
     'InlineSources': 'inlineSources',
@@ -156,13 +162,18 @@ function applyVSSettings(options: IGruntTSOptions, vsSettings: csproj2ts.TypeScr
     'NewLine': 'newLine',
     'NoEmitOnError': 'noEmitOnError',
     'NoEmitHelpers': 'NoEmitHelpers',
+    'NoFallthroughCasesInSwitch': 'noFallthroughCasesInSwitch',
     'NoImplicitAny': 'noImplicitAny',
+    'NoImplicitReturns': 'noImplicitReturns',
+    'noImplicitUseStrict': 'NoImplicitUseStrict',
     'NoLib': 'noLib',
     'NoResolve': 'noResolve',
-    // OutFile and OutDir are resolved elsewhere
+    // OutFile (both out and outFile) and OutDir are resolved elsewhere
     'PreserveConstEnums': 'preserveConstEnums',
+    'ReactNamespace': 'reactNamespace',
     'RemoveComments': 'removeComments',
     'RootDir': 'rootDir',
+    'SkipDefaultLibCheck': 'skipDefaultLibCheck',
     'SourceMap': 'sourceMap',
     'SourceRoot': 'sourceRoot',
     'SuppressImplicitAnyIndexErrors': 'suppressImplicitAnyIndexErrors',

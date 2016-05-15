@@ -1,4 +1,4 @@
-// v5.1.0 2015-10-14T19:47:01.693Z
+// v5.5.0 2016-05-15T19:39:56.955Z
 /// <reference path="../defs/tsd.d.ts"/>
 /// <reference path="./modules/interfaces.d.ts"/>
 'use strict';
@@ -19,6 +19,7 @@ var templateCacheModule = require('./modules/templateCache');
 var transformers = require('./modules/transformers');
 var optionsResolver = require('../tasks/modules/optionsResolver');
 var asyncSeries = utils.asyncSeries, timeIt = utils.timeIt;
+var fail_event = 'grunt-ts.failure';
 function pluginFn(grunt) {
     /////////////////////////////////////////////////////////////////////
     // The grunt task
@@ -28,14 +29,14 @@ function pluginFn(grunt) {
         var filesCompilationIndex = 0;
         var done, options;
         {
-            var currentTask = this;
-            var files = currentTask.files;
+            var currentGruntTask = this;
+            var resolvedFiles = currentGruntTask.files;
             // make async
-            done = currentTask.async();
+            done = currentGruntTask.async();
             // get unprocessed templates from configuration
-            var rawTaskConfig = (grunt.config.getRaw(currentTask.name) || {});
-            var rawTargetConfig = (grunt.config.getRaw(currentTask.name + '.' + currentTask.target) || {});
-            optionsResolver.resolveAsync(rawTaskConfig, rawTargetConfig, currentTask.target, files, grunt.template.process, grunt.file.expand).then(function (result) {
+            var rawTaskConfig = (grunt.config.getRaw(currentGruntTask.name) || {});
+            var rawTargetConfig = (grunt.config.getRaw(currentGruntTask.name + '.' + currentGruntTask.target) || {});
+            optionsResolver.resolveAsync(rawTaskConfig, rawTargetConfig, currentGruntTask.target, resolvedFiles, grunt.template.process, grunt.file.expand).then(function (result) {
                 options = result;
                 options.warnings.forEach(function (warning) {
                     grunt.log.writeln(warning.magenta);
@@ -44,6 +45,9 @@ function pluginFn(grunt) {
                     grunt.log.writeln(error.red);
                 });
                 if (options.errors.length > 0) {
+                    if (options.emitGruntEvents) {
+                        grunt.event.emit(fail_event);
+                    }
                     done(false);
                     return;
                 }
@@ -210,12 +214,15 @@ function pluginFn(grunt) {
                         return isSuccessfulBuild;
                     }).catch(function (err) {
                         grunt.log.writeln(('Error: ' + err).red);
+                        if (options.emitGruntEvents) {
+                            grunt.event.emit(fail_event);
+                        }
                         return false;
                     });
                 }
                 // Find out which files to compile, codegen etc.
                 // Then calls the appropriate functions + compile function on those files
-                function filterFilesAndCompile() {
+                function filterFilesTransformAndCompile() {
                     var filesToCompile = [];
                     if (currentFiles.src || options.vs) {
                         _.map(currentFiles.src, function (file) {
@@ -230,14 +237,6 @@ function pluginFn(grunt) {
                         });
                     }
                     else {
-                        // todo: fix this.
-                        // if (_.isArray(options.files)) {
-                        //     filesToCompile = grunt.file.expand(files[filesCompilationIndex].src);
-                        // } else if (options.files[target.dest]) {
-                        //     filesToCompile = grunt.file.expand(files[target.dest]);
-                        // } else {
-                        //     filesToCompile = grunt.file.expand([(<{ src: string }><any>options.files).src]);
-                        // }
                         filesCompilationIndex += 1;
                     }
                     // ignore directories, and clear the files of output.d.ts and baseDirFile
@@ -250,7 +249,7 @@ function pluginFn(grunt) {
                     //    compile html files must be before reference file creation
                     var generatedFiles = [];
                     if (options.html) {
-                        var html2tsOptions = {
+                        var html2tsOptions_1 = {
                             moduleFunction: _.template(options.htmlModuleTemplate),
                             varFunction: _.template(options.htmlVarTemplate),
                             htmlOutputTemplate: options.htmlOutputTemplate,
@@ -259,7 +258,13 @@ function pluginFn(grunt) {
                             eol: (options.newLine || utils.eol)
                         };
                         var htmlFiles = grunt.file.expand(options.html);
-                        generatedFiles = _.map(htmlFiles, function (filename) { return html2tsModule.compileHTML(filename, html2tsOptions); });
+                        generatedFiles = _.map(htmlFiles, function (filename) { return html2tsModule.compileHTML(filename, html2tsOptions_1); });
+                        generatedFiles.forEach(function (fileName) {
+                            if (filesToCompile.indexOf(fileName) === -1 &&
+                                grunt.file.isMatch(currentFiles.glob, fileName)) {
+                                filesToCompile.push(fileName);
+                            }
+                        });
                     }
                     ///// Template cache
                     // Note: The template cache files do not go into generated files.
@@ -347,7 +352,7 @@ function pluginFn(grunt) {
                 // Reset the time for last compile call
                 lastCompile = new Date().getTime();
                 // Run initial compile
-                return filterFilesAndCompile();
+                return filterFilesTransformAndCompile();
                 // local event to handle file event
                 function handleFileEvent(filepath, displaystr, addedOrChanged) {
                     if (addedOrChanged === void 0) { addedOrChanged = false; }
@@ -364,7 +369,7 @@ function pluginFn(grunt) {
                     }
                     // Log and run the debounced version.
                     grunt.log.writeln((displaystr + ' >>' + filepath).yellow);
-                    filterFilesAndCompile();
+                    filterFilesTransformAndCompile();
                 }
             }).then(function (res) {
                 // Ignore res? (either logs or throws)
@@ -372,6 +377,9 @@ function pluginFn(grunt) {
                     if (res.some(function (success) {
                         return !success;
                     })) {
+                        if (options.emitGruntEvents) {
+                            grunt.event.emit(fail_event);
+                        }
                         done(false);
                     }
                     else {

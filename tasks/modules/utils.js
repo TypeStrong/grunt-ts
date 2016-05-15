@@ -268,6 +268,7 @@ function firstElementWithValue(elements, defaultResult) {
             result = item;
             return false; // break out of lodash loop
         }
+        return undefined;
     });
     return result;
 }

@@ -7,7 +7,7 @@
 Grunt-ts is an npm package that handles TypeScript compilation work in GruntJS build scripts.  It provides a [Grunt-compatible wrapper](#support-for-tsc-switches) for the `tsc` command-line compiler, and provides some [additional functionality](#grunt-ts-gruntfilejs-options) that improves the TypeScript development workflow. Grunt-ts supports compiling against [tsconfig.json](#tsconfig) or even a [Visual Studio project](#vs) directly.  Grunt-ts is itself written in [TypeScript](./tasks/ts.ts).
 
 ### Latest Changes
-Latest release is `5.5.0` with built-in support for features added in TypeScript 1.8.  [Full changelog is here](CHANGELOG.md).
+Latest release is `5.5.1` with built-in support for features added in TypeScript 1.8.  [Full changelog is here](CHANGELOG.md).
 
 ### How To Contribute
 Thank you for your interest in contributing!  Please see the [contributing](CONTRIBUTING.md) guide for details.
@@ -27,7 +27,7 @@ module.exports = function(grunt) {
   grunt.initConfig({
     ts: {
       default : {
-        src: ["**/*.ts", "!node_modules/**/*.ts"]
+        src: ["**/*.ts", "!node_modules/**"]
       }
     }
   });
@@ -60,11 +60,15 @@ Grunt-ts provides explicit support for most `tsc` switches.  Any arbitrary switc
 
 |`tsc` switch|name in grunt-ts|description|
 |:----:|:----:|:-----|
+|--allowJs|[allowJs](#allowjs)|Allow JavaScript files (*.js) to be compiled.|
 |--allowSyntheticDefaultImports|[allowSyntheticDefaultImports](#allowsyntheticdefaultimports)|Allows use "default" ES6 module import syntax with pre-ES6 libraries that don't have a default (on by default with SystemJS)|
+|--allowUnreachableCode|[allowUnreachableCode](#allowunreachablecode)|Do not report errors on unreachable code.|
+|--allowUnusedLabels|[allowUnusedLabels](#allowunusedlabels)|Do not report errors on unused labels.|
 |--declaration|[declaration](#declaration)|Generates a `.d.ts` definitions file for compiled TypeScript files|
 |--emitDecoratorMetadata|[emitDecoratorMetadata](#emitdecoratormetadata)|Emit metadata for type/parameter decorators.|
-|--experimentalAsyncFunctions|[experimentalAsyncFunctions](#experimentalasyncfunctions)|Enables experimental support for ES7 async functions|
-|--experimentalDecorators|[experimentalDecorators](#experimentaldecorators)|Enables experimental support for ES7 decorators|
+|--experimentalAsyncFunctions|[experimentalAsyncFunctions](#experimentalasyncfunctions)|Enables experimental support for proposed ECMAScript async functions|
+|--experimentalDecorators|[experimentalDecorators](#experimentaldecorators)|Enables experimental support for proposed ECMAScript decorators|
+|--forceConsistentCasingInFileNames|[forceConsistentCasingInFileNames](#forceConsistentCasingInFileNames)|Disallow inconsistently-cased references to the same file.|
 |--inlineSourceMap|[inlineSourceMap](#inlinesourcemap)|Emit a single file that includes source maps instead of emitting a separate `.js.map` file.|
 |--inlineSources|[inlineSources](#inlinesources)|Emit the TypeScript source alongside the sourcemaps within a single file; requires `--inlineSourceMap` to be set.|
 |--isolatedModules|[isolatedModules](#isolatedmodules)|Ensures that the output is safe to only emit single files by making cases that break single-file transpilation an error|
@@ -77,14 +81,20 @@ Grunt-ts provides explicit support for most `tsc` switches.  Any arbitrary switc
 |--noEmit|[noEmit](#noemit)|Check, but do not emit JS, even in the absence of errors.|
 |--noEmitHelpers|[noEmitHelpers](#noemithelpers)|Do not generate custom helper functions like `__extends` in compiled output.|
 |--noEmitOnError|[noEmitOnError](#noemitonerror)|Do not emit JavaScript if there is a compilation error|
+|--noFallthroughCasesInSwitch|[noFallthroughCasesInSwitch](#nofallthroughcasesinswitch)|Report errors for fallthrough cases in switch statement.|
 |--noImplicitAny|[noImplicitAny](#noimplicitany)|Warn on expressions and declarations with an implied `any` type.|
+|--noImplicitUseStrict|[noImplicitUseStrict](#noimplicitusestrict)|Warn on expressions and declarations with an implied `any` type.|
+|--noImplicitReturns|[noImplicitReturns](#noimplicitreturns)|Report error when not all code paths in function return a value.|
 |--noLib|[noLib](#nolib)|Do not automatically include lib.d.ts is compilation context.|
 |--noResolve|[noResolve](#noresolve)|Do not add triple-slash references or module import targets to the compilation context.|
 |--out FILE|[out](#out)|Concatenate and emit output to a single file.|
 |--outDir DIRECTORY|[outDir](#outdir)|Redirect output structure to the directory.|
 |--preserveConstEnums|[preserveConstEnums](#preserveconstenums)|Const enums will be kept as enums in the emitted JS.|
+|--pretty|[pretty](#pretty)|Stylize errors and messages using color and context.|
+|--reactNamespace|[reactNamespace](#reactnamespace)|Specifies the object invoked for  createElement  and  __spread  when targeting 'react' JSX emit.|
 |--removeComments|[removeComments](#removecomments)|Configures if comments should be included in the output|
 |--rootDir|[rootDir](#rootdir)|Allows override of common root folder calculated by `--outDir`.|
+|--skipDefaultLibCheck|[skipDefaultLibCheck](#skipdefaultlibcheck)|Don't check a user-defined default lib file's validity.|
 |--sourceMap|[sourceMap](#sourcemap)|Generates corresponding `.map` file|
 |--sourceRoot LOCATION|[sourceRoot](#sourceroot)|Specifies the location where debugger should locate TypeScript files instead of source locations.|
 |--stripInternal|[stripInternal](#stripinternal)|does not emit members marked as @internal.|
@@ -100,19 +110,23 @@ For file ordering, look at [JavaScript Generation](#javascript-generation).
 |grunt-ts property|where to define|description|
 |:----|:----|:-----|
 |[additionalFlags](#additionalflags)|option|`string` - allows passing arbitrary strings to the compiler.  This is intended to enable compatibility with features not supported directly by grunt-ts.|
+|[allowJs](#allowjs)|option|`true`, `false` (default) - Allow JavaScript files (*.js) to be compiled.|
+|[allowUnreachableCode](#allowunreachablecode)|option|`true`, `false` (default) - Do not report errors on unreachable code.|
+|[allowUnusedLabels](#allowunusedlabels)|option|`true`, `false` (default) - Do not report errors on unused labels.|
 |[allowSyntheticDefaultImports](#allowsyntheticdefaultimports)|option|`true`, `false` (default) - Allows use "default" ES6 module import syntax with pre-ES6 libraries that don't have a default (on by default with SystemJS and not required to specify).|
 |[baseDir](#basedir)|option|`string` - Sets root directory for maintaining source structure when using outDir and fast together. Use `rootDir` for newer versions of TypeScript.|
 |[comments](#comments)|option|`true`, `false` (default) - include comments in emitted JS.|
 |[compile](#compile)|option|`true` (default), `false` - compile TypeScript code.|
 |[compiler](#compiler)|option|`string` - path to custom compiler|
 |[declaration](#declaration)|option|`true`, `false` (default) - indicates that definition files should be emitted.|
-|[emitDecoratorMetadata](#emitdecoratormetadata)|option|`true`, `false` (default) - set to true to emit metadata for ES7 decorators (will enable experimentalDecorators)|
+|[emitDecoratorMetadata](#emitdecoratormetadata)|option|`true`, `false` (default) - set to true to emit metadata for proposed ECMAScript decorators (will enable experimentalDecorators)|
 |[emitGruntEvents](#emitgruntevents)|option|`true`, `false` (default) - set to true to raise an event in Grunt upon failed builds.|
-|[experimentalAsyncFunctions](#experimentalasyncfunctions)|option|`true`, `false` (default) - set to true to enable support for ES7 async functions (in ES6 mode only)|
-|[experimentalDecorators](#experimentaldecorators)|option|`true`, `false` (default) - set to true to enable support for ES7 decorators|
+|[experimentalAsyncFunctions](#experimentalasyncfunctions)|option|`true`, `false` (default) - set to true to enable support for proposed ECMAScript async functions (in ES6 mode only)|
+|[experimentalDecorators](#experimentaldecorators)|option|`true`, `false` (default) - set to true to enable support for proposed ECMAScript decorators|
 |[failOnTypeErrors](#failontypeerrors)|option|`true` (default), `false` - fail Grunt pipeline if there is a type error.  (See also [noEmitOnError](#noemithelpers))|
 |[fast](#fast)|option|`'watch'` (default), `'always'`, `'never'` - how to decide on a "fast" grunt-ts compile.|
 |[files](#files)|target|Sets of files to compile and optional output destination|
+|[forceConsistentCasingInFileNames](#forceconsistentcasinginfilenames)|option|`true`, `false` (default) - Disallow inconsistently-cased references to the same file.|
 |[html](#html)|target|`string` or `string[]` - glob to HTML templates|
 |[htmlModuleTemplate](#htmlmoduletemplate)|option|`string` - HTML template namespace|
 |[htmlOutDir](#htmloutdir)|option|`string` - Sets a root for output of transformed-to-TypeScript HTML files|
@@ -130,16 +144,21 @@ For file ordering, look at [JavaScript Generation](#javascript-generation).
 |[noEmit](#noemit)|option|`true`, `false` (default) - If passed as `true`, TypeScript will not emit even if it compiles cleanly|
 |[noEmitHelpers](#noemithelpers)|option|`true`, `false` (default) - If passed as `true`, TypeScript will not generate custom helper functions like `__extends` in compiled output|
 |[noEmitOnError](#noemithelpers)|option|`true`, `false` (default) - If passed as `true`, TypeScript will not emit JS if there is an error (see also [failOnTypeErrors](#failontypeerrors))|
+|[noFallthroughCasesInSwitch](#nofallthroughcasesinswitch)|option|`true`, `false` (default) - Report errors for fallthrough cases in switch statement.|
 |[noImplicitAny](#noimplicitany)|option|`true`, `false` (default) - enable for stricter type checking|
+|[noImplicitReturns](#noimplicitreturns)|option|`true`, `false` (default) - Report error when not all code paths in function return a value.|
 |[noLib](#nolib)|option|`true`, `false` (default) - do not automatically include lib.d.ts in compilation context|
 |[noResolve](#noresolve)|option|`true`, `false` (default) - for deprecated version of TypeScript|
 |[options](#grunt-ts-target-options)|target||
 |[out](#out)|target|`string` - instruct `tsc` to concatenate output to this file.|
 |[outDir](#outdir)|target|`string` - instruct `tsc` to emit JS to this directory.|
 |[preserveConstEnums](#preserveconstenums)|option|`true`, `false` (default) - If true, const enums will be kept as enums in the emitted JS.|
+|[pretty](#pretty)|option|`true`, `false` (default) - Stylize errors and messages using color and context.|
+|[reactNamespace](#reactnamespace)|option|`string` - Specifies the object invoked for `createElement` and `__spread` when targeting 'react' JSX emit.|
 |[reference](#reference)|target|`string` - tells grunt-ts which file to use for maintaining references|
 |[removeComments](#removecomments)|option|`true` (default), `false` - removes comments in emitted JS|
 |[rootDir](#rootdir)|option|`string` - Allows override of common root folder calculated by `--outDir`.|
+|[skipDefaultLibCheck](#skipdefaultlibcheck)|option|`true`, `false` (default) - Don't check a user-defined default lib file's validity.|
 |[sourceRoot](#sourceroot)|option|`string` - root for referencing TS files in `.js.map`|
 |[sourceMap](#sourcemap)|option|`true` (default), `false` - indicates if source maps should be generated (`.js.map`)|
 |[stripInternal](#stripinternal)|option|`true`, `false` (default) - does not emit members marked as @internal.|
@@ -413,6 +432,24 @@ grunt.initConfig({
 });
 ````
 
+#### allowJs
+
+Allows JavaScript files to be compiled.  This setting works well with `outDir`.  This feature requires grunt-ts 5.5 or higher and TypeScript 1.8 or higher.
+
+````javascript
+grunt.initConfig({
+  ts: {
+    default: {
+      src: ["**/*.ts", "**/*.js", "!emit/**", "!node_modules/**"],
+      outDir: 'emit/',
+      options: {
+        allowJs: true
+      }
+    }
+  }
+});
+````
+
 #### allowSyntheticDefaultImports
 
 Allows use of ES6 "default" import syntax with pre-ES6 modules when not using SystemJS.  If using module format "amd", "commonjs" or "umd", the following import syntax for jQuery will give the error "Module 'jquery' has no default export" when exporting to "amd", "commonjs", or "umd" format: `import * as $ from 'jquery';`.  In that case, passing allowSyntheticDefaultImports will eliminate this error.  NOTE: This is the default behavior when SystemJS module format is used (`module: "system"`).  This switch (and behavior) requires TypeScript 1.8 or higher.  See [this issue](https://github.com/Microsoft/TypeScript/issues/5285) for more details.
@@ -424,6 +461,40 @@ grunt.initConfig({
       options: {
         allowSyntheticDefaultImports: true,
         module: 'umd'
+      }
+    }
+  }
+});
+````
+
+#### allowUnreachableCode
+
+When set to true, TypeScript will not report errors on unreachable code.  Requires TypeScript 1.8 or higher.
+
+````javascript
+grunt.initConfig({
+  ts: {
+    default: {
+      src: ["**/*.ts", "!node_modules/**"],
+      options: {
+        allowUnreachableCode: true
+      }
+    }
+  }
+});
+````
+
+#### allowUnusedLabels
+
+When set to true, TypeScript will not report errors when there are unused labels in your code.  Requires TypeScript 1.8 or higher.
+
+````javascript
+grunt.initConfig({
+  ts: {
+    default: {
+      src: ["**/*.ts", "!node_modules/**"],
+      options: {
+        allowUnusedLabels: true
       }
     }
   }
@@ -596,7 +667,7 @@ grunt.event.on('grunt-ts.failure', function() {
 true | false (default)
 ````
 
-Enable support for experimental ES7 async functionality.  This is only available in TypeScript 1.6 and higher in 'es6' mode.
+Enable support for experimental proposed ECMAScript async functionality.  This is only available in TypeScript 1.6 and higher in 'es6' mode.
 
 ````javascript
 grunt.initConfig({
@@ -615,7 +686,7 @@ grunt.initConfig({
 true | false (default)
 ````
 
-Enable support for experimental ES7 decorators.  This is only available in TypeScript 1.5 and higher.
+Enable support for experimental proposed ECMAScript decorators.  This is only available in TypeScript 1.5 and higher.
 
 ````javascript
 grunt.initConfig({
@@ -667,6 +738,23 @@ grunt.initConfig({
     options: {
       // disable the grunt-ts fast feature
       fast: 'never'
+    }
+  }
+});
+````
+
+#### forceConsistentCasingInFileNames
+
+When set to true, disallows inconsistently-cased references to the same file.  For example, when using ES6-style imports, importing a file as "./MyLibrary" in one file and "./mylibrary" in another.
+
+````javascript
+grunt.initConfig({
+  ts: {
+    default: {
+      src: ["**/*.ts", "!node_modules/**"],
+      options: {
+        forceConsistentCasingInFileNames: true
+      }
     }
   }
 });
@@ -1007,6 +1095,28 @@ grunt.initConfig({
 });
 ````
 
+#### noFallthroughCasesInSwitch
+
+````javascript
+true | false (default)
+````
+
+Report errors for fallthrough cases in switch statement.
+
+````javascript
+grunt.initConfig({
+  ts: {
+    default: {
+      src: ["**/*.ts", "!node_modules/**"],
+      options: {
+        noFallthroughCasesInSwitch: true
+      }
+    }
+  }
+});
+````
+
+
 #### noImplicitAny
 
 ````javascript
@@ -1021,6 +1131,26 @@ grunt.initConfig({
     default: {
       options: {
         noImplicitAny: true
+      }
+    }
+  }
+});
+````
+
+#### noImplicitReturns
+
+````javascript
+true | false (default)
+````
+
+Report error when not all code paths in function return a value.
+
+````javascript
+grunt.initConfig({
+  ts: {
+    default: {
+      options: {
+        noImplicitReturns: true
       }
     }
   }
@@ -1085,6 +1215,44 @@ grunt.initConfig({
 });
 ````
 
+#### pretty
+
+````javascript
+true | false (default)
+````
+
+Stylize errors and messages using color and context.
+
+````javascript
+grunt.initConfig({
+  ts: {
+    default: {
+      options: {
+        pretty: true
+      }
+    }
+  }
+});
+````
+
+#### reactNamespace
+
+````javascript
+string
+````
+
+Specifies the object invoked for `createElement` and  `__spread`  when targeting 'react' JSX emit.  Requires TypeScript 1.8 or higher and grunt-ts 5.5 or higher.
+
+````javascript
+grunt.initConfig({
+  ts: {
+    options: {
+      rootDir: "src/app"
+    }
+  }
+});
+````
+
 #### removeComments
 
 ````javascript
@@ -1116,6 +1284,26 @@ grunt.initConfig({
   ts: {
     options: {
       rootDir: "src/app"
+    }
+  }
+});
+````
+
+#### skipDefaultLibCheck
+
+````javascript
+true | false (default)
+````
+
+Don't check a user-defined default lib file's validity.
+
+````javascript
+grunt.initConfig({
+  ts: {
+    default: {
+      options: {
+        skipDefaultLibCheck: true
+      }
     }
   }
 });

@@ -59,7 +59,11 @@ module.exports = function (grunt) {
                 comments: true,
                 sourceMap: true,
                 verbose: true,
-                fast: 'always'
+                fast: 'always',
+                forceConsistentCasingInFileNames: true,
+                noFallthroughCasesInSwitch: true,
+                noImplicitReturns: true,
+                pretty: true
             },
             build: {
                 src: ['tasks/**/*.ts']

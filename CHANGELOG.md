@@ -1,5 +1,12 @@
 # Releases
 
+## vNext
+
+## v5.5.1
+* CHORE: Internal grunt-ts compiler now upgraded to v5.5.0 / TypeScript 1.8.9.
+* CHORE: Grunt-ts itself now compiles cleanly with `--forceConsistentCasingInFileNames`, `--noFallthroughCasesInSwitch`, and `--noImplicitReturns` enabled.
+* DOCS: Completed documentation for new v5.5 (TypeScript 1.8) features.
+
 ## v5.5.0
 * FEAT: Support TypeScript 1.8+
 * FIX: "Visual Studio config issue: {} when src contains nested arrays".  Thanks very much to first-time contributor @davidparsson for the PR! (#353)

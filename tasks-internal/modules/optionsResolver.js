@@ -7,13 +7,20 @@ var _ = require('lodash');
 var es6_promise_1 = require('es6-promise');
 var visualStudioOptionsResolver_1 = require('./visualStudioOptionsResolver');
 var tsconfig_1 = require('./tsconfig');
-var propertiesFromTarget = ['amdloader', 'html', 'htmlOutDir', 'htmlOutDirFlatten', 'reference', 'testExecute', 'tsconfig',
-    'templateCache', 'vs', 'watch'], propertiesFromTargetOptions = ['additionalFlags', 'comments', 'compile', 'compiler', 'declaration',
-    'emitDecoratorMetadata', 'experimentalDecorators', 'failOnTypeErrors', 'fast', 'htmlModuleTemplate', 'htmlOutDir',
-    'htmlOutputTemplate', 'htmlOutDirFlatten', 'htmlVarTemplate', 'inlineSourceMap', 'inlineSources', 'isolatedModules',
-    'mapRoot', 'module', 'newLine', 'noEmit', 'noEmitHelpers', 'noEmitOnError', 'noImplicitAny', 'noResolve',
-    'preserveConstEnums', 'removeComments', 'sourceRoot', 'sourceMap', 'suppressImplicitAnyIndexErrors', 'target',
-    'verbose', 'jsx', 'moduleResolution', 'experimentalAsyncFunctions', 'rootDir'], delayTemplateExpansion = ['htmlModuleTemplate', 'htmlVarTemplate','htmlOutputTemplate'];
+// Compiler Options documentation:
+// https://github.com/Microsoft/TypeScript-Handbook/blob/master/pages/Compiler%20Options.md
+var propertiesFromTarget = ['amdloader', 'baseDir', 'html', 'htmlOutDir', 'htmlOutDirFlatten', 'reference', 'testExecute', 'tsconfig',
+    'templateCache', 'vs', 'watch'], 
+// purposefully not supported: help, version, charset, diagnostics, listFiles
+// supported via other code: out, outDir, outFile, project
+propertiesFromTargetOptions = ['additionalFlags', 'allowSyntheticDefaultImports', 'comments', 'compile', 'compiler', 'declaration',
+    'emitBOM', 'emitDecoratorMetadata', 'experimentalDecorators', 'failOnTypeErrors', 'fast', 'htmlModuleTemplate', 'htmlOutDir',
+    'htmlOutputTemplate', 'htmlOutDirFlatten', 'htmlVarTemplate', 'inlineSourceMap', 'inlineSources', 'isolatedModules', 'locale',
+    'mapRoot', 'module', 'newLine', 'noEmit', 'noEmitHelpers', 'noEmitOnError', 'noImplicitAny', 'noLib', 'noResolve',
+    'preserveConstEnums', 'removeComments', 'sourceRoot', 'sourceMap', 'stripInternal', 'suppressExcessPropertyErrors',
+    'suppressImplicitAnyIndexErrors', 'target', 'verbose', 'jsx', 'moduleResolution', 'experimentalAsyncFunctions', 'rootDir',
+    'emitGruntEvents', 'reactNamespace', 'skipDefaultLibCheck', 'pretty', 'allowUnusedLabels', 'noImplicitReturns',
+    'noFallthroughCasesInSwitch', 'allowUnreachableCode', 'forceConsistentCasingInFileNames', 'allowJs', 'noImplicitUseStrict'], delayTemplateExpansion = ['htmlModuleTemplate', 'htmlVarTemplate', 'htmlOutputTemplate'];
 var templateProcessor = null;
 var globExpander = null;
 function noopTemplateProcessor(templateString, options) {
@@ -23,11 +30,12 @@ function emptyGlobExpander(globs) {
     return [];
 }
 emptyGlobExpander.isStub = true;
-function resolveAsync(rawTaskOptions, rawTargetOptions, targetName, files, theTemplateProcessor, theGlobExpander) {
+function resolveAsync(rawTaskOptions, rawTargetOptions, targetName, resolvedFiles, theTemplateProcessor, theGlobExpander) {
     if (targetName === void 0) { targetName = ''; }
-    if (files === void 0) { files = []; }
+    if (resolvedFiles === void 0) { resolvedFiles = []; }
     if (theTemplateProcessor === void 0) { theTemplateProcessor = null; }
     if (theGlobExpander === void 0) { theGlobExpander = null; }
+    var result = emptyOptionsResolveResult();
     return new es6_promise_1.Promise(function (resolve, reject) {
         if (theTemplateProcessor && typeof theTemplateProcessor === 'function') {
             templateProcessor = theTemplateProcessor;
@@ -43,7 +51,6 @@ function resolveAsync(rawTaskOptions, rawTargetOptions, targetName, files, theTe
         }
         fixMissingOptions(rawTaskOptions);
         fixMissingOptions(rawTargetOptions);
-        var result = emptyOptionsResolveResult();
         {
             var _a = resolveAndWarnOnConfigurationIssues(rawTaskOptions, rawTargetOptions, targetName), errors = _a.errors, warnings = _a.warnings;
             (_b = result.errors).push.apply(_b, errors);
@@ -51,7 +58,7 @@ function resolveAsync(rawTaskOptions, rawTargetOptions, targetName, files, theTe
         }
         result = applyGruntOptions(result, rawTaskOptions);
         result = applyGruntOptions(result, rawTargetOptions);
-        result = copyCompilationTasks(result, files);
+        result = copyCompilationTasks(result, resolvedFiles, resolveOutputOptions(rawTaskOptions, rawTargetOptions));
         visualStudioOptionsResolver_1.resolveVSOptionsAsync(result, rawTaskOptions, rawTargetOptions, templateProcessor).then(function (result) {
             tsconfig_1.resolveAsync(result, rawTaskOptions, rawTargetOptions, templateProcessor, globExpander).then(function (result) {
                 result = addressAssociatedOptionsAndResolveConflicts(result);
@@ -63,16 +70,31 @@ function resolveAsync(rawTaskOptions, rawTargetOptions, targetName, files, theTe
                     result.targetName = targetName;
                 }
                 return resolve(result);
-            }).catch(function (error) {
-                return reject(error);
+            }).catch(function (tsConfigError) {
+                result.errors.push('tsconfig error: ' + JSON.stringify(tsConfigError));
+                return resolve(result);
             });
-        }).catch(function (error) {
-            return reject(error);
+        }).catch(function (vsConfigError) {
+            result.errors.push('Visual Studio config issue: ' + JSON.stringify(vsConfigError));
+            return resolve(result);
         });
         var _b, _c;
     });
 }
 exports.resolveAsync = resolveAsync;
+function resolveOutputOptions(rawTaskOptions, rawTargetOptions) {
+    var result = {};
+    var props = ['outDir', 'out'];
+    var options = [rawTaskOptions, rawTargetOptions];
+    options.forEach(function (opt) {
+        props.forEach(function (prop) {
+            if (opt && (prop in opt)) {
+                result[prop] = opt[prop];
+            }
+        });
+    });
+    return result;
+}
 function fixMissingOptions(config) {
     if (config && !config.options) {
         config.options = {};
@@ -101,7 +123,11 @@ function resolveAndWarnOnConfigurationIssues(task, target, targetName) {
     return { errors: errors, warnings: warnings };
     function getAdditionalWarnings(task, target, targetName) {
         var additionalWarnings = [];
-        if (((task && task.src) || (target && target.src)) &&
+        if (propertiesFromTarget.indexOf(targetName) >= 0) {
+            additionalWarnings.push(("Warning: Using the grunt-ts keyword \"" + targetName + "\" as a target name may cause ") +
+                "incorrect behavior or errors.");
+        }
+        if (((task && task.src && targetName !== 'src') || (target && target.src)) &&
             ((task && task.files) || (target && target.files))) {
             additionalWarnings.push("Warning: In task \"" + targetName + "\", either \"files\" or \"src\" should be used - not both.");
         }
@@ -112,6 +138,10 @@ function resolveAndWarnOnConfigurationIssues(task, target, targetName) {
         if (usingDestArray(task) || usingDestArray(target)) {
             additionalWarnings.push(("Warning: target \"" + targetName + "\" has an array specified for the files.dest property.") +
                 "  This is not supported.  Taking first element and ignoring the rest.");
+        }
+        if ((task && task.outFile) || (target && target.outFile)) {
+            additionalWarnings.push(("Warning: target \"" + targetName + "\" is using \"outFile\".  This is not supported by") +
+                " grunt-ts via the Gruntfile - it's only relevant when present in tsconfig.json file.  Use \"out\" instead.");
         }
         return additionalWarnings;
         function usingDestArray(task) {
@@ -208,8 +238,8 @@ function resolveAndWarnOnConfigurationIssues(task, target, targetName) {
 }
 function applyGruntOptions(applyTo, gruntOptions) {
     if (gruntOptions) {
-        for (var _i = 0; _i < propertiesFromTarget.length; _i++) {
-            var propertyName = propertiesFromTarget[_i];
+        for (var _i = 0, propertiesFromTarget_1 = propertiesFromTarget; _i < propertiesFromTarget_1.length; _i++) {
+            var propertyName = propertiesFromTarget_1[_i];
             if (propertyName in gruntOptions && propertyName !== 'vs') {
                 if (typeof gruntOptions[propertyName] === 'string' && utils.hasValue(gruntOptions[propertyName]) &&
                     delayTemplateExpansion.indexOf(propertyName) === -1) {
@@ -221,8 +251,8 @@ function applyGruntOptions(applyTo, gruntOptions) {
             }
         }
         if (gruntOptions.options) {
-            for (var _a = 0; _a < propertiesFromTargetOptions.length; _a++) {
-                var propertyName = propertiesFromTargetOptions[_a];
+            for (var _a = 0, propertiesFromTargetOptions_1 = propertiesFromTargetOptions; _a < propertiesFromTargetOptions_1.length; _a++) {
+                var propertyName = propertiesFromTargetOptions_1[_a];
                 if (propertyName in gruntOptions.options) {
                     if (typeof gruntOptions.options[propertyName] === 'string' && utils.hasValue(gruntOptions.options[propertyName]) &&
                         delayTemplateExpansion.indexOf(propertyName) === -1) {
@@ -237,27 +267,45 @@ function applyGruntOptions(applyTo, gruntOptions) {
     }
     return applyTo;
 }
-function copyCompilationTasks(options, files) {
+function copyCompilationTasks(options, resolvedFiles, outputInfo) {
     if (!utils.hasValue(options.CompilationTasks)) {
         options.CompilationTasks = [];
     }
-    if (!utils.hasValue(files)) {
+    if (!utils.hasValue(resolvedFiles) || resolvedFiles.length === 0) {
+        if (options.CompilationTasks.length === 0 && (('outDir' in outputInfo) || ('out' in outputInfo))) {
+            var newCompilationTask = {
+                src: []
+            };
+            if ('outDir' in outputInfo) {
+                newCompilationTask.outDir = outputInfo.outDir;
+            }
+            if ('out' in outputInfo) {
+                newCompilationTask.outDir = outputInfo.outDir;
+            }
+            options.CompilationTasks.push(newCompilationTask);
+        }
         return options;
     }
-    for (var i = 0; i < files.length; i += 1) {
+    for (var i = 0; i < resolvedFiles.length; i += 1) {
+        var glob = void 0;
+        var orig = resolvedFiles[i].orig;
+        if (orig && ('src' in orig)) {
+            glob = [].concat(orig.src);
+        }
         var compilationSet = {
-            src: _.map(files[i].src, function (fileName) { return utils.enclosePathInQuotesIfRequired(fileName); }),
-            out: utils.enclosePathInQuotesIfRequired(files[i].out),
-            outDir: utils.enclosePathInQuotesIfRequired(files[i].outDir)
+            src: _.map(resolvedFiles[i].src, function (fileName) { return utils.enclosePathInQuotesIfRequired(fileName); }),
+            out: utils.enclosePathInQuotesIfRequired(resolvedFiles[i].out),
+            outDir: utils.enclosePathInQuotesIfRequired(resolvedFiles[i].outDir),
+            glob: glob
         };
-        if ('dest' in files[i] && files[i].dest) {
+        if ('dest' in resolvedFiles[i] && resolvedFiles[i].dest) {
             var dest = void 0;
-            if (_.isArray(files[i].dest)) {
+            if (_.isArray(resolvedFiles[i].dest)) {
                 // using an array for dest is not supported.  Only take first element.
-                dest = files[i].dest[0];
+                dest = resolvedFiles[i].dest[0];
             }
             else {
-                dest = files[i].dest;
+                dest = resolvedFiles[i].dest;
             }
             if (utils.isJavaScriptFile(dest)) {
                 compilationSet.out = dest;
@@ -290,9 +338,6 @@ function addressAssociatedOptionsAndResolveConflicts(options) {
         options.warnings.push('TypeScript cannot use inlineSourceMap and sourceMap together.  Ignoring sourceMap.');
         options.sourceMap = false;
     }
-    if (options.inlineSources && options.sourceMap) {
-        options.errors.push('It is not permitted to use inlineSources and sourceMap together.  Use one or the other.');
-    }
     if (options.inlineSources && !options.sourceMap) {
         options.inlineSources = true;
         options.inlineSourceMap = true;
@@ -310,13 +355,14 @@ function addressAssociatedOptionsAndResolveConflicts(options) {
         options.removeComments = !!options.removeComments;
         options.comments = !options.removeComments;
     }
-    if ('html' in options && options.CompilationTasks.length === 0) {
-        options.errors.push("ERROR: option `html` provided without specifying corresponding TypeScript source files to " +
-            "compile.  The transform will not occur unless grunt-ts also expects to compile these files.");
+    if ('html' in options &&
+        (options.CompilationTasks.length === 0 ||
+            !_.some(options.CompilationTasks, function (item) { return ((item.src || []).length > 0 || (item.glob || []).length > 0); }))) {
+        options.errors.push("ERROR: option \"html\" provided without corresponding TypeScript source files or glob to " +
+            "compile.  The transform will not occur unless grunt-ts also expects to compile some files.");
     }
     options.CompilationTasks.forEach(function (compileTask) {
         if (compileTask.out && compileTask.outDir) {
-            console.log(JSON.stringify(compileTask));
             options.warnings.push('The parameter `out` is incompatible with `outDir`; pass one or the other - not both.  Ignoring `out` and using `outDir`.');
             compileTask.out = '';
         }
@@ -350,6 +396,12 @@ function applyGruntTSDefaults(options) {
     }
     if (!('removeComments' in options) && !('comments' in options)) {
         options.removeComments = defaults_1.GruntTSDefaults.removeComments;
+    }
+    if (!('failOnTypeErrors' in options)) {
+        options.failOnTypeErrors = defaults_1.GruntTSDefaults.failOnTypeErrors;
+    }
+    if (!('emitGruntEvents' in options)) {
+        options.emitGruntEvents = defaults_1.GruntTSDefaults.emitGruntEvents;
     }
     return options;
 }

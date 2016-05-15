@@ -1,16 +1,19 @@
 /// <reference path="../../defs/tsd.d.ts"/>
+"use strict";
 var path = require('path');
 var fs = require('fs');
+var os = require('os');
 var util = require('util');
 var _ = require('lodash');
 var es6_promise_1 = require('es6-promise');
 exports.grunt = require('grunt');
 exports.eol = exports.grunt.util.linefeed;
-function newLineIsRedundant(newLineParameter) {
-    return ((newLineParameter === 'CRLF' && exports.grunt.util.linefeed === '\r\n') ||
-        (newLineParameter === 'LF' && exports.grunt.util.linefeed === '\n'));
+function newLineIsRedundantForTsc(newLineParameter, operatingSystem) {
+    if (operatingSystem === void 0) { operatingSystem = os; }
+    return ((newLineParameter === 'CRLF' && operatingSystem.EOL === '\r\n') ||
+        (newLineParameter === 'LF' && operatingSystem.EOL === '\n'));
 }
-exports.newLineIsRedundant = newLineIsRedundant;
+exports.newLineIsRedundantForTsc = newLineIsRedundantForTsc;
 function newLineActualAsParameter(actualNewLineChars) {
     if (actualNewLineChars) {
         return actualNewLineChars.replace(/\n/g, 'LF').replace(/\r/g, 'CR');
@@ -341,12 +344,18 @@ function asyncSeries(items, callPerItem) {
     });
 }
 exports.asyncSeries = asyncSeries;
-function copyFileSync(srcFile, destFile, encoding) {
+function copyFile(srcFile, destFile, callback, encoding) {
     if (encoding === void 0) { encoding = 'utf8'; }
-    var content = fs.readFileSync(srcFile, encoding);
-    fs.writeFileSync(destFile, content, encoding);
+    fs.readFile(srcFile, encoding, function (err, data) {
+        fs.writeFile(destFile, data, encoding, function (err) {
+            if (err) {
+                return callback(err);
+            }
+            return callback();
+        });
+    });
 }
-exports.copyFileSync = copyFileSync;
+exports.copyFile = copyFile;
 function readAndParseJSONFromFileSync(fileName, encoding) {
     if (encoding === void 0) { encoding = 'utf8'; }
     var textContent, result;

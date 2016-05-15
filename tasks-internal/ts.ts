@@ -21,6 +21,7 @@ import * as templateCacheModule from './modules/templateCache';
 import * as transformers from './modules/transformers';
 import * as optionsResolver from '../tasks/modules/optionsResolver';
 const {asyncSeries, timeIt} = utils;
+const fail_event = 'grunt-ts.failure';
 
 function pluginFn(grunt: IGrunt) {
 
@@ -36,18 +37,18 @@ function pluginFn(grunt: IGrunt) {
           options: IGruntTSOptions;
 
         {
-          const currentTask: grunt.task.IMultiTask<ITargetOptions> = this;
-          const files: IGruntTSCompilationInfo[] = currentTask.files;
+          const currentGruntTask: grunt.task.IMultiTask<ITargetOptions> = this;
+          const resolvedFiles: IGruntTSCompilationInfo[] = currentGruntTask.files;
           // make async
-          done = currentTask.async();
+          done = currentGruntTask.async();
 
           // get unprocessed templates from configuration
           let rawTaskConfig =
-             <ITargetOptions>(grunt.config.getRaw(currentTask.name) || {});
+             <ITargetOptions>(grunt.config.getRaw(currentGruntTask.name) || {});
           let rawTargetConfig =
-            <ITargetOptions>(grunt.config.getRaw(currentTask.name + '.' + currentTask.target) || {});
+            <ITargetOptions>(grunt.config.getRaw(currentGruntTask.name + '.' + currentGruntTask.target) || {});
 
-          optionsResolver.resolveAsync(rawTaskConfig, rawTargetConfig, currentTask.target, files,
+          optionsResolver.resolveAsync(rawTaskConfig, rawTargetConfig, currentGruntTask.target, resolvedFiles,
               grunt.template.process, grunt.file.expand).then((result) => {
             options = result;
 
@@ -60,6 +61,9 @@ function pluginFn(grunt: IGrunt) {
             });
 
             if (options.errors.length > 0) {
+              if (options.emitGruntEvents) {
+                  grunt.event.emit(fail_event);
+              }
               done(false);
               return;
             }
@@ -221,7 +225,6 @@ function pluginFn(grunt: IGrunt) {
                             }
 
                             grunt.log.writeln('');
-
                             if (isOnlyTypeErrors && !options.failOnTypeErrors) {
                                 grunt.log.write(('>> ').green);
                                 grunt.log.writeln('Type errors only.');
@@ -253,13 +256,16 @@ function pluginFn(grunt: IGrunt) {
                         return isSuccessfulBuild;
                     }).catch(function(err) {
                       grunt.log.writeln(('Error: ' + err).red);
+                      if (options.emitGruntEvents) {
+                        grunt.event.emit(fail_event);
+                      }
                       return false;
                     });
                 }
 
                 // Find out which files to compile, codegen etc.
                 // Then calls the appropriate functions + compile function on those files
-                function filterFilesAndCompile(): Promise<boolean> {
+                function filterFilesTransformAndCompile(): Promise<boolean> {
 
                     var filesToCompile: string[] = [];
 
@@ -278,14 +284,6 @@ function pluginFn(grunt: IGrunt) {
                         });
 
                     } else {
-                        // todo: fix this.
-                        // if (_.isArray(options.files)) {
-                        //     filesToCompile = grunt.file.expand(files[filesCompilationIndex].src);
-                        // } else if (options.files[target.dest]) {
-                        //     filesToCompile = grunt.file.expand(files[target.dest]);
-                        // } else {
-                        //     filesToCompile = grunt.file.expand([(<{ src: string }><any>options.files).src]);
-                        // }
                         filesCompilationIndex += 1;
                     }
 
@@ -312,6 +310,12 @@ function pluginFn(grunt: IGrunt) {
 
                         let htmlFiles = grunt.file.expand(options.html);
                         generatedFiles = _.map(htmlFiles, (filename) => html2tsModule.compileHTML(filename, html2tsOptions));
+                        generatedFiles.forEach((fileName) => {
+                          if (filesToCompile.indexOf(fileName) === -1 &&
+                            grunt.file.isMatch(currentFiles.glob, fileName)) {
+                            filesToCompile.push(fileName);
+                          }
+                        });
                     }
 
                     ///// Template cache
@@ -421,7 +425,7 @@ function pluginFn(grunt: IGrunt) {
                 lastCompile = new Date().getTime();
 
                 // Run initial compile
-                return filterFilesAndCompile();
+                return filterFilesTransformAndCompile();
 
                 // local event to handle file event
                 function handleFileEvent(filepath: string, displaystr: string, addedOrChanged: boolean = false) {
@@ -442,7 +446,7 @@ function pluginFn(grunt: IGrunt) {
                     // Log and run the debounced version.
                     grunt.log.writeln((displaystr + ' >>' + filepath).yellow);
 
-                    filterFilesAndCompile();
+                    filterFilesTransformAndCompile();
                 }
 
             }).then((res: boolean[]) => {
@@ -451,6 +455,9 @@ function pluginFn(grunt: IGrunt) {
                     if (res.some((success: boolean) => {
                         return !success;
                     })) {
+                        if (options.emitGruntEvents) {
+                          grunt.event.emit(fail_event);
+                        }
                         done(false);
                     }
                     else {

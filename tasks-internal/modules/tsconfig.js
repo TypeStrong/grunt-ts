@@ -73,7 +73,6 @@ function resolveAsync(applyTo, taskOptions, targetOptions, theTemplateProcessor,
                 else {
                     return reject('Error reading "' + projectFile + '": ' + JSON.stringify(ex));
                 }
-                return reject(ex);
             }
             try {
                 var projectSpec;
@@ -111,13 +110,19 @@ function warnOnBadConfiguration(options, projectSpec) {
 }
 function getGlobs(taskOptions, targetOptions) {
     var globs = null;
-    if (taskOptions && taskOptions.src) {
-        globs = taskOptions.src;
+    if (taskOptions && isStringOrArray(taskOptions.src)) {
+        globs = _.map(getFlatCloneOf([taskOptions.src]), function (item) { return templateProcessor(item, {}); });
     }
-    if (targetOptions && targetOptions.src) {
-        globs = targetOptions.src;
+    if (targetOptions && isStringOrArray(targetOptions.src)) {
+        globs = _.map(getFlatCloneOf([targetOptions.src]), function (item) { return templateProcessor(item, {}); });
     }
     return globs;
+    function isStringOrArray(thing) {
+        return (_.isArray(thing) || _.isString(thing));
+    }
+    function getFlatCloneOf(array) {
+        return _.flatten(array).slice();
+    }
 }
 function resolve_output_locations(options, projectSpec) {
     if (options.CompilationTasks
@@ -158,6 +163,10 @@ function getTSConfigSettings(raw) {
                 tsconfig: tsconfigName
             };
         }
+        if (!('tsconfig' in raw.tsconfig) &&
+            !raw.tsconfig.passThrough) {
+            raw.tsconfig.tsconfig = 'tsconfig.json';
+        }
         return raw.tsconfig;
     }
     catch (ex) {
@@ -174,17 +183,58 @@ function getTSConfigSettings(raw) {
     }
 }
 function applyCompilerOptions(applyTo, projectSpec) {
-    var result = applyTo || {};
-    var co = projectSpec.compilerOptions;
-    var tsconfig = applyTo.tsconfig;
+    var result = applyTo || {}, co = projectSpec.compilerOptions, tsconfig = applyTo.tsconfig;
     if (!tsconfig.ignoreSettings && co) {
-        var sameNameInTSConfigAndGruntTS = ['declaration', 'emitDecoratorMetadata',
-            'experimentalAsyncFunctions', 'experimentalDecorators', 'isolatedModules',
-            'inlineSourceMap', 'inlineSources', 'jsx', 'mapRoot', 'module',
-            'moduleResolution', 'newLine', 'noEmit',
-            'noEmitHelpers', 'noEmitOnError', 'noImplicitAny', 'noLib', 'noResolve',
-            'out', 'outDir', 'preserveConstEnums', 'removeComments', 'rootDir',
-            'sourceMap', 'sourceRoot', 'suppressImplicitAnyIndexErrors', 'target'];
+        // Go here for the tsconfig.json documentation:
+        // https://github.com/Microsoft/TypeScript-Handbook/blob/master/pages/tsconfig.json.md
+        // There is a link to http://json.schemastore.org/tsconfig
+        var sameNameInTSConfigAndGruntTS = [
+            'allowJs',
+            'allowSyntheticDefaultImports',
+            'allowUnreachableCode',
+            'allowUnusedLabels',
+            // we do not support charset as we assume input files are UTF-8.
+            'declaration',
+            'emitBOM',
+            'emitDecoratorMetadata',
+            'experimentalAsyncFunctions',
+            'experimentalDecorators',
+            'forceConsistentCasingInFileNames',
+            'isolatedModules',
+            'inlineSourceMap',
+            'inlineSources',
+            'jsx',
+            // we do not support listFiles.
+            'locale',
+            'mapRoot',
+            'module',
+            'moduleResolution',
+            'newLine',
+            'noEmit',
+            'noEmitHelpers',
+            'noEmitOnError',
+            'noFallthroughCasesInSwitch',
+            'noImplicitAny',
+            'noImplicitReturns',
+            'noImplicitUseStrict',
+            'noLib',
+            'noResolve',
+            'out',
+            'outDir',
+            // outFile is handled below.
+            'preserveConstEnums',
+            'pretty',
+            'reactNamespace',
+            'removeComments',
+            'rootDir',
+            'skipDefaultLibCheck',
+            'sourceMap',
+            'sourceRoot',
+            'stripInternal',
+            'suppressExcessPropertyIndexErrors',
+            'suppressImplicitAnyIndexErrors',
+            'target'
+        ];
         sameNameInTSConfigAndGruntTS.forEach(function (propertyName) {
             if ((propertyName in co) && !(propertyName in result)) {
                 result[propertyName] = co[propertyName];
@@ -209,8 +259,7 @@ function applyCompilerOptions(applyTo, projectSpec) {
         if (!gruntfileGlobs) {
             throw new Error('The tsconfig option overwriteFilesGlob is set to true, but no glob was passed-in.');
         }
-        var relPath = relativePathFromGruntfileToTSConfig();
-        var gruntGlobsRelativeToTSConfig = [];
+        var relPath = relativePathFromGruntfileToTSConfig(), gruntGlobsRelativeToTSConfig = [];
         for (var i = 0; i < gruntfileGlobs.length; i += 1) {
             gruntfileGlobs[i] = gruntfileGlobs[i].replace(/\\/g, '/');
             gruntGlobsRelativeToTSConfig.push(path.relative(relPath, gruntfileGlobs[i]).replace(/\\/g, '/'));
@@ -234,40 +283,25 @@ function applyCompilerOptions(applyTo, projectSpec) {
         addUniqueRelativeFilesToSrc(projectSpec.files, src, absolutePathToTSConfig);
     }
     else {
-        if (!globExpander.isStub) {
-            var virtualGlob = [];
-            if (projectSpec.exclude && _.isArray(projectSpec.exclude)) {
-                virtualGlob.push(path.resolve(absolutePathToTSConfig, './*.ts'));
-                virtualGlob.push(path.resolve(absolutePathToTSConfig, './*.tsx'));
-                var tsconfigExcludedDirectories = [];
-                projectSpec.exclude.forEach(function (exc) {
-                    tsconfigExcludedDirectories.push(path.normalize(path.join(absolutePathToTSConfig, exc)));
-                });
-                fs.readdirSync(absolutePathToTSConfig).forEach(function (item) {
-                    var filePath = path.normalize(path.join(absolutePathToTSConfig, item));
-                    if (fs.statSync(filePath).isDirectory()) {
-                        if (tsconfigExcludedDirectories.indexOf(filePath) === -1) {
-                            virtualGlob.push(path.resolve(absolutePathToTSConfig, item, './**/*.ts'));
-                            virtualGlob.push(path.resolve(absolutePathToTSConfig, item, './**/*.tsx'));
-                        }
-                    }
-                });
-            }
-            else {
-                virtualGlob.push(path.resolve(absolutePathToTSConfig, './**/*.ts'));
-                virtualGlob.push(path.resolve(absolutePathToTSConfig, './**/*.tsx'));
-            }
-            var files = globExpander(virtualGlob);
-            // make files relative to the tsconfig.json file
-            for (var i = 0; i < files.length; i += 1) {
-                files[i] = path.relative(absolutePathToTSConfig, files[i]).replace(/\\/g, '/');
-            }
-            projectSpec.files = files;
-            if (projectSpec.filesGlob) {
-                saveTSConfigSync(tsconfig.tsconfig, projectSpec);
-            }
-            addUniqueRelativeFilesToSrc(files, src, absolutePathToTSConfig);
+        var validPattern_1 = /\.tsx?$/i;
+        var excludedPaths_1 = [];
+        if (_.isArray(projectSpec.exclude)) {
+            excludedPaths_1 = projectSpec.exclude.map(function (filepath) {
+                return utils.makeRelativePath(absolutePathToTSConfig, path.resolve(absolutePathToTSConfig, filepath));
+            });
         }
+        var files = utils.getFiles(absolutePathToTSConfig, function (filepath) {
+            return excludedPaths_1.indexOf(utils.makeRelativePath(absolutePathToTSConfig, filepath)) > -1
+                || (fs.statSync(filepath).isFile()
+                    && !validPattern_1.test(filepath));
+        }).map(function (filepath) {
+            return utils.makeRelativePath(absolutePathToTSConfig, filepath);
+        });
+        projectSpec.files = files;
+        if (projectSpec.filesGlob) {
+            saveTSConfigSync(tsconfig.tsconfig, projectSpec);
+        }
+        addUniqueRelativeFilesToSrc(files, src, absolutePathToTSConfig);
     }
     return result;
 }

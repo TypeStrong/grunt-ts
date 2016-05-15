@@ -110,6 +110,26 @@ export function getReferencesInOrder(referenceFile: string, referencePath: strin
 export function updateAmdLoader(referenceFile: string, files: IReferences, loaderFile: string,
       loaderPath: string, outDir: string, newLine = utils.eol) {
 
+    let commonPath: string;
+    const makeRelativeToOutDir = function(files: string[]) {
+        files = _.map(files, (file) => {
+            // Remove common path and replace with absolute outDir
+            file = file.replace(commonPath, outDir);
+
+            // remove extension '.ts' / '.tsx':
+            file = file.substr(0, file.lastIndexOf('.'));
+
+            // Make relative to amd loader
+            file = utils.makeRelativePath(loaderPath, file);
+
+            // Prepend "./" to prevent "basePath" requirejs setting from interferring:
+            file = './' + file;
+
+            return file;
+        });
+        return files;
+    };
+
     // Read the original file if it exists
     if (fs.existsSync(referenceFile)) {
         grunt.log.verbose.writeln('Generating amdloader from reference file ' + referenceFile);
@@ -145,31 +165,12 @@ export function updateAmdLoader(referenceFile: string, files: IReferences, loade
         //          Finally: outDir path + remainder section
         if (outDir) {
             // Find common path
-            var commonPath = utils.findCommonPath(files.before.concat(files.generated.concat(files.unordered.concat(files.after))), pathSeperator);
+            commonPath = utils.findCommonPath(files.before.concat(files.generated.concat(files.unordered.concat(files.after))), pathSeperator);
             grunt.log.verbose.writeln('Found common path: ' + commonPath);
 
             // Make sure outDir is absolute:
             outDir = path.resolve(outDir);
             grunt.log.verbose.writeln('Using outDir: ' + outDir);
-
-            function makeRelativeToOutDir(files: string[]) {
-                files = _.map(files, (file) => {
-                    // Remove common path and replace with absolute outDir
-                    file = file.replace(commonPath, outDir);
-
-                    // remove ts extension '.ts':
-                    file = file.substr(0, file.length - 3);
-
-                    // Make relative to amd loader
-                    file = utils.makeRelativePath(loaderPath, file);
-
-                    // Prepend "./" to prevent "basePath" requirejs setting from interferring:
-                    file = './' + file;
-
-                    return file;
-                });
-                return files;
-            }
 
             grunt.log.verbose.writeln('Making files relative to outDir...');
             files.before = makeRelativeToOutDir(files.before);

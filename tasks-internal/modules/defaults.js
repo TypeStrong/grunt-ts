@@ -1,8 +1,10 @@
 'use strict';
 var utils = require('./utils');
-exports.TypeScriptDefaults = {
+var _ = require('lodash');
+var TypeScriptDefaults = {
     allowBool: false,
     allowImportModule: false,
+    allowSyntheticDefaultImports: null,
     amdloader: null,
     compile: true,
     declaration: false,
@@ -27,11 +29,16 @@ exports.TypeScriptDefaults = {
     htmlOutputTemplate: null,
     htmlOutDir: null,
     htmlOutDirFlatten: null,
-    failOnTypeErrors: true,
+    failOnTypeErrors: null,
+    emitGruntEvents: null,
     noEmitOnError: false,
     preserveConstEnums: false,
+    suppressExcessPropertyErrors: false,
     suppressImplicitAnyIndexErrors: false,
+    stripInternal: false,
     noEmit: false,
+    noLib: false,
+    emitBOM: false,
     inlineSources: false,
     inlineSourceMap: false,
     newLine: utils.eol,
@@ -40,15 +47,27 @@ exports.TypeScriptDefaults = {
     additionalFlags: '',
     templateCache: null,
     targetName: '',
+    locale: null,
     jsx: null,
     moduleResolution: null,
     experimentalAsyncFunctions: null,
+    reactNamespace: null,
+    skipDefaultLibCheck: null,
+    pretty: false,
+    allowUnusedLabels: false,
+    noImplicitReturns: false,
+    noFallthroughCasesInSwitch: false,
+    allowUnreachableCode: false,
+    forceConsistentCasingInFileNames: false,
+    allowJs: false,
+    noImplicitUseStrict: false,
     rootDir: null,
     warnings: [],
     errors: []
 };
-exports.GruntTSDefaults = applyGruntTSDefaults(exports.TypeScriptDefaults);
+exports.GruntTSDefaults = applyGruntTSDefaults(_.clone(TypeScriptDefaults));
 function applyGruntTSDefaults(options) {
+    // this function applies defaults where grunt-ts differs from TypeScript
     options.sourceMap = true;
     options.target = 'es5';
     options.htmlModuleTemplate = '<%= filename %>';
@@ -56,6 +75,8 @@ function applyGruntTSDefaults(options) {
     options.htmlOutDirFlatten = false;
     options.fast = 'watch';
     options.removeComments = true;
+    options.failOnTypeErrors = true;
+    options.emitGruntEvents = false;
     return options;
 }
 //# sourceMappingURL=defaults.js.map

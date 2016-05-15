@@ -34,7 +34,7 @@ interface ITaskOptions {
     emitDecoratorMetadata: boolean;
     experimentalDecorators: boolean;
     mapRoot: string;
-    /** amd | commonjs | umd | system  */
+    /** amd | commonjs | umd | system | es6 | es2015  */
     module: string;
     noImplicitAny: boolean;
     noResolve: boolean;
@@ -81,6 +81,40 @@ interface ITaskOptions {
     experimentalAsyncFunctions: string;
     /** Sepecifies the root directory of input files.  Use to control the output directory structure with --outDir. */
     rootDir: string;
+    /** grunt-ts setting to emit events in Grunt */
+    emitGruntEvents: boolean;
+    /** noLib - do not auto-include the lib.d.ts file in the compilation context */
+    noLib: boolean;
+    /** emitBOM - indicates if emitted files should include a Byte Order Mark */
+    emitBOM: boolean;
+    /** locale - pass a culture string like "en" or "ja-jp" for locale-specific error messages (requires error file in same folder as tsc) */
+    locale: string;
+    /** Disables strict object literal assignment checking */
+    suppressExcessPropertyErrors: boolean;
+    /** Does not emit objects marked as internal */
+    stripInternal: boolean;
+    /** Assumes a defalt export as the whole module if one is not specified, or as the only export if only one export is specified */
+    allowSyntheticDefaultImports: boolean;
+    /** Specifies the object invoked for createElement and __spread when targeting 'react' JSX emit. */
+    reactNamespace: string;
+    /** Treat a file as a default lib if it has '/// <reference no-default-lib="true"/> at the top */
+    skipDefaultLibCheck: boolean;
+    /** Stylize errors and messages using color and context. */
+    pretty: boolean;
+    /** Do not report errors on unused labels. */
+    allowUnusedLabels: boolean;
+    /** Report error when not all code paths in function return a value. */
+    noImplicitReturns: boolean;
+    /** Report errors for fallthrough cases in switch statement. */
+    noFallthroughCasesInSwitch: boolean;
+    /** Do not report errors on unreachable code. */
+    allowUnreachableCode: boolean;
+    /** Disallow inconsistently-cased references to the same file. */
+    forceConsistentCasingInFileNames: boolean;
+    /** Allow JavaScript files to be compiled. */
+    allowJs: boolean;
+    /** Do not emit  "use strict"  directives in module output. */
+    noImplicitUseStrict: boolean;
 }
 
 interface IVisualStudioProjectSupport {
@@ -110,6 +144,7 @@ interface IGruntTSCompilationInfo extends grunt.file.IFilesConfig {
   outDir?: string;
   out?: string;
   src?: string[];
+  glob?: string[];
 }
 
 declare module 'strip-bom' {

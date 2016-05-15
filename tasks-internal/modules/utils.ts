@@ -2,6 +2,7 @@
 
 import path = require('path');
 import fs = require('fs');
+import os = require('os');
 import util = require('util');
 import _ = require('lodash');
 import {Promise} from 'es6-promise';
@@ -9,9 +10,9 @@ import {Promise} from 'es6-promise';
 export var grunt: IGrunt = require('grunt');
 export const eol: string = grunt.util.linefeed;
 
-export function newLineIsRedundant(newLineParameter: string) {
-  return ((newLineParameter === 'CRLF' && grunt.util.linefeed === '\r\n') ||
-          (newLineParameter === 'LF' && grunt.util.linefeed === '\n'));
+export function newLineIsRedundantForTsc(newLineParameter: string, operatingSystem: {EOL: string} = os) {
+  return ((newLineParameter === 'CRLF' && operatingSystem.EOL === '\r\n') ||
+          (newLineParameter === 'LF' && operatingSystem.EOL === '\n'));
 }
 
 export function newLineActualAsParameter(actualNewLineChars: string) {
@@ -365,9 +366,15 @@ export function asyncSeries<U, W>(items: U[], callPerItem: (item: U) => Promise<
     });
 }
 
-export function copyFileSync(srcFile: string, destFile: string, encoding = 'utf8') {
-  var content = fs.readFileSync(srcFile, encoding);
-  fs.writeFileSync(destFile, content, encoding);
+export function copyFile(srcFile: string, destFile: string, callback: (err?: Error) => any, encoding = 'utf8') {
+  fs.readFile(srcFile, encoding, (err, data) => {
+    fs.writeFile(destFile, data, encoding, (err) => {
+      if (err) {
+        return callback(err);
+      }
+      return callback();
+    });
+  });
 }
 
 export function readAndParseJSONFromFileSync(fileName: string, encoding = 'utf8') : any {
