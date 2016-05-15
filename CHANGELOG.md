@@ -1,7 +1,9 @@
 # Releases
 
-## Next
-* FEAT: Support TypeScript 1.8+ (coming soon)
+## v5.5.0
+* FEAT: Support TypeScript 1.8+
+* FIX: "Visual Studio config issue: {} when src contains nested arrays".  Thanks very much to first-time contributor @davidparsson for the PR! (#353)
+* DOCS: Moved contributing guide out to its own document: CONTRIBUTING.md
 
 ## v5.4.0 (2016-03-22)
 * FIX: amdloader will now work for [`.tsx` extension as well](https://github.com/TypeStrong/grunt-ts/pull/274) [reapplied](https://github.com/TypeStrong/grunt-ts/pull/314)
