@@ -46,12 +46,12 @@
     "rimraf": "2.2.6",
     "semver": "^5.1.0",
     "strip-bom": "^2.0.0",
-    "typescript": "1.8.9",
     "underscore": "1.5.1",
     "underscore.string": "2.3.3"
   },
   "peerDependencies": {
-    "grunt": ">=0.4.0"
+    "grunt": ">=0.4.0",
+    "typescript": "^1.8.0 || >=2.0.0-dev"
   },
   "devDependencies": {
     "grunt": "~0.4.0",
@@ -64,7 +64,8 @@
     "grunt-tslint": "^2.4.0",
     "tslint": "^2.4.0",
     "jshint-path-reporter": "~0.1.3",
-    "source-map-support": "~0.2.5"
+    "source-map-support": "~0.2.5",
+    "typescript": "1.8.10"
   },
   "optionalDependencies": {},
   "keywords": [

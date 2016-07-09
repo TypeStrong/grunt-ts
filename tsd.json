@@ -1,27 +1,27 @@
 {
   "version": "v4",
-  "repo": "borisyankov/DefinitelyTyped",
+  "repo": "DefinitelyTyped/DefinitelyTyped",
   "ref": "master",
   "path": "defs",
   "bundle": "defs/tsd.d.ts",
   "installed": {
     "node/node.d.ts": {
-      "commit": "832c51db815c766fa42a2e995a7b3136ec6d15c2"
+      "commit": "7f5ba75603de7e6c5b1d24125518220c1f5ecd84"
     },
     "underscore.string/underscore.string.d.ts": {
-      "commit": "1c1c12eaea0040c2c4493319c286f7d8e8968827"
+      "commit": "7f5ba75603de7e6c5b1d24125518220c1f5ecd84"
     },
     "gruntjs/gruntjs.d.ts": {
-      "commit": "1c1c12eaea0040c2c4493319c286f7d8e8968827"
+      "commit": "7f5ba75603de7e6c5b1d24125518220c1f5ecd84"
     },
     "nodeunit/nodeunit.d.ts": {
-      "commit": "da995655d8f810e5e860d908bf5422ee59ef8ab6"
+      "commit": "7f5ba75603de7e6c5b1d24125518220c1f5ecd84"
     },
     "es6-promise/es6-promise.d.ts": {
-      "commit": "8f081073e6cb416f901b272810d8b04d6e01c9e0"
+      "commit": "7f5ba75603de7e6c5b1d24125518220c1f5ecd84"
     },
     "semver/semver.d.ts": {
-      "commit": "299b5caa22876ef27dc8e9a5b7fd7bf93457b6f4"
+      "commit": "7f5ba75603de7e6c5b1d24125518220c1f5ecd84"
     }
   }
 }
