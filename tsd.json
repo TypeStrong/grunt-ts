@@ -8,9 +8,6 @@
     "node/node.d.ts": {
       "commit": "7f5ba75603de7e6c5b1d24125518220c1f5ecd84"
     },
-    "underscore.string/underscore.string.d.ts": {
-      "commit": "7f5ba75603de7e6c5b1d24125518220c1f5ecd84"
-    },
     "gruntjs/gruntjs.d.ts": {
       "commit": "7f5ba75603de7e6c5b1d24125518220c1f5ecd84"
     },
@@ -22,6 +19,9 @@
     },
     "semver/semver.d.ts": {
       "commit": "7f5ba75603de7e6c5b1d24125518220c1f5ecd84"
+    },
+    "lodash/lodash.d.ts": {
+      "commit": "de82425735f84a10b43921ae4b1d085b3752a626"
     }
   }
 }

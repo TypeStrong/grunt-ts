@@ -121,7 +121,7 @@ function getGlobs(taskOptions, targetOptions) {
         return (_.isArray(thing) || _.isString(thing));
     }
     function getFlatCloneOf(array) {
-        return _.flatten(array).slice();
+        return _.flattenDeep(array).slice();
     }
 }
 function resolve_output_locations(options, projectSpec) {

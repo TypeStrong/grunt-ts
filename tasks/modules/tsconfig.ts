@@ -140,7 +140,7 @@ function getGlobs(taskOptions: ITargetOptions, targetOptions: ITargetOptions) {
   }
 
   function getFlatCloneOf(array: Array<any>) {
-    return [...(<any>_.flatten(array))];
+    return [...(<any>_.flattenDeep(array))];
   }
 }
 
