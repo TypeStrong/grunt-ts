@@ -4,9 +4,10 @@
 * TODO: Update getting started documentation.
 * TODO: Support TypeScript 2.0 and 2.1 features natively
 
-## v6.0.0-beta.1
+## v6.0.0-beta.2
 * CHORE: Update definition files used inside grunt-ts.  Thanks @vvakame!
 * CHORE: Move `typescript` to a peer dependency.
+* FIX: Loosened warnings on bad config that isn't actually bad config.  Thanks for the report, @0815fox (#364)!
 
 ## v5.5.1
 * CHORE: Internal grunt-ts compiler now upgraded to v5.5.0 / TypeScript 1.8.9.
