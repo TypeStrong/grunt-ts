@@ -213,18 +213,21 @@ function resolveAndWarnOnConfigurationIssues(task: ITargetOptions,
       if (task) {
         for (let propertyName in task) {
           if (propertiesFromTarget.indexOf(propertyName) === -1 && propertyName !== 'options') {
-            if (propertiesFromTargetOptions.indexOf(propertyName) > -1) {
-              let warningText = `Property "${propertyName}" in ${configName} is possibly in the wrong place and will be ignored.  ` +
-                `It is expected on the options object.`;
-              warnings.push(warningText);
-            } else if (lowercaseTargetProps.indexOf(propertyName.toLocaleLowerCase()) === -1
-              && lowercaseTargetOptionsProps.indexOf(propertyName.toLocaleLowerCase()) > -1) {
-              let index = lowercaseTargetOptionsProps.indexOf(propertyName.toLocaleLowerCase());
-              let correctPropertyName = propertiesFromTargetOptions[index];
+            if (propertiesFromTargetOptions.indexOf(propertyName) > -1 &&
+                !_.isPlainObject(task[propertyName])) {
+                let warningText = `Property "${propertyName}" in ${configName} is possibly in the wrong place and will be ignored.  ` +
+                  `It is expected on the options object.`;
+                warnings.push(warningText);
+            } else if (lowercaseTargetProps.indexOf(propertyName.toLocaleLowerCase()) === -1 &&
+               lowercaseTargetOptionsProps.indexOf(propertyName.toLocaleLowerCase()) > -1 &&
+               !_.isPlainObject(task[propertyName])) {
 
-              let warningText = `Property "${propertyName}" in ${configName} is possibly in the wrong place and will be ignored.  ` +
-                `It is expected on the options object.  It is also the wrong case and should be ${correctPropertyName}.`;
-              warnings.push(warningText);
+                let index = lowercaseTargetOptionsProps.indexOf(propertyName.toLocaleLowerCase());
+                let correctPropertyName = propertiesFromTargetOptions[index];
+
+                let warningText = `Property "${propertyName}" in ${configName} is possibly in the wrong place and will be ignored.  ` +
+                  `It is expected on the options object.  It is also the wrong case and should be ${correctPropertyName}.`;
+                warnings.push(warningText);
             }
           }
         }

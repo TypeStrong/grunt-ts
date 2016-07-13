@@ -194,6 +194,23 @@ export var tests : nodeunit.ITestGroup = {
           test.done();
         }).catch((err) => {test.ifError(err); test.done();});
     },
+    "compile as target name should not be a warning (issue #364)": (test: nodeunit.Test) => {
+        test.expect(2);
+        const result = or.resolveAsync(null, <any>{compile: { tsconfig:true } }).then((result) => {
+          test.equal(result.warnings.length, 0, "expected no warnings");
+          test.equal(result.errors.length, 0, "expected no errors");
+          test.done();
+        }).catch((err) => {test.ifError(err); test.done();});
+    },
+    "COMPILE as target name should not be a warning (issue #364)": (test: nodeunit.Test) => {
+        test.expect(2);
+        const result = or.resolveAsync(null, <any>{COMPILE: { tsconfig:true } }).then((result) => {
+          console.log(result.warnings);
+          test.equal(result.warnings.length, 0, "expected no warnings");
+          test.equal(result.errors.length, 0, "expected no errors");
+          test.done();
+        }).catch((err) => {test.ifError(err); test.done();});
+    },
     "No warning on target named src that uses files": (test: nodeunit.Test) => {
         test.expect(1);
 

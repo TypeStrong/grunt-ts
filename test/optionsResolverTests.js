@@ -186,6 +186,23 @@ exports.tests = {
                 test.done();
             }).catch(function (err) { test.ifError(err); test.done(); });
         },
+        "compile as target name should not be a warning (issue #364)": function (test) {
+            test.expect(2);
+            var result = or.resolveAsync(null, { compile: { tsconfig: true } }).then(function (result) {
+                test.equal(result.warnings.length, 0, "expected no warnings");
+                test.equal(result.errors.length, 0, "expected no errors");
+                test.done();
+            }).catch(function (err) { test.ifError(err); test.done(); });
+        },
+        "COMPILE as target name should not be a warning (issue #364)": function (test) {
+            test.expect(2);
+            var result = or.resolveAsync(null, { COMPILE: { tsconfig: true } }).then(function (result) {
+                console.log(result.warnings);
+                test.equal(result.warnings.length, 0, "expected no warnings");
+                test.equal(result.errors.length, 0, "expected no errors");
+                test.done();
+            }).catch(function (err) { test.ifError(err); test.done(); });
+        },
         "No warning on target named src that uses files": function (test) {
             test.expect(1);
             var cfg = getConfig("files minimalist");

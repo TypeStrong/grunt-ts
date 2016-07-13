@@ -169,13 +169,15 @@ function resolveAndWarnOnConfigurationIssues(task, target, targetName) {
         if (task) {
             for (var propertyName in task) {
                 if (propertiesFromTarget.indexOf(propertyName) === -1 && propertyName !== 'options') {
-                    if (propertiesFromTargetOptions.indexOf(propertyName) > -1) {
+                    if (propertiesFromTargetOptions.indexOf(propertyName) > -1 &&
+                        !_.isPlainObject(task[propertyName])) {
                         var warningText = ("Property \"" + propertyName + "\" in " + configName + " is possibly in the wrong place and will be ignored.  ") +
                             "It is expected on the options object.";
                         warnings.push(warningText);
                     }
-                    else if (lowercaseTargetProps.indexOf(propertyName.toLocaleLowerCase()) === -1
-                        && lowercaseTargetOptionsProps.indexOf(propertyName.toLocaleLowerCase()) > -1) {
+                    else if (lowercaseTargetProps.indexOf(propertyName.toLocaleLowerCase()) === -1 &&
+                        lowercaseTargetOptionsProps.indexOf(propertyName.toLocaleLowerCase()) > -1 &&
+                        !_.isPlainObject(task[propertyName])) {
                         var index = lowercaseTargetOptionsProps.indexOf(propertyName.toLocaleLowerCase());
                         var correctPropertyName = propertiesFromTargetOptions[index];
                         var warningText = ("Property \"" + propertyName + "\" in " + configName + " is possibly in the wrong place and will be ignored.  ") +
