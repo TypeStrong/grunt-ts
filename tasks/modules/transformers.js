@@ -9,7 +9,6 @@ var __extends = (this && this.__extends) || function (d, b) {
 var fs = require('fs');
 var path = require('path');
 var grunt = require('grunt');
-var _str = require('underscore.string');
 var _ = require('lodash');
 var utils = require('./utils');
 // Setup when transformers are triggered
@@ -52,7 +51,7 @@ function getImports(currentFilePath, name, targetFiles, targetDirs, getIndexIfDi
                     return true;
                 }
                 return path.extname(filename) // must have extension : do not exclude directories
-                    && (!_str.endsWith(filename, '.ts') || _str.endsWith(filename, '.d.ts'))
+                    && (!_.endsWith(filename, '.ts') || _.endsWith(filename, '.d.ts'))
                     && !fs.lstatSync(filename).isDirectory(); // for people that name directories with dots
             });
             filesInDir.sort(); // Sort needed to increase reliability of codegen between runs
@@ -91,7 +90,7 @@ var BaseTransformer = (function () {
         return '//' + '/ts:';
     };
     BaseTransformer.prototype.isGenerated = function (line) {
-        return _str.contains(line, this.signatureGenerated);
+        return _.includes(line, this.signatureGenerated);
     };
     BaseTransformer.prototype.matches = function (line) {
         return line.match(this.match);

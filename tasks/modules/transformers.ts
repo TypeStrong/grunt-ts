@@ -4,7 +4,6 @@
 import fs = require('fs');
 import path = require('path');
 import grunt = require('grunt');
-import _str = require('underscore.string');
 import _ = require('lodash');
 import utils = require('./utils');
 
@@ -53,7 +52,7 @@ function getImports(currentFilePath: string, name: string, targetFiles: string[]
                 if (path.relative(currentFilePath, filename) === '') { return true; }
 
                 return path.extname(filename) // must have extension : do not exclude directories
-                    && (!_str.endsWith(filename, '.ts') || _str.endsWith(filename, '.d.ts'))
+                    && (!_.endsWith(filename, '.ts') || _.endsWith(filename, '.d.ts'))
                     && !fs.lstatSync(filename).isDirectory(); // for people that name directories with dots
             });
             filesInDir.sort(); // Sort needed to increase reliability of codegen between runs
@@ -113,7 +112,7 @@ class BaseTransformer {
     }
 
     isGenerated(line: string): boolean {
-        return _str.contains(line, this.signatureGenerated);
+        return _.includes(line, this.signatureGenerated);
     }
 
     matches(line: string): string[] {
