@@ -292,10 +292,10 @@ export function compileAllFiles(options: IGruntTSOptions, compilationInfo: IGrun
 
       if (options.module) {
      	  let moduleOptionString: string = ('' + options.module).toLowerCase();
-      	if ('amd|commonjs|system|umd|es6|es2015'.indexOf(moduleOptionString) > -1) {
+      	if ('none|amd|commonjs|system|umd|es6|es2015'.indexOf(moduleOptionString) > -1) {
               args.push('--module', moduleOptionString);
       	} else {
-  	        console.warn('WARNING: Option "module" only supports "amd" | "commonjs" | "system" | "umd" | "es6" | "es2015" '.magenta);
+  	        console.warn('WARNING: Option "module" only supports "none" | "amd" | "commonjs" | "system" | "umd" | "es6" | "es2015" '.magenta);
       	}
       }
 
