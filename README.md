@@ -977,7 +977,7 @@ grunt.initConfig({
 #### module
 
 ````javascript
-"amd" | "commonjs" | "system" | "umd" | "es6" | "es2015" | "" (default)
+"amd" | "commonjs" | "system" | "umd" | "es6" | "es2015" | "" (default) | "none" (same behavior as "")
 ````
 
 Specifies if TypeScript should emit AMD, CommonJS, SystemJS, "ES6", or UMD-style external modules.  Has no effect if internal modules are used.  Note - this should not be used in combination with `out` [prior to TypeScript 1.8](https://github.com/Microsoft/TypeScript/wiki/What%27s-new-in-TypeScript#option-to-concatenate-amd-and-system-modules-into-a-single-output-file) because the TypeScript compiler does not support concatenation of external modules; consider using a module bundler like WebPack, Browserify, or Require's r.js to concatenate external modules.
