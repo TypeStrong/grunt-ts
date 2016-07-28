@@ -139,7 +139,7 @@ For file ordering, look at [JavaScript Generation](#javascript-generation).
 |[jsx](#jsx)|option|`'preserve'`, `'react'`, (TypeScript default is `'react'`).  If `'preserve'`, TypeScript will emit `.jsx`; if `'react'`, TypeScript will transpile and emit `.js` files.|
 |[locale](#locale)|option|`string` - specify locale for error messages|
 |[mapRoot](#maproot)|option|`string` - root for referencing `.js.map` files in JS|
-|[module](#module)|option|default to be nothing, If you want to set it you set it to either `'amd'` or `'system'`|
+|[module](#module)|option|default is none (`''`), but can be set to `'amd'`, `'commonjs'`, `'system'`, or other values.|
 |[moduleResolution](#moduleresolution)|option|`'classic'` or `'node'`.  This was introduced in TypeScript 1.6.  The default is `'node'` if not passed.  [More details here](https://github.com/Microsoft/TypeScript/wiki/What%27s-new-in-TypeScript#adjustments-in-module-resolution-logic).|
 |[newLine](#newline)|option|`CRLF`, `LF`, `` (default) - If passed with a value, TypeScript will use the specified line endings.  Also affects grunt-ts transforms.|
 |[noEmit](#noemit)|option|`true`, `false` (default) - If passed as `true`, TypeScript will not emit even if it compiles cleanly|
