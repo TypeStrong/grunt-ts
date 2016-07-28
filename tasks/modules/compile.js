@@ -257,11 +257,11 @@ function compileAllFiles(options, compilationInfo) {
         args.push('--target', options.target.toUpperCase());
         if (options.module) {
             var moduleOptionString = ('' + options.module).toLowerCase();
-            if ('amd|commonjs|system|umd|es6|es2015'.indexOf(moduleOptionString) > -1) {
+            if ('none|amd|commonjs|system|umd|es6|es2015'.indexOf(moduleOptionString) > -1) {
                 args.push('--module', moduleOptionString);
             }
             else {
-                console.warn('WARNING: Option "module" only supports "amd" | "commonjs" | "system" | "umd" | "es6" | "es2015" '.magenta);
+                console.warn('WARNING: Option "module" only supports "none" | "amd" | "commonjs" | "system" | "umd" | "es6" | "es2015" '.magenta);
             }
         }
         if (compilationInfo.outDir) {
