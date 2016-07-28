@@ -4,10 +4,14 @@
 * TODO: Update getting started documentation.
 * TODO: Support TypeScript 2.0 and 2.1 features natively
 
-## v6.0.0-beta.2
+## v6.0.0-beta.3
 * CHORE: Update definition files used inside grunt-ts.  Thanks @vvakame!
 * CHORE: Move `typescript` to a peer dependency.
 * FIX: Loosened warnings on bad config that isn't actually bad config.  Thanks for the report, @0815fox (#364)!
+* FEAT: Support added for testing Node 4, 5, and 6 in the Travis.yml.  Also upgraded Chokidar to 1.6 - thanks for the PR, @franleplant (#370)
+* FIX: Added "none" as valid option for `module` setting.  Thanks for the PR, @kodypeterson (#371)
+* DOCS: Fixed up docs for `module` setting - thanks for the PR, @zzsanduo (#362)
+
 
 ## v5.5.1
 * CHORE: Internal grunt-ts compiler now upgraded to v5.5.0 / TypeScript 1.8.9.
