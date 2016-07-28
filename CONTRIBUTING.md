@@ -98,6 +98,6 @@ $ grunt upgrade
  * Run `grunt release` and ensure it comes back clean (should finish but with warnings).
  * Update the version in package.json.
  * Update CHANGELOG.md and README.md (top section referencing latest version number).
- * Commit to master.
+ * Commit to master.  Push to GitHub.
  * Publish to npm.
  * Push version tag to GitHub.
