@@ -3,8 +3,11 @@
 import {Promise} from 'es6-promise';
 import * as fs from 'fs';
 import * as path from 'path';
+import * as os from 'os';
 import * as stripBom from 'strip-bom';
 import * as _ from 'lodash';
+import * as detectIndent from 'detect-indent';
+import * as detectNewline from 'detect-newline';
 import * as utils from './utils';
 
 let templateProcessor: (templateString: string, options: any) => string = null;
@@ -86,20 +89,25 @@ export function resolveAsync(applyTo: IGruntTSOptions,
         }
       }
 
+      let detectedIndent: string = '    ';
+      let detectedNewline: string = os.EOL;
       try {
         var projectSpec: ITSConfigFile;
+
         const content = stripBom(projectFileTextContent);
         if (content.trim() === '') {
           projectSpec = {};
         } else {
           projectSpec = JSON.parse(content);
+          detectedIndent = detectIndent(content).indent;
+          detectedNewline = detectNewline(content);
         }
       } catch (ex) {
         return reject('Error parsing "' + projectFile + '".  It may not be valid JSON in UTF-8.');
       }
 
       applyTo = warnOnBadConfiguration(applyTo, projectSpec);
-      applyTo = applyCompilerOptions(applyTo, projectSpec);
+      applyTo = applyCompilerOptions(applyTo, projectSpec, detectedIndent, detectedNewline);
       applyTo = resolve_output_locations(applyTo, projectSpec);
     }
 
@@ -213,7 +221,11 @@ function getTSConfigSettings(raw: ITargetOptions): ITSConfigSupport {
   }
 }
 
-function applyCompilerOptions(applyTo: IGruntTSOptions, projectSpec: ITSConfigFile) {
+function applyCompilerOptions(applyTo: IGruntTSOptions,
+  projectSpec: ITSConfigFile,
+  indent: string,
+  newline: string) {
+
   const result: IGruntTSOptions = applyTo || <any>{},
     co = projectSpec.compilerOptions,
     tsconfig: ITSConfigSupport = applyTo.tsconfig;
@@ -322,7 +334,7 @@ function applyCompilerOptions(applyTo: IGruntTSOptions, projectSpec: ITSConfigFi
           if (projectSpec.files) {
             projectSpec.files = [];
           }
-          saveTSConfigSync(tsconfig.tsconfig, projectSpec);
+          saveTSConfigSync(tsconfig.tsconfig, projectSpec, indent, newline);
     }
   }
 
@@ -330,7 +342,7 @@ function applyCompilerOptions(applyTo: IGruntTSOptions, projectSpec: ITSConfigFi
     if (projectSpec.files === undefined) {
       projectSpec.files = [];
     }
-    updateTSConfigAndFilesFromGlob(projectSpec.files, projectSpec.filesGlob, tsconfig.tsconfig );
+    updateTSConfigAndFilesFromGlob(projectSpec.files, projectSpec.filesGlob, tsconfig.tsconfig, indent, newline);
   }
 
   if (projectSpec.files) {
@@ -356,7 +368,7 @@ function applyCompilerOptions(applyTo: IGruntTSOptions, projectSpec: ITSConfigFi
         );
     projectSpec.files = files;
     if (projectSpec.filesGlob) {
-        saveTSConfigSync(tsconfig.tsconfig, projectSpec);
+        saveTSConfigSync(tsconfig.tsconfig, projectSpec, indent, newline);
     }
     addUniqueRelativeFilesToSrc(files, src, absolutePathToTSConfig);
   }
@@ -373,7 +385,8 @@ function relativePathFromGruntfileToTSConfig() {
 
 
 function updateTSConfigAndFilesFromGlob(filesRelativeToTSConfig: string[],
-      globRelativeToTSConfig: string[], tsconfigFileName: string) {
+      globRelativeToTSConfig: string[], tsconfigFileName: string,
+      indent: string, newline: string) {
 
     if ((<any>globExpander).isStub) {
       return;
@@ -409,7 +422,7 @@ function updateTSConfigAndFilesFromGlob(filesRelativeToTSConfig: string[],
       _.difference(filesRelativeToTSConfig, tempTSConfigFiles).length > 0) {
         try {
           tsconfigJSONContent.files = filesRelativeToTSConfig;
-          saveTSConfigSync(tsconfigFileName, tsconfigJSONContent);
+          saveTSConfigSync(tsconfigFileName, tsconfigJSONContent, indent, newline);
         } catch (ex) {
           const error = new Error('Error updating tsconfig.json: ' + ex);
           throw error;
@@ -417,8 +430,31 @@ function updateTSConfigAndFilesFromGlob(filesRelativeToTSConfig: string[],
     }
 }
 
-function saveTSConfigSync(fileName: string, content: any) {
-    fs.writeFileSync(fileName, JSON.stringify(content, null, '    '));
+function saveTSConfigSync(fileName: string, content: any, indent: string, newline: string) {
+    fs.writeFileSync(fileName, prettyJSON(content, indent, newline));
+}
+
+export function prettyJSON(object: any, indent: string | number = 4, newLine: string = os.EOL): string {
+    var cache = [];
+    var value = JSON.stringify(
+        object,
+        // fixup circular reference
+        function(key, value) {
+            if (typeof value === 'object' && value !== null) {
+                if (cache.indexOf(value) !== -1) {
+                    // Circular reference found, discard key
+                    return;
+                }
+                // Store value in our collection
+                cache.push(value);
+            }
+            return value;
+        },
+        indent
+    );
+    value = value.replace(/(?:\r\n|\r|\n)/g, newLine) + newLine;
+    cache = null;
+    return value;
 }
 
 

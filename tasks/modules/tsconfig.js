@@ -2,8 +2,11 @@
 var es6_promise_1 = require('es6-promise');
 var fs = require('fs');
 var path = require('path');
+var os = require('os');
 var stripBom = require('strip-bom');
 var _ = require('lodash');
+var detectIndent = require('detect-indent');
+var detectNewline = require('detect-newline');
 var utils = require('./utils');
 var templateProcessor = null;
 var globExpander = null;
@@ -74,6 +77,8 @@ function resolveAsync(applyTo, taskOptions, targetOptions, theTemplateProcessor,
                     return reject('Error reading "' + projectFile + '": ' + JSON.stringify(ex));
                 }
             }
+            var detectedIndent = '    ';
+            var detectedNewline = os.EOL;
             try {
                 var projectSpec;
                 var content = stripBom(projectFileTextContent);
@@ -82,13 +87,15 @@ function resolveAsync(applyTo, taskOptions, targetOptions, theTemplateProcessor,
                 }
                 else {
                     projectSpec = JSON.parse(content);
+                    detectedIndent = detectIndent(content).indent;
+                    detectedNewline = detectNewline(content);
                 }
             }
             catch (ex) {
                 return reject('Error parsing "' + projectFile + '".  It may not be valid JSON in UTF-8.');
             }
             applyTo = warnOnBadConfiguration(applyTo, projectSpec);
-            applyTo = applyCompilerOptions(applyTo, projectSpec);
+            applyTo = applyCompilerOptions(applyTo, projectSpec, detectedIndent, detectedNewline);
             applyTo = resolve_output_locations(applyTo, projectSpec);
         }
         resolve(applyTo);
@@ -182,7 +189,7 @@ function getTSConfigSettings(raw) {
         throw exception;
     }
 }
-function applyCompilerOptions(applyTo, projectSpec) {
+function applyCompilerOptions(applyTo, projectSpec, indent, newline) {
     var result = applyTo || {}, co = projectSpec.compilerOptions, tsconfig = applyTo.tsconfig;
     if (!tsconfig.ignoreSettings && co) {
         // Go here for the tsconfig.json documentation:
@@ -273,14 +280,14 @@ function applyCompilerOptions(applyTo, projectSpec) {
             if (projectSpec.files) {
                 projectSpec.files = [];
             }
-            saveTSConfigSync(tsconfig.tsconfig, projectSpec);
+            saveTSConfigSync(tsconfig.tsconfig, projectSpec, indent, newline);
         }
     }
     if (tsconfig.updateFiles && projectSpec.filesGlob) {
         if (projectSpec.files === undefined) {
             projectSpec.files = [];
         }
-        updateTSConfigAndFilesFromGlob(projectSpec.files, projectSpec.filesGlob, tsconfig.tsconfig);
+        updateTSConfigAndFilesFromGlob(projectSpec.files, projectSpec.filesGlob, tsconfig.tsconfig, indent, newline);
     }
     if (projectSpec.files) {
         addUniqueRelativeFilesToSrc(projectSpec.files, src, absolutePathToTSConfig);
@@ -302,7 +309,7 @@ function applyCompilerOptions(applyTo, projectSpec) {
         });
         projectSpec.files = files;
         if (projectSpec.filesGlob) {
-            saveTSConfigSync(tsconfig.tsconfig, projectSpec);
+            saveTSConfigSync(tsconfig.tsconfig, projectSpec, indent, newline);
         }
         addUniqueRelativeFilesToSrc(files, src, absolutePathToTSConfig);
     }
@@ -314,7 +321,7 @@ function relativePathFromGruntfileToTSConfig() {
     }
     return path.relative('.', absolutePathToTSConfig).replace(/\\/g, '/');
 }
-function updateTSConfigAndFilesFromGlob(filesRelativeToTSConfig, globRelativeToTSConfig, tsconfigFileName) {
+function updateTSConfigAndFilesFromGlob(filesRelativeToTSConfig, globRelativeToTSConfig, tsconfigFileName, indent, newline) {
     if (globExpander.isStub) {
         return;
     }
@@ -340,7 +347,7 @@ function updateTSConfigAndFilesFromGlob(filesRelativeToTSConfig, globRelativeToT
         _.difference(filesRelativeToTSConfig, tempTSConfigFiles).length > 0) {
         try {
             tsconfigJSONContent.files = filesRelativeToTSConfig;
-            saveTSConfigSync(tsconfigFileName, tsconfigJSONContent);
+            saveTSConfigSync(tsconfigFileName, tsconfigJSONContent, indent, newline);
         }
         catch (ex) {
             var error = new Error('Error updating tsconfig.json: ' + ex);
@@ -348,9 +355,31 @@ function updateTSConfigAndFilesFromGlob(filesRelativeToTSConfig, globRelativeToT
         }
     }
 }
-function saveTSConfigSync(fileName, content) {
-    fs.writeFileSync(fileName, JSON.stringify(content, null, '    '));
+function saveTSConfigSync(fileName, content, indent, newline) {
+    fs.writeFileSync(fileName, prettyJSON(content, indent, newline));
 }
+function prettyJSON(object, indent, newLine) {
+    if (indent === void 0) { indent = 4; }
+    if (newLine === void 0) { newLine = os.EOL; }
+    var cache = [];
+    var value = JSON.stringify(object, 
+    // fixup circular reference
+    function (key, value) {
+        if (typeof value === 'object' && value !== null) {
+            if (cache.indexOf(value) !== -1) {
+                // Circular reference found, discard key
+                return;
+            }
+            // Store value in our collection
+            cache.push(value);
+        }
+        return value;
+    }, indent);
+    value = value.replace(/(?:\r\n|\r|\n)/g, newLine) + newLine;
+    cache = null;
+    return value;
+}
+exports.prettyJSON = prettyJSON;
 function addUniqueRelativeFilesToSrc(tsconfigFilesArray, compilationTaskSrc, absolutePathToTSConfig) {
     var gruntfileFolder = path.resolve('.');
     _.map(_.uniq(tsconfigFilesArray), function (file) {
