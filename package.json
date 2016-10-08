@@ -40,6 +40,8 @@
   "dependencies": {
     "chokidar": "~1.6.0",
     "csproj2ts": "0.0.7",
+    "detect-indent": "^4.0.0",
+    "detect-newline": "^2.1.0",
     "es6-promise": "~0.1.1",
     "lodash": "^4.13.0",
     "ncp": "0.5.1",
