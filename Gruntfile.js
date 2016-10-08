@@ -696,6 +696,16 @@ module.exports = function (grunt) {
                     noImplicitUseStrict: true
                 }
             },
+            new_TypeScript_2_0_Features: {
+                test: true,
+                testExecute: commandLineAssertions.new_TypeScript_2_0_Features,
+                src: 'test/simple/ts/**/*.ts',
+                options: {
+                    strictNullChecks: true,
+                    noImplicitThis: true,
+                    lib: ['es2017']
+                }
+            },
             allowJs_CompileWorks: {
                 test: true,
                 src: ['test/allowJs/allowJsConsumer.ts',

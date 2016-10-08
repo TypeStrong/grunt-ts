@@ -74,6 +74,7 @@ Grunt-ts provides explicit support for most `tsc` switches.  Any arbitrary switc
 |--inlineSources|[inlineSources](#inlinesources)|Emit the TypeScript source alongside the sourcemaps within a single file; requires `--inlineSourceMap` to be set.|
 |--isolatedModules|[isolatedModules](#isolatedmodules)|Ensures that the output is safe to only emit single files by making cases that break single-file transpilation an error|
 |--jsx|[jsx](#jsx)|Specifies the JSX code generation style: 'preserve' or 'react'|
+|--lib|[lib](#lib)|List of library files to be included in the compilation.|
 |--locale|[locale](#locale)|Specify locale for error messages.|
 |--mapRoot LOCATION|[mapRoot](#maproot)|Specifies the location where debugger should locate map files instead of generated locations.|
 |--module KIND|[module](#module)|Specify module style for code generation|
@@ -86,6 +87,7 @@ Grunt-ts provides explicit support for most `tsc` switches.  Any arbitrary switc
 |--noImplicitAny|[noImplicitAny](#noimplicitany)|Warn on expressions and declarations with an implied `any` type.|
 |--noImplicitUseStrict|[noImplicitUseStrict](#noimplicitusestrict)|Warn on expressions and declarations with an implied `any` type.|
 |--noImplicitReturns|[noImplicitReturns](#noimplicitreturns)|Report error when not all code paths in function return a value.|
+|--noImplicitThis|[noImplicitThis](#noImplicitThis)|Raise error on `this` expressions with an implied `any` type.|
 |--noLib|[noLib](#nolib)|Do not automatically include lib.d.ts is compilation context.|
 |--noResolve|[noResolve](#noresolve)|Do not add triple-slash references or module import targets to the compilation context.|
 |--out FILE|[out](#out)|Concatenate and emit output to a single file.|
@@ -96,6 +98,7 @@ Grunt-ts provides explicit support for most `tsc` switches.  Any arbitrary switc
 |--removeComments|[removeComments](#removecomments)|Configures if comments should be included in the output|
 |--rootDir|[rootDir](#rootdir)|Allows override of common root folder calculated by `--outDir`.|
 |--skipDefaultLibCheck|[skipDefaultLibCheck](#skipdefaultlibcheck)|Don't check a user-defined default lib file's validity.|
+|--strictNullChecks|[strictNullChecks](#strictNullChecks)|Enables strict null checking mode.|
 |--sourceMap|[sourceMap](#sourcemap)|Generates corresponding `.map` file|
 |--sourceRoot LOCATION|[sourceRoot](#sourceroot)|Specifies the location where debugger should locate TypeScript files instead of source locations.|
 |--stripInternal|[stripInternal](#stripinternal)|does not emit members marked as @internal.|
@@ -137,6 +140,7 @@ For file ordering, look at [JavaScript Generation](#javascript-generation).
 |[inlineSources](#inlinesources)|option|`true`, `false` (default) Emit the TypeScript source alongside the sourcemaps within a single file; If enabled, will automatically enable `inlineSourceMap` and `sourceMap`.|
 |[isolatedModules](#isolatedmodules)|option|`true`, `false` (default) Ensures that the output is safe to only emit single files by making cases that break single-file transpilation an error.|
 |[jsx](#jsx)|option|`'preserve'`, `'react'`, (TypeScript default is `'react'`).  If `'preserve'`, TypeScript will emit `.jsx`; if `'react'`, TypeScript will transpile and emit `.js` files.|
+|[lib](#lib)|option|`string[]`. List of library files to be included in the compilation. If `--lib` is not specified a default library is injected.|
 |[locale](#locale)|option|`string` - specify locale for error messages|
 |[mapRoot](#maproot)|option|`string` - root for referencing `.js.map` files in JS|
 |[module](#module)|option|default is none (`''`), but can be set to `'amd'`, `'commonjs'`, `'system'`, or other values.|
@@ -148,6 +152,7 @@ For file ordering, look at [JavaScript Generation](#javascript-generation).
 |[noFallthroughCasesInSwitch](#nofallthroughcasesinswitch)|option|`true`, `false` (default) - Report errors for fallthrough cases in switch statement.|
 |[noImplicitAny](#noimplicitany)|option|`true`, `false` (default) - enable for stricter type checking|
 |[noImplicitReturns](#noimplicitreturns)|option|`true`, `false` (default) - Report error when not all code paths in function return a value.|
+|[noImplicitThis](#noImplicitThis)|option|`true`, `false` (default) - Raise error on this expressions with an implied `any` type.|
 |[noLib](#nolib)|option|`true`, `false` (default) - do not automatically include lib.d.ts in compilation context|
 |[noResolve](#noresolve)|option|`true`, `false` (default) - for deprecated version of TypeScript|
 |[options](#grunt-ts-target-options)|target||
@@ -162,6 +167,7 @@ For file ordering, look at [JavaScript Generation](#javascript-generation).
 |[skipDefaultLibCheck](#skipdefaultlibcheck)|option|`true`, `false` (default) - Don't check a user-defined default lib file's validity.|
 |[sourceRoot](#sourceroot)|option|`string` - root for referencing TS files in `.js.map`|
 |[sourceMap](#sourcemap)|option|`true` (default), `false` - indicates if source maps should be generated (`.js.map`)|
+|[strictNullChecks](#strictNullChecks)|option|`true`, `false` (default) - Enables strict null checking mode.|
 |[stripInternal](#stripinternal)|option|`true`, `false` (default) - does not emit members marked as @internal.|
 |[suppressExcessPropertyErrors](#suppressexcesspropertyerrors)|option|`false` (default), `true` - indicates if TypeScript should disable strict object literal assignment checking (experimental)|
 |[suppressImplicitAnyIndexErrors](#suppressimplicitanyindexerrors)|option|`false` (default), `true` - indicates if TypeScript should allow access to properties of an object by string indexer when `--noImplicitAny` is active, even if TypeScript doesn't know about them.|
@@ -941,6 +947,20 @@ grunt.initConfig({
 });
 ````
 
+#### lib
+
+List of library files to be included in the compilation. If `--lib` is not specified a default library is injected.
+
+````javascript
+grunt.initConfig({
+  ts: {
+    options: {
+      lib: ['es2015']
+    }
+  }
+});
+````
+
 #### locale
 
 Specify culture string for error messages - will pass the `--locale` switch.  Requires appropriate TypeScript error messages file to be present (see TypeScript documentation for more details).
@@ -1158,6 +1178,26 @@ grunt.initConfig({
 });
 ````
 
+#### noImplicitThis
+
+````javascript
+true | false (default)
+````
+
+Set to true to pass `--noImplicitThis` to the compiler.  Requires more strict type checking.  Raise error on `this` expressions with an implied `any` type.
+
+````javascript
+grunt.initConfig({
+  ts: {
+    default: {
+      options: {
+        noImplicitThis: true
+      }
+    }
+  }
+});
+````
+
 #### noLib
 
 ````javascript
@@ -1304,6 +1344,26 @@ grunt.initConfig({
     default: {
       options: {
         skipDefaultLibCheck: true
+      }
+    }
+  }
+});
+````
+
+#### strictNullChecks
+
+````javascript
+true | false (default)
+````
+
+In strict null checking mode, the `null` and `undefined` values are not in the domain of every type and are only assignable to themselves and `any` (the one exception being that `undefined` is also assignable to `void`).
+
+````javascript
+grunt.initConfig({
+  ts: {
+    default: {
+      options: {
+        strictNullChecks: true
       }
     }
   }

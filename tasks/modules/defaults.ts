@@ -63,6 +63,9 @@ const TypeScriptDefaults: IGruntTSOptions = {
     forceConsistentCasingInFileNames: false,
     allowJs: false,
     noImplicitUseStrict: false,
+    strictNullChecks: false,
+    noImplicitThis: false,
+    lib: null,
     rootDir: null,
     warnings: [],
     errors: []
