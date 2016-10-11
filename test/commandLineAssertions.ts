@@ -609,7 +609,22 @@ export const new_TypeScript_1_8_Features: ICompilePromise = (strings, options) =
   });
 };
 
+export const new_TypeScript_2_0_Features: ICompilePromise = (strings, options) => {
+  return new Promise(function(resolve, reject) {
 
+    const command = strings[1].replace(/\\/g,'/');
+
+    if (command.indexOf(`--strictNullChecks`) > -1 &&
+        command.indexOf(`--noImplicitThis`) > -1 &&
+        command.indexOf(`--lib es2017`) > -1) {
+      resolve({
+        code: 0,
+        output: ""
+      });
+    }
+    throw `expected to see all of the new TypeScript 2.0 values in the command line and didn't.  Got this: ${command}`;
+  });
+};
 
 export const test_noLib = simpleCommandLineCheck("--noLib");
 export const test_emitBOM = simpleCommandLineCheck("--emitBOM");

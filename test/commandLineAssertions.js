@@ -546,6 +546,20 @@ exports.new_TypeScript_1_8_Features = function (strings, options) {
         throw "expected to see all of the new TypeScript 1.8 values in the command line and didn't.  Got this: " + command;
     });
 };
+exports.new_TypeScript_2_0_Features = function (strings, options) {
+    return new Promise(function (resolve, reject) {
+        var command = strings[1].replace(/\\/g, '/');
+        if (command.indexOf("--strictNullChecks") > -1 &&
+            command.indexOf("--noImplicitThis") > -1 &&
+            command.indexOf("--lib es2017") > -1) {
+            resolve({
+                code: 0,
+                output: ""
+            });
+        }
+        throw "expected to see all of the new TypeScript 2.0 values in the command line and didn't.  Got this: " + command;
+    });
+};
 exports.test_noLib = simpleCommandLineCheck("--noLib");
 exports.test_emitBOM = simpleCommandLineCheck("--emitBOM");
 exports.test_locale = simpleCommandLineCheck("--locale ja-jp");

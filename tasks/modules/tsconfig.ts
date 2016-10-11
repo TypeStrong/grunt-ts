@@ -241,6 +241,7 @@ function applyCompilerOptions(applyTo: IGruntTSOptions, projectSpec: ITSConfigFi
       'inlineSources',
       'jsx',
       // we do not support listFiles.
+      'lib',
       'locale',
       'mapRoot',
       'module',
@@ -252,6 +253,7 @@ function applyCompilerOptions(applyTo: IGruntTSOptions, projectSpec: ITSConfigFi
       'noFallthroughCasesInSwitch',
       'noImplicitAny',
       'noImplicitReturns',
+      'noImplicitThis',
       'noImplicitUseStrict',
       'noLib',
       'noResolve',
@@ -264,6 +266,7 @@ function applyCompilerOptions(applyTo: IGruntTSOptions, projectSpec: ITSConfigFi
       'removeComments',
       'rootDir',
       'skipDefaultLibCheck',
+      'strictNullChecks',
       'sourceMap',
       'sourceRoot',
       'stripInternal',

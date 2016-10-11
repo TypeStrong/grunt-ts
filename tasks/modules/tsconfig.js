@@ -205,6 +205,7 @@ function applyCompilerOptions(applyTo, projectSpec) {
             'inlineSources',
             'jsx',
             // we do not support listFiles.
+            'lib',
             'locale',
             'mapRoot',
             'module',
@@ -216,6 +217,7 @@ function applyCompilerOptions(applyTo, projectSpec) {
             'noFallthroughCasesInSwitch',
             'noImplicitAny',
             'noImplicitReturns',
+            'noImplicitThis',
             'noImplicitUseStrict',
             'noLib',
             'noResolve',
@@ -228,6 +230,7 @@ function applyCompilerOptions(applyTo, projectSpec) {
             'removeComments',
             'rootDir',
             'skipDefaultLibCheck',
+            'strictNullChecks',
             'sourceMap',
             'sourceRoot',
             'stripInternal',

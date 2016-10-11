@@ -115,6 +115,12 @@ interface ITaskOptions {
     allowJs: boolean;
     /** Do not emit  "use strict"  directives in module output. */
     noImplicitUseStrict: boolean;
+    /** Enables strict null checking mode */
+    strictNullChecks: boolean;
+    /** Raise error on this expressions with an implied 'any' type. */
+    noImplicitThis: boolean;
+    /** List of library files to be included in the compilation */
+    lib: Array<string>;
 }
 
 interface IVisualStudioProjectSupport {
