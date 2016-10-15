@@ -3,7 +3,6 @@
 import {Promise} from 'es6-promise';
 import * as fs from 'fs';
 import * as path from 'path';
-import * as os from 'os';
 import * as stripBom from 'strip-bom';
 import * as _ from 'lodash';
 import * as detectIndent from 'detect-indent';
@@ -90,7 +89,7 @@ export function resolveAsync(applyTo: IGruntTSOptions,
       }
 
       let detectedIndent: string = '    ';
-      let detectedNewline: string = os.EOL;
+      let detectedNewline: string = utils.eol;
       try {
         var projectSpec: ITSConfigFile;
 
@@ -434,7 +433,7 @@ function saveTSConfigSync(fileName: string, content: any, indent: string, newlin
     fs.writeFileSync(fileName, prettyJSON(content, indent, newline));
 }
 
-export function prettyJSON(object: any, indent: string | number = 4, newLine: string = os.EOL): string {
+export function prettyJSON(object: any, indent: string | number = 4, newLine: string = utils.eol): string {
     var cache = [];
     var value = JSON.stringify(
         object,

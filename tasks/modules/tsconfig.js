@@ -2,7 +2,6 @@
 var es6_promise_1 = require('es6-promise');
 var fs = require('fs');
 var path = require('path');
-var os = require('os');
 var stripBom = require('strip-bom');
 var _ = require('lodash');
 var detectIndent = require('detect-indent');
@@ -78,7 +77,7 @@ function resolveAsync(applyTo, taskOptions, targetOptions, theTemplateProcessor,
                 }
             }
             var detectedIndent = '    ';
-            var detectedNewline = os.EOL;
+            var detectedNewline = utils.eol;
             try {
                 var projectSpec;
                 var content = stripBom(projectFileTextContent);
@@ -360,7 +359,7 @@ function saveTSConfigSync(fileName, content, indent, newline) {
 }
 function prettyJSON(object, indent, newLine) {
     if (indent === void 0) { indent = 4; }
-    if (newLine === void 0) { newLine = os.EOL; }
+    if (newLine === void 0) { newLine = utils.eol; }
     var cache = [];
     var value = JSON.stringify(object, 
     // fixup circular reference
