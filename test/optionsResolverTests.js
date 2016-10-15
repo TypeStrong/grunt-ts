@@ -5,6 +5,7 @@ var path = require('path');
 var or = require('../tasks/modules/optionsResolver');
 var utils = require('../tasks/modules/utils');
 var _ = require('lodash');
+var testFunctions = require('./test');
 var grunt = require('grunt');
 var config = {
     "minimalist": {
@@ -787,6 +788,69 @@ exports.tests = {
                 test.ok(result.CompilationTasks.length > 0, "expected some compilation tasks from default tsconfig.json");
                 test.strictEqual(result.errors.length, 0, "expected zero errors.");
                 test.strictEqual(result.warnings.length, 0, "expected zero warnings.");
+                test.done();
+            }).catch(function (err) { test.ifError(err); test.done(); });
+        },
+        "four spaces indent is preserved when updating tsconfig": function (test) {
+            test.expect(1);
+            var taskTargetConfig = getConfig("minimalist");
+            taskTargetConfig.tsconfig = './test/tsconfig/four_spaces_indent_tsconfig.json';
+            var result = or.resolveAsync(null, taskTargetConfig, "", null, null, grunt.file.expand).then(function (result) {
+                testFunctions.testExpectedFile(test, './test/tsconfig/four_spaces_indent_tsconfig.expected.json', false);
+                test.done();
+            }).catch(function (err) { test.ifError(err); test.done(); });
+        },
+        "tab indent is preserved when updating tsconfig": function (test) {
+            test.expect(1);
+            var taskTargetConfig = getConfig("minimalist");
+            taskTargetConfig.tsconfig = './test/tsconfig/tab_indent_tsconfig.json';
+            var result = or.resolveAsync(null, taskTargetConfig, "", null, null, grunt.file.expand).then(function (result) {
+                testFunctions.testExpectedFile(test, './test/tsconfig/tab_indent_tsconfig.expected.json', false);
+                test.done();
+            }).catch(function (err) { test.ifError(err); test.done(); });
+        },
+        "three spaces indent is preserved when updating tsconfig": function (test) {
+            test.expect(1);
+            var taskTargetConfig = getConfig("minimalist");
+            taskTargetConfig.tsconfig = './test/tsconfig/three_spaces_indent_tsconfig.json';
+            var result = or.resolveAsync(null, taskTargetConfig, "", null, null, grunt.file.expand).then(function (result) {
+                testFunctions.testExpectedFile(test, './test/tsconfig/three_spaces_indent_tsconfig.expected.json', false);
+                test.done();
+            }).catch(function (err) { test.ifError(err); test.done(); });
+        },
+        "crlf newline is preserved when updating tsconfig": function (test) {
+            test.expect(1);
+            var taskTargetConfig = getConfig("minimalist");
+            taskTargetConfig.tsconfig = './test/tsconfig/crlf_newline_tsconfig.json';
+            var result = or.resolveAsync(null, taskTargetConfig, "", null, null, grunt.file.expand).then(function (result) {
+                testFunctions.testExpectedFile(test, './test/tsconfig/crlf_newline_tsconfig.expected.json', false);
+                test.done();
+            }).catch(function (err) { test.ifError(err); test.done(); });
+        },
+        "lf newline is preserved when updating tsconfig": function (test) {
+            test.expect(1);
+            var taskTargetConfig = getConfig("minimalist");
+            taskTargetConfig.tsconfig = './test/tsconfig/lf_newline_tsconfig.json';
+            var result = or.resolveAsync(null, taskTargetConfig, "", null, null, grunt.file.expand).then(function (result) {
+                testFunctions.testExpectedFile(test, './test/tsconfig/lf_newline_tsconfig.expected.json', false);
+                test.done();
+            }).catch(function (err) { test.ifError(err); test.done(); });
+        },
+        "mixed indent uses first detected indent when updating tsconfig": function (test) {
+            test.expect(1);
+            var taskTargetConfig = getConfig("minimalist");
+            taskTargetConfig.tsconfig = './test/tsconfig/mixed_indent_tsconfig.json';
+            var result = or.resolveAsync(null, taskTargetConfig, "", null, null, grunt.file.expand).then(function (result) {
+                testFunctions.testExpectedFile(test, './test/tsconfig/mixed_indent_tsconfig.expected.json', false);
+                test.done();
+            }).catch(function (err) { test.ifError(err); test.done(); });
+        },
+        "mixed newline uses lf newline when updating tsconfig": function (test) {
+            test.expect(1);
+            var taskTargetConfig = getConfig("minimalist");
+            taskTargetConfig.tsconfig = './test/tsconfig/mixed_newline_tsconfig.json';
+            var result = or.resolveAsync(null, taskTargetConfig, "", null, null, grunt.file.expand).then(function (result) {
+                testFunctions.testExpectedFile(test, './test/tsconfig/mixed_newline_tsconfig.expected.json', false);
                 test.done();
             }).catch(function (err) { test.ifError(err); test.done(); });
         }

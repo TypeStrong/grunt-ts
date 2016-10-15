@@ -28,9 +28,10 @@ function assertFileDoesNotExist(test, path: string) {
     test.equal(false, exists, 'Expected this file to not exist: ' + path);
 }
 
-function testExpectedFile(test, path: string, whitespaceDifferencesOK = false) {
-    var actualFileName = path.replace('\\expected', '').replace('/expected', ''),
-        expectedFileName = path;
+export function testExpectedFile(test, path: string, whitespaceDifferencesOK = false) {
+    let actualFileName = path.replace('\\expected', '').replace('/expected', '')
+      .replace('.expected.', '.');
+    let expectedFileName = path;
 
     var actual = grunt.file.read(actualFileName);
     var expected = grunt.file.read(expectedFileName);
