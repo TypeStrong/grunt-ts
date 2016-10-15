@@ -836,7 +836,7 @@ exports.tests = {
                 test.done();
             }).catch(function (err) { test.ifError(err); test.done(); });
         },
-        "mixed indent uses first detected indent when updating tsconfig": function (test) {
+        "mixed indent uses most frequently detected indent when updating tsconfig": function (test) {
             test.expect(1);
             var taskTargetConfig = getConfig("minimalist");
             taskTargetConfig.tsconfig = './test/tsconfig/mixed_indent_tsconfig.json';
@@ -845,7 +845,7 @@ exports.tests = {
                 test.done();
             }).catch(function (err) { test.ifError(err); test.done(); });
         },
-        "mixed newline uses lf newline when updating tsconfig": function (test) {
+        "mixed newline uses most frequently detected newline when updating tsconfig": function (test) {
             test.expect(1);
             var taskTargetConfig = getConfig("minimalist");
             taskTargetConfig.tsconfig = './test/tsconfig/mixed_newline_tsconfig.json';
