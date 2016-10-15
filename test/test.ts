@@ -1,57 +1,14 @@
 /// <reference path="../defs/tsd.d.ts" />
 
 var grunt: IGrunt = require('grunt');
-import fs = require('fs');
-import path = require('path');
-import utils = require('../tasks/modules/utils');
-import _ = require('lodash');
 import * as nodeunit from 'nodeunit';
 
-function testFile(test, path: string, whitespaceDifferencesOK = false) {
-    var actualFileName = 'test/' + path,
-        expectedFileName = 'test/expected/' + path;
-
-    var actual = grunt.file.read(actualFileName);
-    var expected = grunt.file.read(expectedFileName);
-
-    if (whitespaceDifferencesOK) {
-      actual = actual.replace(/\s/g,'');
-      expected = expected.replace(/\s/g,'');
-    }
-
-    test.equal(expected, actual, `Actual did not match expected.  Run this to compare:` +
-      `${grunt.util.linefeed}kdiff3 "${actualFileName}" "${expectedFileName}"`);
-}
-
-function assertFileDoesNotExist(test, path: string) {
-    var exists = grunt.file.exists(path);
-    test.equal(false, exists, 'Expected this file to not exist: ' + path);
-}
-
-export function testExpectedFile(test, path: string, whitespaceDifferencesOK = false) {
-    let actualFileName = path.replace('\\expected', '').replace('/expected', '')
-      .replace('.expected.', '.');
-    let expectedFileName = path;
-
-    var actual = grunt.file.read(actualFileName);
-    var expected = grunt.file.read(expectedFileName);
-
-    if (whitespaceDifferencesOK) {
-      actual = actual.replace(/\s/g,'');
-      expected = expected.replace(/\s/g,'');
-    }
-
-    test.equal(expected, actual, `Actual did not match expected.  Run this to compare:` +
-      `${grunt.util.linefeed}kdiff3 "${actualFileName}" "${expectedFileName}"`);
-}
-
-
-function testDirectory(test, folder, whitespaceDifferencesOK = false) {
-    var files = utils.getFiles(('test/expected/' + folder));
-    _.forEach(files, (expected: string) => {
-        testExpectedFile(test, expected, whitespaceDifferencesOK);
-    });
-}
+import {
+  assertFileDoesNotExist,
+  testDirectory,
+  testFile,
+  testExpectedFile
+} from './testHelpers';
 
 export var tests : nodeunit.ITestGroup = {
     setUp: (callback) => {

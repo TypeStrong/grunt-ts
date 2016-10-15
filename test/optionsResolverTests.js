@@ -5,7 +5,7 @@ var path = require('path');
 var or = require('../tasks/modules/optionsResolver');
 var utils = require('../tasks/modules/utils');
 var _ = require('lodash');
-var testFunctions = require('./test');
+var testHelpers_1 = require('./testHelpers');
 var grunt = require('grunt');
 var config = {
     "minimalist": {
@@ -796,7 +796,7 @@ exports.tests = {
             var taskTargetConfig = getConfig("minimalist");
             taskTargetConfig.tsconfig = './test/tsconfig/four_spaces_indent_tsconfig.json';
             var result = or.resolveAsync(null, taskTargetConfig, "", null, null, grunt.file.expand).then(function (result) {
-                testFunctions.testExpectedFile(test, './test/tsconfig/four_spaces_indent_tsconfig.expected.json', false);
+                testHelpers_1.testExpectedFile(test, './test/tsconfig/four_spaces_indent_tsconfig.expected.json', false);
                 test.done();
             }).catch(function (err) { test.ifError(err); test.done(); });
         },
@@ -805,7 +805,7 @@ exports.tests = {
             var taskTargetConfig = getConfig("minimalist");
             taskTargetConfig.tsconfig = './test/tsconfig/tab_indent_tsconfig.json';
             var result = or.resolveAsync(null, taskTargetConfig, "", null, null, grunt.file.expand).then(function (result) {
-                testFunctions.testExpectedFile(test, './test/tsconfig/tab_indent_tsconfig.expected.json', false);
+                testHelpers_1.testExpectedFile(test, './test/tsconfig/tab_indent_tsconfig.expected.json', false);
                 test.done();
             }).catch(function (err) { test.ifError(err); test.done(); });
         },
@@ -814,7 +814,7 @@ exports.tests = {
             var taskTargetConfig = getConfig("minimalist");
             taskTargetConfig.tsconfig = './test/tsconfig/three_spaces_indent_tsconfig.json';
             var result = or.resolveAsync(null, taskTargetConfig, "", null, null, grunt.file.expand).then(function (result) {
-                testFunctions.testExpectedFile(test, './test/tsconfig/three_spaces_indent_tsconfig.expected.json', false);
+                testHelpers_1.testExpectedFile(test, './test/tsconfig/three_spaces_indent_tsconfig.expected.json', false);
                 test.done();
             }).catch(function (err) { test.ifError(err); test.done(); });
         },
@@ -823,7 +823,7 @@ exports.tests = {
             var taskTargetConfig = getConfig("minimalist");
             taskTargetConfig.tsconfig = './test/tsconfig/crlf_newline_tsconfig.json';
             var result = or.resolveAsync(null, taskTargetConfig, "", null, null, grunt.file.expand).then(function (result) {
-                testFunctions.testExpectedFile(test, './test/tsconfig/crlf_newline_tsconfig.expected.json', false);
+                testHelpers_1.testExpectedFile(test, './test/tsconfig/crlf_newline_tsconfig.expected.json', false);
                 test.done();
             }).catch(function (err) { test.ifError(err); test.done(); });
         },
@@ -832,7 +832,7 @@ exports.tests = {
             var taskTargetConfig = getConfig("minimalist");
             taskTargetConfig.tsconfig = './test/tsconfig/lf_newline_tsconfig.json';
             var result = or.resolveAsync(null, taskTargetConfig, "", null, null, grunt.file.expand).then(function (result) {
-                testFunctions.testExpectedFile(test, './test/tsconfig/lf_newline_tsconfig.expected.json', false);
+                testHelpers_1.testExpectedFile(test, './test/tsconfig/lf_newline_tsconfig.expected.json', false);
                 test.done();
             }).catch(function (err) { test.ifError(err); test.done(); });
         },
@@ -841,7 +841,7 @@ exports.tests = {
             var taskTargetConfig = getConfig("minimalist");
             taskTargetConfig.tsconfig = './test/tsconfig/mixed_indent_tsconfig.json';
             var result = or.resolveAsync(null, taskTargetConfig, "", null, null, grunt.file.expand).then(function (result) {
-                testFunctions.testExpectedFile(test, './test/tsconfig/mixed_indent_tsconfig.expected.json', false);
+                testHelpers_1.testExpectedFile(test, './test/tsconfig/mixed_indent_tsconfig.expected.json', false);
                 test.done();
             }).catch(function (err) { test.ifError(err); test.done(); });
         },
@@ -850,7 +850,7 @@ exports.tests = {
             var taskTargetConfig = getConfig("minimalist");
             taskTargetConfig.tsconfig = './test/tsconfig/mixed_newline_tsconfig.json';
             var result = or.resolveAsync(null, taskTargetConfig, "", null, null, grunt.file.expand).then(function (result) {
-                testFunctions.testExpectedFile(test, './test/tsconfig/mixed_newline_tsconfig.expected.json', false);
+                testHelpers_1.testExpectedFile(test, './test/tsconfig/mixed_newline_tsconfig.expected.json', false);
                 test.done();
             }).catch(function (err) { test.ifError(err); test.done(); });
         }

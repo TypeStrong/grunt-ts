@@ -7,7 +7,7 @@ import * as or from '../tasks/modules/optionsResolver';
 import * as tsconfig from '../tasks/modules/tsconfig';
 import * as utils from '../tasks/modules/utils';
 import * as _ from 'lodash';
-import * as testFunctions from './test';
+import { testExpectedFile } from './testHelpers';
 
 let grunt: IGrunt = require('grunt');
 
@@ -849,7 +849,7 @@ export var tests : nodeunit.ITestGroup = {
     taskTargetConfig.tsconfig = './test/tsconfig/four_spaces_indent_tsconfig.json';
 
     const result = or.resolveAsync(null, taskTargetConfig, "", null, null, grunt.file.expand).then((result: IGruntTSOptions) => {
-      testFunctions.testExpectedFile(test, './test/tsconfig/four_spaces_indent_tsconfig.expected.json', false);
+      testExpectedFile(test, './test/tsconfig/four_spaces_indent_tsconfig.expected.json', false);
       test.done();
     }).catch((err) => {test.ifError(err); test.done();});
   },
@@ -859,7 +859,7 @@ export var tests : nodeunit.ITestGroup = {
     taskTargetConfig.tsconfig = './test/tsconfig/tab_indent_tsconfig.json';
 
     const result = or.resolveAsync(null, taskTargetConfig, "", null, null, grunt.file.expand).then((result: IGruntTSOptions) => {
-      testFunctions.testExpectedFile(test, './test/tsconfig/tab_indent_tsconfig.expected.json', false);
+      testExpectedFile(test, './test/tsconfig/tab_indent_tsconfig.expected.json', false);
       test.done();
     }).catch((err) => {test.ifError(err); test.done();});
   },
@@ -869,7 +869,7 @@ export var tests : nodeunit.ITestGroup = {
     taskTargetConfig.tsconfig = './test/tsconfig/three_spaces_indent_tsconfig.json';
 
     const result = or.resolveAsync(null, taskTargetConfig, "", null, null, grunt.file.expand).then((result: IGruntTSOptions) => {
-      testFunctions.testExpectedFile(test, './test/tsconfig/three_spaces_indent_tsconfig.expected.json', false);
+      testExpectedFile(test, './test/tsconfig/three_spaces_indent_tsconfig.expected.json', false);
       test.done();
     }).catch((err) => {test.ifError(err); test.done();});
   },
@@ -879,7 +879,7 @@ export var tests : nodeunit.ITestGroup = {
     taskTargetConfig.tsconfig = './test/tsconfig/crlf_newline_tsconfig.json';
 
     const result = or.resolveAsync(null, taskTargetConfig, "", null, null, grunt.file.expand).then((result: IGruntTSOptions) => {
-      testFunctions.testExpectedFile(test, './test/tsconfig/crlf_newline_tsconfig.expected.json', false);
+      testExpectedFile(test, './test/tsconfig/crlf_newline_tsconfig.expected.json', false);
       test.done();
     }).catch((err) => {test.ifError(err); test.done();});
   },
@@ -889,7 +889,7 @@ export var tests : nodeunit.ITestGroup = {
     taskTargetConfig.tsconfig = './test/tsconfig/lf_newline_tsconfig.json';
 
     const result = or.resolveAsync(null, taskTargetConfig, "", null, null, grunt.file.expand).then((result: IGruntTSOptions) => {
-      testFunctions.testExpectedFile(test, './test/tsconfig/lf_newline_tsconfig.expected.json', false);
+      testExpectedFile(test, './test/tsconfig/lf_newline_tsconfig.expected.json', false);
       test.done();
     }).catch((err) => {test.ifError(err); test.done();});
   },
@@ -899,7 +899,7 @@ export var tests : nodeunit.ITestGroup = {
     taskTargetConfig.tsconfig = './test/tsconfig/mixed_indent_tsconfig.json';
 
     const result = or.resolveAsync(null, taskTargetConfig, "", null, null, grunt.file.expand).then((result: IGruntTSOptions) => {
-      testFunctions.testExpectedFile(test, './test/tsconfig/mixed_indent_tsconfig.expected.json', false);
+      testExpectedFile(test, './test/tsconfig/mixed_indent_tsconfig.expected.json', false);
       test.done();
     }).catch((err) => {test.ifError(err); test.done();});
   },
@@ -909,7 +909,7 @@ export var tests : nodeunit.ITestGroup = {
     taskTargetConfig.tsconfig = './test/tsconfig/mixed_newline_tsconfig.json';
 
     const result = or.resolveAsync(null, taskTargetConfig, "", null, null, grunt.file.expand).then((result: IGruntTSOptions) => {
-      testFunctions.testExpectedFile(test, './test/tsconfig/mixed_newline_tsconfig.expected.json', false);
+      testExpectedFile(test, './test/tsconfig/mixed_newline_tsconfig.expected.json', false);
       test.done();
     }).catch((err) => {test.ifError(err); test.done();});
   }
