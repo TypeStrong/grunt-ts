@@ -112,11 +112,7 @@ function pluginFn(grunt: IGrunt) {
                 function isBaseDirFile(filename: string, targetFiles: string[]) {
 
                     var baseDirFile: string = '.baseDir.ts';
-                    var bd = '';
-                    if (!options.baseDir) {
-                        bd = utils.findCommonPath(targetFiles, '/');
-                        options.baseDir = bd;
-                    }
+                    var bd = options.baseDir || utils.findCommonPath(targetFiles, '/');
 
                     return path.resolve(filename) === path.resolve(path.join(bd, baseDirFile));
                 }

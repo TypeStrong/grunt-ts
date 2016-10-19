@@ -583,11 +583,7 @@ function simpleCommandLineCheck(lookFor) {
 }
 var BASE_DIR_FILE_NAME = ".baseDir.ts";
 exports.test_baseDirSpecified = baseDirCheck(true);
-// Although a `.baseDir.ts` file should not be included in case that
-// the `baseDir` option is not specified (and the value of the `fast` option is 'never'),
-// a `.baseDir.ts` file is included actually.
-// This is a bug.
-exports.test_baseDirNotSpecified = baseDirCheck(true);
+exports.test_baseDirNotSpecified = baseDirCheck(false);
 function baseDirCheck(shouldBaseDirBeIncluded) {
     return function (strings, options) {
         return new Promise(function (resolve, reject) {
