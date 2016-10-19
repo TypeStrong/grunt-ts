@@ -649,3 +649,29 @@ function simpleCommandLineCheck(lookFor: string) {
   };
   return result;
 }
+
+const BASE_DIR_FILE_NAME = ".baseDir.ts";
+export const test_baseDirSpecified = baseDirCheck(true);
+// Although a `.baseDir.ts` file should not be included in case that
+// the `baseDir` option is not specified (and the value of the `fast` option is 'never'),
+// a `.baseDir.ts` file is included actually.
+// This is a bug.
+export const test_baseDirNotSpecified = baseDirCheck(true);
+function baseDirCheck(shouldBaseDirBeIncluded: boolean): ICompilePromise {
+  return (strings, options) => {
+    return new Promise((resolve, reject) => {
+
+      const command = strings[1].replace(/\\/g,'/');
+
+      var isBaseDirFileNameIncluded = (command.indexOf(BASE_DIR_FILE_NAME) !== -1);
+      if (isBaseDirFileNameIncluded === shouldBaseDirBeIncluded) {
+        resolve({
+          code: 0,
+          output: ""
+        });
+      } else {
+        throw `expected ${shouldBaseDirBeIncluded ? "" : "not "}to see ${BASE_DIR_FILE_NAME} on the command line and didn't.  Got this: ${command}`;
+      }
+    });
+  };
+}
