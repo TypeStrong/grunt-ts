@@ -15,7 +15,8 @@
     "filesGlob": [
         "./defs/**/*.ts",
         "./tasks/**/*.ts",
-        "./test/*.ts"
+        "./test/*.ts",
+        "./test/tsconfig_artifact/newlineConfigs/*.ts"
     ],
     "files": [
         "defs/es6-promise/es6-promise.d.ts",

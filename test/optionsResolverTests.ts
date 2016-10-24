@@ -11,6 +11,14 @@ import { testExpectedFile } from './testHelpers';
 
 let grunt: IGrunt = require('grunt');
 
+// inline strings for newline configs
+import { crlf_newline_tsconfig_json } from './tsconfig_artifact/newlineConfigs/crlf_newline_tsconfig.json';
+import { crlf_newline_tsconfig_expected_json } from './tsconfig_artifact/newlineConfigs/crlf_newline_tsconfig.expected.json';
+import { lf_newline_tsconfig_json } from './tsconfig_artifact/newlineConfigs/lf_newline_tsconfig.json';
+import { lf_newline_tsconfig_expected_json } from './tsconfig_artifact/newlineConfigs/lf_newline_tsconfig.expected.json';
+import { mixed_newline_tsconfig_json } from './tsconfig_artifact/newlineConfigs/mixed_newline_tsconfig.json';
+import { mixed_newline_tsconfig_expected_json } from './tsconfig_artifact/newlineConfigs/mixed_newline_tsconfig.expected.json';
+
 const config : {[name: string]: IGruntTargetOptions} = {
   "minimalist": <any>{
     src: ["**/*.ts", "!node_modules/**/*.ts"]
@@ -526,6 +534,16 @@ export var tests : nodeunit.ITestGroup = {
         }
 
         try {
+          // write inline string configs to test config files
+          fs.writeFileSync('./test/tsconfig/crlf_newline_tsconfig.json', crlf_newline_tsconfig_json);
+          fs.writeFileSync('./test/tsconfig/crlf_newline_tsconfig.expected.json', crlf_newline_tsconfig_expected_json);
+
+          fs.writeFileSync('./test/tsconfig/lf_newline_tsconfig.json', lf_newline_tsconfig_json);
+          fs.writeFileSync('./test/tsconfig/lf_newline_tsconfig.expected.json', lf_newline_tsconfig_expected_json);
+
+          fs.writeFileSync('./test/tsconfig/mixed_newline_tsconfig.json', mixed_newline_tsconfig_json);
+          fs.writeFileSync('./test/tsconfig/mixed_newline_tsconfig.expected.json', mixed_newline_tsconfig_expected_json);
+
           fs.readdir('test/tsconfig_artifact', processFiles);
         } catch(ex) {
           console.log(ex);

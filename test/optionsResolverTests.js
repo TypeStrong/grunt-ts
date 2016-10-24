@@ -7,6 +7,13 @@ var utils = require('../tasks/modules/utils');
 var _ = require('lodash');
 var testHelpers_1 = require('./testHelpers');
 var grunt = require('grunt');
+// inline strings for newline configs
+var crlf_newline_tsconfig_json_1 = require('./tsconfig_artifact/newlineConfigs/crlf_newline_tsconfig.json');
+var crlf_newline_tsconfig_expected_json_1 = require('./tsconfig_artifact/newlineConfigs/crlf_newline_tsconfig.expected.json');
+var lf_newline_tsconfig_json_1 = require('./tsconfig_artifact/newlineConfigs/lf_newline_tsconfig.json');
+var lf_newline_tsconfig_expected_json_1 = require('./tsconfig_artifact/newlineConfigs/lf_newline_tsconfig.expected.json');
+var mixed_newline_tsconfig_json_1 = require('./tsconfig_artifact/newlineConfigs/mixed_newline_tsconfig.json');
+var mixed_newline_tsconfig_expected_json_1 = require('./tsconfig_artifact/newlineConfigs/mixed_newline_tsconfig.expected.json');
 var config = {
     "minimalist": {
         src: ["**/*.ts", "!node_modules/**/*.ts"]
@@ -508,6 +515,13 @@ exports.tests = {
                 });
             };
             try {
+                // write inline string configs to test config files
+                fs.writeFileSync('./test/tsconfig/crlf_newline_tsconfig.json', crlf_newline_tsconfig_json_1.crlf_newline_tsconfig_json);
+                fs.writeFileSync('./test/tsconfig/crlf_newline_tsconfig.expected.json', crlf_newline_tsconfig_expected_json_1.crlf_newline_tsconfig_expected_json);
+                fs.writeFileSync('./test/tsconfig/lf_newline_tsconfig.json', lf_newline_tsconfig_json_1.lf_newline_tsconfig_json);
+                fs.writeFileSync('./test/tsconfig/lf_newline_tsconfig.expected.json', lf_newline_tsconfig_expected_json_1.lf_newline_tsconfig_expected_json);
+                fs.writeFileSync('./test/tsconfig/mixed_newline_tsconfig.json', mixed_newline_tsconfig_json_1.mixed_newline_tsconfig_json);
+                fs.writeFileSync('./test/tsconfig/mixed_newline_tsconfig.expected.json', mixed_newline_tsconfig_expected_json_1.mixed_newline_tsconfig_expected_json);
                 fs.readdir('test/tsconfig_artifact', processFiles);
             }
             catch (ex) {
