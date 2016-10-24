@@ -23,6 +23,7 @@ test/definitelytypedtest/reference.ts
 !tasks/ts-internal.js
 !test/expected/**/*.js
 !test/expected/**/*.map
+!test/tsconfig_artifact/newlineConfigs/*.js
 !test/*.js
 .tscache/
 !test/tsconfig/*.json
