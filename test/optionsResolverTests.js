@@ -197,7 +197,6 @@ exports.tests = {
         "COMPILE as target name should not be a warning (issue #364)": function (test) {
             test.expect(2);
             var result = or.resolveAsync(null, { COMPILE: { tsconfig: true } }).then(function (result) {
-                console.log(result.warnings);
                 test.equal(result.warnings.length, 0, "expected no warnings");
                 test.equal(result.errors.length, 0, "expected no errors");
                 test.done();
@@ -708,7 +707,8 @@ exports.tests = {
         "paths written to filesGlob are resolved first": function (test) {
             test.expect(4);
             var cfg = getConfig("minimalist");
-            cfg.src = ['./test/<%= grunt.pathsFilesGlobProperty %>/a*.ts'];
+            // this assumes the test gruntfile which uses the {% and %} delimiters.
+            cfg.src = ["./test/{%= grunt.pathsFilesGlobProperty %}/a*.ts"];
             cfg.tsconfig = {
                 tsconfig: 'test/tsconfig/simple_filesGlob_tsconfig.json',
                 ignoreFiles: false,
