@@ -1,8 +1,9 @@
 /// <reference path="../defs/tsd.d.ts"/>
 /// <reference path="../tasks/modules/interfaces.d.ts"/>
 "use strict";
+var es6_promise_1 = require("es6-promise");
 exports.decoratorMetadataPassed = function (strings, options) {
-    return new Promise(function (resolve, reject) {
+    return new es6_promise_1.Promise(function (resolve, reject) {
         if (options.emitDecoratorMetadata === true &&
             options.experimentalDecorators === true) {
             resolve({
@@ -14,7 +15,7 @@ exports.decoratorMetadataPassed = function (strings, options) {
     });
 };
 exports.decoratorMetadataNotPassed = function (strings, options) {
-    return new Promise(function (resolve, reject) {
+    return new es6_promise_1.Promise(function (resolve, reject) {
         if (options.emitDecoratorMetadata === undefined) {
             resolve({
                 code: 0,
@@ -25,7 +26,7 @@ exports.decoratorMetadataNotPassed = function (strings, options) {
     });
 };
 exports.variablesReplacedForTSConfig = function (strings, options) {
-    return new Promise(function (resolve, reject) {
+    return new es6_promise_1.Promise(function (resolve, reject) {
         var expected = "test/tsconfig/tsconfig-grunt-ts.json";
         if (options.tsconfig && options.tsconfig.tsconfig === expected) {
             resolve({
@@ -37,7 +38,7 @@ exports.variablesReplacedForTSConfig = function (strings, options) {
     });
 };
 exports.tsconfig_passThrough_onlySendsConfigThrough_WithPathAndAdditional = function (strings, options) {
-    return new Promise(function (resolve, reject) {
+    return new es6_promise_1.Promise(function (resolve, reject) {
         var tscfg = options.tsconfig;
         if (tscfg
             && tscfg.passThrough
@@ -52,7 +53,7 @@ exports.tsconfig_passThrough_onlySendsConfigThrough_WithPathAndAdditional = func
     });
 };
 exports.tsconfig_passThrough_onlySendsConfigThrough_WithoutPath = function (strings, options) {
-    return new Promise(function (resolve, reject) {
+    return new es6_promise_1.Promise(function (resolve, reject) {
         var tscfg = options.tsconfig;
         if (tscfg && tscfg.passThrough && tscfg.tsconfig === '.') {
             resolve({
@@ -64,7 +65,7 @@ exports.tsconfig_passThrough_onlySendsConfigThrough_WithoutPath = function (stri
     });
 };
 exports.variablesReplacedFor_vs = function (strings, options) {
-    return new Promise(function (resolve, reject) {
+    return new es6_promise_1.Promise(function (resolve, reject) {
         var expected = "test/vsproj/testproject.csproj";
         if (options.vs && options.vs.project === expected) {
             resolve({
@@ -76,7 +77,7 @@ exports.variablesReplacedFor_vs = function (strings, options) {
     });
 };
 exports.experimentalDecoratorsPassed = function (strings, options) {
-    return new Promise(function (resolve, reject) {
+    return new es6_promise_1.Promise(function (resolve, reject) {
         if (options.experimentalDecorators === true) {
             resolve({
                 code: 0,
@@ -87,7 +88,7 @@ exports.experimentalDecoratorsPassed = function (strings, options) {
     });
 };
 exports.noEmitPassed = function (strings, options) {
-    return new Promise(function (resolve, reject) {
+    return new es6_promise_1.Promise(function (resolve, reject) {
         if (options.noEmit === true) {
             resolve({
                 code: 0,
@@ -98,7 +99,7 @@ exports.noEmitPassed = function (strings, options) {
     });
 };
 exports.noEmitNotPassed = function (strings, options) {
-    return new Promise(function (resolve, reject) {
+    return new es6_promise_1.Promise(function (resolve, reject) {
         if (options.noEmit === undefined) {
             resolve({
                 code: 0,
@@ -109,7 +110,7 @@ exports.noEmitNotPassed = function (strings, options) {
     });
 };
 exports.inlineSourcesPassed = function (strings, options) {
-    return new Promise(function (resolve, reject) {
+    return new es6_promise_1.Promise(function (resolve, reject) {
         if (options.inlineSources === true &&
             options.sourceMap === false &&
             options.inlineSourceMap === true) {
@@ -127,7 +128,7 @@ exports.inlineSourcesPassed = function (strings, options) {
     });
 };
 exports.inlineSourcesAndInlineSourceMapPassed = function (strings, options) {
-    return new Promise(function (resolve, reject) {
+    return new es6_promise_1.Promise(function (resolve, reject) {
         if (options.inlineSources === true &&
             options.sourceMap === false &&
             options.inlineSourceMap === true) {
@@ -145,7 +146,7 @@ exports.inlineSourcesAndInlineSourceMapPassed = function (strings, options) {
     });
 };
 exports.inlineSourceMapPassedWithSourceMap = function (strings, options) {
-    return new Promise(function (resolve, reject) {
+    return new es6_promise_1.Promise(function (resolve, reject) {
         if (options.inlineSources === undefined &&
             options.sourceMap === false &&
             options.inlineSourceMap === true) {
@@ -163,7 +164,7 @@ exports.inlineSourceMapPassedWithSourceMap = function (strings, options) {
     });
 };
 exports.inlineSourcesNotPassed = function (strings, options) {
-    return new Promise(function (resolve, reject) {
+    return new es6_promise_1.Promise(function (resolve, reject) {
         if (options.inlineSources === undefined && options.sourceMap === false) {
             resolve({
                 code: 0,
@@ -179,7 +180,7 @@ exports.inlineSourcesNotPassed = function (strings, options) {
     });
 };
 exports.vsproj_test = function (strings, options) {
-    return new Promise(function (resolve, reject) {
+    return new es6_promise_1.Promise(function (resolve, reject) {
         if (options.sourceMap === true &&
             options.removeComments === false &&
             options.module === 'commonjs' &&
@@ -196,7 +197,7 @@ exports.vsproj_test = function (strings, options) {
     });
 };
 exports.vsproj_test_config = function (strings, options) {
-    return new Promise(function (resolve, reject) {
+    return new es6_promise_1.Promise(function (resolve, reject) {
         if (options.sourceMap === false &&
             options.removeComments === true &&
             options.CompilationTasks[0].outDir.indexOf('vsproj_test_config') >= 0) {
@@ -212,7 +213,7 @@ exports.vsproj_test_config = function (strings, options) {
     });
 };
 exports.param_newLine_CRLF = function (strings, options) {
-    return new Promise(function (resolve, reject) {
+    return new es6_promise_1.Promise(function (resolve, reject) {
         if (options.newLine === "CRLF") {
             resolve({
                 code: 0,
@@ -224,7 +225,7 @@ exports.param_newLine_CRLF = function (strings, options) {
     });
 };
 exports.param_newLine_LF = function (strings, options) {
-    return new Promise(function (resolve, reject) {
+    return new es6_promise_1.Promise(function (resolve, reject) {
         if (options.newLine === "LF") {
             resolve({
                 code: 0,
@@ -236,7 +237,7 @@ exports.param_newLine_LF = function (strings, options) {
     });
 };
 exports.files_testFilesUsedWithDestAsAFolder = function (strings, options) {
-    return new Promise(function (resolve, reject) {
+    return new es6_promise_1.Promise(function (resolve, reject) {
         if (options.CompilationTasks[0].outDir === "test/multifile/files_testFilesUsedWithDestAsAJSFolder" &&
             (options.CompilationTasks[0].out || "not specified") === "not specified") {
             resolve({
@@ -249,7 +250,7 @@ exports.files_testFilesUsedWithDestAsAFolder = function (strings, options) {
     });
 };
 exports.files_testFilesUsedWithDestAsAFile = function (strings, options) {
-    return new Promise(function (resolve, reject) {
+    return new es6_promise_1.Promise(function (resolve, reject) {
         if (options.CompilationTasks[0].out === "test/multifile/files_testFilesUsedWithDestAsAJSFile/testDest.js" &&
             (options.CompilationTasks[0].outDir || "not specified") === "not specified") {
             resolve({
@@ -262,7 +263,7 @@ exports.files_testFilesUsedWithDestAsAFile = function (strings, options) {
     });
 };
 exports.test_systemJS = function (strings, options) {
-    return new Promise(function (resolve, reject) {
+    return new es6_promise_1.Promise(function (resolve, reject) {
         if (options.module === "system") {
             resolve({
                 code: 0,
@@ -274,7 +275,7 @@ exports.test_systemJS = function (strings, options) {
     });
 };
 exports.test_umd = function (strings, options) {
-    return new Promise(function (resolve, reject) {
+    return new es6_promise_1.Promise(function (resolve, reject) {
         if (options.module === "umd") {
             resolve({
                 code: 0,
@@ -286,7 +287,7 @@ exports.test_umd = function (strings, options) {
     });
 };
 exports.test_isolatedModules = function (strings, options) {
-    return new Promise(function (resolve, reject) {
+    return new es6_promise_1.Promise(function (resolve, reject) {
         if (options.isolatedModules === true) {
             resolve({
                 code: 0,
@@ -297,7 +298,7 @@ exports.test_isolatedModules = function (strings, options) {
     });
 };
 exports.test_noEmitHelpers = function (strings, options) {
-    return new Promise(function (resolve, reject) {
+    return new es6_promise_1.Promise(function (resolve, reject) {
         if (options.noEmitHelpers === true) {
             resolve({
                 code: 0,
@@ -308,7 +309,7 @@ exports.test_noEmitHelpers = function (strings, options) {
     });
 };
 exports.test_additionalFlags = function (strings, options) {
-    return new Promise(function (resolve, reject) {
+    return new es6_promise_1.Promise(function (resolve, reject) {
         if (options.additionalFlags === '--version') {
             resolve({
                 code: 0,
@@ -319,7 +320,7 @@ exports.test_additionalFlags = function (strings, options) {
     });
 };
 exports.bad_sourcemap_option = function (strings, options) {
-    return new Promise(function (resolve, reject) {
+    return new es6_promise_1.Promise(function (resolve, reject) {
         if (options.warnings.length > 0
             && options.warnings[0].indexOf("sourceMap") > -1) {
             resolve({
@@ -331,7 +332,7 @@ exports.bad_sourcemap_option = function (strings, options) {
     });
 };
 exports.out_with_spaces = function (strings, options) {
-    return new Promise(function (resolve, reject) {
+    return new es6_promise_1.Promise(function (resolve, reject) {
         var command = strings[1];
         if (command.indexOf('--out "test/out with spaces/out with spaces.js"') > -1) {
             resolve({
@@ -343,7 +344,7 @@ exports.out_with_spaces = function (strings, options) {
     });
 };
 exports.files_showWarningIfFilesIsUsedWithSrcOrOut = function (strings, options) {
-    return new Promise(function (resolve, reject) {
+    return new es6_promise_1.Promise(function (resolve, reject) {
         var command = strings[1].replace(/\\/g, '/');
         var expectedWarning = "Warning: In task \"files_showWarningIfFilesIsUsedWithSrcOrOut\", either" +
             " \"files\" or \"src\" should be used - not both.";
@@ -363,7 +364,7 @@ exports.files_showWarningIfFilesIsUsedWithSrcOrOut = function (strings, options)
     });
 };
 exports.files_showWarningIfFilesIsUsedWithSrcOrOutDir = function (strings, options) {
-    return new Promise(function (resolve, reject) {
+    return new es6_promise_1.Promise(function (resolve, reject) {
         var command = strings[1].replace(/\\/g, '/');
         var expectedWarning = "Warning: In task \"files_showWarningIfFilesIsUsedWithSrcOrOutDir\", either" +
             " \"files\" or \"src\" should be used - not both.";
@@ -383,7 +384,7 @@ exports.files_showWarningIfFilesIsUsedWithSrcOrOutDir = function (strings, optio
     });
 };
 exports.files_showWarningIfFilesIsUsedWithVs = function (strings, options) {
-    return new Promise(function (resolve, reject) {
+    return new es6_promise_1.Promise(function (resolve, reject) {
         var command = strings[1].replace(/\\/g, '/');
         var expectedWarning = "Warning: In task \"files_showWarningIfFilesIsUsedWithVs\", either \"files\" " +
             "or \"vs\" should be used - not both.";
@@ -404,7 +405,7 @@ exports.files_showWarningIfFilesIsUsedWithVs = function (strings, options) {
     });
 };
 exports.files_showWarningIfFilesIsUsedWithFast = function (strings, options) {
-    return new Promise(function (resolve, reject) {
+    return new es6_promise_1.Promise(function (resolve, reject) {
         var command = strings[1].replace(/\\/g, '/');
         var expectedWarning = "Warning: target \"files_showWarningIfFilesIsUsedWithFast\" is attempting to use fast compilation with \"files\"." +
             "  This is not currently supported.  Setting \"fast\" to \"never\".";
@@ -422,7 +423,7 @@ exports.files_showWarningIfFilesIsUsedWithFast = function (strings, options) {
     });
 };
 exports.files_testWarnIfFilesHasDestArray = function (strings, options) {
-    return new Promise(function (resolve, reject) {
+    return new es6_promise_1.Promise(function (resolve, reject) {
         var command = strings[1].replace(/\\/g, '/');
         var expectedWarning = "Warning: target \"files_testWarnIfFilesHasDestArray\" has an array specified for the files.dest property." +
             "  This is not supported.  Taking first element and ignoring the rest.";
@@ -442,7 +443,7 @@ exports.files_testWarnIfFilesHasDestArray = function (strings, options) {
     });
 };
 exports.warnbothcomments = function (strings, options) {
-    return new Promise(function (resolve, reject) {
+    return new es6_promise_1.Promise(function (resolve, reject) {
         var command = strings[1].replace(/\\/g, '/');
         var expectedWarning = "WARNING: Option \"comments\" and \"removeComments\" should not be used together.  " +
             "The --removeComments value of false supercedes the --comments value of true";
@@ -459,7 +460,7 @@ exports.warnbothcomments = function (strings, options) {
     });
 };
 exports.test_jsx = function (strings, options) {
-    return new Promise(function (resolve, reject) {
+    return new es6_promise_1.Promise(function (resolve, reject) {
         var command = strings[1].replace(/\\/g, '/');
         var expected = '--jsx preserve';
         if (command.indexOf(expected) > -1) {
@@ -472,7 +473,7 @@ exports.test_jsx = function (strings, options) {
     });
 };
 exports.test_moduleResolution = function (strings, options) {
-    return new Promise(function (resolve, reject) {
+    return new es6_promise_1.Promise(function (resolve, reject) {
         var command = strings[1].replace(/\\/g, '/');
         var expected = '--moduleResolution classic';
         if (command.indexOf(expected) > -1) {
@@ -485,7 +486,7 @@ exports.test_moduleResolution = function (strings, options) {
     });
 };
 exports.test_experimentalAsyncFunctions = function (strings, options) {
-    return new Promise(function (resolve, reject) {
+    return new es6_promise_1.Promise(function (resolve, reject) {
         var command = strings[1].replace(/\\/g, '/');
         var expected = '--experimentalAsyncFunctions';
         if (command.indexOf(expected) > -1) {
@@ -498,7 +499,7 @@ exports.test_experimentalAsyncFunctions = function (strings, options) {
     });
 };
 exports.test_rootDir = function (strings, options) {
-    return new Promise(function (resolve, reject) {
+    return new es6_promise_1.Promise(function (resolve, reject) {
         var command = strings[1].replace(/\\/g, '/');
         var expected = '--rootDir test/simple';
         if (command.indexOf(expected) > -1) {
@@ -511,7 +512,7 @@ exports.test_rootDir = function (strings, options) {
     });
 };
 exports.test_directoriesWithSpaces = function (strings, options) {
-    return new Promise(function (resolve, reject) {
+    return new es6_promise_1.Promise(function (resolve, reject) {
         var command = strings[1].replace(/\\/g, '/');
         if (command.indexOf("--rootDir \"test/rootDir with spaces\"") > -1 &&
             command.indexOf("--outDir \"test/outDir with spaces\"") > -1 &&
@@ -526,7 +527,7 @@ exports.test_directoriesWithSpaces = function (strings, options) {
     });
 };
 exports.new_TypeScript_1_8_Features = function (strings, options) {
-    return new Promise(function (resolve, reject) {
+    return new es6_promise_1.Promise(function (resolve, reject) {
         var command = strings[1].replace(/\\/g, '/');
         if (command.indexOf("--reactNamespace myReact") > -1 &&
             command.indexOf("--skipDefaultLibCheck") > -1 &&
@@ -554,7 +555,7 @@ exports.test_stripInternal = simpleCommandLineCheck("--stripInternal");
 exports.test_allowSyntheticDefaultImports = simpleCommandLineCheck("--allowSyntheticDefaultImports");
 function simpleCommandLineCheck(lookFor) {
     var result = function (strings, options) {
-        return new Promise(function (resolve, reject) {
+        return new es6_promise_1.Promise(function (resolve, reject) {
             var command = strings[1].replace(/\\/g, '/');
             if (command.indexOf(lookFor) > -1) {
                 resolve({
