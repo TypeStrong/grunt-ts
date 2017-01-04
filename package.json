@@ -49,7 +49,7 @@
   },
   "peerDependencies": {
     "grunt": ">=0.4.0 || ^1.0.1",
-    "typescript": "^1.8.0 || 2.1.4"
+    "typescript": "2.1.4 || ~1"
   },
   "devDependencies": {
     "grunt": "~0.4.0 || ^1.0.1",
