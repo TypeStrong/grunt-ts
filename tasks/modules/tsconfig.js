@@ -1,10 +1,10 @@
 'use strict';
-var es6_promise_1 = require('es6-promise');
-var fs = require('fs');
-var path = require('path');
-var stripBom = require('strip-bom');
-var _ = require('lodash');
-var utils = require('./utils');
+var es6_promise_1 = require("es6-promise");
+var fs = require("fs");
+var path = require("path");
+var stripBom = require("strip-bom");
+var _ = require("lodash");
+var utils = require("./utils");
 var templateProcessor = null;
 var globExpander = null;
 var gruntfileGlobs = null;

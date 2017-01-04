@@ -1,9 +1,9 @@
 /// <reference path="../../defs/tsd.d.ts"/>
 "use strict";
-var _ = require('lodash');
-var path = require('path');
-var fs = require('fs');
-var utils = require('./utils');
+var _ = require("lodash");
+var path = require("path");
+var fs = require("fs");
+var utils = require("./utils");
 var grunt = utils.grunt;
 var pathSeperator = path.sep;
 function getReferencesInOrder(referenceFile, referencePath, generatedFiles) {

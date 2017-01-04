@@ -1,5 +1,5 @@
 "use strict";
-var compile = require('../tasks/modules/compile');
+var compile = require("../tasks/modules/compile");
 exports.tests = {
     "grunt-ts `fast` compile feature": {
         "Successful compile with (fast === never) should NOT refresh fast cache": function (test) {

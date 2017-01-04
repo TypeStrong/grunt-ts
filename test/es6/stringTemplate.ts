@@ -1,2 +1,4 @@
-var name = "World";
-console.log(`Hello ${name}!`);
+{
+    let name = "World";
+    console.log(`Hello ${name}!`);
+}

@@ -1,9 +1,9 @@
 /// <reference path="../../defs/tsd.d.ts"/>
 "use strict";
-var _ = require('lodash');
-var fs = require('fs');
-var grunt = require('grunt');
-var utils = require('./utils');
+var _ = require("lodash");
+var fs = require("fs");
+var grunt = require("grunt");
+var utils = require("./utils");
 /////////////////////////////////////////////////////////////////////
 // Reference file logic
 ////////////////////////////////////////////////////////////////////

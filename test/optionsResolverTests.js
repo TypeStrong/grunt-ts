@@ -1,10 +1,10 @@
 /// <reference path="../defs/tsd.d.ts" />
 "use strict";
-var fs = require('fs');
-var path = require('path');
-var or = require('../tasks/modules/optionsResolver');
-var utils = require('../tasks/modules/utils');
-var _ = require('lodash');
+var fs = require("fs");
+var path = require("path");
+var or = require("../tasks/modules/optionsResolver");
+var utils = require("../tasks/modules/utils");
+var _ = require("lodash");
 var grunt = require('grunt');
 var config = {
     "minimalist": {

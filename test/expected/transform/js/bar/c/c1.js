@@ -1,6 +1,6 @@
 "use strict";
 ///ts:import=foo
-var foo = require('../../foo/index'); ///ts:import:generated
+var foo = require("../../foo/index"); ///ts:import:generated
 // USE CLASSES FROM A/B:
 // With `export =` and naming file same as main export variable: 
 var a1 = new foo.A1();

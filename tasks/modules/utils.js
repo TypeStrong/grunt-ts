@@ -1,11 +1,11 @@
 /// <reference path="../../defs/tsd.d.ts"/>
 "use strict";
-var path = require('path');
-var fs = require('fs');
-var os = require('os');
-var util = require('util');
-var _ = require('lodash');
-var es6_promise_1 = require('es6-promise');
+var path = require("path");
+var fs = require("fs");
+var os = require("os");
+var util = require("util");
+var _ = require("lodash");
+var es6_promise_1 = require("es6-promise");
 exports.grunt = require('grunt');
 exports.eol = exports.grunt.util.linefeed;
 function newLineIsRedundantForTsc(newLineParameter, operatingSystem) {

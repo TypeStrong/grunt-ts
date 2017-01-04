@@ -5,18 +5,18 @@
  * grunt-ts
  * Licensed under the MIT license.
  */
-var _ = require('lodash');
-var path = require('path');
-var fs = require('fs');
-var es6_promise_1 = require('es6-promise');
-var utils = require('./modules/utils');
-var compileModule = require('./modules/compile');
-var referenceModule = require('./modules/reference');
-var amdLoaderModule = require('./modules/amdLoader');
-var html2tsModule = require('./modules/html2ts');
-var templateCacheModule = require('./modules/templateCache');
-var transformers = require('./modules/transformers');
-var optionsResolver = require('../tasks/modules/optionsResolver');
+var _ = require("lodash");
+var path = require("path");
+var fs = require("fs");
+var es6_promise_1 = require("es6-promise");
+var utils = require("./modules/utils");
+var compileModule = require("./modules/compile");
+var referenceModule = require("./modules/reference");
+var amdLoaderModule = require("./modules/amdLoader");
+var html2tsModule = require("./modules/html2ts");
+var templateCacheModule = require("./modules/templateCache");
+var transformers = require("./modules/transformers");
+var optionsResolver = require("../tasks/modules/optionsResolver");
 var asyncSeries = utils.asyncSeries, timeIt = utils.timeIt;
 var fail_event = 'grunt-ts.failure';
 function pluginFn(grunt) {
