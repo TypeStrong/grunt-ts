@@ -1063,7 +1063,7 @@ module.exports = function (grunt) {
     grunt.registerTask('build', ['prep', 'ts-internal', 'tslint:source']);
 
     // Test
-    grunt.registerTask('fail', ['continueOn', 'test_fail', 'continueOff', 'validate_failure_count']);
+    grunt.registerTask('fail', ['continue:on', 'test_fail', 'continue:off', 'validate_failure_count']);
     grunt.registerTask('test', ['stageFiles', 'test_all', 'fail', 'nodeunit:fast', 'nodeunit:slow',
       'tslint:transformedHtml', 'clean:testPost']);
 

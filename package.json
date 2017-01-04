@@ -54,7 +54,7 @@
   },
   "devDependencies": {
     "grunt": "~0.4.0",
-    "grunt-continue": "0.0.1",
+    "grunt-continue": "0.1.0",
     "grunt-contrib-clean": "~0.4.0",
     "grunt-contrib-jshint": "~0.8.0",
     "grunt-contrib-nodeunit": "~0.2.2",
