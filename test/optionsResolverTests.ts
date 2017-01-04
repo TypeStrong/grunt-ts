@@ -205,7 +205,6 @@ export var tests : nodeunit.ITestGroup = {
     "COMPILE as target name should not be a warning (issue #364)": (test: nodeunit.Test) => {
         test.expect(2);
         const result = or.resolveAsync(null, <any>{COMPILE: { tsconfig:true } }).then((result) => {
-          console.log(result.warnings);
           test.equal(result.warnings.length, 0, "expected no warnings");
           test.equal(result.errors.length, 0, "expected no errors");
           test.done();
