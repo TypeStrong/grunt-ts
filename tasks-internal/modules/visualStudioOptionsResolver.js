@@ -1,9 +1,9 @@
 'use strict';
-var csproj2ts = require('csproj2ts');
-var path = require('path');
-var utils = require('./utils');
-var es6_promise_1 = require('es6-promise');
-var _ = require('lodash');
+var csproj2ts = require("csproj2ts");
+var path = require("path");
+var utils = require("./utils");
+var es6_promise_1 = require("es6-promise");
+var _ = require("lodash");
 var templateProcessor = null;
 function resolveVSOptionsAsync(applyTo, taskOptions, targetOptions, theTemplateProcessor) {
     templateProcessor = theTemplateProcessor;

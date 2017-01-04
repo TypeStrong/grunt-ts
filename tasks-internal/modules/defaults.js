@@ -1,6 +1,6 @@
 'use strict';
-var utils = require('./utils');
-var _ = require('lodash');
+var utils = require("./utils");
+var _ = require("lodash");
 var TypeScriptDefaults = {
     allowBool: false,
     allowImportModule: false,
