@@ -596,7 +596,7 @@ export var tests : nodeunit.ITestGroup = {
         }).catch((err) => {test.ifError(err); test.done();});
     },
     "config entries come through appropriately": (test: nodeunit.Test) => {
-        test.expect(13);
+        test.expect(16);
         const cfg = getConfig("minimalist");
         cfg.tsconfig = './test/tsconfig/full_valid_tsconfig.json';
 
@@ -612,6 +612,9 @@ export var tests : nodeunit.ITestGroup = {
           test.strictEqual(result.emitDecoratorMetadata, undefined, 'emitDecoratorMetadata is not specified in this tsconfig.json');
           test.strictEqual(result.CompilationTasks.length, 1);
           test.strictEqual(result.allowSyntheticDefaultImports, true);
+          test.strictEqual(result.charset, 'utf8');
+          test.strictEqual(result.strictNullChecks, false);
+          test.strictEqual(result.listFiles, true);
           test.strictEqual(result.CompilationTasks[0].outDir, 'test/tsconfig/files');
           test.strictEqual(result.CompilationTasks[0].out, undefined);
           test.done();

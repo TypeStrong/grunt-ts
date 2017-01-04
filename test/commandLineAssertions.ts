@@ -200,16 +200,17 @@ export const vsproj_test : ICompilePromise = (strings, options) => {
     if (options.sourceMap === true &&
         options.removeComments === false &&
         options.module === 'commonjs' &&
-        options.CompilationTasks[0].outDir === 'test/vsproj/vsproj_test') {
+        options.CompilationTasks[0].outDir === 'test/vsproj/vsproj_test' &&
+        options.strictNullChecks === true) {
       resolve({
         code: 0,
         output: ""
       });
     }
     throw "expected sourceMap === true, removeComments===" +
-      "false, module===commonjs, outDir===vsproj_test.  Was " +
+      "false, module===commonjs, outDir===vsproj_test, strictNullChecks===true.  Was " +
         JSON.stringify([options.sourceMap,
-        options.removeComments, options.module, options.CompilationTasks[0].outDir]);
+        options.removeComments, options.module, options.CompilationTasks[0].outDir, options.strictNullChecks]);
   });
 };
 
