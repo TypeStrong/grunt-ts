@@ -35,7 +35,6 @@
     "node": ">= 0.8.0"
   },
   "scripts": {
-    "test": "grunt test --verbose"
   },
   "dependencies": {
     "chokidar": "^1.6.1",
