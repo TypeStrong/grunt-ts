@@ -92,7 +92,7 @@ export function compileAllFiles(options: IGruntTSOptions, compilationInfo: IGrun
     let targetFiles: string[] = compilationInfo.src;
 
     // Make a local copy so we can modify files without having external side effects
-    let files = _.map(targetFiles, (file) => file);
+    let files = _.map(targetFiles, file => file);
 
     var newFiles: string[] = files;
     if (options.fast === 'watch') { // if we only do fast compile if target is watched
@@ -156,7 +156,7 @@ export function compileAllFiles(options: IGruntTSOptions, compilationInfo: IGrun
     }
 
     // Quote the files to compile. Needed for command line parsing by tsc
-    files = _.map(files, (item) => `"${path.resolve(item)}"`);
+    files = _.map(files, item => utils.quotedRelativePath(item));
 
     let args: string[] = files.slice(0),
       tsc: string,
@@ -287,6 +287,61 @@ export function compileAllFiles(options: IGruntTSOptions, compilationInfo: IGrun
       if (options.noImplicitUseStrict) {
           args.push('--noImplicitUseStrict');
       }
+      if (options.alwaysStrict) {
+          args.push('--alwaysStrict');
+      }
+      if (options.diagnostics) {
+          args.push('--diagnostics');
+      }
+      if (options.importHelpers) {
+          args.push('--importHelpers');
+      }
+      if (options.listFiles) {
+          args.push('--listFiles');
+      }
+      if (options.listEmittedFiles) {
+          args.push('--listEmittedFiles');
+      }
+      if (options.noImplicitThis) {
+          args.push('--noImplicitThis');
+      }
+      if (options.noUnusedLocals) {
+          args.push('--noUnusedLocals');
+      }
+      if (options.noUnusedParameters) {
+          args.push('--noUnusedParameters');
+      }
+      if (options.strictNullChecks) {
+          args.push('--strictNullChecks');
+      }
+      if (options.traceResolution) {
+          args.push('--traceResolution');
+      }
+      if (options.baseUrl) {
+          args.push('--baseUrl', `"${utils.stripQuotesIfQuoted(options.baseUrl)}"`);
+      }
+      if (options.charset) {
+          args.push('--charset', options.charset);
+      }
+      if (options.declarationDir) {
+          args.push('--declarationDir', utils.quotedRelativePath(options.declarationDir));
+      }
+      if (options.jsxFactory) {
+          args.push('--jsxFactory', options.jsxFactory);
+      }
+      if (options.lib) {
+          args.push('--lib', options.lib.join(','));
+      }
+      if (options.maxNodeModuleJsDepth > 0 || options.maxNodeModuleJsDepth === 0) {
+          args.push('--maxNodeModuleJsDepth', options.maxNodeModuleJsDepth + '');
+      }
+      if (options.types) {
+          args.push('--types', _.map(options.types, t => `"${utils.stripQuotesIfQuoted(t)}"`).join(','));
+      }
+      if (options.typeRoots) {
+          args.push('--typeRoots', _.map(options.typeRoots, tr => utils.quotedRelativePath(tr)).join(','));
+      }
+
 
       args.push('--target', options.target.toUpperCase());
 

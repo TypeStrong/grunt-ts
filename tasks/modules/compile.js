@@ -126,7 +126,7 @@ function compileAllFiles(options, compilationInfo) {
         files = [referenceFile];
     }
     // Quote the files to compile. Needed for command line parsing by tsc
-    files = _.map(files, function (item) { return "\"" + path.resolve(item) + "\""; });
+    files = _.map(files, function (item) { return utils.quotedRelativePath(item); });
     var args = files.slice(0), tsc, tscVersion = '';
     var tsconfig = options.tsconfig;
     if (options.compiler) {
@@ -253,6 +253,60 @@ function compileAllFiles(options, compilationInfo) {
         }
         if (options.noImplicitUseStrict) {
             args.push('--noImplicitUseStrict');
+        }
+        if (options.alwaysStrict) {
+            args.push('--alwaysStrict');
+        }
+        if (options.diagnostics) {
+            args.push('--diagnostics');
+        }
+        if (options.importHelpers) {
+            args.push('--importHelpers');
+        }
+        if (options.listFiles) {
+            args.push('--listFiles');
+        }
+        if (options.listEmittedFiles) {
+            args.push('--listEmittedFiles');
+        }
+        if (options.noImplicitThis) {
+            args.push('--noImplicitThis');
+        }
+        if (options.noUnusedLocals) {
+            args.push('--noUnusedLocals');
+        }
+        if (options.noUnusedParameters) {
+            args.push('--noUnusedParameters');
+        }
+        if (options.strictNullChecks) {
+            args.push('--strictNullChecks');
+        }
+        if (options.traceResolution) {
+            args.push('--traceResolution');
+        }
+        if (options.baseUrl) {
+            args.push('--baseUrl', "\"" + utils.stripQuotesIfQuoted(options.baseUrl) + "\"");
+        }
+        if (options.charset) {
+            args.push('--charset', options.charset);
+        }
+        if (options.declarationDir) {
+            args.push('--declarationDir', utils.quotedRelativePath(options.declarationDir));
+        }
+        if (options.jsxFactory) {
+            args.push('--jsxFactory', options.jsxFactory);
+        }
+        if (options.lib) {
+            args.push('--lib', options.lib.join(','));
+        }
+        if (options.maxNodeModuleJsDepth > 0 || options.maxNodeModuleJsDepth === 0) {
+            args.push('--maxNodeModuleJsDepth', options.maxNodeModuleJsDepth + '');
+        }
+        if (options.types) {
+            args.push('--types', _.map(options.types, function (t) { return "\"" + utils.stripQuotesIfQuoted(t) + "\""; }).join(','));
+        }
+        if (options.typeRoots) {
+            args.push('--typeRoots', _.map(options.typeRoots, function (tr) { return utils.quotedRelativePath(tr); }).join(','));
         }
         args.push('--target', options.target.toUpperCase());
         if (options.module) {

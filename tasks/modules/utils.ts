@@ -94,6 +94,10 @@ export function endsWith(str: string, suffix: string): boolean {
     return str.indexOf(suffix, str.length - suffix.length) !== -1;
 }
 
+export function quotedRelativePath(thePath: string) {
+    return `"${stripQuotesIfQuoted(path.relative('.',path.resolve(thePath)))}"`;
+}
+
 export function stripQuotesIfQuoted(possiblyQuotedString: string) {
     if (!possiblyQuotedString.length || possiblyQuotedString.length < 2) {
       return possiblyQuotedString;

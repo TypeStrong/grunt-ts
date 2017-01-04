@@ -87,6 +87,10 @@ function endsWith(str, suffix) {
     return str.indexOf(suffix, str.length - suffix.length) !== -1;
 }
 exports.endsWith = endsWith;
+function quotedRelativePath(thePath) {
+    return "\"" + stripQuotesIfQuoted(path.relative('.', path.resolve(thePath))) + "\"";
+}
+exports.quotedRelativePath = quotedRelativePath;
 function stripQuotesIfQuoted(possiblyQuotedString) {
     if (!possiblyQuotedString.length || possiblyQuotedString.length < 2) {
         return possiblyQuotedString;

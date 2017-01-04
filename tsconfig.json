@@ -24,7 +24,6 @@
         "defs/node/node.d.ts",
         "defs/nodeunit/nodeunit.d.ts",
         "defs/tsd.d.ts",
-        "defs/underscore.string/underscore.string.d.ts",
         "tasks/modules/amdLoader.ts",
         "tasks/modules/cacheUtils.ts",
         "tasks/modules/compile.ts",

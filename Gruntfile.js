@@ -697,6 +697,31 @@ module.exports = function (grunt) {
                     noImplicitUseStrict: true
                 }
             },
+            new_TypeScript_2_and_2_1_Features: {
+                test: true,
+                testExecute: commandLineAssertions.new_TypeScript_2_and_2_1_Features,
+                src: 'test/simple/ts/**/*.ts',
+                options: {
+                    alwaysStrict: true,
+                    baseUrl: '../',
+                    charset: 'utf8',
+                    declarationDir: '.././declarations dir/',
+                    diagnostics: true,
+                    importHelpers: true,
+                    jsxFactory: 'React.createElement',
+                    lib: ['es5', 'ES2015.Promise'],
+                    listEmittedFiles: true,
+                    listFiles: true,
+                    maxNodeModuleJsDepth: 2,
+                    noImplicitThis: true,
+                    noUnusedLocals: true,
+                    noUnusedParameters: true,
+                    strictNullChecks: true,
+                    traceResolution: true,
+                    types: ['node', 'lodash', 'express'],
+                    typeRoots: ['./sometypings','../../otherTypings']
+                }
+            },
             allowJs_CompileWorks: {
                 test: true,
                 src: ['test/allowJs/allowJsConsumer.ts',

@@ -35,7 +35,8 @@
     "node": ">= 0.8.0"
   },
   "scripts": {
-    "test": "grunt test --verbose --stack"
+    "test": "grunt test --verbose --stack",
+    "watch": "tsc -p . -w"
   },
   "dependencies": {
     "chokidar": "^1.6.1",

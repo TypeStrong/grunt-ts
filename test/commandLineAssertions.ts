@@ -610,6 +610,38 @@ export const new_TypeScript_1_8_Features: ICompilePromise = (strings, options) =
   });
 };
 
+export const new_TypeScript_2_and_2_1_Features: ICompilePromise = (strings, options) => {
+  return new Promise(function(resolve, reject) {
+
+    const command = strings[1].replace(/\\/g,'/');
+
+    if (command.indexOf(`--alwaysStrict`) > -1 &&
+        command.indexOf(`--baseUrl "../"`) > -1 &&
+        command.indexOf(`--charset utf8`) > -1 &&
+        command.indexOf(`--declarationDir "../declarations dir"`) > -1 &&
+        command.indexOf(`--diagnostics`) > -1 &&
+        command.indexOf(`--importHelpers`) > -1 &&
+        command.indexOf(`--jsxFactory React.createElement`) > -1 &&
+        command.indexOf(`--lib es5,ES2015.Promise`) > -1 &&
+        command.indexOf(`--listEmittedFiles`) > -1 &&
+        command.indexOf(`--listFiles`) > -1 &&
+        command.indexOf(`--maxNodeModuleJsDepth 2`) > -1 &&
+        command.indexOf(`--noImplicitThis`) > -1 &&
+        command.indexOf(`--noUnusedLocals`) > -1 &&
+        command.indexOf(`--noUnusedParameters`) > -1 &&
+        command.indexOf(`--strictNullChecks`) > -1 &&
+        command.indexOf(`--traceResolution`) > -1 &&
+        command.indexOf(`--types "node","lodash","express"`) > -1 &&
+        command.indexOf(`--typeRoots "sometypings","../../otherTypings"`) > -1)
+    {
+      resolve({
+        code: 0,
+        output: ""
+      });
+    }
+    throw `expected to see all of the new TypeScript 2 and 2.1 values in the command line and didn't.  Got this: ${command}`;
+  });
+}
 
 
 export const test_noLib = simpleCommandLineCheck("--noLib");
