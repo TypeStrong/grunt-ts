@@ -617,7 +617,7 @@ export const new_TypeScript_2_and_2_1_Features: ICompilePromise = (strings, opti
     const command = strings[1].replace(/\\/g,'/');
 
     if (command.indexOf(`--alwaysStrict`) > -1 &&
-        command.indexOf(`--baseUrl "../"`) > -1 &&
+        command.indexOf(`--baseUrl ..`) > -1 &&
         command.indexOf(`--charset utf8`) > -1 &&
         command.indexOf(`--declarationDir "../declarations dir"`) > -1 &&
         command.indexOf(`--diagnostics`) > -1 &&

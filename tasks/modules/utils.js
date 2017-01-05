@@ -87,8 +87,14 @@ function endsWith(str, suffix) {
     return str.indexOf(suffix, str.length - suffix.length) !== -1;
 }
 exports.endsWith = endsWith;
-function quotedRelativePath(thePath) {
-    return "\"" + stripQuotesIfQuoted(path.relative('.', path.resolve(thePath))) + "\"";
+function possiblyQuotedRelativePath(thePath, relativeTo) {
+    if (relativeTo === void 0) { relativeTo = '.'; }
+    return enclosePathInQuotesIfRequired(path.relative(relativeTo, path.resolve(thePath)));
+}
+exports.possiblyQuotedRelativePath = possiblyQuotedRelativePath;
+function quotedRelativePath(thePath, relativeTo) {
+    if (relativeTo === void 0) { relativeTo = '.'; }
+    return "\"" + stripQuotesIfQuoted(path.relative(relativeTo, path.resolve(thePath))) + "\"";
 }
 exports.quotedRelativePath = quotedRelativePath;
 function stripQuotesIfQuoted(possiblyQuotedString) {

@@ -126,7 +126,7 @@ function compileAllFiles(options, compilationInfo) {
         files = [referenceFile];
     }
     // Quote the files to compile. Needed for command line parsing by tsc
-    files = _.map(files, function (item) { return utils.quotedRelativePath(item); });
+    files = _.map(files, function (item) { return utils.possiblyQuotedRelativePath(item); });
     var args = files.slice(0), tsc, tscVersion = '';
     var tsconfig = options.tsconfig;
     if (options.compiler) {
@@ -285,13 +285,13 @@ function compileAllFiles(options, compilationInfo) {
             args.push('--traceResolution');
         }
         if (options.baseUrl) {
-            args.push('--baseUrl', "\"" + utils.stripQuotesIfQuoted(options.baseUrl) + "\"");
+            args.push('--baseUrl', utils.possiblyQuotedRelativePath(options.baseUrl));
         }
         if (options.charset) {
             args.push('--charset', options.charset);
         }
         if (options.declarationDir) {
-            args.push('--declarationDir', utils.quotedRelativePath(options.declarationDir));
+            args.push('--declarationDir', utils.possiblyQuotedRelativePath(options.declarationDir));
         }
         if (options.jsxFactory) {
             args.push('--jsxFactory', options.jsxFactory);
@@ -306,6 +306,7 @@ function compileAllFiles(options, compilationInfo) {
             args.push('--types', _.map(options.types, function (t) { return "\"" + utils.stripQuotesIfQuoted(t) + "\""; }).join(','));
         }
         if (options.typeRoots) {
+            // typeRoots should always be quoted since it can have multiple comma-separated values
             args.push('--typeRoots', _.map(options.typeRoots, function (tr) { return utils.quotedRelativePath(tr); }).join(','));
         }
         args.push('--target', options.target.toUpperCase());

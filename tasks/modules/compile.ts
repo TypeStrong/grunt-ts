@@ -156,7 +156,7 @@ export function compileAllFiles(options: IGruntTSOptions, compilationInfo: IGrun
     }
 
     // Quote the files to compile. Needed for command line parsing by tsc
-    files = _.map(files, item => utils.quotedRelativePath(item));
+    files = _.map(files, item => utils.possiblyQuotedRelativePath(item));
 
     let args: string[] = files.slice(0),
       tsc: string,
@@ -318,13 +318,13 @@ export function compileAllFiles(options: IGruntTSOptions, compilationInfo: IGrun
           args.push('--traceResolution');
       }
       if (options.baseUrl) {
-          args.push('--baseUrl', `"${utils.stripQuotesIfQuoted(options.baseUrl)}"`);
+          args.push('--baseUrl', utils.possiblyQuotedRelativePath(options.baseUrl));
       }
       if (options.charset) {
           args.push('--charset', options.charset);
       }
       if (options.declarationDir) {
-          args.push('--declarationDir', utils.quotedRelativePath(options.declarationDir));
+          args.push('--declarationDir', utils.possiblyQuotedRelativePath(options.declarationDir));
       }
       if (options.jsxFactory) {
           args.push('--jsxFactory', options.jsxFactory);
@@ -339,6 +339,7 @@ export function compileAllFiles(options: IGruntTSOptions, compilationInfo: IGrun
           args.push('--types', _.map(options.types, t => `"${utils.stripQuotesIfQuoted(t)}"`).join(','));
       }
       if (options.typeRoots) {
+          // typeRoots should always be quoted since it can have multiple comma-separated values
           args.push('--typeRoots', _.map(options.typeRoots, tr => utils.quotedRelativePath(tr)).join(','));
       }
 

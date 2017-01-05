@@ -552,7 +552,7 @@ exports.new_TypeScript_2_and_2_1_Features = function (strings, options) {
     return new es6_promise_1.Promise(function (resolve, reject) {
         var command = strings[1].replace(/\\/g, '/');
         if (command.indexOf("--alwaysStrict") > -1 &&
-            command.indexOf("--baseUrl \"../\"") > -1 &&
+            command.indexOf("--baseUrl ..") > -1 &&
             command.indexOf("--charset utf8") > -1 &&
             command.indexOf("--declarationDir \"../declarations dir\"") > -1 &&
             command.indexOf("--diagnostics") > -1 &&
