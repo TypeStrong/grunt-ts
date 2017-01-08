@@ -575,10 +575,10 @@ export var tests : nodeunit.ITestGroup = {
         }
       };
 
-      const result = or.resolveAsync(config, config.build, "build").then((result) => {
+      const result = or.resolveAsync(config, config.build, "build", [], null, grunt.file.expand).then((result) => {
         test.strictEqual(result.CompilationTasks.length, 1, "expected a compilation task");
         test.strictEqual(result.CompilationTasks[0].src.length, 5);
-        test.ok(result.CompilationTasks[0].src.indexOf("test/customcompiler/foo.ts") > -1);
+        test.ok(result.CompilationTasks[0].src.indexOf("test/customcompiler/ts/foo.ts") > -1);
         test.ok(result.CompilationTasks[0].src.indexOf("test/abtest/a.ts") > -1);
         test.ok(result.CompilationTasks[0].src.indexOf("test/abtest/b.ts") > -1);
         test.ok(result.CompilationTasks[0].src.indexOf("test/abtest/c.ts") > -1);
@@ -687,7 +687,7 @@ export var tests : nodeunit.ITestGroup = {
           test.strictEqual(result.CompilationTasks.length, 1);
           test.strictEqual(result.CompilationTasks[0].out, 'files/this_is_the_out_file.js');
           test.strictEqual(result.CompilationTasks[0].outDir, undefined);
-          test.strictEqual(result.warnings.length, 1);
+          test.strictEqual(result.warnings.length, 2);
           test.ok(result.warnings[0].indexOf('Using `out` in tsconfig.json can be unreliable') > -1);
           test.done();
         }).catch((err) => {test.ifError(err); test.done();});

@@ -360,11 +360,11 @@ function addFilesToCompilationContext(applyTo: IGruntTSOptions, projectSpec: ITS
   const resolvedInclude: string[] = [], resolvedExclude: string[] = [], resolvedFiles: string[] = [];
 
   if (projectSpec.exclude) {
-    resolvedExclude.push(...(projectSpec.exclude.map(i => utils.prependIfNotStartsWith(path.join(absolutePathToTSConfig, i), '!'))));
+    resolvedExclude.push(...(projectSpec.exclude.map(f => utils.prependIfNotStartsWith(path.join(absolutePathToTSConfig, f), '!'))));
   } else {
-    resolvedExclude.push(utils.prependIfNotStartsWith('node_modules/**', '!'),
-      utils.prependIfNotStartsWith('bower_components/**', '!'),
-      utils.prependIfNotStartsWith('jspm_packages/**', '!'));
+    resolvedExclude.push(utils.prependIfNotStartsWith(path.join(absolutePathToTSConfig, 'node_modules/**'), '!'),
+      utils.prependIfNotStartsWith(path.join(absolutePathToTSConfig, 'bower_components/**'), '!'),
+      utils.prependIfNotStartsWith(path.join(absolutePathToTSConfig, 'jspm_packages/**'), '!'));
 
     if (applyTo.CompilationTasks && applyTo.CompilationTasks.length > 0 && applyTo.CompilationTasks[0].outDir) {
       resolvedExclude.push(utils.prependIfNotStartsWith(path.join(absolutePathToTSConfig, applyTo.CompilationTasks[0].outDir), '!'));
@@ -379,9 +379,16 @@ function addFilesToCompilationContext(applyTo: IGruntTSOptions, projectSpec: ITS
       resolvedInclude.push(...projectSpec.include.map(f => path.join(absolutePathToTSConfig, f)));
     }
   } else {
-    resolvedInclude.push('**/*.ts', '**/*.d.ts', '**/*.tsx');
+    resolvedInclude.push(
+      path.join(absolutePathToTSConfig, '**/*.ts'),
+      path.join(absolutePathToTSConfig, '**/*.d.ts'),
+      path.join(absolutePathToTSConfig, '**/*.tsx')
+    );
     if (applyTo.allowJs) {
-      resolvedExclude.push('**/*.js', '**/*.jsx');
+      resolvedExclude.push(
+        path.join(absolutePathToTSConfig, '**/*.js'),
+        path.join(absolutePathToTSConfig, '**/*.jsx')
+      );
     }
   }
 
@@ -392,6 +399,9 @@ function addFilesToCompilationContext(applyTo: IGruntTSOptions, projectSpec: ITS
 
   const expandedCompilationContext: string[] = [];
   if (resolvedInclude.length > 0 || resolvedExclude.length > 0) {
+    if ((globExpander as any).isStub) {
+      result.warnings.push('Attempt to resolve glob in tsconfig module using stub globExpander.');
+    }
     expandedCompilationContext.push(...globExpander([...resolvedInclude, ...resolvedExclude]));
   }
   expandedCompilationContext.push(...resolvedFiles);

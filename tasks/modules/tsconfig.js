@@ -305,10 +305,10 @@ function addFilesToCompilationContext(applyTo, projectSpec) {
     // see http://www.typescriptlang.org/docs/handbook/tsconfig-json.html
     var resolvedInclude = [], resolvedExclude = [], resolvedFiles = [];
     if (projectSpec.exclude) {
-        resolvedExclude.push.apply(resolvedExclude, (projectSpec.exclude.map(function (i) { return utils.prependIfNotStartsWith(path.join(absolutePathToTSConfig, i), '!'); })));
+        resolvedExclude.push.apply(resolvedExclude, (projectSpec.exclude.map(function (f) { return utils.prependIfNotStartsWith(path.join(absolutePathToTSConfig, f), '!'); })));
     }
     else {
-        resolvedExclude.push(utils.prependIfNotStartsWith('node_modules/**', '!'), utils.prependIfNotStartsWith('bower_components/**', '!'), utils.prependIfNotStartsWith('jspm_packages/**', '!'));
+        resolvedExclude.push(utils.prependIfNotStartsWith(path.join(absolutePathToTSConfig, 'node_modules/**'), '!'), utils.prependIfNotStartsWith(path.join(absolutePathToTSConfig, 'bower_components/**'), '!'), utils.prependIfNotStartsWith(path.join(absolutePathToTSConfig, 'jspm_packages/**'), '!'));
         if (applyTo.CompilationTasks && applyTo.CompilationTasks.length > 0 && applyTo.CompilationTasks[0].outDir) {
             resolvedExclude.push(utils.prependIfNotStartsWith(path.join(absolutePathToTSConfig, applyTo.CompilationTasks[0].outDir), '!'));
         }
@@ -322,14 +322,17 @@ function addFilesToCompilationContext(applyTo, projectSpec) {
         }
     }
     else {
-        resolvedInclude.push('**/*.ts', '**/*.d.ts', '**/*.tsx');
+        resolvedInclude.push(path.join(absolutePathToTSConfig, '**/*.ts'), path.join(absolutePathToTSConfig, '**/*.d.ts'), path.join(absolutePathToTSConfig, '**/*.tsx'));
         if (applyTo.allowJs) {
-            resolvedExclude.push('**/*.js', '**/*.jsx');
+            resolvedExclude.push(path.join(absolutePathToTSConfig, '**/*.js'), path.join(absolutePathToTSConfig, '**/*.jsx'));
         }
     }
     var result = applyTo, co = projectSpec.compilerOptions, tsconfig = applyTo.tsconfig, src = applyTo.CompilationTasks[0].src;
     var expandedCompilationContext = [];
     if (resolvedInclude.length > 0 || resolvedExclude.length > 0) {
+        if (globExpander.isStub) {
+            result.warnings.push('Attempt to resolve glob in tsconfig module using stub globExpander.');
+        }
         expandedCompilationContext.push.apply(expandedCompilationContext, globExpander(resolvedInclude.concat(resolvedExclude)));
     }
     expandedCompilationContext.push.apply(expandedCompilationContext, resolvedFiles);
