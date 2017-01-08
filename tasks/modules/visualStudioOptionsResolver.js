@@ -1,9 +1,9 @@
 'use strict';
-var csproj2ts = require('csproj2ts');
-var path = require('path');
-var utils = require('./utils');
-var es6_promise_1 = require('es6-promise');
-var _ = require('lodash');
+var csproj2ts = require("csproj2ts");
+var path = require("path");
+var utils = require("./utils");
+var es6_promise_1 = require("es6-promise");
+var _ = require("lodash");
 var templateProcessor = null;
 function resolveVSOptionsAsync(applyTo, taskOptions, targetOptions, theTemplateProcessor) {
     templateProcessor = theTemplateProcessor;
@@ -118,9 +118,13 @@ function applyVSSettings(options, vsSettings) {
     // Visit this page for MSBuild documentation:
     // https://github.com/Microsoft/TypeScript-Handbook/blob/master/pages/Compiler%20Options%20in%20MSBuild.md
     var simpleVSSettingsToGruntTSMappings = {
+        'AdditionalFlags': 'additionalFlags',
         'AllowSyntheticDefaultImports': 'allowSyntheticDefaultImports',
-        'AllowUnusedLabels': 'allowUnusedLabels',
         'AllowUnreachableCode': 'allowUnreachableCode',
+        'AllowUnusedLabels': 'allowUnusedLabels',
+        'BaseUrl': 'baseUrl',
+        'Charset': 'charset',
+        'DeclarationDir': 'declarationDir',
         'EmitBOM': 'emitBom',
         'EmitDecoratorMetadata': 'emitDecoratorMetadata',
         'ExperimentalAsyncFunctions': 'experimentalAsyncFunctions',
@@ -135,24 +139,28 @@ function applyVSSettings(options, vsSettings) {
         'ModuleKind': 'module',
         'ModuleResolution': 'moduleResolution',
         'NewLine': 'newLine',
+        'NoEmitHelpers': 'noEmitHelpers',
         'NoEmitOnError': 'noEmitOnError',
-        'NoEmitHelpers': 'NoEmitHelpers',
         'NoFallthroughCasesInSwitch': 'noFallthroughCasesInSwitch',
         'NoImplicitAny': 'noImplicitAny',
         'NoImplicitReturns': 'noImplicitReturns',
-        'noImplicitUseStrict': 'NoImplicitUseStrict',
+        'NoImplicitThis': 'noImplicitThis',
+        'NoImplicitUseStrict': 'noImplicitUseStrict',
         'NoLib': 'noLib',
         'NoResolve': 'noResolve',
         // OutFile (both out and outFile) and OutDir are resolved elsewhere
+        'PreferredUILang': 'locale',
         'PreserveConstEnums': 'preserveConstEnums',
         'ReactNamespace': 'reactNamespace',
         'RemoveComments': 'removeComments',
         'RootDir': 'rootDir',
+        'SkipLibCheck': 'skipLibCheck',
         'SkipDefaultLibCheck': 'skipDefaultLibCheck',
         'SourceMap': 'sourceMap',
         'SourceRoot': 'sourceRoot',
-        'SuppressImplicitAnyIndexErrors': 'suppressImplicitAnyIndexErrors',
+        'StrictNullChecks': 'strictNullChecks',
         'SuppressExcessPropertyErrors': 'suppressExcessPropertyErrors',
+        'SuppressImplicitAnyIndexErrors': 'suppressImplicitAnyIndexErrors',
         'Target': 'target'
     };
     for (var item in simpleVSSettingsToGruntTSMappings) {

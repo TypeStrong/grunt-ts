@@ -11,7 +11,10 @@
         "suppressImplicitAnyIndexErrors": true,
         "sourceMap": true,
         "outDir": "./files",
-        "allowSyntheticDefaultImports": true
+        "allowSyntheticDefaultImports": true,
+        "charset": "utf8",
+        "strictNullChecks": false,
+        "listFiles": true
     },
     "filesGlob": [
         "./defs/**/*.ts",
@@ -26,7 +29,6 @@
         "./defs/node/node.d.ts",
         "./defs/nodeunit/nodeunit.d.ts",
         "./defs/tsd.d.ts",
-        "./defs/underscore.string/underscore.string.d.ts",
         "./tasks/deletedcode.ts",
         "./tasks/modules/amdLoader.ts",
         "./tasks/modules/cacheUtils.ts",

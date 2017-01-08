@@ -6,12 +6,11 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var fs = require('fs');
-var path = require('path');
-var grunt = require('grunt');
-var _str = require('underscore.string');
-var _ = require('lodash');
-var utils = require('./utils');
+var fs = require("fs");
+var path = require("path");
+var grunt = require("grunt");
+var _ = require("lodash");
+var utils = require("./utils");
 // Setup when transformers are triggered
 var currentTargetFiles;
 var currentTargetDirs;
@@ -52,7 +51,7 @@ function getImports(currentFilePath, name, targetFiles, targetDirs, getIndexIfDi
                     return true;
                 }
                 return path.extname(filename) // must have extension : do not exclude directories
-                    && (!_str.endsWith(filename, '.ts') || _str.endsWith(filename, '.d.ts'))
+                    && (!_.endsWith(filename, '.ts') || _.endsWith(filename, '.d.ts'))
                     && !fs.lstatSync(filename).isDirectory(); // for people that name directories with dots
             });
             filesInDir.sort(); // Sort needed to increase reliability of codegen between runs
@@ -91,7 +90,7 @@ var BaseTransformer = (function () {
         return '//' + '/ts:';
     };
     BaseTransformer.prototype.isGenerated = function (line) {
-        return _str.contains(line, this.signatureGenerated);
+        return _.includes(line, this.signatureGenerated);
     };
     BaseTransformer.prototype.matches = function (line) {
         return line.match(this.match);
@@ -99,22 +98,23 @@ var BaseTransformer = (function () {
     BaseTransformer.containsTransformSignature = function (line) {
         return BaseTransformer.tsSignatureMatch.test(line);
     };
-    BaseTransformer.tsSignatureMatch = /\/\/\/\s*ts\:/;
-    // equals sign is optional because we want to match on the signature regardless of any errors,
-    // transformFiles() checks that the equals sign exists (by checking for the first matched capture group)
-    // and fails if it is not found.
-    BaseTransformer.tsTransformerMatch = '^///\\s*ts:{0}(=?)(.*)';
     return BaseTransformer;
 }());
+BaseTransformer.tsSignatureMatch = /\/\/\/\s*ts\:/;
+// equals sign is optional because we want to match on the signature regardless of any errors,
+// transformFiles() checks that the equals sign exists (by checking for the first matched capture group)
+// and fails if it is not found.
+BaseTransformer.tsTransformerMatch = '^///\\s*ts:{0}(=?)(.*)';
 // This is a separate class from BaseTransformer to make it easier to add non import/export transforms in the future
 var BaseImportExportTransformer = (function (_super) {
     __extends(BaseImportExportTransformer, _super);
     function BaseImportExportTransformer(key, variableSyntax, template, getIndexIfDir, removeExtensionFromFilePath) {
-        _super.call(this, key, variableSyntax);
-        this.key = key;
-        this.template = template;
-        this.getIndexIfDir = getIndexIfDir;
-        this.removeExtensionFromFilePath = removeExtensionFromFilePath;
+        var _this = _super.call(this, key, variableSyntax) || this;
+        _this.key = key;
+        _this.template = template;
+        _this.getIndexIfDir = getIndexIfDir;
+        _this.removeExtensionFromFilePath = removeExtensionFromFilePath;
+        return _this;
     }
     BaseImportExportTransformer.prototype.transform = function (sourceFile, templateVars) {
         var _this = this;
@@ -152,20 +152,22 @@ var BaseImportExportTransformer = (function (_super) {
 var ImportTransformer = (function (_super) {
     __extends(ImportTransformer, _super);
     function ImportTransformer() {
-        _super.call(this, 'import', '<fileOrDirectoryName>[,<variableName>]', _.template('import <%=filename%> = require(\'<%= pathToFile %>\');'), true, true);
+        return _super.call(this, 'import', '<fileOrDirectoryName>[,<variableName>]', _.template('import <%=filename%> = require(\'<%= pathToFile %>\');'), true, true) || this;
     }
     return ImportTransformer;
 }(BaseImportExportTransformer));
 var ExportTransformer = (function (_super) {
     __extends(ExportTransformer, _super);
     function ExportTransformer(eol) {
+        var _this = 
         // This code is same as import transformer
         // One difference : we do not short circuit to `index.ts` if found
         _super.call(this, 'export', '<fileOrDirectoryName>[,<variableName>]', 
         // workaround for https://github.com/Microsoft/TypeScript/issues/512
         _.template('import <%=filename%>_file = require(\'<%= pathToFile %>\'); <%= signatureGenerated %>' + eol +
-            'export var <%=filename%> = <%=filename%>_file;'), false, true);
-        this.eol = eol;
+            'export var <%=filename%> = <%=filename%>_file;'), false, true) || this;
+        _this.eol = eol;
+        return _this;
     }
     return ExportTransformer;
 }(BaseImportExportTransformer));
@@ -174,17 +176,18 @@ var ReferenceTransformer = (function (_super) {
     function ReferenceTransformer() {
         // This code is same as export transformer
         // also we preserve .ts file extension
-        _super.call(this, 'ref', '<fileOrDirectoryName>', _.template('/// <reference path="<%= pathToFile %>"/>'), false, false);
+        return _super.call(this, 'ref', '<fileOrDirectoryName>', _.template('/// <reference path="<%= pathToFile %>"/>'), false, false) || this;
     }
     return ReferenceTransformer;
 }(BaseImportExportTransformer));
 var UnknownTransformer = (function (_super) {
     __extends(UnknownTransformer, _super);
     function UnknownTransformer() {
-        _super.call(this, '(.*)', '');
-        this.key = 'unknown';
-        this.signatureGenerated = this.tripleSlashTS() + 'unknown:generated';
-        this.syntaxError = '/// Unknown transform ' + this.signatureGenerated;
+        var _this = _super.call(this, '(.*)', '') || this;
+        _this.key = 'unknown';
+        _this.signatureGenerated = _this.tripleSlashTS() + 'unknown:generated';
+        _this.syntaxError = '/// Unknown transform ' + _this.signatureGenerated;
+        return _this;
     }
     UnknownTransformer.prototype.transform = function (sourceFile, templateVars) {
         return [this.syntaxError];

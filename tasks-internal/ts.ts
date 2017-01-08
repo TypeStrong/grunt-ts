@@ -175,7 +175,7 @@ function pluginFn(grunt: IGrunt) {
                         //   Level 5 errors = compiler flag misuse - prevents JS emit.
                         var level1ErrorCount = 0, level5ErrorCount = 0, nonEmitPreventingWarningCount = 0;
                         var hasTS7017Error = false;
-                        var hasPreventEmitErrors = _.reduce(result.output.split('\n'), function (memo, errorMsg: string) {
+                        var hasPreventEmitErrors = _.reduce(result.output.split('\n'), (memo, errorMsg) => {
                             var isPreventEmitError = false;
                             if (errorMsg.search(/error TS7017:/g) >= 0) {
                                 hasTS7017Error = true;

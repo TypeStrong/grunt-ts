@@ -4,11 +4,11 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var B1 = require('./b1');
+var B1 = require("./b1");
 var B2 = (function (_super) {
     __extends(B2, _super);
     function B2() {
-        _super.apply(this, arguments);
+        return _super.apply(this, arguments) || this;
     }
     B2.prototype.b2 = function () { return this.b1() + "b2"; };
     return B2;

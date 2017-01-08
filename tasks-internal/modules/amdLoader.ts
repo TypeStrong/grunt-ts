@@ -1,7 +1,6 @@
 /// <reference path="../../defs/tsd.d.ts"/>
 
 import _ = require('lodash');
-import _str = require('underscore.string');
 import path = require('path');
 import fs = require('fs');
 
@@ -62,19 +61,19 @@ export function getReferencesInOrder(referenceFile: string, referencePath: strin
 
     for (var i = 0; i < lines.length; i++) {
 
-        var line = _str.trim(lines[i]);
+        var line = _.trim(lines[i]);
 
-        if (_str.include(line, ourSignatureStart)) {
+        if (_.includes(line, ourSignatureStart)) {
             // Wait for the end signature:
             loopState = ReferenceOrder.unordered;
         }
-        if (_str.include(line, ourSignatureEnd)) {
+        if (_.includes(line, ourSignatureEnd)) {
             loopState = ReferenceOrder.after;
         }
 
 
         // Fetch the existing reference's filename if any:
-        if (_str.include(line, referenceIntro)) {
+        if (_.includes(line, referenceIntro)) {
             var match = line.match(referenceMatch);
             var filename = match[1];
             switch (loopState) {

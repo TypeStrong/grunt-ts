@@ -1,10 +1,10 @@
 "use strict";
 ///ts:import=a
-var a = require('../../foo/a/index'); ///ts:import:generated
+var a = require("../../foo/a/index"); ///ts:import:generated
 ///ts:import=b1
-var b1 = require('../../foo/b/b1'); ///ts:import:generated
+var b1 = require("../../foo/b/b1"); ///ts:import:generated
 ///ts:import=b2
-var b2 = require('../../foo/b/b2'); ///ts:import:generated
+var b2 = require("../../foo/b/b2"); ///ts:import:generated
 // USE CLASSES FROM A/B:
 // With `export =` and naming file same as main export variable: 
 var a1 = new a.A1();

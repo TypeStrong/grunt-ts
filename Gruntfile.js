@@ -5,6 +5,7 @@ module.exports = function (grunt) {
     'use strict';
 
     var gruntStartedTimestamp = new Date().getTime(); // for report-time-elapsed task
+    grunt.template.addDelimiters('config', '{%', '%}'); 
 
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
@@ -344,7 +345,7 @@ module.exports = function (grunt) {
             variablesReplacedInOut: {
                 test: true,
                 src: ['test/simple/ts/zoo.ts'],
-                out: 'test/varreplacedtest/<%= pkg.name %>-test.js',
+                out: 'test/varreplacedtest/{%= pkg.name %}-test.js',
                 options: {
                     target: 'es5',
                     declaration: false
@@ -353,7 +354,7 @@ module.exports = function (grunt) {
             variablesReplacedInReference: {
                 test: true,
                 src: ['test/referenceReplaced/*.ts'],
-                reference: 'test/referenceReplaced/referenced-<%= pkg.name %>.ts',
+                reference: 'test/referenceReplaced/referenced-{%= pkg.name %}.ts',
                 options: {
                     target: 'es5',
                     declaration: false,
@@ -363,12 +364,12 @@ module.exports = function (grunt) {
             },
             variablesReplacedForTSConfig: {
                 test: true,
-                tsconfig: 'test/tsconfig/tsconfig-<%= pkg.name %>.json',
+                tsconfig: 'test/tsconfig/tsconfig-{%= pkg.name %}.json',
                 testExecute: commandLineAssertions.variablesReplacedForTSConfig
             },
             variablesReplacedFor_vs: {
                 test: true,
-                vs: '<%= vsproj_path %>/testproject.csproj',
+                vs: '{%= vsproj_path %}/testproject.csproj',
                 testExecute: commandLineAssertions.variablesReplacedFor_vs
             },
             tsconfig_passThrough_onlySendsConfigThrough_WithPathAndAdditional: {
@@ -704,6 +705,31 @@ module.exports = function (grunt) {
                     strictNullChecks: true,
                     noImplicitThis: true,
                     lib: ['es2017']
+                }
+            },
+            new_TypeScript_2_and_2_1_Features: {
+                test: true,
+                testExecute: commandLineAssertions.new_TypeScript_2_and_2_1_Features,
+                src: 'test/simple/ts/**/*.ts',
+                options: {
+                    alwaysStrict: true,
+                    baseUrl: '../',
+                    charset: 'utf8',
+                    declarationDir: '.././declarations dir/',
+                    diagnostics: true,
+                    importHelpers: true,
+                    jsxFactory: 'React.createElement',
+                    lib: ['es5', 'es2015.promise'],
+                    listEmittedFiles: true,
+                    listFiles: true,
+                    maxNodeModuleJsDepth: 2,
+                    noImplicitThis: true,
+                    noUnusedLocals: true,
+                    noUnusedParameters: true,
+                    strictNullChecks: true,
+                    traceResolution: true,
+                    types: ['node', 'lodash', 'express'],
+                    typeRoots: ['./sometypings','../../otherTypings']
                 }
             },
             allowJs_CompileWorks: {
@@ -1066,14 +1092,13 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-continue');
     grunt.loadNpmTasks('grunt-contrib-nodeunit');
     grunt.loadNpmTasks('grunt-contrib-watch');
-    grunt.loadNpmTasks('grunt-debug-task');
 
     // Build
     grunt.registerTask('prep', ['clean:test', 'jshint:support']);
     grunt.registerTask('build', ['prep', 'ts-internal', 'tslint:source']);
 
     // Test
-    grunt.registerTask('fail', ['continueOn', 'test_fail', 'continueOff', 'validate_failure_count']);
+    grunt.registerTask('fail', ['continue:on', 'test_fail', 'continue:off', 'validate_failure_count']);
     grunt.registerTask('test', ['stageFiles', 'test_all', 'fail', 'nodeunit:fast', 'nodeunit:slow',
       'tslint:transformedHtml', 'clean:testPost']);
 

@@ -1,13 +1,13 @@
 /// <reference path="../../defs/tsd.d.ts"/>
 /// <reference path="./interfaces.d.ts"/>
 'use strict';
-var path = require('path');
-var fs = require('fs');
-var _ = require('lodash');
-var utils = require('./utils');
-var cache = require('./cacheUtils');
-var semver = require('semver');
-var es6_promise_1 = require('es6-promise');
+var path = require("path");
+var fs = require("fs");
+var _ = require("lodash");
+var utils = require("./utils");
+var cache = require("./cacheUtils");
+var semver = require("semver");
+var es6_promise_1 = require("es6-promise");
 exports.grunt = require('grunt');
 ///////////////////////////
 // Helper
@@ -126,7 +126,7 @@ function compileAllFiles(options, compilationInfo) {
         files = [referenceFile];
     }
     // Quote the files to compile. Needed for command line parsing by tsc
-    files = _.map(files, function (item) { return ("\"" + path.resolve(item) + "\""); });
+    files = _.map(files, function (item) { return utils.possiblyQuotedRelativePath(item); });
     var args = files.slice(0), tsc, tscVersion = '';
     var tsconfig = options.tsconfig;
     if (options.compiler) {
@@ -254,11 +254,47 @@ function compileAllFiles(options, compilationInfo) {
         if (options.noImplicitUseStrict) {
             args.push('--noImplicitUseStrict');
         }
-        if (options.strictNullChecks) {
-            args.push('--strictNullChecks');
+        if (options.alwaysStrict) {
+            args.push('--alwaysStrict');
+        }
+        if (options.diagnostics) {
+            args.push('--diagnostics');
+        }
+        if (options.importHelpers) {
+            args.push('--importHelpers');
+        }
+        if (options.listFiles) {
+            args.push('--listFiles');
+        }
+        if (options.listEmittedFiles) {
+            args.push('--listEmittedFiles');
         }
         if (options.noImplicitThis) {
             args.push('--noImplicitThis');
+        }
+        if (options.noUnusedLocals) {
+            args.push('--noUnusedLocals');
+        }
+        if (options.noUnusedParameters) {
+            args.push('--noUnusedParameters');
+        }
+        if (options.strictNullChecks) {
+            args.push('--strictNullChecks');
+        }
+        if (options.traceResolution) {
+            args.push('--traceResolution');
+        }
+        if (options.baseUrl) {
+            args.push('--baseUrl', utils.possiblyQuotedRelativePath(options.baseUrl));
+        }
+        if (options.charset) {
+            args.push('--charset', options.charset);
+        }
+        if (options.declarationDir) {
+            args.push('--declarationDir', utils.possiblyQuotedRelativePath(options.declarationDir));
+        }
+        if (options.jsxFactory) {
+            args.push('--jsxFactory', options.jsxFactory);
         }
         if (options.lib) {
             var possibleOptions_1 = [
@@ -285,11 +321,21 @@ function compileAllFiles(options, compilationInfo) {
                 'es2017.sharedmemory'
             ];
             options.lib.forEach(function (option) {
-                if (possibleOptions_1.indexOf(option) === -1) {
-                    console.warn(("WARNING: Option \"lib\" does not support " + option + " ").magenta);
+                if (possibleOptions_1.indexOf((option + '').toLocaleLowerCase()) === -1) {
+                    exports.grunt.log.warn(("WARNING: Option \"lib\" does not support " + option + " ").magenta);
                 }
             });
             args.push('--lib', options.lib.join(','));
+        }
+        if (options.maxNodeModuleJsDepth > 0 || options.maxNodeModuleJsDepth === 0) {
+            args.push('--maxNodeModuleJsDepth', options.maxNodeModuleJsDepth + '');
+        }
+        if (options.types) {
+            args.push('--types', _.map(options.types, function (t) { return "\"" + utils.stripQuotesIfQuoted(t) + "\""; }).join(','));
+        }
+        if (options.typeRoots) {
+            // typeRoots should always be quoted since it can have multiple comma-separated values
+            args.push('--typeRoots', _.map(options.typeRoots, function (tr) { return utils.quotedRelativePath(tr); }).join(','));
         }
         args.push('--target', options.target.toUpperCase());
         if (options.module) {

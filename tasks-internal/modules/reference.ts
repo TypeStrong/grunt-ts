@@ -1,7 +1,6 @@
 /// <reference path="../../defs/tsd.d.ts"/>
 
 import _ = require('lodash');
-import _str = require('underscore.string');
 import fs = require('fs');
 import grunt = require('grunt');
 
@@ -44,16 +43,16 @@ export function updateReferenceFile(files: string[], generatedFiles: string[], r
 
         for (i = 0; i < lines.length; i++) {
 
-            var line = _str.trim(lines[i]);
+            var line = _.trim(lines[i]);
 
             // Skip logic for our generated section
-            if (_str.include(line, ourSignatureStart)) {
+            if (_.includes(line, ourSignatureStart)) {
                 // Wait for the end signature:
                 signatureSectionPosition = i;
                 inSignatureSection = true;
                 continue;
             }
-            if (_str.include(line, ourSignatureEnd)) {
+            if (_.includes(line, ourSignatureEnd)) {
                 inSignatureSection = false;
                 continue;
             }
@@ -65,7 +64,7 @@ export function updateReferenceFile(files: string[], generatedFiles: string[], r
             origFileLines.push(line);
 
             // Fetch the existing reference's filename if any:
-            if (_str.include(line, referenceIntro)) {
+            if (_.includes(line, referenceIntro)) {
                 var match = line.match(referenceMatch);
                 var filename = match[1];
                 origFileReferences.push(filename);
@@ -84,7 +83,7 @@ export function updateReferenceFile(files: string[], generatedFiles: string[], r
 
         // If there are orig references
         if (origFileReferences.length) {
-            if (_.contains(origFileReferences, filepath)) {
+            if (_.includes(origFileReferences, filepath)) {
                 return;
             }
         }

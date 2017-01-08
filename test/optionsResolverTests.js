@@ -1,10 +1,10 @@
 /// <reference path="../defs/tsd.d.ts" />
 "use strict";
-var fs = require('fs');
-var path = require('path');
-var or = require('../tasks/modules/optionsResolver');
-var utils = require('../tasks/modules/utils');
-var _ = require('lodash');
+var fs = require("fs");
+var path = require("path");
+var or = require("../tasks/modules/optionsResolver");
+var utils = require("../tasks/modules/utils");
+var _ = require("lodash");
 var grunt = require('grunt');
 var config = {
     "minimalist": {
@@ -197,7 +197,6 @@ exports.tests = {
         "COMPILE as target name should not be a warning (issue #364)": function (test) {
             test.expect(2);
             var result = or.resolveAsync(null, { COMPILE: { tsconfig: true } }).then(function (result) {
-                console.log(result.warnings);
                 test.equal(result.warnings.length, 0, "expected no warnings");
                 test.equal(result.errors.length, 0, "expected no errors");
                 test.done();
@@ -514,6 +513,59 @@ exports.tests = {
                 callback(ex);
             }
         },
+        "include will record an error in presence of overwriteFilesGlob or updateFiles": function (test) {
+            test.expect(4);
+            var config = {
+                options: {
+                    target: 'es5'
+                },
+                build: {
+                    tsconfig: {
+                        tsconfig: './test/tsconfig/test_include_tsconfig.json',
+                        overwriteFilesGlob: true,
+                        updateFiles: true
+                    }
+                }
+            };
+            var result = or.resolveAsync(config, config.build, "build").then(function (result) {
+                test.strictEqual(result.errors.length, 3);
+                var errorText = JSON.stringify(result.errors);
+                test.ok(errorText.indexOf("the `overwriteFilesGlob` feature") > -1);
+                test.ok(errorText.indexOf("the `updateFiles` feature") > -1);
+                test.ok(errorText.indexOf("no glob was passed-in") > -1);
+                test.done();
+            }).catch(function (err) { test.ifError(err); test.done(); });
+        },
+        "include will bring in files when specified": function (test) {
+            test.expect(7);
+            var config = {
+                options: {
+                    target: 'es5'
+                },
+                build: {
+                    tsconfig: {
+                        tsconfig: './test/tsconfig/test_include_tsconfig.json',
+                        ignoreFiles: false,
+                        ignoreSettings: false,
+                        overwriteFilesGlob: false,
+                        updateFiles: false,
+                        passThrough: false
+                    }
+                }
+            };
+            var result = or.resolveAsync(config, config.build, "build", [], null, grunt.file.expand).then(function (result) {
+                test.strictEqual(result.CompilationTasks.length, 1, "expected a compilation task");
+                test.strictEqual(result.CompilationTasks[0].src.length, 5);
+                test.ok(result.CompilationTasks[0].src.indexOf("test/customcompiler/ts/foo.ts") > -1);
+                test.ok(result.CompilationTasks[0].src.indexOf("test/abtest/a.ts") > -1);
+                test.ok(result.CompilationTasks[0].src.indexOf("test/abtest/b.ts") > -1);
+                test.ok(result.CompilationTasks[0].src.indexOf("test/abtest/c.ts") > -1);
+                test.ok(result.CompilationTasks[0].src.indexOf("test/abtest/reference.ts") > -1);
+                console.log(JSON.stringify(result.errors));
+                console.log(JSON.stringify(result.warnings));
+                test.done();
+            }).catch(function (err) { test.ifError(err); test.done(); });
+        },
         "Can get config from a valid file": function (test) {
             test.expect(1);
             var cfg = getConfig("minimalist");
@@ -580,7 +632,7 @@ exports.tests = {
             }).catch(function (err) { test.ifError(err); test.done(); });
         },
         "config entries come through appropriately": function (test) {
-            test.expect(13);
+            test.expect(16);
             var cfg = getConfig("minimalist");
             cfg.tsconfig = './test/tsconfig/full_valid_tsconfig.json';
             var result = or.resolveAsync(null, cfg).then(function (result) {
@@ -595,6 +647,9 @@ exports.tests = {
                 test.strictEqual(result.emitDecoratorMetadata, undefined, 'emitDecoratorMetadata is not specified in this tsconfig.json');
                 test.strictEqual(result.CompilationTasks.length, 1);
                 test.strictEqual(result.allowSyntheticDefaultImports, true);
+                test.strictEqual(result.charset, 'utf8');
+                test.strictEqual(result.strictNullChecks, false);
+                test.strictEqual(result.listFiles, true);
                 test.strictEqual(result.CompilationTasks[0].outDir, 'test/tsconfig/files');
                 test.strictEqual(result.CompilationTasks[0].out, undefined);
                 test.done();
@@ -608,7 +663,7 @@ exports.tests = {
                 test.strictEqual(result.CompilationTasks.length, 1);
                 test.strictEqual(result.CompilationTasks[0].out, 'files/this_is_the_out_file.js');
                 test.strictEqual(result.CompilationTasks[0].outDir, undefined);
-                test.strictEqual(result.warnings.length, 1);
+                test.strictEqual(result.warnings.length, 2);
                 test.ok(result.warnings[0].indexOf('Using `out` in tsconfig.json can be unreliable') > -1);
                 test.done();
             }).catch(function (err) { test.ifError(err); test.done(); });
@@ -666,7 +721,7 @@ exports.tests = {
             test.expect(3);
             var cfg = getConfig("tsconfig has specific file");
             var files = [{ src: ['test/simple/ts/zoo.ts'] }];
-            var result = or.resolveAsync(null, getConfig("tsconfig has specific file"), null, files).then(function (result) {
+            var result = or.resolveAsync(null, getConfig("tsconfig has specific file"), null, files, null, grunt.file.expand).then(function (result) {
                 test.strictEqual(result.CompilationTasks[0].src.length, 2);
                 test.ok(result.CompilationTasks[0].src.indexOf('test/tsconfig/files/validtsconfig.ts') > -1);
                 test.ok(result.CompilationTasks[0].src.indexOf('test/simple/ts/zoo.ts') > -1);
@@ -708,7 +763,8 @@ exports.tests = {
         "paths written to filesGlob are resolved first": function (test) {
             test.expect(4);
             var cfg = getConfig("minimalist");
-            cfg.src = ['./test/<%= grunt.pathsFilesGlobProperty %>/a*.ts'];
+            // this assumes the test gruntfile which uses the {% and %} delimiters.
+            cfg.src = ["./test/{%= grunt.pathsFilesGlobProperty %}/a*.ts"];
             cfg.tsconfig = {
                 tsconfig: 'test/tsconfig/simple_filesGlob_tsconfig.json',
                 ignoreFiles: false,
@@ -765,7 +821,7 @@ exports.tests = {
                 tsconfig: './test/tsconfig/simple_filesGlob_tsconfig.json',
                 overwriteFilesGlob: true
             };
-            var result = or.resolveAsync(null, cfg, "", null, null, grunt.file.expand).then(function (result) {
+            var result = or.resolveAsync(null, cfg, "", [], null, grunt.file.expand).then(function (result) {
                 test.ok(result.CompilationTasks[0].src.indexOf('test/simple/ts/zoo.ts') >= 0, 'expected to find zoo.ts');
                 test.strictEqual(result.CompilationTasks[0].src.length, 1);
                 var resultingTSConfig = utils.readAndParseJSONFromFileSync(cfg.tsconfig.tsconfig);

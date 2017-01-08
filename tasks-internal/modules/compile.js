@@ -1,13 +1,13 @@
 /// <reference path="../../defs/tsd.d.ts"/>
 /// <reference path="./interfaces.d.ts"/>
 'use strict';
-var path = require('path');
-var fs = require('fs');
-var _ = require('lodash');
-var utils = require('./utils');
-var cache = require('./cacheUtils');
-var semver = require('semver');
-var es6_promise_1 = require('es6-promise');
+var path = require("path");
+var fs = require("fs");
+var _ = require("lodash");
+var utils = require("./utils");
+var cache = require("./cacheUtils");
+var semver = require("semver");
+var es6_promise_1 = require("es6-promise");
 exports.grunt = require('grunt');
 ///////////////////////////
 // Helper
@@ -126,7 +126,7 @@ function compileAllFiles(options, compilationInfo) {
         files = [referenceFile];
     }
     // Quote the files to compile. Needed for command line parsing by tsc
-    files = _.map(files, function (item) { return ("\"" + path.resolve(item) + "\""); });
+    files = _.map(files, function (item) { return "\"" + path.resolve(item) + "\""; });
     var args = files.slice(0), tsc, tscVersion = '';
     var tsconfig = options.tsconfig;
     if (options.compiler) {
@@ -257,11 +257,11 @@ function compileAllFiles(options, compilationInfo) {
         args.push('--target', options.target.toUpperCase());
         if (options.module) {
             var moduleOptionString = ('' + options.module).toLowerCase();
-            if ('amd|commonjs|system|umd|es6|es2015'.indexOf(moduleOptionString) > -1) {
+            if ('none|amd|commonjs|system|umd|es6|es2015'.indexOf(moduleOptionString) > -1) {
                 args.push('--module', moduleOptionString);
             }
             else {
-                console.warn('WARNING: Option "module" only supports "amd" | "commonjs" | "system" | "umd" | "es6" | "es2015" '.magenta);
+                console.warn('WARNING: Option "module" only supports "none" | "amd" | "commonjs" | "system" | "umd" | "es6" | "es2015" '.magenta);
             }
         }
         if (compilationInfo.outDir) {

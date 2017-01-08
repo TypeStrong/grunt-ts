@@ -281,6 +281,7 @@ export function firstElementWithValue<T>(elements: T[], defaultResult: T = null)
             result = item;
             return false; // break out of lodash loop
         }
+        return undefined;
     });
     return result;
 }

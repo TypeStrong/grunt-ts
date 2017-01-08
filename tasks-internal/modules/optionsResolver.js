@@ -1,12 +1,12 @@
 /// <reference path="../../defs/tsd.d.ts"/>
 /// <reference path="./interfaces.d.ts"/>
 'use strict';
-var defaults_1 = require('./defaults');
-var utils = require('./utils');
-var _ = require('lodash');
-var es6_promise_1 = require('es6-promise');
-var visualStudioOptionsResolver_1 = require('./visualStudioOptionsResolver');
-var tsconfig_1 = require('./tsconfig');
+var defaults_1 = require("./defaults");
+var utils = require("./utils");
+var _ = require("lodash");
+var es6_promise_1 = require("es6-promise");
+var visualStudioOptionsResolver_1 = require("./visualStudioOptionsResolver");
+var tsconfig_1 = require("./tsconfig");
 // Compiler Options documentation:
 // https://github.com/Microsoft/TypeScript-Handbook/blob/master/pages/Compiler%20Options.md
 var propertiesFromTarget = ['amdloader', 'baseDir', 'html', 'htmlOutDir', 'htmlOutDirFlatten', 'reference', 'testExecute', 'tsconfig',
@@ -124,7 +124,7 @@ function resolveAndWarnOnConfigurationIssues(task, target, targetName) {
     function getAdditionalWarnings(task, target, targetName) {
         var additionalWarnings = [];
         if (propertiesFromTarget.indexOf(targetName) >= 0) {
-            additionalWarnings.push(("Warning: Using the grunt-ts keyword \"" + targetName + "\" as a target name may cause ") +
+            additionalWarnings.push("Warning: Using the grunt-ts keyword \"" + targetName + "\" as a target name may cause " +
                 "incorrect behavior or errors.");
         }
         if (((task && task.src && targetName !== 'src') || (target && target.src)) &&
@@ -136,11 +136,11 @@ function resolveAndWarnOnConfigurationIssues(task, target, targetName) {
             additionalWarnings.push("Warning: In task \"" + targetName + "\", either \"files\" or \"vs\" should be used - not both.");
         }
         if (usingDestArray(task) || usingDestArray(target)) {
-            additionalWarnings.push(("Warning: target \"" + targetName + "\" has an array specified for the files.dest property.") +
+            additionalWarnings.push("Warning: target \"" + targetName + "\" has an array specified for the files.dest property." +
                 "  This is not supported.  Taking first element and ignoring the rest.");
         }
         if ((task && task.outFile) || (target && target.outFile)) {
-            additionalWarnings.push(("Warning: target \"" + targetName + "\" is using \"outFile\".  This is not supported by") +
+            additionalWarnings.push("Warning: target \"" + targetName + "\" is using \"outFile\".  This is not supported by" +
                 " grunt-ts via the Gruntfile - it's only relevant when present in tsconfig.json file.  Use \"out\" instead.");
         }
         return additionalWarnings;
@@ -159,7 +159,7 @@ function resolveAndWarnOnConfigurationIssues(task, target, targetName) {
     }
     function fixFilesUsedWithFast(task, configName) {
         if (task && task.files && task.options && task.options.fast) {
-            warnings.push(("Warning: " + configName + " is attempting to use fast compilation with \"files\".  ") +
+            warnings.push("Warning: " + configName + " is attempting to use fast compilation with \"files\".  " +
                 "This is not currently supported.  Setting \"fast\" to \"never\".");
             task.options.fast = 'never';
         }
@@ -169,16 +169,18 @@ function resolveAndWarnOnConfigurationIssues(task, target, targetName) {
         if (task) {
             for (var propertyName in task) {
                 if (propertiesFromTarget.indexOf(propertyName) === -1 && propertyName !== 'options') {
-                    if (propertiesFromTargetOptions.indexOf(propertyName) > -1) {
-                        var warningText = ("Property \"" + propertyName + "\" in " + configName + " is possibly in the wrong place and will be ignored.  ") +
+                    if (propertiesFromTargetOptions.indexOf(propertyName) > -1 &&
+                        !_.isPlainObject(task[propertyName])) {
+                        var warningText = "Property \"" + propertyName + "\" in " + configName + " is possibly in the wrong place and will be ignored.  " +
                             "It is expected on the options object.";
                         warnings.push(warningText);
                     }
-                    else if (lowercaseTargetProps.indexOf(propertyName.toLocaleLowerCase()) === -1
-                        && lowercaseTargetOptionsProps.indexOf(propertyName.toLocaleLowerCase()) > -1) {
+                    else if (lowercaseTargetProps.indexOf(propertyName.toLocaleLowerCase()) === -1 &&
+                        lowercaseTargetOptionsProps.indexOf(propertyName.toLocaleLowerCase()) > -1 &&
+                        !_.isPlainObject(task[propertyName])) {
                         var index = lowercaseTargetOptionsProps.indexOf(propertyName.toLocaleLowerCase());
                         var correctPropertyName = propertiesFromTargetOptions[index];
-                        var warningText = ("Property \"" + propertyName + "\" in " + configName + " is possibly in the wrong place and will be ignored.  ") +
+                        var warningText = "Property \"" + propertyName + "\" in " + configName + " is possibly in the wrong place and will be ignored.  " +
                             ("It is expected on the options object.  It is also the wrong case and should be " + correctPropertyName + ".");
                         warnings.push(warningText);
                     }
@@ -188,7 +190,7 @@ function resolveAndWarnOnConfigurationIssues(task, target, targetName) {
                 for (var propertyName in task.options) {
                     if (propertiesFromTargetOptions.indexOf(propertyName) === -1) {
                         if (propertiesFromTarget.indexOf(propertyName) > -1) {
-                            var warningText = ("Property \"" + propertyName + "\" in " + configName + " is possibly in the wrong place and will be ignored.  ") +
+                            var warningText = "Property \"" + propertyName + "\" in " + configName + " is possibly in the wrong place and will be ignored.  " +
                                 "It is expected on the task or target, not under options.";
                             warnings.push(warningText);
                         }
@@ -196,7 +198,7 @@ function resolveAndWarnOnConfigurationIssues(task, target, targetName) {
                             && lowercaseTargetProps.indexOf(propertyName.toLocaleLowerCase()) > -1) {
                             var index = lowercaseTargetProps.indexOf(propertyName.toLocaleLowerCase());
                             var correctPropertyName = propertiesFromTarget[index];
-                            var warningText = ("Property \"" + propertyName + "\" in " + configName + " is possibly in the wrong place and will be ignored.  ") +
+                            var warningText = "Property \"" + propertyName + "\" in " + configName + " is possibly in the wrong place and will be ignored.  " +
                                 ("It is expected on the task or target, not under options.  It is also the wrong case and should be " + correctPropertyName + ".");
                             warnings.push(warningText);
                         }
@@ -213,7 +215,7 @@ function resolveAndWarnOnConfigurationIssues(task, target, targetName) {
                     && (propertiesFromTargetOptions.indexOf(propertyName) === -1)) {
                     var index = lowercaseTargetProps.indexOf(propertyName.toLocaleLowerCase());
                     var correctPropertyName = propertiesFromTarget[index];
-                    var warningText = ("Property \"" + propertyName + "\" in " + configName + " is incorrectly cased; it should ") +
+                    var warningText = "Property \"" + propertyName + "\" in " + configName + " is incorrectly cased; it should " +
                         ("be \"" + correctPropertyName + "\".  Fixing it for you and proceeding.");
                     warnings.push(warningText);
                     task[correctPropertyName] = task[propertyName];
@@ -226,7 +228,7 @@ function resolveAndWarnOnConfigurationIssues(task, target, targetName) {
                     && (propertiesFromTarget.indexOf(propertyName) === -1)) {
                     var index = lowercaseTargetOptionsProps.indexOf(propertyName.toLocaleLowerCase());
                     var correctPropertyName = propertiesFromTargetOptions[index];
-                    var warningText = ("Property \"" + propertyName + "\" in " + configName + " options is incorrectly cased; it should ") +
+                    var warningText = "Property \"" + propertyName + "\" in " + configName + " options is incorrectly cased; it should " +
                         ("be \"" + correctPropertyName + "\".  Fixing it for you and proceeding.");
                     warnings.push(warningText);
                     task.options[correctPropertyName] = task.options[propertyName];

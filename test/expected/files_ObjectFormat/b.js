@@ -12,7 +12,7 @@ var C = (function () {
 var B = (function (_super) {
     __extends(B, _super);
     function B() {
-        _super.apply(this, arguments);
+        return _super.apply(this, arguments) || this;
     }
     return B;
 }(C));
@@ -25,7 +25,7 @@ var B = (function (_super) {
 var A = (function (_super) {
     __extends(A, _super);
     function A() {
-        _super.apply(this, arguments);
+        return _super.apply(this, arguments) || this;
     }
     return A;
 }(B));
@@ -41,7 +41,7 @@ var Animal = (function () {
 var Snake = (function (_super) {
     __extends(Snake, _super);
     function Snake(name) {
-        _super.call(this, name);
+        return _super.call(this, name) || this;
     }
     Snake.prototype.move = function () {
         alert("Slithering...");
@@ -52,7 +52,7 @@ var Snake = (function (_super) {
 var Horse = (function (_super) {
     __extends(Horse, _super);
     function Horse(name) {
-        _super.call(this, name);
+        return _super.call(this, name) || this;
     }
     Horse.prototype.move = function () {
         alert("Galloping...");

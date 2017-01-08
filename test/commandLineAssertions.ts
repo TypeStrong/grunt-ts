@@ -1,6 +1,7 @@
 /// <reference path="../defs/tsd.d.ts"/>
 /// <reference path="../tasks/modules/interfaces.d.ts"/>
 
+import {Promise} from 'es6-promise';
 
 export const decoratorMetadataPassed : ICompilePromise = (strings, options) => {
   return new Promise(function(resolve, reject) {
@@ -199,16 +200,17 @@ export const vsproj_test : ICompilePromise = (strings, options) => {
     if (options.sourceMap === true &&
         options.removeComments === false &&
         options.module === 'commonjs' &&
-        options.CompilationTasks[0].outDir === 'test/vsproj/vsproj_test') {
+        options.CompilationTasks[0].outDir === 'test/vsproj/vsproj_test' &&
+        options.strictNullChecks === true) {
       resolve({
         code: 0,
         output: ""
       });
     }
     throw "expected sourceMap === true, removeComments===" +
-      "false, module===commonjs, outDir===vsproj_test.  Was " +
+      "false, module===commonjs, outDir===vsproj_test, strictNullChecks===true.  Was " +
         JSON.stringify([options.sourceMap,
-        options.removeComments, options.module, options.CompilationTasks[0].outDir]);
+        options.removeComments, options.module, options.CompilationTasks[0].outDir, options.strictNullChecks]);
   });
 };
 
@@ -613,7 +615,6 @@ export const new_TypeScript_2_0_Features: ICompilePromise = (strings, options) =
   return new Promise(function(resolve, reject) {
 
     const command = strings[1].replace(/\\/g,'/');
-
     if (command.indexOf(`--strictNullChecks`) > -1 &&
         command.indexOf(`--noImplicitThis`) > -1 &&
         command.indexOf(`--lib es2017`) > -1) {
@@ -625,6 +626,40 @@ export const new_TypeScript_2_0_Features: ICompilePromise = (strings, options) =
     throw `expected to see all of the new TypeScript 2.0 values in the command line and didn't.  Got this: ${command}`;
   });
 };
+
+export const new_TypeScript_2_and_2_1_Features: ICompilePromise = (strings, options) => {
+  return new Promise(function(resolve, reject) {
+
+    const command = strings[1].replace(/\\/g,'/');
+
+    if (command.indexOf(`--alwaysStrict`) > -1 &&
+        command.indexOf(`--baseUrl ..`) > -1 &&
+        command.indexOf(`--charset utf8`) > -1 &&
+        command.indexOf(`--declarationDir "../declarations dir"`) > -1 &&
+        command.indexOf(`--diagnostics`) > -1 &&
+        command.indexOf(`--importHelpers`) > -1 &&
+        command.indexOf(`--jsxFactory React.createElement`) > -1 &&
+        command.indexOf(`--lib es5,es2015.promise`) > -1 &&
+        command.indexOf(`--listEmittedFiles`) > -1 &&
+        command.indexOf(`--listFiles`) > -1 &&
+        command.indexOf(`--maxNodeModuleJsDepth 2`) > -1 &&
+        command.indexOf(`--noImplicitThis`) > -1 &&
+        command.indexOf(`--noUnusedLocals`) > -1 &&
+        command.indexOf(`--noUnusedParameters`) > -1 &&
+        command.indexOf(`--strictNullChecks`) > -1 &&
+        command.indexOf(`--traceResolution`) > -1 &&
+        command.indexOf(`--types "node","lodash","express"`) > -1 &&
+        command.indexOf(`--typeRoots "sometypings","../../otherTypings"`) > -1)
+    {
+      resolve({
+        code: 0,
+        output: ""
+      });
+    }
+    throw `expected to see all of the new TypeScript 2 and 2.1 values in the command line and didn't.  Got this: ${command}`;
+  });
+}
+
 
 export const test_noLib = simpleCommandLineCheck("--noLib");
 export const test_emitBOM = simpleCommandLineCheck("--emitBOM");

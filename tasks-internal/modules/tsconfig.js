@@ -1,10 +1,10 @@
 'use strict';
-var es6_promise_1 = require('es6-promise');
-var fs = require('fs');
-var path = require('path');
-var stripBom = require('strip-bom');
-var _ = require('lodash');
-var utils = require('./utils');
+var es6_promise_1 = require("es6-promise");
+var fs = require("fs");
+var path = require("path");
+var stripBom = require("strip-bom");
+var _ = require("lodash");
+var utils = require("./utils");
 var templateProcessor = null;
 var globExpander = null;
 var gruntfileGlobs = null;
@@ -121,7 +121,7 @@ function getGlobs(taskOptions, targetOptions) {
         return (_.isArray(thing) || _.isString(thing));
     }
     function getFlatCloneOf(array) {
-        return _.flatten(array).slice();
+        return _.flattenDeep(array).slice();
     }
 }
 function resolve_output_locations(options, projectSpec) {
