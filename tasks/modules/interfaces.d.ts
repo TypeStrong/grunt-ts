@@ -209,6 +209,7 @@ interface ITSConfigFile {
     compilerOptions?: ICompilerOptions;
     files?: string[];
     exclude?: string[];
+    include?: string[];
     filesGlob?: string[];
 }
 

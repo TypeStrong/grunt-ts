@@ -530,6 +530,64 @@ export var tests : nodeunit.ITestGroup = {
           callback(ex);
         }
   	},
+    "include will record an error in presence of overwriteFilesGlob or updateFiles": (test: nodeunit.Test) => {
+      test.expect(4);
+      const config = <any>{
+        options: {
+          target: 'es5'
+        },
+        build: {
+          tsconfig: {
+            tsconfig: './test/tsconfig/test_include_tsconfig.json',
+            overwriteFilesGlob: true,
+            updateFiles: true
+          }
+        }
+      };
+
+      const result = or.resolveAsync(config, config.build, "build").then((result) => {
+        test.strictEqual(result.errors.length, 3);
+        const errorText = JSON.stringify(result.errors);
+        
+        test.ok(errorText.indexOf("the `overwriteFilesGlob` feature") > -1);
+        test.ok(errorText.indexOf("the `updateFiles` feature") > -1);
+        test.ok(errorText.indexOf("no glob was passed-in") > -1);
+
+        test.done();
+      }).catch((err) => {test.ifError(err); test.done();});
+
+    },
+    "include will bring in files when specified": (test: nodeunit.Test) => {
+      test.expect(7)
+      const config = <any>{
+        options: {
+          target: 'es5'
+        },
+        build: {
+          tsconfig: {
+            tsconfig: './test/tsconfig/test_include_tsconfig.json',
+            ignoreFiles: false,
+            ignoreSettings: false,
+            overwriteFilesGlob: false,
+            updateFiles: false,
+            passThrough: false
+          }
+        }
+      };
+
+      const result = or.resolveAsync(config, config.build, "build").then((result) => {
+        test.strictEqual(result.CompilationTasks.length, 1, "expected a compilation task");
+        test.strictEqual(result.CompilationTasks[0].src.length, 5);
+        test.ok(result.CompilationTasks[0].src.indexOf("test/customcompiler/foo.ts") > -1);
+        test.ok(result.CompilationTasks[0].src.indexOf("test/abtest/a.ts") > -1);
+        test.ok(result.CompilationTasks[0].src.indexOf("test/abtest/b.ts") > -1);
+        test.ok(result.CompilationTasks[0].src.indexOf("test/abtest/c.ts") > -1);
+        test.ok(result.CompilationTasks[0].src.indexOf("test/abtest/reference.ts") > -1);
+
+        test.done();
+      }).catch((err) => {test.ifError(err); test.done();});
+
+    },
     "Can get config from a valid file": (test: nodeunit.Test) => {
         test.expect(1);
         const cfg = getConfig("minimalist");
@@ -696,7 +754,7 @@ export var tests : nodeunit.ITestGroup = {
     const cfg = getConfig("tsconfig has specific file");
     const files: IGruntTSCompilationInfo[] = [{src: ['test/simple/ts/zoo.ts']}];
 
-    const result = or.resolveAsync(null, getConfig("tsconfig has specific file"), null, files).then((result) => {
+    const result = or.resolveAsync(null, getConfig("tsconfig has specific file"), null, files, null, grunt.file.expand).then((result) => {
 
       test.strictEqual(result.CompilationTasks[0].src.length, 2);
       test.ok(result.CompilationTasks[0].src.indexOf('test/tsconfig/files/validtsconfig.ts') > -1);

@@ -146,25 +146,33 @@ export function resolveAsync(rawTaskOptions: ITargetOptions,
     result = copyCompilationTasks(result, resolvedFiles, resolveOutputOptions(rawTaskOptions, rawTargetOptions));
 
     resolveVSOptionsAsync(result, rawTaskOptions, rawTargetOptions, templateProcessor).then((result) => {
-    resolveTSConfigAsync(result, rawTaskOptions, rawTargetOptions, templateProcessor, globExpander).then((result) => {
+      resolveTSConfigAsync(result, rawTaskOptions, rawTargetOptions, templateProcessor, globExpander).then((result) => {
 
-      result = addressAssociatedOptionsAndResolveConflicts(result);
-      result = enclosePathsInQuotesIfRequired(result);
-      result = logAdditionalConfigurationWarnings(result);
-      result = applyGruntTSDefaults(result);
+        result = addressAssociatedOptionsAndResolveConflicts(result);
+        result = enclosePathsInQuotesIfRequired(result);
+        result = logAdditionalConfigurationWarnings(result);
+        result = applyGruntTSDefaults(result);
 
-      if (result.targetName === undefined ||
-          (!result.targetName && targetName)) {
-        result.targetName = targetName;
-      }
+        if (result.targetName === undefined ||
+            (!result.targetName && targetName)) {
+          result.targetName = targetName;
+        }
 
-      return resolve(result);
-    }).catch((tsConfigError) => {
-      result.errors.push('tsconfig error: ' + JSON.stringify(tsConfigError));
-      return resolve(result);
-    });
+        return resolve(result);
+      }).catch((tsConfigError) => {
+        if (tsConfigError.message) {
+          result.errors.push('tsconfig error: ' + tsConfigError.message);
+        } else {
+          result.errors.push('tsconfig error: ' + JSON.stringify(tsConfigError));
+        }
+        return resolve(result);
+      });
     }).catch((vsConfigError) => {
-      result.errors.push('Visual Studio config issue: ' + JSON.stringify(vsConfigError));
+      if (vsConfigError.message) {
+        result.errors.push('Visual Studio config issue: ' + vsConfigError.message);
+      } else {
+        result.errors.push('Visual Studio config issue: ' + JSON.stringify(vsConfigError));
+      }
       return resolve(result);
     });
   });

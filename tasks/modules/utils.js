@@ -393,4 +393,17 @@ function shouldPassThrough(options) {
     return (options.tsconfig && options.tsconfig.passThrough);
 }
 exports.shouldPassThrough = shouldPassThrough;
+function prependIfNotStartsWith(baseString, prependThisMaybe) {
+    if (!baseString) {
+        return prependThisMaybe;
+    }
+    if (baseString.length < prependThisMaybe.length) {
+        return prependThisMaybe + baseString;
+    }
+    if (baseString.substr(0, prependThisMaybe.length) === prependThisMaybe) {
+        return baseString;
+    }
+    return prependThisMaybe + baseString;
+}
+exports.prependIfNotStartsWith = prependIfNotStartsWith;
 //# sourceMappingURL=utils.js.map

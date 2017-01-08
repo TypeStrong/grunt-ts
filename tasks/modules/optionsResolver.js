@@ -141,11 +141,21 @@ function resolveAsync(rawTaskOptions, rawTargetOptions, targetName, resolvedFile
                 }
                 return resolve(result);
             }).catch(function (tsConfigError) {
-                result.errors.push('tsconfig error: ' + JSON.stringify(tsConfigError));
+                if (tsConfigError.message) {
+                    result.errors.push('tsconfig error: ' + tsConfigError.message);
+                }
+                else {
+                    result.errors.push('tsconfig error: ' + JSON.stringify(tsConfigError));
+                }
                 return resolve(result);
             });
         }).catch(function (vsConfigError) {
-            result.errors.push('Visual Studio config issue: ' + JSON.stringify(vsConfigError));
+            if (vsConfigError.message) {
+                result.errors.push('Visual Studio config issue: ' + vsConfigError.message);
+            }
+            else {
+                result.errors.push('Visual Studio config issue: ' + JSON.stringify(vsConfigError));
+            }
             return resolve(result);
         });
         var _b, _c;

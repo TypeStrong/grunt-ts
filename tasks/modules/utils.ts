@@ -412,3 +412,16 @@ export function shouldCompile(options: IGruntTSOptions) {
 export function shouldPassThrough(options: IGruntTSOptions) {
   return (options.tsconfig && (<ITSConfigSupport>options.tsconfig).passThrough);
 }
+
+export function prependIfNotStartsWith(baseString: string, prependThisMaybe: string) {
+    if (!baseString) {
+        return prependThisMaybe;
+    }
+    if (baseString.length < prependThisMaybe.length) {
+        return prependThisMaybe + baseString;
+    }
+    if (baseString.substr(0, prependThisMaybe.length) === prependThisMaybe) {
+        return baseString;
+    }
+    return prependThisMaybe + baseString;
+}

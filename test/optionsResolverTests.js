@@ -513,6 +513,57 @@ exports.tests = {
                 callback(ex);
             }
         },
+        "include will record an error in presence of overwriteFilesGlob or updateFiles": function (test) {
+            test.expect(4);
+            var config = {
+                options: {
+                    target: 'es5'
+                },
+                build: {
+                    tsconfig: {
+                        tsconfig: './test/tsconfig/test_include_tsconfig.json',
+                        overwriteFilesGlob: true,
+                        updateFiles: true
+                    }
+                }
+            };
+            var result = or.resolveAsync(config, config.build, "build").then(function (result) {
+                test.strictEqual(result.errors.length, 3);
+                var errorText = JSON.stringify(result.errors);
+                test.ok(errorText.indexOf("the `overwriteFilesGlob` feature") > -1);
+                test.ok(errorText.indexOf("the `updateFiles` feature") > -1);
+                test.ok(errorText.indexOf("no glob was passed-in") > -1);
+                test.done();
+            }).catch(function (err) { test.ifError(err); test.done(); });
+        },
+        "include will bring in files when specified": function (test) {
+            test.expect(7);
+            var config = {
+                options: {
+                    target: 'es5'
+                },
+                build: {
+                    tsconfig: {
+                        tsconfig: './test/tsconfig/test_include_tsconfig.json',
+                        ignoreFiles: false,
+                        ignoreSettings: false,
+                        overwriteFilesGlob: false,
+                        updateFiles: false,
+                        passThrough: false
+                    }
+                }
+            };
+            var result = or.resolveAsync(config, config.build, "build").then(function (result) {
+                test.strictEqual(result.CompilationTasks.length, 1, "expected a compilation task");
+                test.strictEqual(result.CompilationTasks[0].src.length, 5);
+                test.ok(result.CompilationTasks[0].src.indexOf("test/customcompiler/foo.ts") > -1);
+                test.ok(result.CompilationTasks[0].src.indexOf("test/abtest/a.ts") > -1);
+                test.ok(result.CompilationTasks[0].src.indexOf("test/abtest/b.ts") > -1);
+                test.ok(result.CompilationTasks[0].src.indexOf("test/abtest/c.ts") > -1);
+                test.ok(result.CompilationTasks[0].src.indexOf("test/abtest/reference.ts") > -1);
+                test.done();
+            }).catch(function (err) { test.ifError(err); test.done(); });
+        },
         "Can get config from a valid file": function (test) {
             test.expect(1);
             var cfg = getConfig("minimalist");
@@ -668,7 +719,7 @@ exports.tests = {
             test.expect(3);
             var cfg = getConfig("tsconfig has specific file");
             var files = [{ src: ['test/simple/ts/zoo.ts'] }];
-            var result = or.resolveAsync(null, getConfig("tsconfig has specific file"), null, files).then(function (result) {
+            var result = or.resolveAsync(null, getConfig("tsconfig has specific file"), null, files, null, grunt.file.expand).then(function (result) {
                 test.strictEqual(result.CompilationTasks[0].src.length, 2);
                 test.ok(result.CompilationTasks[0].src.indexOf('test/tsconfig/files/validtsconfig.ts') > -1);
                 test.ok(result.CompilationTasks[0].src.indexOf('test/simple/ts/zoo.ts') > -1);
