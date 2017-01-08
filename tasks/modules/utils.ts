@@ -425,3 +425,29 @@ export function prependIfNotStartsWith(baseString: string, prependThisMaybe: str
     }
     return prependThisMaybe + baseString;
 }
+
+// "polyfill" for path.isAbsolute() which is not supported on Node.js 0.10
+// (really this is just the code from Node.js 7)
+export function isAbsolutePath(thePath: string): boolean {
+    if (path.isAbsolute && typeof path.isAbsolute === 'function') {
+        return path.isAbsolute(thePath);
+    }
+    const len = thePath.length;
+    if (len === 0) {
+        return false;
+    }
+    let code = thePath.charCodeAt(0);
+    if (code === 47 /*/*/ || code === 92 /*\\*/) {
+        return true;
+    }
+    else if ((code >= 65 /*A*/ && code <= 90 /*Z*/) || (code >= 97 /*a*/ && code <= 122 /*z*/)) {
+        // Possible device root
+        if (len > 2 && thePath.charCodeAt(1) === 58/*:*/) {
+            code = thePath.charCodeAt(2);
+            if (code === 47 /*/*/ || code === 92 /*\\*/) {
+                return true;
+            }
+        }
+    }
+    return false;
+}

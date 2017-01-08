@@ -406,4 +406,30 @@ function prependIfNotStartsWith(baseString, prependThisMaybe) {
     return prependThisMaybe + baseString;
 }
 exports.prependIfNotStartsWith = prependIfNotStartsWith;
+// "polyfill" for path.isAbsolute() which is not supported on Node.js 0.10
+// (really this is just the code from Node.js 7)
+function isAbsolutePath(thePath) {
+    if (path.isAbsolute && typeof path.isAbsolute === 'function') {
+        return path.isAbsolute(thePath);
+    }
+    var len = thePath.length;
+    if (len === 0) {
+        return false;
+    }
+    var code = thePath.charCodeAt(0);
+    if (code === 47 /*/*/ || code === 92 /*\\*/) {
+        return true;
+    }
+    else if ((code >= 65 /*A*/ && code <= 90 /*Z*/) || (code >= 97 /*a*/ && code <= 122 /*z*/)) {
+        // Possible device root
+        if (len > 2 && thePath.charCodeAt(1) === 58 /*:*/) {
+            code = thePath.charCodeAt(2);
+            if (code === 47 /*/*/ || code === 92 /*\\*/) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+exports.isAbsolutePath = isAbsolutePath;
 //# sourceMappingURL=utils.js.map

@@ -355,7 +355,7 @@ export function compileAllFiles(options: IGruntTSOptions, compilationInfo: IGrun
               ];
 
           options.lib.forEach(option => {
-              if (possibleOptions.indexOf(option) === -1) {
+              if (possibleOptions.indexOf((option + '').toLocaleLowerCase()) === -1) {
                   grunt.log.warn(`WARNING: Option "lib" does not support ${option} `.magenta);
               }
           });

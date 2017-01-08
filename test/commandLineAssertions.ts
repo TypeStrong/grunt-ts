@@ -639,7 +639,7 @@ export const new_TypeScript_2_and_2_1_Features: ICompilePromise = (strings, opti
         command.indexOf(`--diagnostics`) > -1 &&
         command.indexOf(`--importHelpers`) > -1 &&
         command.indexOf(`--jsxFactory React.createElement`) > -1 &&
-        command.indexOf(`--lib es5,ES2015.Promise`) > -1 &&
+        command.indexOf(`--lib es5,es2015.promise`) > -1 &&
         command.indexOf(`--listEmittedFiles`) > -1 &&
         command.indexOf(`--listFiles`) > -1 &&
         command.indexOf(`--maxNodeModuleJsDepth 2`) > -1 &&

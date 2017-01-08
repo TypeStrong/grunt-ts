@@ -719,7 +719,7 @@ module.exports = function (grunt) {
                     diagnostics: true,
                     importHelpers: true,
                     jsxFactory: 'React.createElement',
-                    lib: ['es5', 'ES2015.Promise'],
+                    lib: ['es5', 'es2015.promise'],
                     listEmittedFiles: true,
                     listFiles: true,
                     maxNodeModuleJsDepth: 2,

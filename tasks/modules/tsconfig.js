@@ -397,7 +397,7 @@ var replaceSlashesRegex = new RegExp('\\' + path.sep, 'g');
 function addUniqueRelativeFilesToSrc(tsconfigFilesArray, compilationTaskSrc, absolutePathToTSConfig) {
     var gruntfileFolder = path.resolve('.');
     _.map(_.uniq(tsconfigFilesArray), function (file) {
-        var absolutePathToFile = path.isAbsolute(file) ? file : path.normalize(path.join(absolutePathToTSConfig, file));
+        var absolutePathToFile = utils.isAbsolutePath(file) ? file : path.normalize(path.join(absolutePathToTSConfig, file));
         var relativePathToFileFromGruntfile = path.relative(gruntfileFolder, absolutePathToFile).replace(replaceSlashesRegex, '/');
         if (compilationTaskSrc.indexOf(absolutePathToFile) === -1 &&
             compilationTaskSrc.indexOf(relativePathToFileFromGruntfile) === -1) {

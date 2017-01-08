@@ -487,7 +487,7 @@ function addUniqueRelativeFilesToSrc(tsconfigFilesArray: string[], compilationTa
   const gruntfileFolder = path.resolve('.');
 
   _.map(_.uniq(tsconfigFilesArray), (file) => {
-      const absolutePathToFile = path.isAbsolute(file) ? file : path.normalize(path.join(absolutePathToTSConfig, file));
+      const absolutePathToFile = utils.isAbsolutePath(file) ? file : path.normalize(path.join(absolutePathToTSConfig, file));
       const relativePathToFileFromGruntfile = path.relative(gruntfileFolder, absolutePathToFile).replace(replaceSlashesRegex, '/');
 
       if (compilationTaskSrc.indexOf(absolutePathToFile) === -1 &&
@@ -496,3 +496,4 @@ function addUniqueRelativeFilesToSrc(tsconfigFilesArray: string[], compilationTa
       }
   });
 }
+

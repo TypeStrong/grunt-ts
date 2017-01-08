@@ -321,7 +321,7 @@ function compileAllFiles(options, compilationInfo) {
                 'es2017.sharedmemory'
             ];
             options.lib.forEach(function (option) {
-                if (possibleOptions_1.indexOf(option) === -1) {
+                if (possibleOptions_1.indexOf((option + '').toLocaleLowerCase()) === -1) {
                     exports.grunt.log.warn(("WARNING: Option \"lib\" does not support " + option + " ").magenta);
                 }
             });
