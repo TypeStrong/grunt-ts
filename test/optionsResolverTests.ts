@@ -583,7 +583,8 @@ export var tests : nodeunit.ITestGroup = {
         test.ok(result.CompilationTasks[0].src.indexOf("test/abtest/b.ts") > -1);
         test.ok(result.CompilationTasks[0].src.indexOf("test/abtest/c.ts") > -1);
         test.ok(result.CompilationTasks[0].src.indexOf("test/abtest/reference.ts") > -1);
-
+        console.log(JSON.stringify(result.errors));
+        console.log(JSON.stringify(result.warnings));
         test.done();
       }).catch((err) => {test.ifError(err); test.done();});
 
