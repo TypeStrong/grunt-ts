@@ -316,7 +316,7 @@ function applyCompilerOptions(applyTo: IGruntTSOptions, projectSpec: ITSConfigFi
   }
 
   if (!('updateFiles' in tsconfig)) {
-    tsconfig.updateFiles = !('include' in tsconfig) && ('filesGlob' in tsconfig);
+    tsconfig.updateFiles = !('include' in projectSpec) && ('filesGlob' in projectSpec);
   }
 
   if (applyTo.CompilationTasks.length === 0) {
@@ -359,6 +359,11 @@ function addFilesToCompilationContext(applyTo: IGruntTSOptions, projectSpec: ITS
 
   const resolvedInclude: string[] = [], resolvedExclude: string[] = [], resolvedFiles: string[] = [];
 
+  const result: IGruntTSOptions = applyTo,
+    co = projectSpec.compilerOptions,
+    tsconfig: ITSConfigSupport = applyTo.tsconfig,
+    src = applyTo.CompilationTasks[0].src;
+
   if (projectSpec.exclude) {
     resolvedExclude.push(...(projectSpec.exclude.map(f => utils.prependIfNotStartsWith(path.join(absolutePathToTSConfig, f), '!'))));
   } else {
@@ -379,23 +384,20 @@ function addFilesToCompilationContext(applyTo: IGruntTSOptions, projectSpec: ITS
       resolvedInclude.push(...projectSpec.include.map(f => path.join(absolutePathToTSConfig, f)));
     }
   } else {
-    resolvedInclude.push(
-      path.join(absolutePathToTSConfig, '**/*.ts'),
-      path.join(absolutePathToTSConfig, '**/*.d.ts'),
-      path.join(absolutePathToTSConfig, '**/*.tsx')
-    );
-    if (applyTo.allowJs) {
-      resolvedExclude.push(
-        path.join(absolutePathToTSConfig, '**/*.js'),
-        path.join(absolutePathToTSConfig, '**/*.jsx')
+    if (!tsconfig.updateFiles) {
+      resolvedInclude.push(
+        path.join(absolutePathToTSConfig, '**/*.ts'),
+        path.join(absolutePathToTSConfig, '**/*.d.ts'),
+        path.join(absolutePathToTSConfig, '**/*.tsx')
       );
+      if (applyTo.allowJs) {
+        resolvedExclude.push(
+          path.join(absolutePathToTSConfig, '**/*.js'),
+          path.join(absolutePathToTSConfig, '**/*.jsx')
+        );
+      }
     }
   }
-
-  const result: IGruntTSOptions = applyTo,
-    co = projectSpec.compilerOptions,
-    tsconfig: ITSConfigSupport = applyTo.tsconfig,
-    src = applyTo.CompilationTasks[0].src;
 
   const expandedCompilationContext: string[] = [];
   if (resolvedInclude.length > 0 || resolvedExclude.length > 0) {
@@ -412,37 +414,10 @@ function addFilesToCompilationContext(applyTo: IGruntTSOptions, projectSpec: ITS
     if (projectSpec.files === undefined) {
       projectSpec.files = [];
     }
-    updateTSConfigAndFilesFromGlob(projectSpec.files, projectSpec.filesGlob, tsconfig.tsconfig);
+    updateTSConfigAndFilesFromGlobAndAddToCompilationContext(projectSpec.files, projectSpec.filesGlob, tsconfig.tsconfig, src);
   }
 
-
-    // {
-    //   const validPattern = result.allowJs ? /\.[tj]sx?$/i : /\.tsx?$/i;
-    //   let excludedPaths: string[] = [];
-    //   if (_.isArray(projectSpec.exclude)) {
-    //     excludedPaths = projectSpec.exclude.map(filepath =>
-    //       utils.makeRelativePath(absolutePathToTSConfig, path.resolve(absolutePathToTSConfig, filepath))
-    //     );
-    //   }
-
-    //   const files =
-    //       utils.getFiles(absolutePathToTSConfig, filepath =>
-    //         excludedPaths.indexOf(utils.makeRelativePath(absolutePathToTSConfig, filepath)) > -1
-    //         || (
-    //           fs.statSync(filepath).isFile()
-    //           && !validPattern.test(filepath)
-    //         )
-    //       ).map(filepath =>
-    //         utils.makeRelativePath(absolutePathToTSConfig, filepath)
-    //       );
-    //   projectSpec.files = files;
-    //   if (projectSpec.filesGlob) {
-    //       saveTSConfigSync(tsconfig.tsconfig, projectSpec);
-    //   }
-
-    //   addUniqueRelativeFilesToSrc(files, src, absolutePathToTSConfig);
-    // }
-    return result;
+  return result;
 }
 
 
@@ -454,8 +429,8 @@ function relativePathFromGruntfileToTSConfig() {
 }
 
 
-function updateTSConfigAndFilesFromGlob(filesRelativeToTSConfig: string[],
-      globRelativeToTSConfig: string[], tsconfigFileName: string) {
+function updateTSConfigAndFilesFromGlobAndAddToCompilationContext(filesRelativeToTSConfig: string[],
+      globRelativeToTSConfig: string[], tsconfigFileName: string, currentCompilationFilesList: string[]) {
 
     if ((<any>globExpander).isStub) {
       return;
@@ -476,6 +451,9 @@ function updateTSConfigAndFilesFromGlob(filesRelativeToTSConfig: string[],
       const relativePathFromGruntfileToTSConfig = path.relative('.', absolutePathToTSConfig).replace(/\\/g, '/');
       for (let i = 0; i < filesRelativeToGruntfile.length; i += 1) {
         filesRelativeToGruntfile[i] = filesRelativeToGruntfile[i].replace(/\\/g, '/');
+        if (currentCompilationFilesList.indexOf(filesRelativeToGruntfile[i]) === -1) {
+          currentCompilationFilesList.push(filesRelativeToGruntfile[i]);
+        }
         filesRelativeToTSConfig_temp.push(path.relative(relativePathFromGruntfileToTSConfig, filesRelativeToGruntfile[i]).replace(/\\/g, '/'));
       }
 

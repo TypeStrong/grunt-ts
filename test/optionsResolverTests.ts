@@ -873,7 +873,8 @@ export var tests : nodeunit.ITestGroup = {
       tsconfig: './test/tsconfig/simple_filesGlob_tsconfig.json',
       overwriteFilesGlob: true
     };
-    const result = or.resolveAsync(null, cfg, "", null, null, grunt.file.expand).then((result) => {
+
+    const result = or.resolveAsync(null, cfg, "", [], null, grunt.file.expand).then((result) => {
 
         test.ok(result.CompilationTasks[0].src.indexOf('test/simple/ts/zoo.ts') >= 0, 'expected to find zoo.ts');
         test.strictEqual(result.CompilationTasks[0].src.length, 1);

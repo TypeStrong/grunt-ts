@@ -274,7 +274,7 @@ function applyCompilerOptions(applyTo, projectSpec) {
         }
     }
     if (!('updateFiles' in tsconfig)) {
-        tsconfig.updateFiles = !('include' in tsconfig) && ('filesGlob' in tsconfig);
+        tsconfig.updateFiles = !('include' in projectSpec) && ('filesGlob' in projectSpec);
     }
     if (applyTo.CompilationTasks.length === 0) {
         applyTo.CompilationTasks.push({ src: [] });
@@ -304,6 +304,7 @@ function applyCompilerOptions(applyTo, projectSpec) {
 function addFilesToCompilationContext(applyTo, projectSpec) {
     // see http://www.typescriptlang.org/docs/handbook/tsconfig-json.html
     var resolvedInclude = [], resolvedExclude = [], resolvedFiles = [];
+    var result = applyTo, co = projectSpec.compilerOptions, tsconfig = applyTo.tsconfig, src = applyTo.CompilationTasks[0].src;
     if (projectSpec.exclude) {
         resolvedExclude.push.apply(resolvedExclude, (projectSpec.exclude.map(function (f) { return utils.prependIfNotStartsWith(path.join(absolutePathToTSConfig, f), '!'); })));
     }
@@ -322,12 +323,13 @@ function addFilesToCompilationContext(applyTo, projectSpec) {
         }
     }
     else {
-        resolvedInclude.push(path.join(absolutePathToTSConfig, '**/*.ts'), path.join(absolutePathToTSConfig, '**/*.d.ts'), path.join(absolutePathToTSConfig, '**/*.tsx'));
-        if (applyTo.allowJs) {
-            resolvedExclude.push(path.join(absolutePathToTSConfig, '**/*.js'), path.join(absolutePathToTSConfig, '**/*.jsx'));
+        if (!tsconfig.updateFiles) {
+            resolvedInclude.push(path.join(absolutePathToTSConfig, '**/*.ts'), path.join(absolutePathToTSConfig, '**/*.d.ts'), path.join(absolutePathToTSConfig, '**/*.tsx'));
+            if (applyTo.allowJs) {
+                resolvedExclude.push(path.join(absolutePathToTSConfig, '**/*.js'), path.join(absolutePathToTSConfig, '**/*.jsx'));
+            }
         }
     }
-    var result = applyTo, co = projectSpec.compilerOptions, tsconfig = applyTo.tsconfig, src = applyTo.CompilationTasks[0].src;
     var expandedCompilationContext = [];
     if (resolvedInclude.length > 0 || resolvedExclude.length > 0) {
         if (globExpander.isStub) {
@@ -341,32 +343,8 @@ function addFilesToCompilationContext(applyTo, projectSpec) {
         if (projectSpec.files === undefined) {
             projectSpec.files = [];
         }
-        updateTSConfigAndFilesFromGlob(projectSpec.files, projectSpec.filesGlob, tsconfig.tsconfig);
+        updateTSConfigAndFilesFromGlobAndAddToCompilationContext(projectSpec.files, projectSpec.filesGlob, tsconfig.tsconfig, src);
     }
-    // {
-    //   const validPattern = result.allowJs ? /\.[tj]sx?$/i : /\.tsx?$/i;
-    //   let excludedPaths: string[] = [];
-    //   if (_.isArray(projectSpec.exclude)) {
-    //     excludedPaths = projectSpec.exclude.map(filepath =>
-    //       utils.makeRelativePath(absolutePathToTSConfig, path.resolve(absolutePathToTSConfig, filepath))
-    //     );
-    //   }
-    //   const files =
-    //       utils.getFiles(absolutePathToTSConfig, filepath =>
-    //         excludedPaths.indexOf(utils.makeRelativePath(absolutePathToTSConfig, filepath)) > -1
-    //         || (
-    //           fs.statSync(filepath).isFile()
-    //           && !validPattern.test(filepath)
-    //         )
-    //       ).map(filepath =>
-    //         utils.makeRelativePath(absolutePathToTSConfig, filepath)
-    //       );
-    //   projectSpec.files = files;
-    //   if (projectSpec.filesGlob) {
-    //       saveTSConfigSync(tsconfig.tsconfig, projectSpec);
-    //   }
-    //   addUniqueRelativeFilesToSrc(files, src, absolutePathToTSConfig);
-    // }
     return result;
 }
 function relativePathFromGruntfileToTSConfig() {
@@ -375,7 +353,7 @@ function relativePathFromGruntfileToTSConfig() {
     }
     return path.relative('.', absolutePathToTSConfig).replace(/\\/g, '/');
 }
-function updateTSConfigAndFilesFromGlob(filesRelativeToTSConfig, globRelativeToTSConfig, tsconfigFileName) {
+function updateTSConfigAndFilesFromGlobAndAddToCompilationContext(filesRelativeToTSConfig, globRelativeToTSConfig, tsconfigFileName, currentCompilationFilesList) {
     if (globExpander.isStub) {
         return;
     }
@@ -390,6 +368,9 @@ function updateTSConfigAndFilesFromGlob(filesRelativeToTSConfig, globRelativeToT
         var relativePathFromGruntfileToTSConfig_1 = path.relative('.', absolutePathToTSConfig).replace(/\\/g, '/');
         for (var i = 0; i < filesRelativeToGruntfile.length; i += 1) {
             filesRelativeToGruntfile[i] = filesRelativeToGruntfile[i].replace(/\\/g, '/');
+            if (currentCompilationFilesList.indexOf(filesRelativeToGruntfile[i]) === -1) {
+                currentCompilationFilesList.push(filesRelativeToGruntfile[i]);
+            }
             filesRelativeToTSConfig_temp.push(path.relative(relativePathFromGruntfileToTSConfig_1, filesRelativeToGruntfile[i]).replace(/\\/g, '/'));
         }
         filesRelativeToTSConfig.length = 0;
