@@ -115,7 +115,7 @@ interface ITaskOptions {
     noImplicitAny: boolean;
     /** Report error when not all code paths in function return a value. */
     noImplicitReturns: boolean;
-    /** Raise error on this expressions with an implied any type. */
+    /** Raise error on this expressions with an implied 'any' type. */
     noImplicitThis: boolean;
     /** Do not emit  "use strict"  directives in module output. */
     noImplicitUseStrict: boolean;
@@ -141,7 +141,7 @@ interface ITaskOptions {
     skipDefaultLibCheck: boolean;
     sourceMap: boolean;
     sourceRoot: string;
-    /** null and undefined are not in the domain of every type */
+    /** Enables strict null checking mode (null and undefined are not in the domain of every type) */
     strictNullChecks: boolean;
     /** Does not emit objects marked @internal in jsdoc */
     stripInternal: boolean;

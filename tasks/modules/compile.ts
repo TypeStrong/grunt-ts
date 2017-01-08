@@ -330,6 +330,35 @@ export function compileAllFiles(options: IGruntTSOptions, compilationInfo: IGrun
           args.push('--jsxFactory', options.jsxFactory);
       }
       if (options.lib) {
+          let possibleOptions = [
+              'es5',
+              'es6',
+              'es2015',
+              'es7',
+              'es2016',
+              'es2017',
+              'dom',
+              'webworker',
+              'scripthost',
+              'es2015.core',
+              'es2015.collection',
+              'es2015.generator',
+              'es2015.iterable',
+              'es2015.promise',
+              'es2015.proxy',
+              'es2015.reflect',
+              'es2015.symbol',
+              'es2015.symbol.wellknown',
+              'es2016.array.include',
+              'es2017.object',
+              'es2017.sharedmemory'
+              ];
+
+          options.lib.forEach(option => {
+              if (possibleOptions.indexOf(option) === -1) {
+                  grunt.log.warn(`WARNING: Option "lib" does not support ${option} `.magenta);
+              }
+          });
           args.push('--lib', options.lib.join(','));
       }
       if (options.maxNodeModuleJsDepth > 0 || options.maxNodeModuleJsDepth === 0) {
