@@ -622,10 +622,14 @@ export var tests : nodeunit.ITestGroup = {
           }
         }
       };
+      
+      if (!fs.existsSync('tasks/scratch.js')) {
+        fs.writeFileSync('tasks/scratch.js', ''); // ensure there is a scratch file there just in case it hasn't been compiled.
+      }
 
       const result = or.resolveAsync(config, config.build, "build", [], null, grunt.file.expand).then((result) => {
         test.strictEqual(result.CompilationTasks.length, 1, "expected a compilation task");
-        test.ok(result.CompilationTasks[0].src.length === 4, "expected to find ts.ts, scratch.ts, ts.js, and scratch.js only.");
+        test.strictEqual(result.CompilationTasks[0].src.length, 4, "expected to find ts.ts, scratch.ts, ts.js, and scratch.js only.");
         test.ok(result.CompilationTasks[0].src.indexOf("tasks/ts.js.map") === -1, "expected non-TypeScript files to be filtered out.");
         test.ok(result.CompilationTasks[0].src.indexOf("tasks/ts.js") > -1, "expected JS file to be included.");
         test.ok(result.CompilationTasks[0].src.indexOf("tasks/ts.ts") > -1, "expected TypeScript files to be included.");
