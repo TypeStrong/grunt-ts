@@ -142,6 +142,7 @@ function compileAllFiles(options, compilationInfo) {
         tscVersion = getTscVersion(tscPath);
         exports.grunt.log.writeln('Using tsc v' + tscVersion);
     }
+    exports.grunt.log.verbose.writeln("TypeScript path: " + tsc);
     if (tsconfig && tsconfig.passThrough) {
         args.push('--project', tsconfig.tsconfig);
     }
@@ -410,6 +411,7 @@ function compileAllFiles(options, compilationInfo) {
     if (options.additionalFlags) {
         args.push(options.additionalFlags);
     }
+    /** Reads the tsc version from the package.json of the relevant TypeScript install */
     function getTscVersion(tscPath) {
         var pkg = JSON.parse(fs.readFileSync(path.resolve(tscPath, '..', 'package.json')).toString());
         return '' + pkg.version;
