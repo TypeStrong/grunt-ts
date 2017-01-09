@@ -92,7 +92,7 @@ export function compileAllFiles(options: IGruntTSOptions, compilationInfo: IGrun
     let targetFiles: string[] = compilationInfo.src;
 
     // Make a local copy so we can modify files without having external side effects
-    let files = _.map(targetFiles, (file) => file);
+    let files = _.map(targetFiles, file => file);
 
     var newFiles: string[] = files;
     if (options.fast === 'watch') { // if we only do fast compile if target is watched
@@ -156,7 +156,7 @@ export function compileAllFiles(options: IGruntTSOptions, compilationInfo: IGrun
     }
 
     // Quote the files to compile. Needed for command line parsing by tsc
-    files = _.map(files, (item) => `"${path.resolve(item)}"`);
+    files = _.map(files, item => utils.possiblyQuotedRelativePath(item));
 
     let args: string[] = files.slice(0),
       tsc: string,
@@ -287,6 +287,91 @@ export function compileAllFiles(options: IGruntTSOptions, compilationInfo: IGrun
       if (options.noImplicitUseStrict) {
           args.push('--noImplicitUseStrict');
       }
+      if (options.alwaysStrict) {
+          args.push('--alwaysStrict');
+      }
+      if (options.diagnostics) {
+          args.push('--diagnostics');
+      }
+      if (options.importHelpers) {
+          args.push('--importHelpers');
+      }
+      if (options.listFiles) {
+          args.push('--listFiles');
+      }
+      if (options.listEmittedFiles) {
+          args.push('--listEmittedFiles');
+      }
+      if (options.noImplicitThis) {
+          args.push('--noImplicitThis');
+      }
+      if (options.noUnusedLocals) {
+          args.push('--noUnusedLocals');
+      }
+      if (options.noUnusedParameters) {
+          args.push('--noUnusedParameters');
+      }
+      if (options.strictNullChecks) {
+          args.push('--strictNullChecks');
+      }
+      if (options.traceResolution) {
+          args.push('--traceResolution');
+      }
+      if (options.baseUrl) {
+          args.push('--baseUrl', utils.possiblyQuotedRelativePath(options.baseUrl));
+      }
+      if (options.charset) {
+          args.push('--charset', options.charset);
+      }
+      if (options.declarationDir) {
+          args.push('--declarationDir', utils.possiblyQuotedRelativePath(options.declarationDir));
+      }
+      if (options.jsxFactory) {
+          args.push('--jsxFactory', options.jsxFactory);
+      }
+      if (options.lib) {
+          let possibleOptions = [
+              'es5',
+              'es6',
+              'es2015',
+              'es7',
+              'es2016',
+              'es2017',
+              'dom',
+              'webworker',
+              'scripthost',
+              'es2015.core',
+              'es2015.collection',
+              'es2015.generator',
+              'es2015.iterable',
+              'es2015.promise',
+              'es2015.proxy',
+              'es2015.reflect',
+              'es2015.symbol',
+              'es2015.symbol.wellknown',
+              'es2016.array.include',
+              'es2017.object',
+              'es2017.sharedmemory'
+              ];
+
+          options.lib.forEach(option => {
+              if (possibleOptions.indexOf((option + '').toLocaleLowerCase()) === -1) {
+                  grunt.log.warn(`WARNING: Option "lib" does not support ${option} `.magenta);
+              }
+          });
+          args.push('--lib', options.lib.join(','));
+      }
+      if (options.maxNodeModuleJsDepth > 0 || options.maxNodeModuleJsDepth === 0) {
+          args.push('--maxNodeModuleJsDepth', options.maxNodeModuleJsDepth + '');
+      }
+      if (options.types) {
+          args.push('--types', _.map(options.types, t => `"${utils.stripQuotesIfQuoted(t)}"`).join(','));
+      }
+      if (options.typeRoots) {
+          // typeRoots should always be quoted since it can have multiple comma-separated values
+          args.push('--typeRoots', _.map(options.typeRoots, tr => utils.quotedRelativePath(tr)).join(','));
+      }
+
 
       args.push('--target', options.target.toUpperCase());
 

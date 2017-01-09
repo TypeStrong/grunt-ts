@@ -1,4 +1,4 @@
-// v6.0.0-beta.4 2017-01-04T06:37:18.009Z
+// v6.0.0-beta.7 2017-01-09T16:37:10.527Z
 /// <reference path="../defs/tsd.d.ts"/>
 /// <reference path="./modules/interfaces.d.ts"/>
 'use strict';

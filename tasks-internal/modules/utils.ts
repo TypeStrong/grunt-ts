@@ -94,6 +94,14 @@ export function endsWith(str: string, suffix: string): boolean {
     return str.indexOf(suffix, str.length - suffix.length) !== -1;
 }
 
+export function possiblyQuotedRelativePath(thePath: string, relativeTo = '.') {
+    return enclosePathInQuotesIfRequired(path.relative(relativeTo, path.resolve(thePath)));
+}
+
+export function quotedRelativePath(thePath: string, relativeTo = '.') {
+    return `"${stripQuotesIfQuoted(path.relative(relativeTo, path.resolve(thePath)))}"`;
+}
+
 export function stripQuotesIfQuoted(possiblyQuotedString: string) {
     if (!possiblyQuotedString.length || possiblyQuotedString.length < 2) {
       return possiblyQuotedString;
@@ -403,4 +411,43 @@ export function shouldCompile(options: IGruntTSOptions) {
 
 export function shouldPassThrough(options: IGruntTSOptions) {
   return (options.tsconfig && (<ITSConfigSupport>options.tsconfig).passThrough);
+}
+
+export function prependIfNotStartsWith(baseString: string, prependThisMaybe: string) {
+    if (!baseString) {
+        return prependThisMaybe;
+    }
+    if (baseString.length < prependThisMaybe.length) {
+        return prependThisMaybe + baseString;
+    }
+    if (baseString.substr(0, prependThisMaybe.length) === prependThisMaybe) {
+        return baseString;
+    }
+    return prependThisMaybe + baseString;
+}
+
+// "polyfill" for path.isAbsolute() which is not supported on Node.js 0.10
+// (really this is just the code from Node.js 7)
+export function isAbsolutePath(thePath: string): boolean {
+    if (path.isAbsolute && typeof path.isAbsolute === 'function') {
+        return path.isAbsolute(thePath);
+    }
+    const len = thePath.length;
+    if (len === 0) {
+        return false;
+    }
+    let code = thePath.charCodeAt(0);
+    if (code === 47 /*/*/ || code === 92 /*\\*/) {
+        return true;
+    }
+    else if ((code >= 65 /*A*/ && code <= 90 /*Z*/) || (code >= 97 /*a*/ && code <= 122 /*z*/)) {
+        // Possible device root
+        if (len > 2 && thePath.charCodeAt(1) === 58/*:*/) {
+            code = thePath.charCodeAt(2);
+            if (code === 47 /*/*/ || code === 92 /*\\*/) {
+                return true;
+            }
+        }
+    }
+    return false;
 }

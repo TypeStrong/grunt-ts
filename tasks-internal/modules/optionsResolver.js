@@ -11,16 +11,86 @@ var tsconfig_1 = require("./tsconfig");
 // https://github.com/Microsoft/TypeScript-Handbook/blob/master/pages/Compiler%20Options.md
 var propertiesFromTarget = ['amdloader', 'baseDir', 'html', 'htmlOutDir', 'htmlOutDirFlatten', 'reference', 'testExecute', 'tsconfig',
     'templateCache', 'vs', 'watch'], 
-// purposefully not supported: help, version, charset, diagnostics, listFiles
 // supported via other code: out, outDir, outFile, project
-propertiesFromTargetOptions = ['additionalFlags', 'allowSyntheticDefaultImports', 'comments', 'compile', 'compiler', 'declaration',
-    'emitBOM', 'emitDecoratorMetadata', 'experimentalDecorators', 'failOnTypeErrors', 'fast', 'htmlModuleTemplate', 'htmlOutDir',
-    'htmlOutputTemplate', 'htmlOutDirFlatten', 'htmlVarTemplate', 'inlineSourceMap', 'inlineSources', 'isolatedModules', 'locale',
-    'mapRoot', 'module', 'newLine', 'noEmit', 'noEmitHelpers', 'noEmitOnError', 'noImplicitAny', 'noLib', 'noResolve',
-    'preserveConstEnums', 'removeComments', 'sourceRoot', 'sourceMap', 'stripInternal', 'suppressExcessPropertyErrors',
-    'suppressImplicitAnyIndexErrors', 'target', 'verbose', 'jsx', 'moduleResolution', 'experimentalAsyncFunctions', 'rootDir',
-    'emitGruntEvents', 'reactNamespace', 'skipDefaultLibCheck', 'pretty', 'allowUnusedLabels', 'noImplicitReturns',
-    'noFallthroughCasesInSwitch', 'allowUnreachableCode', 'forceConsistentCasingInFileNames', 'allowJs', 'noImplicitUseStrict'], delayTemplateExpansion = ['htmlModuleTemplate', 'htmlVarTemplate', 'htmlOutputTemplate'];
+propertiesFromTargetOptions = ['additionalFlags',
+    'allowJs',
+    'allowSyntheticDefaultImports',
+    'allowUnreachableCode',
+    'allowUnusedLabels',
+    'alwaysStrict',
+    'baseUrl',
+    'charset',
+    'comments',
+    'compile',
+    'compiler',
+    'declaration',
+    'declarationDir',
+    'diagnostics',
+    'disableSizeLimit',
+    'emitBOM',
+    'emitDecoratorMetadata',
+    'emitGruntEvents',
+    'experimentalAsyncFunctions',
+    'experimentalDecorators',
+    'failOnTypeErrors',
+    'fast',
+    /* help purposefully not supported. */
+    'forceConsistentCasingInFileNames',
+    'htmlModuleTemplate',
+    'htmlOutDir',
+    'htmlOutDirFlatten',
+    'htmlOutputTemplate',
+    'htmlVarTemplate',
+    'importHelpers',
+    'inlineSourceMap',
+    'inlineSources',
+    /* init purposefully not supported. */
+    'isolatedModules',
+    'jsx',
+    'jsxFactory',
+    'lib',
+    'listEmittedFiles',
+    'listFiles',
+    'locale',
+    'mapRoot',
+    'maxNodeModuleJsDepth',
+    'module',
+    'moduleResolution',
+    'newLine',
+    'noEmit',
+    'noEmitHelpers',
+    'noEmitOnError',
+    'noFallthroughCasesInSwitch',
+    'noImplicitAny',
+    'noImplicitReturns',
+    'noImplicitThis',
+    'noImplicitUseStrict',
+    'noLib',
+    'noResolve',
+    'noUnusedLocals',
+    'noUnusedParameters',
+    /* paths is purposefully not supported - requires use of tsconfig.json */
+    'preserveConstEnums',
+    'pretty',
+    'reactNamespace',
+    'removeComments',
+    'rootDir',
+    /* rootDirs is purposefully not supported - requires use of tsconfig.json */
+    'skipDefaultLibCheck',
+    'skipLibCheck',
+    'sourceMap',
+    'sourceRoot',
+    'strictNullChecks',
+    'stripInternal',
+    'suppressExcessPropertyErrors',
+    'suppressImplicitAnyIndexErrors',
+    'target',
+    'traceResolution',
+    'types',
+    'typeRoots',
+    /* version is purposefully not supported. */
+    /* watch is purposefully not supported. */
+    'verbose'], delayTemplateExpansion = ['htmlModuleTemplate', 'htmlVarTemplate', 'htmlOutputTemplate'];
 var templateProcessor = null;
 var globExpander = null;
 function noopTemplateProcessor(templateString, options) {
@@ -71,11 +141,21 @@ function resolveAsync(rawTaskOptions, rawTargetOptions, targetName, resolvedFile
                 }
                 return resolve(result);
             }).catch(function (tsConfigError) {
-                result.errors.push('tsconfig error: ' + JSON.stringify(tsConfigError));
+                if (tsConfigError.message) {
+                    result.errors.push('tsconfig error: ' + tsConfigError.message);
+                }
+                else {
+                    result.errors.push('tsconfig error: ' + JSON.stringify(tsConfigError));
+                }
                 return resolve(result);
             });
         }).catch(function (vsConfigError) {
-            result.errors.push('Visual Studio config issue: ' + JSON.stringify(vsConfigError));
+            if (vsConfigError.message) {
+                result.errors.push('Visual Studio config issue: ' + vsConfigError.message);
+            }
+            else {
+                result.errors.push('Visual Studio config issue: ' + JSON.stringify(vsConfigError));
+            }
             return resolve(result);
         });
         var _b, _c;

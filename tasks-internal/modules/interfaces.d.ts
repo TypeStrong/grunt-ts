@@ -25,96 +25,141 @@ interface ITargetOptions {
 }
 
 interface ITaskOptions {
+    /** Represents a string literal to pass to compiler */
+    additionalFlags: string;
     /** Deprecated in tsc */
     allowBool: boolean;
     /** Deprecated in tsc */
     allowImportModule: boolean;
-    /** Emit declarations*/
-    declaration: boolean;
-    emitDecoratorMetadata: boolean;
-    experimentalDecorators: boolean;
-    mapRoot: string;
-    /** amd | commonjs | umd | system | es6 | es2015  */
-    module: string;
-    noImplicitAny: boolean;
-    noResolve: boolean;
+    /** Allow JavaScript files to be compiled. */
+    allowJs: boolean;
+    /** Assumes a defalt export as the whole module if one is not specified, or as the only export if only one export is specified */
+    allowSyntheticDefaultImports: boolean;
+    /** Do not report errors on unreachable code. */
+    allowUnreachableCode: boolean;
+    /** Do not report errors on unused labels. */
+    allowUnusedLabels: boolean;
+    /** Parse in strict mode and emit "use strict" for each source file */
+    alwaysStrict: boolean;
+    /** Base directory to resolve non-relative module names */
+    baseUrl: string;
+    /** The character set of the input files. */
+    charset: string;
     /** false to remove comments */
     comments: boolean;
-    /** true to remove comments */
-    removeComments: boolean;
-    sourceMap: boolean;
-    sourceRoot: string;
-    /** es3, es5, es6 */
-    target: string;
+    /** grunt-ts specific setting */
+    compile: boolean;
+    /** grunt-ts specific setting - the path to a custom TypeScript compiler's main JS file */
+    compiler: string;
+    /** Emit declarations */
+    declaration: boolean;
+    /** Output directory for generated declaration files. */
+    declarationDir: string;
+    /** Show diagnostic information. */
+    diagnostics: boolean;
+    /** emitBOM - indicates if emitted files should include a Byte Order Mark */
+    emitBOM: boolean;
+    emitDecoratorMetadata: boolean;
+    /** grunt-ts setting to emit events in Grunt */
+    emitGruntEvents: boolean;
+    /** Enables experimental support for ES7 async functions - required for async prior to TypeScript 2 */
+    experimentalAsyncFunctions: string;
+    experimentalDecorators: boolean;
+    /** grunt-ts specific setting to fail Grunt pipeline when a type error is raised by TypeScript. */
     failOnTypeErrors: boolean;
+    /** grunt-ts specific setting - never | always | watch (default) */
+    fast: string;
+    /** Disallow inconsistently-cased references to the same file. */
+    forceConsistentCasingInFileNames: boolean;
+    /** grunt-ts specific setting - template against which the HTML will be generated */
+    htmlOutputTemplate: string;
+    /** grunt-ts specific setting */
+    htmlModuleTemplate: string;
+    /** grunt-ts specific setting */
+    htmlVarTemplate: string;
+    /** Import emit helpers (e.g. __extends, __rest, etc..) from tslib */
+    importHelpers: boolean;
+    inlineSourceMap: boolean;
+    inlineSources: boolean;
+    /** Makes cases that break single-file transpilation an error. */
+    isolatedModules: boolean;
+    /** Specify JSX code generation style: 'preserve' or 'react' */
+    jsx: string;
+    /** Specify the JSX factory function to use when targeting react JSX emit, e.g. React.createElement or h. */
+    jsxFactory: string;
+    /** List of standard library files to be included in the compilation. */
+    lib: string[];
+    /** Print names of generated files part of the compilation. */
+    listEmittedFiles: boolean;
+    /** Print names of files included in the compilation context. */
+    listFiles: boolean;
+    /** locale - pass a culture string like "en" or "ja-jp" for locale-specific error messages (requires error file in same folder as tsc) */
+    locale: string;
+    /** Specifies the location where debugger should locate map files instead of generated locations. */
+    mapRoot: string;
+    /** The maximum dependency depth to search under node_modules and load JavaScript files. */
+    maxNodeModuleJsDepth: number;
+    /** amd | commonjs | umd | system | es6 | es2015 | none  */
+    module: string;
+    /** Specifies module resolution strategy: 'node' (Node.js) or 'classic' (TypeScript pre-1.6). */
+    moduleResolution: string;
+    /** Specifies the end of line sequence to be used when emitting files: 'CRLF' (dos) or 'LF' (unix). */
+    newLine: string;
+    noEmit: boolean;
+    /** If true, will not generate custom helper functions like  __extends in compiled output. */
+    noEmitHelpers: boolean;
     /** If a type error occurs, do not emit the JavaScript.  New in TypeScript 1.4.  */
     noEmitOnError: boolean;
+    /** Report errors for fallthrough cases in switch statement. */
+    noFallthroughCasesInSwitch: boolean;
+    noImplicitAny: boolean;
+    /** Report error when not all code paths in function return a value. */
+    noImplicitReturns: boolean;
+    /** Raise error on this expressions with an implied 'any' type. */
+    noImplicitThis: boolean;
+    /** Do not emit  "use strict"  directives in module output. */
+    noImplicitUseStrict: boolean;
+    /** noLib - do not auto-include the lib.d.ts file in the compilation context */
+    noLib: boolean;
+    noResolve: boolean;
+    /** Report errors on unused locals. */
+    noUnusedLocals: boolean;
+    /** Report errors on unused parameters. */
+    noUnusedParameters: boolean;
     /** Const enums will be kept as enums in the emitted JS. If false, the enum values will
      * look like magic numbers with a comment in the emitted JS. */
     preserveConstEnums: boolean;
+    /** Stylize errors and messages using color and context. */
+    pretty: boolean;
+    /** Specifies the object invoked for createElement and __spread when targeting 'react' JSX emit. */
+    reactNamespace: string;
+    /** true to remove comments */
+    removeComments: boolean;
+    /** Sepecifies the root directory of input files.  Use to control the output directory structure with --outDir. */
+    rootDir: string;
+    /** Treat a file as a default lib if it has '/// <reference no-default-lib="true"/> at the top */
+    skipDefaultLibCheck: boolean;
+    sourceMap: boolean;
+    sourceRoot: string;
+    /** Enables strict null checking mode (null and undefined are not in the domain of every type) */
+    strictNullChecks: boolean;
+    /** Does not emit objects marked @internal in jsdoc */
+    stripInternal: boolean;
+    /** Disables strict object literal assignment checking */
+    suppressExcessPropertyErrors: boolean;
     /** Allows access to properties of an object by string indexer when --noImplicitAny is
      * active, even if TypeScript doesn't know about them. */
     suppressImplicitAnyIndexErrors: boolean;
+    /** es3, es5, es6 */
+    target: string;
+    /** Report module resolution log messages. */
+    traceResolution: boolean;
+    /** List of names of type definitions to include. */
+    types: string[];
+    /** List of folders to include type definitions from. */
+    typeRoots: string[];
+    /** grunt-ts specific setting */
     verbose: boolean;
-    compile: boolean;
-    fast: string; // never | always | watch (default)
-    compiler: string; // If you want, the path to a custom TypeScript compiler's main JS file
-    htmlOutputTemplate: string; // If you want you can specify your own template against which the HTML will be generated
-    htmlModuleTemplate: string;
-    htmlVarTemplate: string;
-    noEmit: boolean;
-    inlineSourceMap: boolean;
-    inlineSources: boolean;
-    /** Specifies the end of line sequence to be used when emitting files: 'CRLF' (dos) or 'LF' (unix). */
-    newLine: string;
-    /** Makes cases that break single-file transpilation an error. */
-    isolatedModules: boolean;
-    /** If true, will not generate custom helper functions like  __extends in compiled output. */
-    noEmitHelpers: boolean;
-    /** Represents a string literal to pass to compiler */
-    additionalFlags: string;
-    /** Specify JSX code generation style: 'preserve' or 'react' */
-    jsx: string;
-    /** Specifies module resolution strategy: 'node' (Node.js) or 'classic' (TypeScript pre-1.6). */
-    moduleResolution: string;
-    /** Enables experimental support for ES7 async functions */
-    experimentalAsyncFunctions: string;
-    /** Sepecifies the root directory of input files.  Use to control the output directory structure with --outDir. */
-    rootDir: string;
-    /** grunt-ts setting to emit events in Grunt */
-    emitGruntEvents: boolean;
-    /** noLib - do not auto-include the lib.d.ts file in the compilation context */
-    noLib: boolean;
-    /** emitBOM - indicates if emitted files should include a Byte Order Mark */
-    emitBOM: boolean;
-    /** locale - pass a culture string like "en" or "ja-jp" for locale-specific error messages (requires error file in same folder as tsc) */
-    locale: string;
-    /** Disables strict object literal assignment checking */
-    suppressExcessPropertyErrors: boolean;
-    /** Does not emit objects marked as internal */
-    stripInternal: boolean;
-    /** Assumes a defalt export as the whole module if one is not specified, or as the only export if only one export is specified */
-    allowSyntheticDefaultImports: boolean;
-    /** Specifies the object invoked for createElement and __spread when targeting 'react' JSX emit. */
-    reactNamespace: string;
-    /** Treat a file as a default lib if it has '/// <reference no-default-lib="true"/> at the top */
-    skipDefaultLibCheck: boolean;
-    /** Stylize errors and messages using color and context. */
-    pretty: boolean;
-    /** Do not report errors on unused labels. */
-    allowUnusedLabels: boolean;
-    /** Report error when not all code paths in function return a value. */
-    noImplicitReturns: boolean;
-    /** Report errors for fallthrough cases in switch statement. */
-    noFallthroughCasesInSwitch: boolean;
-    /** Do not report errors on unreachable code. */
-    allowUnreachableCode: boolean;
-    /** Disallow inconsistently-cased references to the same file. */
-    forceConsistentCasingInFileNames: boolean;
-    /** Allow JavaScript files to be compiled. */
-    allowJs: boolean;
-    /** Do not emit  "use strict"  directives in module output. */
-    noImplicitUseStrict: boolean;
 }
 
 interface IVisualStudioProjectSupport {
@@ -164,6 +209,7 @@ interface ITSConfigFile {
     compilerOptions?: ICompilerOptions;
     files?: string[];
     exclude?: string[];
+    include?: string[];
     filesGlob?: string[];
 }
 

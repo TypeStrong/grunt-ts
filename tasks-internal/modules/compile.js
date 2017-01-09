@@ -126,7 +126,7 @@ function compileAllFiles(options, compilationInfo) {
         files = [referenceFile];
     }
     // Quote the files to compile. Needed for command line parsing by tsc
-    files = _.map(files, function (item) { return "\"" + path.resolve(item) + "\""; });
+    files = _.map(files, function (item) { return utils.possiblyQuotedRelativePath(item); });
     var args = files.slice(0), tsc, tscVersion = '';
     var tsconfig = options.tsconfig;
     if (options.compiler) {
@@ -253,6 +253,89 @@ function compileAllFiles(options, compilationInfo) {
         }
         if (options.noImplicitUseStrict) {
             args.push('--noImplicitUseStrict');
+        }
+        if (options.alwaysStrict) {
+            args.push('--alwaysStrict');
+        }
+        if (options.diagnostics) {
+            args.push('--diagnostics');
+        }
+        if (options.importHelpers) {
+            args.push('--importHelpers');
+        }
+        if (options.listFiles) {
+            args.push('--listFiles');
+        }
+        if (options.listEmittedFiles) {
+            args.push('--listEmittedFiles');
+        }
+        if (options.noImplicitThis) {
+            args.push('--noImplicitThis');
+        }
+        if (options.noUnusedLocals) {
+            args.push('--noUnusedLocals');
+        }
+        if (options.noUnusedParameters) {
+            args.push('--noUnusedParameters');
+        }
+        if (options.strictNullChecks) {
+            args.push('--strictNullChecks');
+        }
+        if (options.traceResolution) {
+            args.push('--traceResolution');
+        }
+        if (options.baseUrl) {
+            args.push('--baseUrl', utils.possiblyQuotedRelativePath(options.baseUrl));
+        }
+        if (options.charset) {
+            args.push('--charset', options.charset);
+        }
+        if (options.declarationDir) {
+            args.push('--declarationDir', utils.possiblyQuotedRelativePath(options.declarationDir));
+        }
+        if (options.jsxFactory) {
+            args.push('--jsxFactory', options.jsxFactory);
+        }
+        if (options.lib) {
+            var possibleOptions_1 = [
+                'es5',
+                'es6',
+                'es2015',
+                'es7',
+                'es2016',
+                'es2017',
+                'dom',
+                'webworker',
+                'scripthost',
+                'es2015.core',
+                'es2015.collection',
+                'es2015.generator',
+                'es2015.iterable',
+                'es2015.promise',
+                'es2015.proxy',
+                'es2015.reflect',
+                'es2015.symbol',
+                'es2015.symbol.wellknown',
+                'es2016.array.include',
+                'es2017.object',
+                'es2017.sharedmemory'
+            ];
+            options.lib.forEach(function (option) {
+                if (possibleOptions_1.indexOf((option + '').toLocaleLowerCase()) === -1) {
+                    exports.grunt.log.warn(("WARNING: Option \"lib\" does not support " + option + " ").magenta);
+                }
+            });
+            args.push('--lib', options.lib.join(','));
+        }
+        if (options.maxNodeModuleJsDepth > 0 || options.maxNodeModuleJsDepth === 0) {
+            args.push('--maxNodeModuleJsDepth', options.maxNodeModuleJsDepth + '');
+        }
+        if (options.types) {
+            args.push('--types', _.map(options.types, function (t) { return "\"" + utils.stripQuotesIfQuoted(t) + "\""; }).join(','));
+        }
+        if (options.typeRoots) {
+            // typeRoots should always be quoted since it can have multiple comma-separated values
+            args.push('--typeRoots', _.map(options.typeRoots, function (tr) { return utils.quotedRelativePath(tr); }).join(','));
         }
         args.push('--target', options.target.toUpperCase());
         if (options.module) {
