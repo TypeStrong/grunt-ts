@@ -14,7 +14,9 @@
         "allowSyntheticDefaultImports": true,
         "charset": "utf8",
         "strictNullChecks": false,
-        "listFiles": true
+        "listFiles": true,
+        "typeRoots": ["./../node_modules/@types", "./../node_modules/types2_see_issue_391"],
+        "types": ["see","issue","391"]
     },
     "filesGlob": [
         "./defs/**/*.ts",

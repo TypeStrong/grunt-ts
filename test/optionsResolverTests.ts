@@ -702,7 +702,7 @@ export var tests : nodeunit.ITestGroup = {
         }).catch((err) => {test.ifError(err); test.done();});
     },
     "config entries come through appropriately": (test: nodeunit.Test) => {
-        test.expect(16);
+        test.expect(20);
         const cfg = getConfig("minimalist");
         cfg.tsconfig = './test/tsconfig/full_valid_tsconfig.json';
 
@@ -721,6 +721,10 @@ export var tests : nodeunit.ITestGroup = {
           test.strictEqual(result.charset, 'utf8');
           test.strictEqual(result.strictNullChecks, false);
           test.strictEqual(result.listFiles, true);
+          test.strictEqual(result.types.length, 3);
+          test.ok(result.types.indexOf('issue') > -1);
+          test.strictEqual(result.typeRoots.length, 2);
+          test.ok(result.typeRoots.indexOf('./../node_modules/@types') > -1);
           test.strictEqual(result.CompilationTasks[0].outDir, 'test/tsconfig/files');
           test.strictEqual(result.CompilationTasks[0].out, undefined);
           test.done();
