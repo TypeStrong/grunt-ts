@@ -1,0 +1,21 @@
+{   
+    "version": "1.5.3",
+    "compilerOptions": {
+        "target": "es6",
+        "module": "amd",
+        "declaration": true,
+        "noImplicitAny": true,
+        "removeComments": false,
+        "noLib": true,
+        "preserveConstEnums": false,
+        "suppressImplicitAnyIndexErrors": true,
+        "sourceMap": false,
+        "inlineSourceMap": true,
+        "inlineSources": true,
+        "emitDecoratorMetadata": true,
+        "experimentalDecorators": true
+    },
+    "include": [
+      "../../tasks/*"
+    ]
+}

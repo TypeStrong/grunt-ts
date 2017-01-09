@@ -564,6 +564,49 @@ exports.tests = {
                 test.done();
             }).catch(function (err) { test.ifError(err); test.done(); });
         },
+        "include with wildcard is limited to valid TypeScript extensions when allowJs is not specified.": function (test) {
+            test.expect(5);
+            var config = {
+                options: {
+                    target: 'es5'
+                },
+                build: {
+                    tsconfig: {
+                        tsconfig: './test/tsconfig/test_include_wildcard.json'
+                    }
+                }
+            };
+            var result = or.resolveAsync(config, config.build, "build", [], null, grunt.file.expand).then(function (result) {
+                test.strictEqual(result.CompilationTasks.length, 1, "expected a compilation task");
+                test.ok(result.CompilationTasks[0].src.length === 2, "expected to find ts.ts and scratch.ts");
+                test.ok(result.CompilationTasks[0].src.indexOf("tasks/ts.js.map") === -1, "expected non-TypeScript files to be filtered out.");
+                test.ok(result.CompilationTasks[0].src.indexOf("tasks/ts.js") === -1, "expected non-TypeScript files to be filtered out.");
+                test.ok(result.CompilationTasks[0].src.indexOf("tasks/ts.ts") > -1, "expected TypeScript files to be included.");
+                test.done();
+            }).catch(function (err) { test.ifError(err); test.done(); });
+        },
+        "include with wildcard is limited to valid TypeScript and JavaScript extensions when allowJs is specified.": function (test) {
+            test.expect(5);
+            var config = {
+                options: {
+                    target: 'es5',
+                    allowJs: true
+                },
+                build: {
+                    tsconfig: {
+                        tsconfig: './test/tsconfig/test_include_wildcard.json'
+                    }
+                }
+            };
+            var result = or.resolveAsync(config, config.build, "build", [], null, grunt.file.expand).then(function (result) {
+                test.strictEqual(result.CompilationTasks.length, 1, "expected a compilation task");
+                test.ok(result.CompilationTasks[0].src.length === 4, "expected to find ts.ts, scratch.ts, ts.js, and scratch.js only.");
+                test.ok(result.CompilationTasks[0].src.indexOf("tasks/ts.js.map") === -1, "expected non-TypeScript files to be filtered out.");
+                test.ok(result.CompilationTasks[0].src.indexOf("tasks/ts.js") > -1, "expected JS file to be included.");
+                test.ok(result.CompilationTasks[0].src.indexOf("tasks/ts.ts") > -1, "expected TypeScript files to be included.");
+                test.done();
+            }).catch(function (err) { test.ifError(err); test.done(); });
+        },
         "Can get config from a valid file": function (test) {
             test.expect(1);
             var cfg = getConfig("minimalist");

@@ -335,10 +335,17 @@ function addFilesToCompilationContext(applyTo, projectSpec) {
         if (globExpander.isStub) {
             result.warnings.push('Attempt to resolve glob in tsconfig module using stub globExpander.');
         }
-        expandedCompilationContext.push.apply(expandedCompilationContext, globExpander(resolvedInclude.concat(resolvedExclude)));
+        expandedCompilationContext.push.apply(expandedCompilationContext, globExpander(resolvedInclude.concat(resolvedExclude)).filter(function (p) {
+            if (_.endsWith(p, '.ts') || _.endsWith(p, '.tsx')) {
+                return true;
+            }
+            if (applyTo.allowJs && (_.endsWith(p, '.js') || _.endsWith(p, '.jsx'))) {
+                return true;
+            }
+            return false;
+        }));
     }
-    expandedCompilationContext.push.apply(expandedCompilationContext, resolvedFiles);
-    addUniqueRelativeFilesToSrc(expandedCompilationContext, src, absolutePathToTSConfig);
+    addUniqueRelativeFilesToSrc(expandedCompilationContext.concat(resolvedFiles), src, absolutePathToTSConfig);
     if (tsconfig.updateFiles && projectSpec.filesGlob) {
         if (projectSpec.files === undefined) {
             projectSpec.files = [];

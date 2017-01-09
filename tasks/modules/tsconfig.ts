@@ -404,11 +404,18 @@ function addFilesToCompilationContext(applyTo: IGruntTSOptions, projectSpec: ITS
     if ((globExpander as any).isStub) {
       result.warnings.push('Attempt to resolve glob in tsconfig module using stub globExpander.');
     }
-    expandedCompilationContext.push(...globExpander([...resolvedInclude, ...resolvedExclude]));
+    expandedCompilationContext.push(...globExpander([...resolvedInclude, ...resolvedExclude]).filter(p => {
+      if (_.endsWith(p, '.ts') || _.endsWith(p, '.tsx')) {
+        return true;
+      }
+      if (applyTo.allowJs && (_.endsWith(p, '.js') || _.endsWith(p, '.jsx'))) {
+        return true;
+      }
+      return false;
+    }));
   }
-  expandedCompilationContext.push(...resolvedFiles);
 
-  addUniqueRelativeFilesToSrc(expandedCompilationContext, src, absolutePathToTSConfig);
+  addUniqueRelativeFilesToSrc([...expandedCompilationContext, ...resolvedFiles], src, absolutePathToTSConfig);
 
   if (tsconfig.updateFiles && projectSpec.filesGlob) {
     if (projectSpec.files === undefined) {
