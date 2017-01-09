@@ -7,11 +7,23 @@
 Grunt-ts is an npm package that handles TypeScript compilation work in GruntJS build scripts.  It provides a [Grunt-compatible wrapper](#support-for-tsc-switches) for the `tsc` command-line compiler, and provides some [additional functionality](#grunt-ts-gruntfilejs-options) that improves the TypeScript development workflow. Grunt-ts supports compiling against [tsconfig.json](#tsconfig) or even a [Visual Studio project](#vs) directly.  Grunt-ts is itself written in [TypeScript](./tasks/ts.ts).
 
 ### Latest Changes
-Latest beta release is `6.0.0-beta.3` which should be compatible with `typescript@next`.
+Latest beta release is `6.0.0-beta.6` which is compatible with TypeScript 2.1.
 Latest release is `5.5.1` with built-in support for features added in TypeScript 1.8.  [Full changelog is here](CHANGELOG.md).
 
 ### How To Contribute
 Thank you for your interest in contributing!  Please see the [contributing](CONTRIBUTING.md) guide for details.
+
+## Quickstart
+
+To install grunt-ts, you must first install TypeScript and GruntJS.
+ * If you don't have TypeScript installed in your project, run `npm install typescript --save-dev`.
+ * If you don't have GruntJS installed in your project, run `npm install grunt --save-dev`.
+ * If you have never used Grunt on your system, install the grunt-cli globally: `npm install grunt-cli -g`.
+
+## Breaking Changes with Grunt-ts 6
+ * The npm tool has effectively deprecated peer dependencies, so Grunt and TypeScript will no longer automatically be installed when installing grunt-ts.  This means you'll just have to install them manually and add them as `devDependencies` in your `package.json`.
+ * Grunt 1.0 is more strict with templates so it is not possible to use `<%` and `%>` as tokens for html replacements with grunt-ts anymore.  In grunt-ts 6.0 and higher, you must use `{%` and `%}` for HTML replacement tokens.
+ 
 
 ## Getting Started
 
