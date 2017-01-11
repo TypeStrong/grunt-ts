@@ -23,7 +23,7 @@ To install grunt-ts, you must first install TypeScript and GruntJS.
 ## Breaking Changes with Grunt-ts 6
  * The npm tool has effectively deprecated peer dependencies, so Grunt and TypeScript will no longer automatically be installed when installing grunt-ts.  This means you'll just have to install them manually and add them as `devDependencies` in your `package.json`.
  * Grunt 1.0 is more strict with templates so it is not possible to use `<%` and `%>` as tokens for html replacements with grunt-ts anymore.  In grunt-ts 6.0 and higher, you must use `{%` and `%}` for HTML replacement tokens.
- 
+ * The blue text with each file name will no longer be displayed in `fast` mode unless `verbose: true` is specified in the task or target `options` (See [#389](https://github.com/TypeStrong/grunt-ts/issues/389)).
 
 ## Getting Started
 
