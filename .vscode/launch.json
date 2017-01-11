@@ -15,7 +15,20 @@
             "args": [
                 "test/optionsResolverTests.js",
                 "-t",
-                "include will bring in files when specified"
+                "if no files, but exclude, *.ts and *.tsx will be included except for the excluded files and folders",
+                "--verbose"
+            ]
+        },{
+            "type": "node",
+            "request": "launch",
+            "name": "Grunt Debug (Windows)",
+            "program": "${env.APPDATA}/npm/node_modules/grunt-cli/bin/grunt",
+            "cwd": "${workspaceRoot}",
+            "outFiles": [],
+            "sourceMaps": true,
+            "args": [
+                "ts:issue_392",
+                "--verbose"
             ]
         },
         {
