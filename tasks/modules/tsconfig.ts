@@ -6,21 +6,26 @@ import * as path from 'path';
 import * as stripBom from 'strip-bom';
 import * as _ from 'lodash';
 import * as utils from './utils';
+import * as ts from '../ts';
 
 let templateProcessor: (templateString: string, options: any) => string = null;
 let globExpander: (globs: string[]) => string[] = null;
 let gruntfileGlobs : string[] = null;
+let verboseLogger: (logText: string) => void = null;
 let absolutePathToTSConfig: string;
+
 
 export function resolveAsync(applyTo: IGruntTSOptions,
   taskOptions: ITargetOptions,
   targetOptions: ITargetOptions,
   theTemplateProcessor: (templateString: string, options: any) => string,
-  theGlobExpander: (globs: string[]) => string[] = null) {
+  theGlobExpander: (globs: string[]) => string[] = null,
+  theVerboseLogger: (logText: string) => void = null) {
 
   templateProcessor = theTemplateProcessor;
   globExpander = theGlobExpander;
   gruntfileGlobs = getGlobs(taskOptions, targetOptions);
+  verboseLogger = theVerboseLogger || ((logText: string) => {});
 
   return new Promise<IGruntTSOptions>((resolve, reject) => {
 
@@ -365,7 +370,20 @@ function addFilesToCompilationContext(applyTo: IGruntTSOptions, projectSpec: ITS
     src = applyTo.CompilationTasks[0].src;
 
   if (projectSpec.exclude) {
-    resolvedExclude.push(...(projectSpec.exclude.map(f => utils.prependIfNotStartsWith(path.join(absolutePathToTSConfig, f), '!'))));
+    resolvedExclude.push(...(projectSpec.exclude.map(f => {
+        let p = path.join(absolutePathToTSConfig, f);
+        try {
+          let stats = fs.statSync(p);
+          if (stats.isDirectory()) {
+            p = path.join(p, '**');
+          }
+        } catch (err) {
+          // eat it - likely a "does not exist" error.
+          verboseLogger(`Warning: "${p}" was specified in tsconfig \`exclude\` property, but was not found on disk.`);
+        }
+        return utils.prependIfNotStartsWith(p, '!');
+      })));
+    verboseLogger('Resolved exclude from tsconfig: ' + JSON.stringify(resolvedExclude));
   } else {
     resolvedExclude.push(utils.prependIfNotStartsWith(path.join(absolutePathToTSConfig, 'node_modules/**'), '!'),
       utils.prependIfNotStartsWith(path.join(absolutePathToTSConfig, 'bower_components/**'), '!'),
@@ -379,9 +397,11 @@ function addFilesToCompilationContext(applyTo: IGruntTSOptions, projectSpec: ITS
   if (projectSpec.include || projectSpec.files) {
     if (projectSpec.files) {
       resolvedFiles.push(...projectSpec.files.map(f => path.join(absolutePathToTSConfig, f)));
+      verboseLogger('Resolved files from tsconfig: ' + JSON.stringify(resolvedFiles));
     }
     if (_.isArray(projectSpec.include)) {
       resolvedInclude.push(...projectSpec.include.map(f => path.join(absolutePathToTSConfig, f)));
+      verboseLogger('Resolved include from tsconfig: ' + JSON.stringify(resolvedInclude));
     }
   } else {
     if (!tsconfig.updateFiles) {
@@ -396,6 +416,7 @@ function addFilesToCompilationContext(applyTo: IGruntTSOptions, projectSpec: ITS
           path.join(absolutePathToTSConfig, '**/*.jsx')
         );
       }
+      verboseLogger('Automatic include from tsconfig: ' + JSON.stringify(resolvedInclude));
     }
   }
 
@@ -414,6 +435,8 @@ function addFilesToCompilationContext(applyTo: IGruntTSOptions, projectSpec: ITS
       return false;
     }));
   }
+
+  verboseLogger('Will resolve tsconfig compilation context from: ' + JSON.stringify([...expandedCompilationContext, ...resolvedFiles]));
 
   addUniqueRelativeFilesToSrc([...expandedCompilationContext, ...resolvedFiles], src, absolutePathToTSConfig);
 

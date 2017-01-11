@@ -93,6 +93,7 @@ propertiesFromTargetOptions = ['additionalFlags',
     'verbose'], delayTemplateExpansion = ['htmlModuleTemplate', 'htmlVarTemplate', 'htmlOutputTemplate'];
 var templateProcessor = null;
 var globExpander = null;
+var verboseLogger = null;
 function noopTemplateProcessor(templateString, options) {
     return templateString;
 }
@@ -100,11 +101,15 @@ function emptyGlobExpander(globs) {
     return [];
 }
 emptyGlobExpander.isStub = true;
-function resolveAsync(rawTaskOptions, rawTargetOptions, targetName, resolvedFiles, theTemplateProcessor, theGlobExpander) {
+function emptyVerboseLogger(logText) {
+    // noop.
+}
+function resolveAsync(rawTaskOptions, rawTargetOptions, targetName, resolvedFiles, theTemplateProcessor, theGlobExpander, theVerboseLogger) {
     if (targetName === void 0) { targetName = ''; }
     if (resolvedFiles === void 0) { resolvedFiles = []; }
     if (theTemplateProcessor === void 0) { theTemplateProcessor = null; }
     if (theGlobExpander === void 0) { theGlobExpander = null; }
+    if (theVerboseLogger === void 0) { theVerboseLogger = null; }
     var result = emptyOptionsResolveResult();
     return new es6_promise_1.Promise(function (resolve, reject) {
         if (theTemplateProcessor && typeof theTemplateProcessor === 'function') {
@@ -119,6 +124,12 @@ function resolveAsync(rawTaskOptions, rawTargetOptions, targetName, resolvedFile
         else {
             globExpander = emptyGlobExpander;
         }
+        if (theVerboseLogger && typeof theVerboseLogger === 'function') {
+            verboseLogger = theVerboseLogger;
+        }
+        else {
+            verboseLogger = emptyVerboseLogger;
+        }
         fixMissingOptions(rawTaskOptions);
         fixMissingOptions(rawTargetOptions);
         {
@@ -130,7 +141,7 @@ function resolveAsync(rawTaskOptions, rawTargetOptions, targetName, resolvedFile
         result = applyGruntOptions(result, rawTargetOptions);
         result = copyCompilationTasks(result, resolvedFiles, resolveOutputOptions(rawTaskOptions, rawTargetOptions));
         visualStudioOptionsResolver_1.resolveVSOptionsAsync(result, rawTaskOptions, rawTargetOptions, templateProcessor).then(function (result) {
-            tsconfig_1.resolveAsync(result, rawTaskOptions, rawTargetOptions, templateProcessor, globExpander).then(function (result) {
+            tsconfig_1.resolveAsync(result, rawTaskOptions, rawTargetOptions, templateProcessor, globExpander, verboseLogger).then(function (result) {
                 result = addressAssociatedOptionsAndResolveConflicts(result);
                 result = enclosePathsInQuotesIfRequired(result);
                 result = logAdditionalConfigurationWarnings(result);

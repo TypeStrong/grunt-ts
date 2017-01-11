@@ -732,6 +732,19 @@ module.exports = function (grunt) {
                     typeRoots: ['./sometypings','../../otherTypings']
                 }
             },
+            issue_392: {
+                src: ['test/issue_392/app/**/*.ts',
+                    '!test/issue_392/app/**/*.spec.ts',
+                    'test/issue_392/typings/**/*.ts',
+                    'test/issue_392/missing_typings/**/*.ts'
+                    ],
+                tsconfig: 'test/issue_392/issue_392-tsconfig.json',
+                testExecute: commandLineAssertions.issue_392,
+                options: {
+                    fast: 'never',
+                    verbose: true
+                }
+            },
             allowJs_CompileWorks: {
                 test: true,
                 src: ['test/allowJs/allowJsConsumer.ts',

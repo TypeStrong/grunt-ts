@@ -591,6 +591,18 @@ exports.new_TypeScript_2_and_2_1_Features = function (strings, options) {
         throw "expected to see all of the new TypeScript 2 and 2.1 values in the command line and didn't.  Got this: " + command;
     });
 };
+exports.issue_392 = function (strings, options) {
+    return new es6_promise_1.Promise(function (resolve, reject) {
+        var command = strings[1].replace(/\\/g, '/');
+        if (command.indexOf("node_modules") === -1) {
+            resolve({
+                code: 0,
+                output: ""
+            });
+        }
+        throw "expected to see node_modules excluded and didn't (See GitHub issue 392).  Got this: " + command;
+    });
+};
 exports.test_noLib = simpleCommandLineCheck("--noLib");
 exports.test_emitBOM = simpleCommandLineCheck("--emitBOM");
 exports.test_locale = simpleCommandLineCheck("--locale ja-jp");

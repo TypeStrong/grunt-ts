@@ -660,6 +660,20 @@ export const new_TypeScript_2_and_2_1_Features: ICompilePromise = (strings, opti
   });
 }
 
+export const issue_392: ICompilePromise = (strings, options) => {
+  return new Promise(function(resolve, reject) {
+
+    const command = strings[1].replace(/\\/g,'/');
+
+    if (command.indexOf(`node_modules`) === -1) {
+      resolve({
+        code: 0,
+        output: ""
+      });
+    }
+    throw `expected to see node_modules excluded and didn't (See GitHub issue 392).  Got this: ${command}`;
+  });
+}
 
 export const test_noLib = simpleCommandLineCheck("--noLib");
 export const test_emitBOM = simpleCommandLineCheck("--emitBOM");
