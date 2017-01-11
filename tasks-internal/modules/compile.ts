@@ -42,13 +42,16 @@ var executeNodeDefault : ICompilePromise = function(args, optionalInfo) {
 // Map to store if the cache was cleared after the gruntfile was parsed
 var cacheClearedOnce: { [targetName: string]: boolean } = {};
 
-function getChangedFiles(files, targetName: string) {
+function getChangedFiles(files, targetName: string, verbose: boolean) {
 
     files = cache.getNewFilesForTarget(files, targetName);
 
-    _.forEach(files, (file) => {
-        grunt.log.writeln(('### Fast Compile >>' + file).cyan);
-    });
+    if (verbose) {
+        _.forEach(files, (file) => {
+                grunt.log.writeln(('### Fast Compile >>' + file).cyan);
+            }
+        );
+    }
 
     return files;
 }
@@ -67,7 +70,7 @@ function clearCache(targetName: string) {
 ////////////////////////////////////////////////////////////////////
 
 function resolveTypeScriptBinPath(): string {
-    var ownRoot = path.resolve(path.dirname((module).filename), '../..');
+    var ownRoot = path.resolve(path.dirname(module.filename), '../..');
     var userRoot = path.resolve(ownRoot, '..', '..');
     var binSub = path.join('node_modules', 'typescript', 'bin');
 
@@ -109,7 +112,7 @@ export function compileAllFiles(options: IGruntTSOptions, compilationInfo: IGrun
             grunt.log.writeln('Fast compile will not work when --out is specified. Ignoring fast compilation'.cyan);
         }
         else {
-            newFiles = getChangedFiles(files, options.targetName);
+            newFiles = getChangedFiles(files, options.targetName, options.verbose);
 
             if (newFiles.length !== 0 || options.testExecute || utils.shouldPassThrough(options)) {
                 files = newFiles;
@@ -175,6 +178,7 @@ export function compileAllFiles(options: IGruntTSOptions, compilationInfo: IGrun
         tscVersion = getTscVersion(tscPath);
         grunt.log.writeln('Using tsc v' + tscVersion);
     }
+    grunt.log.verbose.writeln(`TypeScript path: ${tsc}`);
 
     if (tsconfig && tsconfig.passThrough) {
       args.push('--project', tsconfig.tsconfig);
@@ -450,6 +454,7 @@ export function compileAllFiles(options: IGruntTSOptions, compilationInfo: IGrun
         args.push(options.additionalFlags);
     }
 
+    /** Reads the tsc version from the package.json of the relevant TypeScript install */
     function getTscVersion(tscPath: string) {
       const pkg = JSON.parse(fs.readFileSync(path.resolve(tscPath, '..', 'package.json')).toString());
       return '' + pkg.version;

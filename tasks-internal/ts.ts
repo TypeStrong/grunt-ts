@@ -23,7 +23,8 @@ import * as optionsResolver from '../tasks/modules/optionsResolver';
 const {asyncSeries, timeIt} = utils;
 const fail_event = 'grunt-ts.failure';
 
-function pluginFn(grunt: IGrunt) {
+
+const pluginFn = function (grunt: IGrunt) {
 
     /////////////////////////////////////////////////////////////////////
     // The grunt task
@@ -49,7 +50,7 @@ function pluginFn(grunt: IGrunt) {
             <ITargetOptions>(grunt.config.getRaw(currentGruntTask.name + '.' + currentGruntTask.target) || {});
 
           optionsResolver.resolveAsync(rawTaskConfig, rawTargetConfig, currentGruntTask.target, resolvedFiles,
-              grunt.template.process, grunt.file.expand).then((result) => {
+              grunt.template.process, grunt.file.expand, grunt.log.verbose.writeln).then((result) => {
             options = result;
 
             options.warnings.forEach((warning) => {
@@ -475,5 +476,6 @@ function pluginFn(grunt: IGrunt) {
         return template;
     }
 
-}
+};
+
 export = pluginFn;

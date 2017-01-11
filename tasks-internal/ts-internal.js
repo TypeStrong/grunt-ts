@@ -1,4 +1,4 @@
-// v6.0.0-beta.7 2017-01-09T16:37:10.527Z
+// v6.0.0-beta.9 2017-01-11T18:26:56.064Z
 /// <reference path="../defs/tsd.d.ts"/>
 /// <reference path="./modules/interfaces.d.ts"/>
 'use strict';
@@ -20,7 +20,7 @@ var transformers = require("./modules/transformers");
 var optionsResolver = require("../tasks/modules/optionsResolver");
 var asyncSeries = utils.asyncSeries, timeIt = utils.timeIt;
 var fail_event = 'grunt-ts.failure';
-function pluginFn(grunt) {
+var pluginFn = function (grunt) {
     /////////////////////////////////////////////////////////////////////
     // The grunt task
     ////////////////////////////////////////////////////////////////////
@@ -36,7 +36,7 @@ function pluginFn(grunt) {
             // get unprocessed templates from configuration
             var rawTaskConfig = (grunt.config.getRaw(currentGruntTask.name) || {});
             var rawTargetConfig = (grunt.config.getRaw(currentGruntTask.name + '.' + currentGruntTask.target) || {});
-            optionsResolver.resolveAsync(rawTaskConfig, rawTargetConfig, currentGruntTask.target, resolvedFiles, grunt.template.process, grunt.file.expand).then(function (result) {
+            optionsResolver.resolveAsync(rawTaskConfig, rawTargetConfig, currentGruntTask.target, resolvedFiles, grunt.template.process, grunt.file.expand, grunt.log.verbose.writeln).then(function (result) {
                 options = result;
                 options.warnings.forEach(function (warning) {
                     grunt.log.writeln(warning.magenta);
@@ -395,6 +395,6 @@ function pluginFn(grunt) {
         }
         return template;
     }
-}
+};
 module.exports = pluginFn;
 //# sourceMappingURL=ts.js.map

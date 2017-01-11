@@ -99,6 +99,7 @@ const propertiesFromTarget = ['amdloader', 'baseDir', 'html', 'htmlOutDir', 'htm
 
 let templateProcessor: (templateString: string, options: any) => string = null;
 let globExpander: (globs: string[]) => string[] = null;
+let verboseLogger: (logText: string) => void = null;
 
 function noopTemplateProcessor(templateString: string, options: any) {
   return templateString;
@@ -107,15 +108,19 @@ function noopTemplateProcessor(templateString: string, options: any) {
 function emptyGlobExpander(globs: string[]): string[] {
     return [];
 }
-
 (<any>emptyGlobExpander).isStub = true;
+
+function emptyVerboseLogger(logText: string) {
+  // noop.
+}
 
 export function resolveAsync(rawTaskOptions: ITargetOptions,
                         rawTargetOptions: ITargetOptions,
                         targetName = '',
                         resolvedFiles: IGruntTSCompilationInfo[] = [],
-                        theTemplateProcessor: (templateString: string, options: any) => string = null,
-                        theGlobExpander: (globs: string[]) => string[] = null): Promise<IGruntTSOptions> {
+                        theTemplateProcessor: typeof templateProcessor = null,
+                        theGlobExpander: typeof globExpander = null,
+                        theVerboseLogger: typeof verboseLogger = null): Promise<IGruntTSOptions> {
 
   let result = emptyOptionsResolveResult();
   return new Promise<IGruntTSOptions>((resolve, reject) => {
@@ -133,6 +138,12 @@ export function resolveAsync(rawTaskOptions: ITargetOptions,
         globExpander = emptyGlobExpander;
     }
 
+    if (theVerboseLogger && typeof theVerboseLogger === 'function') {
+        verboseLogger = theVerboseLogger;
+    } else {
+        verboseLogger = emptyVerboseLogger;
+    }
+
     fixMissingOptions(rawTaskOptions);
     fixMissingOptions(rawTargetOptions);
 
@@ -146,7 +157,7 @@ export function resolveAsync(rawTaskOptions: ITargetOptions,
     result = copyCompilationTasks(result, resolvedFiles, resolveOutputOptions(rawTaskOptions, rawTargetOptions));
 
     resolveVSOptionsAsync(result, rawTaskOptions, rawTargetOptions, templateProcessor).then((result) => {
-      resolveTSConfigAsync(result, rawTaskOptions, rawTargetOptions, templateProcessor, globExpander).then((result) => {
+      resolveTSConfigAsync(result, rawTaskOptions, rawTargetOptions, templateProcessor, globExpander, verboseLogger).then((result) => {
 
         result = addressAssociatedOptionsAndResolveConflicts(result);
         result = enclosePathsInQuotesIfRequired(result);

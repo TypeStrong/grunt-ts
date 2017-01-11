@@ -8,12 +8,15 @@ var utils = require("./utils");
 var templateProcessor = null;
 var globExpander = null;
 var gruntfileGlobs = null;
+var verboseLogger = null;
 var absolutePathToTSConfig;
-function resolveAsync(applyTo, taskOptions, targetOptions, theTemplateProcessor, theGlobExpander) {
+function resolveAsync(applyTo, taskOptions, targetOptions, theTemplateProcessor, theGlobExpander, theVerboseLogger) {
     if (theGlobExpander === void 0) { theGlobExpander = null; }
+    if (theVerboseLogger === void 0) { theVerboseLogger = null; }
     templateProcessor = theTemplateProcessor;
     globExpander = theGlobExpander;
     gruntfileGlobs = getGlobs(taskOptions, targetOptions);
+    verboseLogger = theVerboseLogger || (function (logText) { });
     return new es6_promise_1.Promise(function (resolve, reject) {
         try {
             var taskTSConfig = getTSConfigSettings(taskOptions);
@@ -306,7 +309,21 @@ function addFilesToCompilationContext(applyTo, projectSpec) {
     var resolvedInclude = [], resolvedExclude = [], resolvedFiles = [];
     var result = applyTo, co = projectSpec.compilerOptions, tsconfig = applyTo.tsconfig, src = applyTo.CompilationTasks[0].src;
     if (projectSpec.exclude) {
-        resolvedExclude.push.apply(resolvedExclude, (projectSpec.exclude.map(function (f) { return utils.prependIfNotStartsWith(path.join(absolutePathToTSConfig, f), '!'); })));
+        resolvedExclude.push.apply(resolvedExclude, (projectSpec.exclude.map(function (f) {
+            var p = path.join(absolutePathToTSConfig, f);
+            try {
+                var stats = fs.statSync(p);
+                if (stats.isDirectory()) {
+                    p = path.join(p, '**');
+                }
+            }
+            catch (err) {
+                // eat it - likely a "does not exist" error.
+                verboseLogger("Warning: \"" + p + "\" was specified in tsconfig `exclude` property, but was not found on disk.");
+            }
+            return utils.prependIfNotStartsWith(p, '!');
+        })));
+        verboseLogger('Resolved exclude from tsconfig: ' + JSON.stringify(resolvedExclude));
     }
     else {
         resolvedExclude.push(utils.prependIfNotStartsWith(path.join(absolutePathToTSConfig, 'node_modules/**'), '!'), utils.prependIfNotStartsWith(path.join(absolutePathToTSConfig, 'bower_components/**'), '!'), utils.prependIfNotStartsWith(path.join(absolutePathToTSConfig, 'jspm_packages/**'), '!'));
@@ -317,9 +334,11 @@ function addFilesToCompilationContext(applyTo, projectSpec) {
     if (projectSpec.include || projectSpec.files) {
         if (projectSpec.files) {
             resolvedFiles.push.apply(resolvedFiles, projectSpec.files.map(function (f) { return path.join(absolutePathToTSConfig, f); }));
+            verboseLogger('Resolved files from tsconfig: ' + JSON.stringify(resolvedFiles));
         }
         if (_.isArray(projectSpec.include)) {
             resolvedInclude.push.apply(resolvedInclude, projectSpec.include.map(function (f) { return path.join(absolutePathToTSConfig, f); }));
+            verboseLogger('Resolved include from tsconfig: ' + JSON.stringify(resolvedInclude));
         }
     }
     else {
@@ -328,6 +347,7 @@ function addFilesToCompilationContext(applyTo, projectSpec) {
             if (applyTo.allowJs) {
                 resolvedExclude.push(path.join(absolutePathToTSConfig, '**/*.js'), path.join(absolutePathToTSConfig, '**/*.jsx'));
             }
+            verboseLogger('Automatic include from tsconfig: ' + JSON.stringify(resolvedInclude));
         }
     }
     var expandedCompilationContext = [];
@@ -335,10 +355,18 @@ function addFilesToCompilationContext(applyTo, projectSpec) {
         if (globExpander.isStub) {
             result.warnings.push('Attempt to resolve glob in tsconfig module using stub globExpander.');
         }
-        expandedCompilationContext.push.apply(expandedCompilationContext, globExpander(resolvedInclude.concat(resolvedExclude)));
+        expandedCompilationContext.push.apply(expandedCompilationContext, globExpander(resolvedInclude.concat(resolvedExclude)).filter(function (p) {
+            if (_.endsWith(p, '.ts') || _.endsWith(p, '.tsx')) {
+                return true;
+            }
+            if (applyTo.allowJs && (_.endsWith(p, '.js') || _.endsWith(p, '.jsx'))) {
+                return true;
+            }
+            return false;
+        }));
     }
-    expandedCompilationContext.push.apply(expandedCompilationContext, resolvedFiles);
-    addUniqueRelativeFilesToSrc(expandedCompilationContext, src, absolutePathToTSConfig);
+    verboseLogger('Will resolve tsconfig compilation context from: ' + JSON.stringify(expandedCompilationContext.concat(resolvedFiles)));
+    addUniqueRelativeFilesToSrc(expandedCompilationContext.concat(resolvedFiles), src, absolutePathToTSConfig);
     if (tsconfig.updateFiles && projectSpec.filesGlob) {
         if (projectSpec.files === undefined) {
             projectSpec.files = [];

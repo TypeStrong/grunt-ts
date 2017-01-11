@@ -33,11 +33,13 @@ var executeNodeDefault = function (args, optionalInfo) {
 /////////////////////////////////////////////////////////////////
 // Map to store if the cache was cleared after the gruntfile was parsed
 var cacheClearedOnce = {};
-function getChangedFiles(files, targetName) {
+function getChangedFiles(files, targetName, verbose) {
     files = cache.getNewFilesForTarget(files, targetName);
-    _.forEach(files, function (file) {
-        exports.grunt.log.writeln(('### Fast Compile >>' + file).cyan);
-    });
+    if (verbose) {
+        _.forEach(files, function (file) {
+            exports.grunt.log.writeln(('### Fast Compile >>' + file).cyan);
+        });
+    }
     return files;
 }
 function resetChangedFiles(files, targetName) {
@@ -51,7 +53,7 @@ function clearCache(targetName) {
 // tsc handling
 ////////////////////////////////////////////////////////////////////
 function resolveTypeScriptBinPath() {
-    var ownRoot = path.resolve(path.dirname((module).filename), '../..');
+    var ownRoot = path.resolve(path.dirname(module.filename), '../..');
     var userRoot = path.resolve(ownRoot, '..', '..');
     var binSub = path.join('node_modules', 'typescript', 'bin');
     if (fs.existsSync(path.join(userRoot, binSub))) {
@@ -85,7 +87,7 @@ function compileAllFiles(options, compilationInfo) {
             exports.grunt.log.writeln('Fast compile will not work when --out is specified. Ignoring fast compilation'.cyan);
         }
         else {
-            newFiles = getChangedFiles(files, options.targetName);
+            newFiles = getChangedFiles(files, options.targetName, options.verbose);
             if (newFiles.length !== 0 || options.testExecute || utils.shouldPassThrough(options)) {
                 files = newFiles;
                 // If outDir is specified but no baseDir is specified we need to determine one
@@ -142,6 +144,7 @@ function compileAllFiles(options, compilationInfo) {
         tscVersion = getTscVersion(tscPath);
         exports.grunt.log.writeln('Using tsc v' + tscVersion);
     }
+    exports.grunt.log.verbose.writeln("TypeScript path: " + tsc);
     if (tsconfig && tsconfig.passThrough) {
         args.push('--project', tsconfig.tsconfig);
     }
@@ -410,6 +413,7 @@ function compileAllFiles(options, compilationInfo) {
     if (options.additionalFlags) {
         args.push(options.additionalFlags);
     }
+    /** Reads the tsc version from the package.json of the relevant TypeScript install */
     function getTscVersion(tscPath) {
         var pkg = JSON.parse(fs.readFileSync(path.resolve(tscPath, '..', 'package.json')).toString());
         return '' + pkg.version;
