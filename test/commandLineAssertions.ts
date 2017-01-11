@@ -648,8 +648,8 @@ export const new_TypeScript_2_and_2_1_Features: ICompilePromise = (strings, opti
         command.indexOf(`--noUnusedParameters`) > -1 &&
         command.indexOf(`--strictNullChecks`) > -1 &&
         command.indexOf(`--traceResolution`) > -1 &&
-        command.indexOf(`--types "node","lodash","express"`) > -1 &&
-        command.indexOf(`--typeRoots "sometypings","../../otherTypings"`) > -1)
+        command.indexOf(`--types "node,lodash,express"`) > -1 &&
+        command.indexOf(`--typeRoots "./sometypings,../../otherTypings"`) > -1)
     {
       resolve({
         code: 0,

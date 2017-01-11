@@ -369,11 +369,10 @@ export function compileAllFiles(options: IGruntTSOptions, compilationInfo: IGrun
           args.push('--maxNodeModuleJsDepth', options.maxNodeModuleJsDepth + '');
       }
       if (options.types) {
-          args.push('--types', _.map(options.types, t => `"${utils.stripQuotesIfQuoted(t)}"`).join(','));
+          args.push('--types', `"${_.map(options.types, t => utils.stripQuotesIfQuoted(t.trim())).join(',')}"`);
       }
       if (options.typeRoots) {
-          // typeRoots should always be quoted since it can have multiple comma-separated values
-          args.push('--typeRoots', _.map(options.typeRoots, tr => utils.quotedRelativePath(tr)).join(','));
+          args.push('--typeRoots', `"${_.map(options.typeRoots, t => utils.stripQuotesIfQuoted(t.trim())).join(',')}"`);
       }
 
 

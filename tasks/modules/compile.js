@@ -334,11 +334,10 @@ function compileAllFiles(options, compilationInfo) {
             args.push('--maxNodeModuleJsDepth', options.maxNodeModuleJsDepth + '');
         }
         if (options.types) {
-            args.push('--types', _.map(options.types, function (t) { return "\"" + utils.stripQuotesIfQuoted(t) + "\""; }).join(','));
+            args.push('--types', "\"" + _.map(options.types, function (t) { return utils.stripQuotesIfQuoted(t.trim()); }).join(',') + "\"");
         }
         if (options.typeRoots) {
-            // typeRoots should always be quoted since it can have multiple comma-separated values
-            args.push('--typeRoots', _.map(options.typeRoots, function (tr) { return utils.quotedRelativePath(tr); }).join(','));
+            args.push('--typeRoots', "\"" + _.map(options.typeRoots, function (t) { return utils.stripQuotesIfQuoted(t.trim()); }).join(',') + "\"");
         }
         args.push('--target', options.target.toUpperCase());
         if (options.module) {
