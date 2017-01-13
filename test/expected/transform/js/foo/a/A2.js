@@ -8,7 +8,7 @@ var A1 = require("./A1");
 var A2 = (function (_super) {
     __extends(A2, _super);
     function A2() {
-        return _super.apply(this, arguments) || this;
+        return _super !== null && _super.apply(this, arguments) || this;
     }
     A2.prototype.a2 = function () { return this.a1() + "a2"; };
     return A2;
