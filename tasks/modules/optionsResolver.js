@@ -208,8 +208,8 @@ function resolveAndWarnOnConfigurationIssues(task, target, targetName) {
     checkFixableCaseIssues(target, "target \"" + targetName + "\"");
     checkLocations(task, 'ts task');
     checkLocations(target, "target \"" + targetName + "\"");
-    fixFilesUsedWithFast(task, 'ts task');
-    fixFilesUsedWithFast(target, "target \"" + targetName + "\"");
+    warnOnFilesUsedWithFast(task, 'ts task');
+    warnOnFilesUsedWithFast(target, "target \"" + targetName + "\"");
     warnings.push.apply(warnings, getAdditionalWarnings(task, target, targetName));
     return { errors: errors, warnings: warnings };
     function getAdditionalWarnings(task, target, targetName) {
@@ -248,7 +248,7 @@ function resolveAndWarnOnConfigurationIssues(task, target, targetName) {
             return result;
         }
     }
-    function fixFilesUsedWithFast(task, configName) {
+    function warnOnFilesUsedWithFast(task, configName) {
         if (task && task.files && task.options && task.options.fast) {
             warnings.push("Warning: " + configName + " is attempting to use fast compilation with \"files\".  " +
                 "This is not currently supported.  Setting \"fast\" to \"never\".");
