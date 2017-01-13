@@ -16,7 +16,6 @@
                 "test/optionsResolverTests.js",
                 "-t",
                 "if no files, but exclude, *.ts and *.tsx will be included except for the excluded files and folders",
-                "--verbose"
             ]
         },{
             "type": "node",
