@@ -808,6 +808,19 @@ exports.tests = {
                 test.done();
             }).catch(function (err) { test.ifError(err); test.done(); });
         },
+        "outDir from gruntfile affects tsconfig.json resolved files": function (test) {
+            test.expect(3);
+            var cfg = {};
+            cfg.src = ["./test/issue_392_2/**", "!./test/issue_392_2/node_modules/**"];
+            cfg.outDir = "./test/issue_392_2/compiled";
+            cfg.tsconfig = "./test/issue_392_2/tsconfig.json";
+            var result = or.resolveAsync(null, cfg, "", null, null, grunt.file.expand).then(function (result) {
+                test.ok(result.CompilationTasks[0].src.indexOf('test/issue_392_2/app/subfolder/test1.ts') > -1);
+                test.ok(result.CompilationTasks[0].src.indexOf('test/issue_392_2/app/subfolder/test1.spec.ts') > -1);
+                test.ok(result.CompilationTasks[0].src.indexOf('test/issue_392_2/compiled/shouldnotbefound.ts') === -1);
+                test.done();
+            }).catch(function (err) { test.ifError(err); test.done(); });
+        },
         "paths written to filesGlob are resolved first": function (test) {
             test.expect(4);
             var cfg = getConfig("minimalist");

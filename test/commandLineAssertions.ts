@@ -660,6 +660,21 @@ export const new_TypeScript_2_and_2_1_Features: ICompilePromise = (strings, opti
   });
 }
 
+export const honorGruntfileExcludesWhenParsingTsconfig: ICompilePromise = (strings, options) => {
+  return new Promise(function(resolve, reject) {
+
+    const command = strings[1].replace(/\\/g,'/');
+
+    if (command.indexOf(`.spec.ts`) === -1) {
+      resolve({
+        code: 0,
+        output: ""
+      });
+    }
+    throw `expected to not see .spec.ts files included (which are excluded from the glob in the Gruntfile).  Got this: ${command}`;
+  });
+}
+
 export const issue_392: ICompilePromise = (strings, options) => {
   return new Promise(function(resolve, reject) {
 

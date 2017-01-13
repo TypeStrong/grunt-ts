@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "outDir": "compiled"
+  },
+  "exclude": [
+    "spec",
+    "e2e",
+    "node_modules"
+  ]
+}

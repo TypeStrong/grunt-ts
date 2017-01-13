@@ -10,6 +10,7 @@ var globExpander = null;
 var gruntfileGlobs = null;
 var verboseLogger = null;
 var absolutePathToTSConfig;
+var gruntfileFolder = path.resolve('.');
 function resolveAsync(applyTo, taskOptions, targetOptions, theTemplateProcessor, theGlobExpander, theVerboseLogger) {
     if (theGlobExpander === void 0) { theGlobExpander = null; }
     if (theVerboseLogger === void 0) { theVerboseLogger = null; }
@@ -162,7 +163,7 @@ function getTSConfigSettings(raw) {
         }
         if (typeof raw.tsconfig === 'boolean') {
             return {
-                tsconfig: path.join(path.resolve('.'), 'tsconfig.json')
+                tsconfig: path.join(gruntfileFolder, 'tsconfig.json')
             };
         }
         else if (typeof raw.tsconfig === 'string') {
@@ -327,9 +328,9 @@ function addFilesToCompilationContext(applyTo, projectSpec) {
     }
     else {
         resolvedExclude.push(utils.prependIfNotStartsWith(path.join(absolutePathToTSConfig, 'node_modules/**'), '!'), utils.prependIfNotStartsWith(path.join(absolutePathToTSConfig, 'bower_components/**'), '!'), utils.prependIfNotStartsWith(path.join(absolutePathToTSConfig, 'jspm_packages/**'), '!'));
-        if (applyTo.CompilationTasks && applyTo.CompilationTasks.length > 0 && applyTo.CompilationTasks[0].outDir) {
-            resolvedExclude.push(utils.prependIfNotStartsWith(path.join(absolutePathToTSConfig, applyTo.CompilationTasks[0].outDir), '!'));
-        }
+    }
+    if (co && co.outDir) {
+        resolvedExclude.push(utils.prependIfNotStartsWith(path.join(absolutePathToTSConfig, co.outDir, '**'), '!'));
     }
     if (projectSpec.include || projectSpec.files) {
         if (projectSpec.files) {
@@ -345,17 +346,20 @@ function addFilesToCompilationContext(applyTo, projectSpec) {
         if (!tsconfig.updateFiles) {
             resolvedInclude.push(path.join(absolutePathToTSConfig, '**/*.ts'), path.join(absolutePathToTSConfig, '**/*.d.ts'), path.join(absolutePathToTSConfig, '**/*.tsx'));
             if (applyTo.allowJs) {
-                resolvedExclude.push(path.join(absolutePathToTSConfig, '**/*.js'), path.join(absolutePathToTSConfig, '**/*.jsx'));
+                resolvedInclude.push(path.join(absolutePathToTSConfig, '**/*.js'), path.join(absolutePathToTSConfig, '**/*.jsx'));
             }
             verboseLogger('Automatic include from tsconfig: ' + JSON.stringify(resolvedInclude));
         }
     }
+    var resolvedExcludeFromGruntfile = (applyTo.CompilationTasks[0].glob || [])
+        .filter(function (g) { return g.charAt(0) === '!'; }).map(function (g) { return '!' + path.join(gruntfileFolder, g.substr(1)); });
     var expandedCompilationContext = [];
     if (resolvedInclude.length > 0 || resolvedExclude.length > 0) {
         if (globExpander.isStub) {
             result.warnings.push('Attempt to resolve glob in tsconfig module using stub globExpander.');
         }
-        expandedCompilationContext.push.apply(expandedCompilationContext, globExpander(resolvedInclude.concat(resolvedExclude)).filter(function (p) {
+        var globsToResolve = resolvedInclude.concat(resolvedExclude, resolvedExcludeFromGruntfile);
+        expandedCompilationContext.push.apply(expandedCompilationContext, (globExpander(globsToResolve).filter(function (p) {
             if (_.endsWith(p, '.ts') || _.endsWith(p, '.tsx')) {
                 return true;
             }
@@ -363,10 +367,11 @@ function addFilesToCompilationContext(applyTo, projectSpec) {
                 return true;
             }
             return false;
-        }));
+        })));
     }
-    verboseLogger('Will resolve tsconfig compilation context from: ' + JSON.stringify(expandedCompilationContext.concat(resolvedFiles)));
-    addUniqueRelativeFilesToSrc(expandedCompilationContext.concat(resolvedFiles), src, absolutePathToTSConfig);
+    var tsconfigCompilationContext = expandedCompilationContext.concat(resolvedFiles);
+    verboseLogger('Will resolve tsconfig compilation context from: ' + JSON.stringify(tsconfigCompilationContext));
+    addUniqueRelativeFilesToSrc(tsconfigCompilationContext, src, absolutePathToTSConfig);
     if (tsconfig.updateFiles && projectSpec.filesGlob) {
         if (projectSpec.files === undefined) {
             projectSpec.files = [];
@@ -388,7 +393,7 @@ function updateTSConfigAndFilesFromGlobAndAddToCompilationContext(filesRelativeT
     var absolutePathToTSConfig = path.resolve(tsconfigFileName, '..');
     var filesGlobRelativeToGruntfile = [];
     for (var i = 0; i < globRelativeToTSConfig.length; i += 1) {
-        filesGlobRelativeToGruntfile.push(path.relative(path.resolve('.'), path.join(absolutePathToTSConfig, globRelativeToTSConfig[i])));
+        filesGlobRelativeToGruntfile.push(path.relative(gruntfileFolder, path.join(absolutePathToTSConfig, globRelativeToTSConfig[i])));
     }
     var filesRelativeToGruntfile = globExpander(filesGlobRelativeToGruntfile);
     {
@@ -423,7 +428,6 @@ function saveTSConfigSync(fileName, content) {
 }
 var replaceSlashesRegex = new RegExp('\\' + path.sep, 'g');
 function addUniqueRelativeFilesToSrc(tsconfigFilesArray, compilationTaskSrc, absolutePathToTSConfig) {
-    var gruntfileFolder = path.resolve('.');
     _.map(_.uniq(tsconfigFilesArray), function (file) {
         var absolutePathToFile = utils.isAbsolutePath(file) ? file : path.normalize(path.join(absolutePathToTSConfig, file));
         var relativePathToFileFromGruntfile = path.relative(gruntfileFolder, absolutePathToFile).replace(replaceSlashesRegex, '/');

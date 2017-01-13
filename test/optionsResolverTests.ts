@@ -855,6 +855,22 @@ export var tests : nodeunit.ITestGroup = {
       test.done();
     }).catch((err) => {test.ifError(err); test.done();});
   },
+  "outDir from gruntfile affects tsconfig.json resolved files": (test: nodeunit.Test) => {
+    test.expect(3);
+    let cfg: any = {};
+    cfg.src = ["./test/issue_392_2/**","!./test/issue_392_2/node_modules/**"];
+    cfg.outDir = "./test/issue_392_2/compiled";
+    cfg.tsconfig = "./test/issue_392_2/tsconfig.json"
+
+    const result = or.resolveAsync(null, cfg, "", null, null, grunt.file.expand).then((result) => {
+
+      test.ok(result.CompilationTasks[0].src.indexOf('test/issue_392_2/app/subfolder/test1.ts') > -1);
+      test.ok(result.CompilationTasks[0].src.indexOf('test/issue_392_2/app/subfolder/test1.spec.ts') > -1);
+      test.ok(result.CompilationTasks[0].src.indexOf('test/issue_392_2/compiled/shouldnotbefound.ts') === -1);
+
+      test.done();
+    }).catch((err) => {test.ifError(err); test.done();});
+  },
   "paths written to filesGlob are resolved first": (test: nodeunit.Test) => {
     test.expect(4);
     let cfg: any = getConfig("minimalist");

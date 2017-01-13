@@ -591,6 +591,18 @@ exports.new_TypeScript_2_and_2_1_Features = function (strings, options) {
         throw "expected to see all of the new TypeScript 2 and 2.1 values in the command line and didn't.  Got this: " + command;
     });
 };
+exports.honorGruntfileExcludesWhenParsingTsconfig = function (strings, options) {
+    return new es6_promise_1.Promise(function (resolve, reject) {
+        var command = strings[1].replace(/\\/g, '/');
+        if (command.indexOf(".spec.ts") === -1) {
+            resolve({
+                code: 0,
+                output: ""
+            });
+        }
+        throw "expected to not see .spec.ts files included (which are excluded from the glob in the Gruntfile).  Got this: " + command;
+    });
+};
 exports.issue_392 = function (strings, options) {
     return new es6_promise_1.Promise(function (resolve, reject) {
         var command = strings[1].replace(/\\/g, '/');

@@ -14,6 +14,7 @@ let gruntfileGlobs : string[] = null;
 let verboseLogger: (logText: string) => void = null;
 let absolutePathToTSConfig: string;
 
+const gruntfileFolder = path.resolve('.');
 
 export function resolveAsync(applyTo: IGruntTSOptions,
   taskOptions: ITargetOptions,
@@ -195,7 +196,7 @@ function getTSConfigSettings(raw: ITargetOptions): ITSConfigSupport {
 
     if (typeof raw.tsconfig === 'boolean') {
       return {
-        tsconfig: path.join(path.resolve('.'), 'tsconfig.json')
+        tsconfig: path.join(gruntfileFolder, 'tsconfig.json')
       };
     } else if (typeof raw.tsconfig === 'string') {
 
@@ -388,10 +389,10 @@ function addFilesToCompilationContext(applyTo: IGruntTSOptions, projectSpec: ITS
     resolvedExclude.push(utils.prependIfNotStartsWith(path.join(absolutePathToTSConfig, 'node_modules/**'), '!'),
       utils.prependIfNotStartsWith(path.join(absolutePathToTSConfig, 'bower_components/**'), '!'),
       utils.prependIfNotStartsWith(path.join(absolutePathToTSConfig, 'jspm_packages/**'), '!'));
+  }
 
-    if (applyTo.CompilationTasks && applyTo.CompilationTasks.length > 0 && applyTo.CompilationTasks[0].outDir) {
-      resolvedExclude.push(utils.prependIfNotStartsWith(path.join(absolutePathToTSConfig, applyTo.CompilationTasks[0].outDir), '!'));
-    }
+  if (co && co.outDir) {
+    resolvedExclude.push(utils.prependIfNotStartsWith(path.join(absolutePathToTSConfig, co.outDir, '**'), '!'));
   }
 
   if (projectSpec.include || projectSpec.files) {
@@ -411,7 +412,7 @@ function addFilesToCompilationContext(applyTo: IGruntTSOptions, projectSpec: ITS
         path.join(absolutePathToTSConfig, '**/*.tsx')
       );
       if (applyTo.allowJs) {
-        resolvedExclude.push(
+        resolvedInclude.push(
           path.join(absolutePathToTSConfig, '**/*.js'),
           path.join(absolutePathToTSConfig, '**/*.jsx')
         );
@@ -420,12 +421,18 @@ function addFilesToCompilationContext(applyTo: IGruntTSOptions, projectSpec: ITS
     }
   }
 
+  const resolvedExcludeFromGruntfile = (applyTo.CompilationTasks[0].glob || [])
+    .filter(g => g.charAt(0) === '!').map(g => '!' + path.join(gruntfileFolder, g.substr(1)));
+
   const expandedCompilationContext: string[] = [];
   if (resolvedInclude.length > 0 || resolvedExclude.length > 0) {
     if ((globExpander as any).isStub) {
       result.warnings.push('Attempt to resolve glob in tsconfig module using stub globExpander.');
     }
-    expandedCompilationContext.push(...globExpander([...resolvedInclude, ...resolvedExclude]).filter(p => {
+    const globsToResolve = [...resolvedInclude, ...resolvedExclude, ...resolvedExcludeFromGruntfile];
+
+    expandedCompilationContext.push(...(globExpander(globsToResolve).filter(p => {
+
       if (_.endsWith(p, '.ts') || _.endsWith(p, '.tsx')) {
         return true;
       }
@@ -433,12 +440,14 @@ function addFilesToCompilationContext(applyTo: IGruntTSOptions, projectSpec: ITS
         return true;
       }
       return false;
-    }));
+    })));
   }
 
-  verboseLogger('Will resolve tsconfig compilation context from: ' + JSON.stringify([...expandedCompilationContext, ...resolvedFiles]));
+  const tsconfigCompilationContext = [...expandedCompilationContext, ...resolvedFiles];
 
-  addUniqueRelativeFilesToSrc([...expandedCompilationContext, ...resolvedFiles], src, absolutePathToTSConfig);
+  verboseLogger('Will resolve tsconfig compilation context from: ' + JSON.stringify(tsconfigCompilationContext));
+
+  addUniqueRelativeFilesToSrc(tsconfigCompilationContext, src, absolutePathToTSConfig);
 
   if (tsconfig.updateFiles && projectSpec.filesGlob) {
     if (projectSpec.files === undefined) {
@@ -471,7 +480,7 @@ function updateTSConfigAndFilesFromGlobAndAddToCompilationContext(filesRelativeT
     let filesGlobRelativeToGruntfile: string[] = [];
 
     for (let i = 0; i < globRelativeToTSConfig.length; i += 1) {
-      filesGlobRelativeToGruntfile.push(path.relative(path.resolve('.'), path.join(absolutePathToTSConfig, globRelativeToTSConfig[i])));
+      filesGlobRelativeToGruntfile.push(path.relative(gruntfileFolder, path.join(absolutePathToTSConfig, globRelativeToTSConfig[i])));
     }
 
     const filesRelativeToGruntfile = globExpander(filesGlobRelativeToGruntfile);
@@ -514,7 +523,6 @@ function saveTSConfigSync(fileName: string, content: any) {
 const replaceSlashesRegex = new RegExp('\\' + path.sep, 'g');
 
 function addUniqueRelativeFilesToSrc(tsconfigFilesArray: string[], compilationTaskSrc: string[], absolutePathToTSConfig: string) {
-  const gruntfileFolder = path.resolve('.');
 
   _.map(_.uniq(tsconfigFilesArray), (file) => {
       const absolutePathToFile = utils.isAbsolutePath(file) ? file : path.normalize(path.join(absolutePathToTSConfig, file));

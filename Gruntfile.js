@@ -733,6 +733,7 @@ module.exports = function (grunt) {
                 }
             },
             issue_392: {
+                test: true,
                 src: ['test/issue_392/app/**/*.ts',
                     '!test/issue_392/app/**/*.spec.ts',
                     'test/issue_392/typings/**/*.ts',
@@ -740,6 +741,17 @@ module.exports = function (grunt) {
                     ],
                 tsconfig: 'test/issue_392/issue_392-tsconfig.json',
                 testExecute: commandLineAssertions.issue_392,
+                options: {
+                    fast: 'never',
+                    verbose: true
+                }
+            },
+            honorGruntfileExcludesWhenParsingTsconfig: {
+                test: true,
+                src: ['test/issue_392_2/app/**/*.ts','!test/issue_392_2/app/**/*.spec.ts'],
+                tsconfig: 'test/issue_392_2/tsconfig.json',
+                outDir: 'test/issue_392_2/compiled',
+                testExecute: commandLineAssertions.honorGruntfileExcludesWhenParsingTsconfig,
                 options: {
                     fast: 'never',
                     verbose: true
