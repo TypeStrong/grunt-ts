@@ -83,7 +83,7 @@ interface ITaskOptions {
     inlineSources: boolean;
     /** Makes cases that break single-file transpilation an error. */
     isolatedModules: boolean;
-    /** Specify JSX code generation style: 'preserve' or 'react' */
+    /** Specify JSX code generation style: 'preserve', 'react', or 'react-native' */
     jsx: string;
     /** Specify the JSX factory function to use when targeting react JSX emit, e.g. React.createElement or h. */
     jsxFactory: string;
