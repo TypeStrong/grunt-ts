@@ -1,6 +1,7 @@
 /// <reference path="../../defs/tsd.d.ts"/>
 /// <reference path="./interfaces.d.ts"/>
 'use strict';
+Object.defineProperty(exports, "__esModule", { value: true });
 var path = require("path");
 var fs = require("fs");
 var _ = require("lodash");
@@ -373,6 +374,7 @@ function compileAllFiles(options, compilationInfo) {
                 }
                 if (Array.isArray(compilationInfo.dest)) {
                     if (compilationInfo.dest.length === 0) {
+                        // ignore it and do nothing.
                     }
                     else if (compilationInfo.dest.length > 0) {
                         console.warn((('WARNING: "dest" for target "' + options.targetName + '" is an array.  This is not supported by the' +
@@ -390,6 +392,7 @@ function compileAllFiles(options, compilationInfo) {
         if (args.indexOf('--out') > -1 && args.indexOf('--module') > -1) {
             if (semver.satisfies(tscVersion, '>=1.8.0')) {
                 if ((options.module === 'system' || options.module === 'amd')) {
+                    // this is fine.
                 }
                 else {
                     console.warn(('WARNING: TypeScript 1.8+ requires "module" to be set to' +

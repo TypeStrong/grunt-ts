@@ -1,4 +1,5 @@
 "use strict";
+exports.__esModule = true;
 ///ts:import=a
 var a = require("../../foo/a/index"); ///ts:import:generated
 ///ts:import=b1

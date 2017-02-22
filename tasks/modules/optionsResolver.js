@@ -1,6 +1,7 @@
 /// <reference path="../../defs/tsd.d.ts"/>
 /// <reference path="./interfaces.d.ts"/>
 'use strict';
+Object.defineProperty(exports, "__esModule", { value: true });
 var defaults_1 = require("./defaults");
 var utils = require("./utils");
 var _ = require("lodash");

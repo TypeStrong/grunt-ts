@@ -1,5 +1,6 @@
 /// <reference path="../defs/tsd.d.ts" />
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var fs = require("fs");
 var path = require("path");
 var or = require("../tasks/modules/optionsResolver");

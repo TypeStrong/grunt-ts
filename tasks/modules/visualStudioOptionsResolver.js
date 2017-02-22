@@ -1,4 +1,5 @@
 'use strict';
+Object.defineProperty(exports, "__esModule", { value: true });
 var csproj2ts = require("csproj2ts");
 var path = require("path");
 var utils = require("./utils");

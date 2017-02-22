@@ -1,4 +1,5 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var compile = require("../tasks/modules/compile");
 exports.tests = {
     "grunt-ts `fast` compile feature": {

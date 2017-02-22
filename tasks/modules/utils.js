@@ -1,5 +1,6 @@
 /// <reference path="../../defs/tsd.d.ts"/>
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var path = require("path");
 var fs = require("fs");
 var os = require("os");

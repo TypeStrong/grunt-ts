@@ -1,4 +1,5 @@
 'use strict';
+Object.defineProperty(exports, "__esModule", { value: true });
 var es6_promise_1 = require("es6-promise");
 var fs = require("fs");
 var path = require("path");
@@ -264,6 +265,7 @@ function applyCompilerOptions(applyTo, projectSpec) {
             'traceResolution',
             'types',
             'typeRoots'
+            // we do not support the native TypeScript watch.
         ];
         sameNameInTSConfigAndGruntTS.forEach(function (propertyName) {
             if ((propertyName in co) && !(propertyName in result)) {

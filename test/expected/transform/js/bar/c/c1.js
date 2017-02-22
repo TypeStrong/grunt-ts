@@ -1,4 +1,5 @@
 "use strict";
+exports.__esModule = true;
 ///ts:import=foo
 var foo = require("../../foo/index"); ///ts:import:generated
 // USE CLASSES FROM A/B:
