@@ -1,0 +1,7 @@
+{
+  "extends": "./configs/base",
+  "files": [
+    "../../abtest/a.ts",
+    "../../abtest/b.ts"
+  ]
+}

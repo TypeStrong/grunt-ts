@@ -7,6 +7,8 @@ import * as stripBom from 'strip-bom';
 import * as _ from 'lodash';
 import * as utils from './utils';
 import * as ts from '../ts';
+import * as jsmin from 'jsmin2';
+
 
 let templateProcessor: (templateString: string, options: any) => string = null;
 let globExpander: (globs: string[]) => string[] = null;
@@ -79,29 +81,42 @@ export function resolveAsync(applyTo: IGruntTSOptions,
         (<ITSConfigSupport>applyTo.tsconfig).tsconfig = '.';
       }
     } else {
-      let projectFile = (<ITSConfigSupport>applyTo.tsconfig).tsconfig;
-      try {
-        var projectFileTextContent = fs.readFileSync(projectFile, 'utf8');
-      } catch (ex) {
-        if (ex && ex.code === 'ENOENT') {
-            return reject('Could not find file "' + projectFile + '".');
-        } else if (ex && ex.errno) {
-            return reject('Error ' + ex.errno + ' reading "' + projectFile + '".');
-        } else {
-            return reject('Error reading "' + projectFile + '": ' + JSON.stringify(ex));
-        }
-      }
 
-      try {
-        var projectSpec: ITSConfigFile;
-        const content = stripBom(projectFileTextContent);
-        if (content.trim() === '') {
-          projectSpec = {};
-        } else {
-          projectSpec = JSON.parse(content);
+      let projectSpec: ITSConfigFile = {extends: (<ITSConfigSupport>applyTo.tsconfig).tsconfig};
+      while (projectSpec.extends) {
+        const pathOfTsconfig = path.resolve(projectSpec.extends, '..');
+        try {
+          var projectFileTextContent = fs.readFileSync(projectSpec.extends, 'utf8');
+        } catch (ex) {
+          if (ex && ex.code === 'ENOENT') {
+              return reject('Could not find file "' + projectSpec.extends + '".');
+          } else if (ex && ex.errno) {
+              return reject('Error ' + ex.errno + ' reading "' + projectSpec.extends + '".');
+          } else {
+              return reject('Error reading "' + projectSpec.extends + '": ' + JSON.stringify(ex));
+          }
         }
-      } catch (ex) {
-        return reject('Error parsing "' + projectFile + '".  It may not be valid JSON in UTF-8.');
+        try {
+          const content = stripBom(projectFileTextContent);
+          if (content.trim() === '') {
+            // we are done.
+            projectSpec.extends = undefined;
+          } else {
+            const minifiedContent = jsmin(content);
+            const parentContent = JSON.parse(minifiedContent.code);
+            projectSpec = _.defaultsDeep(projectSpec, parentContent);
+            if (parentContent.extends) {
+              projectSpec.extends = path.resolve(pathOfTsconfig, parentContent.extends);
+              if (!_.endsWith(projectSpec.extends, '.json')) {
+                projectSpec.extends += '.json';
+              }
+            } else {
+              projectSpec.extends = undefined;
+            }
+          }
+        } catch (ex) {
+          return reject('Error parsing "' + projectSpec.extends + '".  It may not be valid JSON in UTF-8.');
+        }
       }
 
       applyTo = handleBadConfiguration(applyTo, projectSpec);

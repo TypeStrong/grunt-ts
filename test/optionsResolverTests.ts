@@ -971,6 +971,20 @@ export var tests : nodeunit.ITestGroup = {
       test.strictEqual(result.warnings.length, 0, "expected zero warnings.");
       test.done();
     }).catch((err) => {test.ifError(err); test.done();});
-  }
+  },
+    "tsconfig with extends and nostrictnull works as expected": function (test) {
+      test.expect(4);
+      var cfg = getConfig("minimalist");
+      cfg.tsconfig = {
+          tsconfig: './test/tsconfig_artifact/extends/tsconfig.nostrictnull.json',
+      };
+      var result = or.resolveAsync(null, cfg).then(function (result) {
+          test.strictEqual(result.strictNullChecks, false, "expected to get strict null checks disabled.");
+          test.strictEqual(result.noImplicitAny, true, "expected to get noImplicitAny from configs/base.json.");
+          test.ok(result.CompilationTasks[0].src.indexOf('test/abtest/a.ts') > -1, "expected to see a.ts included.");
+          test.ok(result.CompilationTasks[0].src.indexOf('test/abtest/b.ts') > -1, "expected to see b.ts included.");
+          test.done();
+      }).catch(function (err) { test.ifError(err); test.done(); });
+    }
   }
 };
