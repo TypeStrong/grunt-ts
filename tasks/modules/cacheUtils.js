@@ -9,8 +9,8 @@ var crypto = require("crypto");
 var grunt = require('grunt');
 var rimraf = require('rimraf');
 //////////////////////
-//  Basic algo: 
-//        - We have a timestamp file per target. 
+//  Basic algo:
+//        - We have a timestamp file per target.
 //        - We use the mtime of this file to filter out
 //              new files for this target
 //        - Finally we can update the timestamp file with new time

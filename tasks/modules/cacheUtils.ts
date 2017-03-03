@@ -10,8 +10,8 @@ var grunt: IGrunt = require('grunt');
 var rimraf = require('rimraf');
 
 //////////////////////
-//  Basic algo: 
-//        - We have a timestamp file per target. 
+//  Basic algo:
+//        - We have a timestamp file per target.
 //        - We use the mtime of this file to filter out
 //              new files for this target
 //        - Finally we can update the timestamp file with new time
@@ -69,7 +69,7 @@ function getHashPath(filePath, targetName) {
 }
 
 /**
- * Get an existing hash for a file (if it exists). 
+ * Get an existing hash for a file (if it exists).
  */
 function getExistingHash(filePath, targetName) {
     var hashPath = getHashPath(filePath, targetName);
