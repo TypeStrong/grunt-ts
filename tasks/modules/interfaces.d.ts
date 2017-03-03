@@ -211,6 +211,8 @@ interface ITSConfigFile {
     exclude?: string[];
     include?: string[];
     filesGlob?: string[];
+    /** this tsconfig overrides settings in its parent tsconfig located here */
+    extends?: string;
 }
 
 // NOTE: This is from tsconfig.ts in atom-typescript

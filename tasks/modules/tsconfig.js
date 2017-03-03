@@ -65,34 +65,47 @@ function resolveAsync(applyTo, taskOptions, targetOptions, theTemplateProcessor,
             }
         }
         else {
-            var projectFile = applyTo.tsconfig.tsconfig;
-            try {
-                var projectFileTextContent = fs.readFileSync(projectFile, 'utf8');
-            }
-            catch (ex) {
-                if (ex && ex.code === 'ENOENT') {
-                    return reject('Could not find file "' + projectFile + '".');
+            var projectSpec = { extends: applyTo.tsconfig.tsconfig };
+            while (projectSpec.extends) {
+                var pathOfTsconfig = path.resolve(projectSpec.extends, '..');
+                try {
+                    var projectFileTextContent = fs.readFileSync(projectSpec.extends, 'utf8');
                 }
-                else if (ex && ex.errno) {
-                    return reject('Error ' + ex.errno + ' reading "' + projectFile + '".');
+                catch (ex) {
+                    if (ex && ex.code === 'ENOENT') {
+                        return reject('Could not find file "' + projectSpec.extends + '".');
+                    }
+                    else if (ex && ex.errno) {
+                        return reject('Error ' + ex.errno + ' reading "' + projectSpec.extends + '".');
+                    }
+                    else {
+                        return reject('Error reading "' + projectSpec.extends + '": ' + JSON.stringify(ex));
+                    }
                 }
-                else {
-                    return reject('Error reading "' + projectFile + '": ' + JSON.stringify(ex));
+                try {
+                    var content = stripBom(projectFileTextContent);
+                    if (content.trim() === '') {
+                        // we are done.
+                        projectSpec.extends = undefined;
+                    }
+                    else {
+                        var minifiedContent = jsmin(content);
+                        var parentContent = JSON.parse(minifiedContent.code);
+                        projectSpec = _.defaultsDeep(projectSpec, parentContent);
+                        if (parentContent.extends) {
+                            projectSpec.extends = path.resolve(pathOfTsconfig, parentContent.extends);
+                            if (!_.endsWith(projectSpec.extends, '.json')) {
+                                projectSpec.extends += '.json';
+                            }
+                        }
+                        else {
+                            projectSpec.extends = undefined;
+                        }
+                    }
                 }
-            }
-            try {
-                var projectSpec;
-                var content = stripBom(projectFileTextContent);
-                if (content.trim() === '') {
-                    projectSpec = {};
+                catch (ex) {
+                    return reject('Error parsing "' + projectSpec.extends + '".  It may not be valid JSON in UTF-8.');
                 }
-                else {
-                    var minifiedContent = jsmin(content);
-                    projectSpec = JSON.parse(minifiedContent.code);
-                }
-            }
-            catch (ex) {
-                return reject('Error parsing "' + projectFile + '".  It may not be valid JSON in UTF-8.');
             }
             applyTo = handleBadConfiguration(applyTo, projectSpec);
             applyTo = applyCompilerOptions(applyTo, projectSpec);
