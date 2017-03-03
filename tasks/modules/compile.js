@@ -390,7 +390,10 @@ function compileAllFiles(options, compilationInfo) {
             }
         }
         if (args.indexOf('--out') > -1 && args.indexOf('--module') > -1) {
-            if (semver.satisfies(tscVersion, '>=1.8.0')) {
+            if (tscVersion === '' && options.compiler) {
+                // don't warn if they are using a custom compiler.
+            }
+            else if (semver.satisfies(tscVersion, '>=1.8.0')) {
                 if ((options.module === 'system' || options.module === 'amd')) {
                     // this is fine.
                 }
