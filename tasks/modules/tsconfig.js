@@ -6,6 +6,7 @@ var path = require("path");
 var stripBom = require("strip-bom");
 var _ = require("lodash");
 var utils = require("./utils");
+var jsmin = require("jsmin2");
 var templateProcessor = null;
 var globExpander = null;
 var gruntfileGlobs = null;
@@ -86,7 +87,8 @@ function resolveAsync(applyTo, taskOptions, targetOptions, theTemplateProcessor,
                     projectSpec = {};
                 }
                 else {
-                    projectSpec = JSON.parse(content);
+                    var minifiedContent = jsmin(content);
+                    projectSpec = JSON.parse(minifiedContent.code);
                 }
             }
             catch (ex) {

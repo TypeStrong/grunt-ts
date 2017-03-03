@@ -7,6 +7,8 @@ import * as stripBom from 'strip-bom';
 import * as _ from 'lodash';
 import * as utils from './utils';
 import * as ts from '../ts';
+import * as jsmin from 'jsmin2';
+
 
 let templateProcessor: (templateString: string, options: any) => string = null;
 let globExpander: (globs: string[]) => string[] = null;
@@ -98,7 +100,8 @@ export function resolveAsync(applyTo: IGruntTSOptions,
         if (content.trim() === '') {
           projectSpec = {};
         } else {
-          projectSpec = JSON.parse(content);
+          const minifiedContent = jsmin(content);
+          projectSpec = JSON.parse(minifiedContent.code);
         }
       } catch (ex) {
         return reject('Error parsing "' + projectFile + '".  It may not be valid JSON in UTF-8.');
