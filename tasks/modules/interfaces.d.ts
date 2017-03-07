@@ -256,4 +256,5 @@ interface ICompilerOptions {
     target?: string;
     version?: boolean;
     watch?: boolean;
+    typeRoots: string[];
 }

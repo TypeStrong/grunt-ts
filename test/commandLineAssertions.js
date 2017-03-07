@@ -616,6 +616,18 @@ exports.issue_392 = function (strings, options) {
         throw "expected to see node_modules excluded and didn't (See GitHub issue 392).  Got this: " + command;
     });
 };
+exports.issue_397 = function (strings, options) {
+    return new es6_promise_1.Promise(function (resolve, reject) {
+        var command = strings[1].replace(/\\/g, '/');
+        if (command.indexOf("--typeRoots \"test/issue_397/src/typings,test/issue_397/src/other_typings\"") !== -1) {
+            resolve({
+                code: 0,
+                output: ""
+            });
+        }
+        throw "expected to see typeRoots files to be realive (See GitHub issue 397).  Got this: " + command;
+    });
+};
 exports.test_noLib = simpleCommandLineCheck("--noLib");
 exports.test_emitBOM = simpleCommandLineCheck("--emitBOM");
 exports.test_locale = simpleCommandLineCheck("--locale ja-jp");
