@@ -822,7 +822,7 @@ exports.tests = {
                 test.done();
             }).catch(function (err) { test.ifError(err); test.done(); });
         },
-        "typeRoots files are resolved realive to Gruntfile (See GitHub issue 397)": function (test) {
+        "typeRoots files are resolved relative to Gruntfile (See GitHub issue 397)": function (test) {
             test.expect(3);
             var cfg = getConfig("minimalist");
             cfg.tsconfig = "./test/issue_397/src/issue_397-tsconfig.json";

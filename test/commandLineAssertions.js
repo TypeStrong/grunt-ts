@@ -625,7 +625,7 @@ exports.issue_397 = function (strings, options) {
                 output: ""
             });
         }
-        throw "expected to see typeRoots files to be realive (See GitHub issue 397).  Got this: " + command;
+        throw "expected to see typeRoots files to be relative (See GitHub issue 397).  Got this: " + command;
     });
 };
 exports.test_noLib = simpleCommandLineCheck("--noLib");

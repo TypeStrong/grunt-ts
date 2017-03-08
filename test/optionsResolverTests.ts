@@ -871,7 +871,7 @@ export var tests : nodeunit.ITestGroup = {
       test.done();
     }).catch((err) => {test.ifError(err); test.done();});
   },
-  "typeRoots files are resolved realive to Gruntfile (See GitHub issue 397)": (test: nodeunit.Test) => {
+  "typeRoots files are resolved relative to Gruntfile (See GitHub issue 397)": (test: nodeunit.Test) => {
     test.expect(3);
     let cfg = getConfig("minimalist");
     cfg.tsconfig = "./test/issue_397/src/issue_397-tsconfig.json"
