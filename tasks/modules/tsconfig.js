@@ -214,6 +214,7 @@ function getTSConfigSettings(raw) {
 function applyCompilerOptions(applyTo, projectSpec) {
     var result = applyTo || {};
     var co = projectSpec.compilerOptions, tsconfig = applyTo.tsconfig;
+    absolutePathToTSConfig = path.resolve(tsconfig.tsconfig, '..');
     if (!tsconfig.ignoreSettings && co) {
         // Go here for the tsconfig.json documentation:
         // https://github.com/Microsoft/TypeScript-Handbook/blob/master/pages/tsconfig.json.md
@@ -279,8 +280,6 @@ function applyCompilerOptions(applyTo, projectSpec) {
             'target',
             'traceResolution',
             'types',
-            'typeRoots'
-            // we do not support the native TypeScript watch.
         ];
         sameNameInTSConfigAndGruntTS.forEach(function (propertyName) {
             if ((propertyName in co) && !(propertyName in result)) {
@@ -293,6 +292,11 @@ function applyCompilerOptions(applyTo, projectSpec) {
         if (('outFile' in co) && !('out' in result)) {
             result['out'] = co['outFile'];
         }
+        // when inside the tsconfig.json the `typeRoots` paths needs to be move relative to gruntfile
+        if (('typeRoots' in co) && !('typeRoots' in result)) {
+            var relPath_1 = relativePathFromGruntfileToTSConfig();
+            result['typeRoots'] = _.map(co['typeRoots'], function (p) { return path.relative('.', path.resolve(relPath_1, p)).replace(/\\/g, '/'); });
+        }
     }
     if (!('updateFiles' in tsconfig)) {
         tsconfig.updateFiles = !('include' in projectSpec) && ('filesGlob' in projectSpec);
@@ -300,7 +304,6 @@ function applyCompilerOptions(applyTo, projectSpec) {
     if (applyTo.CompilationTasks.length === 0) {
         applyTo.CompilationTasks.push({ src: [] });
     }
-    absolutePathToTSConfig = path.resolve(tsconfig.tsconfig, '..');
     if (tsconfig.overwriteFilesGlob) {
         if (!gruntfileGlobs) {
             throw new Error('The tsconfig option overwriteFilesGlob is set to true, but no glob was passed-in.');

@@ -690,6 +690,23 @@ export const issue_392: ICompilePromise = (strings, options) => {
   });
 }
 
+export const issue_397: ICompilePromise = (strings, options) => {
+  return new Promise(function(resolve, reject) {
+
+    const command = strings[1].replace(/\\/g,'/');
+
+    if (command.indexOf(`--typeRoots "test/issue_397/src/typings,test/issue_397/src/other_typings"`) !== -1) {
+      resolve({
+        code: 0,
+        output: ""
+      });
+    }
+    throw `expected to see typeRoots files to be realive (See GitHub issue 397).  Got this: ${command}`;
+  });
+}
+
+
+
 export const test_noLib = simpleCommandLineCheck("--noLib");
 export const test_emitBOM = simpleCommandLineCheck("--emitBOM");
 export const test_locale = simpleCommandLineCheck("--locale ja-jp");

@@ -250,6 +250,8 @@ function applyCompilerOptions(applyTo: IGruntTSOptions, projectSpec: ITSConfigFi
   const co = projectSpec.compilerOptions,
     tsconfig: ITSConfigSupport = applyTo.tsconfig;
 
+  absolutePathToTSConfig = path.resolve(tsconfig.tsconfig, '..');
+
   if (!tsconfig.ignoreSettings && co) {
 
     // Go here for the tsconfig.json documentation:
@@ -317,7 +319,7 @@ function applyCompilerOptions(applyTo: IGruntTSOptions, projectSpec: ITSConfigFi
       'target',
       'traceResolution',
       'types',
-      'typeRoots'
+      // typeRoots is handled below.
       // we do not support the native TypeScript watch.
     ];
 
@@ -334,6 +336,12 @@ function applyCompilerOptions(applyTo: IGruntTSOptions, projectSpec: ITSConfigFi
     if (('outFile' in co) && !('out' in result)) {
       result['out'] = co['outFile'];
     }
+
+    // when inside the tsconfig.json the `typeRoots` paths needs to be move relative to gruntfile
+    if (('typeRoots' in co) && !('typeRoots' in result)) {
+      const relPath = relativePathFromGruntfileToTSConfig();
+      result['typeRoots'] = _.map(co['typeRoots'], p => { return path.relative('.', path.resolve(relPath, p)).replace(/\\/g, '/'); });
+    }
   }
 
   if (!('updateFiles' in tsconfig)) {
@@ -343,8 +351,6 @@ function applyCompilerOptions(applyTo: IGruntTSOptions, projectSpec: ITSConfigFi
   if (applyTo.CompilationTasks.length === 0) {
     applyTo.CompilationTasks.push({src: []});
   }
-
-  absolutePathToTSConfig = path.resolve(tsconfig.tsconfig, '..');
 
   if (tsconfig.overwriteFilesGlob) {
     if (!gruntfileGlobs) {

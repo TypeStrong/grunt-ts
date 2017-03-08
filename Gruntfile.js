@@ -746,6 +746,15 @@ module.exports = function (grunt) {
                     verbose: true
                 }
             },
+            issue_397: {
+                test: true,
+                tsconfig: 'test/issue_397/src/issue_397-tsconfig.json',
+                testExecute: commandLineAssertions.issue_397,
+                options: {
+                    fast: 'never',
+                    verbose: true
+                }
+            },
             honorGruntfileExcludesWhenParsingTsconfig: {
                 test: true,
                 src: ['test/issue_392_2/app/**/*.ts','!test/issue_392_2/app/**/*.spec.ts'],

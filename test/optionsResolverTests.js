@@ -698,7 +698,7 @@ exports.tests = {
                 test.strictEqual(result.types.length, 3);
                 test.ok(result.types.indexOf('issue') > -1);
                 test.strictEqual(result.typeRoots.length, 2);
-                test.ok(result.typeRoots.indexOf('./../node_modules/@types') > -1);
+                test.ok(result.typeRoots.indexOf('test/node_modules/@types') > -1);
                 test.strictEqual(result.CompilationTasks[0].outDir, 'test/tsconfig/files');
                 test.strictEqual(result.CompilationTasks[0].out, undefined);
                 test.done();
@@ -819,6 +819,17 @@ exports.tests = {
                 test.ok(result.CompilationTasks[0].src.indexOf('test/issue_392_2/app/subfolder/test1.ts') > -1);
                 test.ok(result.CompilationTasks[0].src.indexOf('test/issue_392_2/app/subfolder/test1.spec.ts') > -1);
                 test.ok(result.CompilationTasks[0].src.indexOf('test/issue_392_2/compiled/shouldnotbefound.ts') === -1);
+                test.done();
+            }).catch(function (err) { test.ifError(err); test.done(); });
+        },
+        "typeRoots files are resolved realive to Gruntfile (See GitHub issue 397)": function (test) {
+            test.expect(3);
+            var cfg = getConfig("minimalist");
+            cfg.tsconfig = "./test/issue_397/src/issue_397-tsconfig.json";
+            var result = or.resolveAsync(null, cfg).then(function (result) {
+                test.strictEqual(result.typeRoots.length, 2);
+                test.ok(result.typeRoots.indexOf('test/issue_397/src/typings') > -1);
+                test.ok(result.typeRoots.indexOf('test/issue_397/src/other_typings') > -1);
                 test.done();
             }).catch(function (err) { test.ifError(err); test.done(); });
         },
