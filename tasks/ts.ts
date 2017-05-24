@@ -430,24 +430,29 @@ const pluginFn = function (grunt: IGrunt) {
 
                 // local event to handle file event
                 function handleFileEvent(filepath: string, displaystr: string, addedOrChanged: boolean = false) {
+                    
+                    const acceptedExtentions = ['.ts', '.tsx', '.js', '.jsx', '.html'];
+                    
+                    acceptedExtentions.forEach(
+                        (extension) => {
+                            
+                            // If extension is accepted and was not just run
+                            if (utils.endsWith(filepath.toLowerCase(), extension) && (new Date().getTime() - lastCompile) > 100){
+                                
+                                // Log and run the debounced version.
+                                grunt.log.writeln((displaystr + ' >>' + filepath).yellow);
 
-                    // Only ts and html :
-                    if (!utils.endsWith(filepath.toLowerCase(), '.ts') && !utils.endsWith(filepath.toLowerCase(), '.html')) {
-                        return;
-                    }
-
-                    // Do not run if just ran, behaviour same as grunt-watch
-                    // These are the files our run modified
-                    if ((new Date().getTime() - lastCompile) <= 100) {
-                        // Uncomment for debugging which files were ignored
-                        // grunt.log.writeln((' ///'  + ' >>' + filepath).grey);
-                        return;
-                    }
-
-                    // Log and run the debounced version.
-                    grunt.log.writeln((displaystr + ' >>' + filepath).yellow);
-
-                    filterFilesTransformAndCompile();
+                                filterFilesTransformAndCompile();
+                                
+                                return;
+                            }
+                            
+                            // Uncomment for debugging which files were ignored
+                            // else if ((new Date().getTime() - lastCompile) <= 100){
+                                // grunt.log.writeln((' ///'  + ' >>' + filepath).grey);
+                            // }
+                        }
+                    );
                 }
 
             }).then((res: boolean[]) => {
