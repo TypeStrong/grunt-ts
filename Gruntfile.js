@@ -977,6 +977,26 @@ module.exports = function (grunt) {
                     noLib: true
                 }
             },
+            test_baseDirSpecified: {
+                test: true,
+                testExecute: commandLineAssertions.test_baseDirSpecified,
+                src: 'test/baseDirOption/baseDirSpecified/foo/bar.ts',
+                outDir: 'test/baseDirOption/outDir/baseDirSpecified/',
+                baseDir: 'test/baseDirOption/baseDirSpecified/',
+                options: {
+                    fast: 'never'
+                }
+            },
+            test_baseDirNotSpecified: {
+                test: true,
+                testExecute: commandLineAssertions.test_baseDirNotSpecified,
+                src: 'test/baseDirOption/baseDirNotSpecified/foo/bar.ts',
+                outDir: 'test/baseDirOption/outDir/baseDirNotSpecified/',
+                // `baseDir` is not specified
+                options: {
+                    fast: 'never'
+                }
+            },
             test_emitBOM: {
                 test: true,
                 testExecute: commandLineAssertions.test_emitBOM,

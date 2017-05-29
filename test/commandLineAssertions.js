@@ -649,4 +649,24 @@ function simpleCommandLineCheck(lookFor) {
     };
     return result;
 }
+var BASE_DIR_FILE_NAME = ".baseDir.ts";
+exports.test_baseDirSpecified = baseDirCheck(true);
+exports.test_baseDirNotSpecified = baseDirCheck(false);
+function baseDirCheck(shouldBaseDirBeIncluded) {
+    return function (strings, options) {
+        return new Promise(function (resolve, reject) {
+            var command = strings[1].replace(/\\/g, '/');
+            var isBaseDirFileNameIncluded = (command.indexOf(BASE_DIR_FILE_NAME) !== -1);
+            if (isBaseDirFileNameIncluded === shouldBaseDirBeIncluded) {
+                resolve({
+                    code: 0,
+                    output: ""
+                });
+            }
+            else {
+                throw "expected " + (shouldBaseDirBeIncluded ? "" : "not ") + "to see " + BASE_DIR_FILE_NAME + " on the command line and didn't.  Got this: " + command;
+            }
+        });
+    };
+}
 //# sourceMappingURL=commandLineAssertions.js.map

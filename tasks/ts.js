@@ -84,11 +84,7 @@ var pluginFn = function (grunt) {
                 // see https://github.com/grunt-ts/grunt-ts/issues/77
                 function isBaseDirFile(filename, targetFiles) {
                     var baseDirFile = '.baseDir.ts';
-                    var bd = '';
-                    if (!options.baseDir) {
-                        bd = utils.findCommonPath(targetFiles, '/');
-                        options.baseDir = bd;
-                    }
+                    var bd = options.baseDir || utils.findCommonPath(targetFiles, '/');
                     return path.resolve(filename) === path.resolve(path.join(bd, baseDirFile));
                 }
                 // Create an amd loader?
