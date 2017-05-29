@@ -136,17 +136,19 @@ export function compileAllFiles(options: IGruntTSOptions, compilationInfo: IGrun
         }
     }
 
-    // Transform files as needed. Currently all of this logic in is one module
-    // transformers.transformFiles(newFiles, targetFiles, target, task);
-
     // If baseDir is specified create a temp tsc file to make sure that `--outDir` works fine
     // see https://github.com/grunt-ts/grunt-ts/issues/77
-    var baseDirFile: string = '.baseDir.ts';
-    var baseDirFilePath: string;
-    if (compilationInfo.outDir && options.baseDir && files.length > 0) {
-        baseDirFilePath = path.join(options.baseDir, baseDirFile);
+    if (compilationInfo.outDir && options.baseDir && files.length > 0 && !options.rootDir) {
+        const baseDirFile: string = '.baseDir.ts',
+            baseDirFilePath = path.join(options.baseDir, baseDirFile);
         if (!fs.existsSync(baseDirFilePath)) {
-            grunt.file.write(baseDirFilePath, '// Ignore this file. See https://github.com/grunt-ts/grunt-ts/issues/77');
+            const baseDir_Message = `// grunt-ts creates this file to help TypeScript find ` +
+                `the compilation root of your project.  If you wish to get to stop creating ` +
+                `it, specify a \`rootDir\` setting in your Gruntfile or tsconfig.  See ` +
+                `https://github.com/TypeStrong/grunt-ts#rootdir for details.  Note that ` +
+                `\`rootDir\` goes under \`options\`, and is case-sensitive.  This message ` +
+                `was revised in grunt-ts v6.`;
+            grunt.file.write(baseDirFilePath, baseDir_Message);
         }
         files.push(baseDirFilePath);
     }

@@ -51,6 +51,10 @@ exports.tests = {
         testFile(test, 'simple/js/zoo.d.ts');
         test.done();
     },
+    simple_with_rootDir: function (test) {
+        testDirectory(test, 'simple_with_rootDir');
+        test.done();
+    },
     abtest: function (test) {
         testFile(test, 'abtest/reference.ts');
         testFile(test, 'abtest/out.js', true);

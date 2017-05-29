@@ -115,6 +115,15 @@ module.exports = function (grunt) {
                 src: ['test/simple/ts/zoo.ts'],
                 outDir: 'test/simple/js/',
             },
+            simple_with_rootDir: {
+                test: true,
+                options: {
+                    sourceMap: false,
+                    rootDir: 'test/simple'
+                },
+                src: ['test/simple/ts/zoo.ts'],
+                outDir: 'test/simple_with_rootDir/js/',
+            },
             out_with_spaces: {
                 test: true,
                 testExecute: commandLineAssertions.out_with_spaces,
