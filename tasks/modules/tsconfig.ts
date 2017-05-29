@@ -5,6 +5,8 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as stripBom from 'strip-bom';
 import * as _ from 'lodash';
+import * as detectIndent from 'detect-indent';
+import * as detectNewline from 'detect-newline';
 import * as utils from './utils';
 import * as ts from '../ts';
 import * as jsmin from 'jsmin2';
@@ -15,6 +17,8 @@ let globExpander: (globs: string[]) => string[] = null;
 let gruntfileGlobs : string[] = null;
 let verboseLogger: (logText: string) => void = null;
 let absolutePathToTSConfig: string;
+
+let detectedIndentString = '    ', detectedNewline = utils.eol;
 
 const gruntfileFolder = path.resolve('.');
 
@@ -81,7 +85,6 @@ export function resolveAsync(applyTo: IGruntTSOptions,
         (<ITSConfigSupport>applyTo.tsconfig).tsconfig = '.';
       }
     } else {
-
       let projectSpec: ITSConfigFile = {extends: (<ITSConfigSupport>applyTo.tsconfig).tsconfig};
       while (projectSpec.extends) {
         const pathOfTsconfig = path.resolve(projectSpec.extends, '..');
@@ -102,6 +105,8 @@ export function resolveAsync(applyTo: IGruntTSOptions,
             // we are done.
             projectSpec.extends = undefined;
           } else {
+            detectedIndentString = detectIndent(content).indent;
+            detectedNewline = detectNewline(content);
             const minifiedContent = jsmin(content);
             const parentContent = JSON.parse(minifiedContent.code);
             projectSpec = _.defaultsDeep(projectSpec, parentContent);
@@ -537,8 +542,30 @@ function updateTSConfigAndFilesFromGlobAndAddToCompilationContext(filesRelativeT
     }
 }
 
-function saveTSConfigSync(fileName: string, content: any) {
-    fs.writeFileSync(fileName, JSON.stringify(content, null, '    '));
+function saveTSConfigSync(fileName: string, content: ITSConfigFile) {
+    fs.writeFileSync(fileName, prettyJSON(content, detectedIndentString, detectedNewline));
+}
+
+export function prettyJSON(object: any, indent: string | number = 4, newLine: string = utils.eol): string {
+  const cache = [];
+  let value = JSON.stringify(
+    object,
+    // fixup circular reference
+    function(key, value) {
+      if (typeof value === 'object' && value !== null) {
+        if (cache.indexOf(value) !== -1) {
+          // Circular reference found, discard key
+          return;
+        }
+        // Store value in our collection
+        cache.push(value);
+      }
+      return value;
+    },
+    indent
+  );
+  value = value.replace(/(?:\r\n|\r|\n)/g, newLine) + newLine;
+  return value;
 }
 
 const replaceSlashesRegex = new RegExp('\\' + path.sep, 'g');

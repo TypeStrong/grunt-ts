@@ -1,7 +1,8 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var grunt = require('grunt');
-var utils = require('../tasks/modules/utils');
-var _ = require('lodash');
+var utils = require("../tasks/modules/utils");
+var _ = require("lodash");
 function testFile(test, path, whitespaceDifferencesOK) {
     if (whitespaceDifferencesOK === void 0) { whitespaceDifferencesOK = false; }
     var actualFileName = 'test/' + path, expectedFileName = 'test/expected/' + path;

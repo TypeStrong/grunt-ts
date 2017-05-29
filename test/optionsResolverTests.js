@@ -1,12 +1,18 @@
 "use strict";
-/// <reference path="../defs/tsd.d.ts" />
 Object.defineProperty(exports, "__esModule", { value: true });
 var fs = require("fs");
 var path = require("path");
 var or = require("../tasks/modules/optionsResolver");
 var utils = require("../tasks/modules/utils");
 var _ = require("lodash");
+var testHelpers_1 = require("./testHelpers");
 var grunt = require('grunt');
+var crlf_newline_tsconfig_json_1 = require("./tsconfig_artifact/newlineConfigs/crlf_newline_tsconfig.json");
+var crlf_newline_tsconfig_expected_json_1 = require("./tsconfig_artifact/newlineConfigs/crlf_newline_tsconfig.expected.json");
+var lf_newline_tsconfig_json_1 = require("./tsconfig_artifact/newlineConfigs/lf_newline_tsconfig.json");
+var lf_newline_tsconfig_expected_json_1 = require("./tsconfig_artifact/newlineConfigs/lf_newline_tsconfig.expected.json");
+var mixed_newline_tsconfig_json_1 = require("./tsconfig_artifact/newlineConfigs/mixed_newline_tsconfig.json");
+var mixed_newline_tsconfig_expected_json_1 = require("./tsconfig_artifact/newlineConfigs/mixed_newline_tsconfig.expected.json");
 var config = {
     "minimalist": {
         src: ["**/*.ts", "!node_modules/**/*.ts"]
@@ -388,7 +394,6 @@ exports.tests = {
             }).catch(function (err) { test.ifError(err); test.done(); });
         },
         "outDir works in combination with tsconfig": function (test) {
-            // as reported by @gilamran in https://github.com/TypeStrong/grunt-ts/issues/312
             var config = {
                 options: {
                     target: 'es5'
@@ -507,6 +512,12 @@ exports.tests = {
                 });
             };
             try {
+                fs.writeFileSync('./test/tsconfig/crlf_newline_tsconfig.json', crlf_newline_tsconfig_json_1.crlf_newline_tsconfig_json);
+                fs.writeFileSync('./test/tsconfig/crlf_newline_tsconfig.expected.json', crlf_newline_tsconfig_expected_json_1.crlf_newline_tsconfig_expected_json);
+                fs.writeFileSync('./test/tsconfig/lf_newline_tsconfig.json', lf_newline_tsconfig_json_1.lf_newline_tsconfig_json);
+                fs.writeFileSync('./test/tsconfig/lf_newline_tsconfig.expected.json', lf_newline_tsconfig_expected_json_1.lf_newline_tsconfig_expected_json);
+                fs.writeFileSync('./test/tsconfig/mixed_newline_tsconfig.json', mixed_newline_tsconfig_json_1.mixed_newline_tsconfig_json);
+                fs.writeFileSync('./test/tsconfig/mixed_newline_tsconfig.expected.json', mixed_newline_tsconfig_expected_json_1.mixed_newline_tsconfig_expected_json);
                 fs.readdir('test/tsconfig_artifact', processFiles);
             }
             catch (ex) {
@@ -600,7 +611,7 @@ exports.tests = {
                 }
             };
             if (!fs.existsSync('tasks/scratch.js')) {
-                fs.writeFileSync('tasks/scratch.js', ''); // ensure there is a scratch file there just in case it hasn't been compiled.
+                fs.writeFileSync('tasks/scratch.js', '');
             }
             var result = or.resolveAsync(config, config.build, "build", [], null, grunt.file.expand).then(function (result) {
                 test.strictEqual(result.CompilationTasks.length, 1, "expected a compilation task");
@@ -731,7 +742,6 @@ exports.tests = {
         "most basic tsconfig with true works": function (test) {
             test.expect(12);
             var result = or.resolveAsync(null, getConfig("tsconfig has true")).then(function (result) {
-                // NOTE: With tsconfig: true, this depends on the actual grunt-ts tsconfig so technically it could be wrong in the future.
                 test.strictEqual(result.tsconfig.tsconfig, path.join(path.resolve('.'), 'tsconfig.json'));
                 test.strictEqual(result.target, 'es5');
                 test.strictEqual(result.module, 'commonjs');
@@ -836,7 +846,6 @@ exports.tests = {
         "paths written to filesGlob are resolved first": function (test) {
             test.expect(4);
             var cfg = getConfig("minimalist");
-            // this assumes the test gruntfile which uses the {% and %} delimiters.
             cfg.src = ["./test/{%= grunt.pathsFilesGlobProperty %}/a*.ts"];
             cfg.tsconfig = {
                 tsconfig: 'test/tsconfig/simple_filesGlob_tsconfig.json',
@@ -916,6 +925,69 @@ exports.tests = {
                 test.ok(result.CompilationTasks.length > 0, "expected some compilation tasks from default tsconfig.json");
                 test.strictEqual(result.errors.length, 0, "expected zero errors.");
                 test.strictEqual(result.warnings.length, 0, "expected zero warnings.");
+                test.done();
+            }).catch(function (err) { test.ifError(err); test.done(); });
+        },
+        "four spaces indent is preserved when updating tsconfig": function (test) {
+            test.expect(1);
+            var taskTargetConfig = getConfig("minimalist");
+            taskTargetConfig.tsconfig = './test/tsconfig/four_spaces_indent_tsconfig.json';
+            var result = or.resolveAsync(null, taskTargetConfig, "", null, null, grunt.file.expand).then(function (result) {
+                testHelpers_1.testExpectedFile(test, './test/tsconfig/four_spaces_indent_tsconfig.expected.json', false);
+                test.done();
+            }).catch(function (err) { test.ifError(err); test.done(); });
+        },
+        "tab indent is preserved when updating tsconfig": function (test) {
+            test.expect(1);
+            var taskTargetConfig = getConfig("minimalist");
+            taskTargetConfig.tsconfig = './test/tsconfig/tab_indent_tsconfig.json';
+            var result = or.resolveAsync(null, taskTargetConfig, "", null, null, grunt.file.expand).then(function (result) {
+                testHelpers_1.testExpectedFile(test, './test/tsconfig/tab_indent_tsconfig.expected.json', false);
+                test.done();
+            }).catch(function (err) { test.ifError(err); test.done(); });
+        },
+        "three spaces indent is preserved when updating tsconfig": function (test) {
+            test.expect(1);
+            var taskTargetConfig = getConfig("minimalist");
+            taskTargetConfig.tsconfig = './test/tsconfig/three_spaces_indent_tsconfig.json';
+            var result = or.resolveAsync(null, taskTargetConfig, "", null, null, grunt.file.expand).then(function (result) {
+                testHelpers_1.testExpectedFile(test, './test/tsconfig/three_spaces_indent_tsconfig.expected.json', false);
+                test.done();
+            }).catch(function (err) { test.ifError(err); test.done(); });
+        },
+        "crlf newline is preserved when updating tsconfig": function (test) {
+            test.expect(1);
+            var taskTargetConfig = getConfig("minimalist");
+            taskTargetConfig.tsconfig = './test/tsconfig/crlf_newline_tsconfig.json';
+            var result = or.resolveAsync(null, taskTargetConfig, "", null, null, grunt.file.expand).then(function (result) {
+                testHelpers_1.testExpectedFile(test, './test/tsconfig/crlf_newline_tsconfig.expected.json', false);
+                test.done();
+            }).catch(function (err) { test.ifError(err); test.done(); });
+        },
+        "lf newline is preserved when updating tsconfig": function (test) {
+            test.expect(1);
+            var taskTargetConfig = getConfig("minimalist");
+            taskTargetConfig.tsconfig = './test/tsconfig/lf_newline_tsconfig.json';
+            var result = or.resolveAsync(null, taskTargetConfig, "", null, null, grunt.file.expand).then(function (result) {
+                testHelpers_1.testExpectedFile(test, './test/tsconfig/lf_newline_tsconfig.expected.json', false);
+                test.done();
+            }).catch(function (err) { test.ifError(err); test.done(); });
+        },
+        "mixed indent uses most frequently detected indent when updating tsconfig": function (test) {
+            test.expect(1);
+            var taskTargetConfig = getConfig("minimalist");
+            taskTargetConfig.tsconfig = './test/tsconfig/mixed_indent_tsconfig.json';
+            var result = or.resolveAsync(null, taskTargetConfig, "", null, null, grunt.file.expand).then(function (result) {
+                testHelpers_1.testExpectedFile(test, './test/tsconfig/mixed_indent_tsconfig.expected.json', false);
+                test.done();
+            }).catch(function (err) { test.ifError(err); test.done(); });
+        },
+        "mixed newline uses most frequently detected newline when updating tsconfig": function (test) {
+            test.expect(1);
+            var taskTargetConfig = getConfig("minimalist");
+            taskTargetConfig.tsconfig = './test/tsconfig/mixed_newline_tsconfig.json';
+            var result = or.resolveAsync(null, taskTargetConfig, "", null, null, grunt.file.expand).then(function (result) {
+                testHelpers_1.testExpectedFile(test, './test/tsconfig/mixed_newline_tsconfig.expected.json', false);
                 test.done();
             }).catch(function (err) { test.ifError(err); test.done(); });
         },

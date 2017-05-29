@@ -116,8 +116,6 @@ function relativePathToVSProjectFolderFromGruntfile(settings) {
     return path.resolve(settings.VSProjectDetails.ProjectFileName, '..');
 }
 function applyVSSettings(options, vsSettings) {
-    // Visit this page for MSBuild documentation:
-    // https://github.com/Microsoft/TypeScript-Handbook/blob/master/pages/Compiler%20Options%20in%20MSBuild.md
     var simpleVSSettingsToGruntTSMappings = {
         'AdditionalFlags': 'additionalFlags',
         'AllowSyntheticDefaultImports': 'allowSyntheticDefaultImports',
@@ -149,7 +147,6 @@ function applyVSSettings(options, vsSettings) {
         'NoImplicitUseStrict': 'noImplicitUseStrict',
         'NoLib': 'noLib',
         'NoResolve': 'noResolve',
-        // OutFile (both out and outFile) and OutDir are resolved elsewhere
         'PreferredUILang': 'locale',
         'PreserveConstEnums': 'preserveConstEnums',
         'ReactNamespace': 'reactNamespace',

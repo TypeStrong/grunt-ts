@@ -86,7 +86,6 @@ var TypeScriptDefaults = {
 };
 exports.GruntTSDefaults = applyGruntTSDefaults(_.clone(TypeScriptDefaults));
 function applyGruntTSDefaults(options) {
-    // this function applies defaults where grunt-ts differs from TypeScript
     options.sourceMap = true;
     options.target = 'es5';
     options.htmlModuleTemplate = '<%= filename %>';
