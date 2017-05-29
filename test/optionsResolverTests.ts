@@ -7,8 +7,17 @@ import * as or from '../tasks/modules/optionsResolver';
 import * as tsconfig from '../tasks/modules/tsconfig';
 import * as utils from '../tasks/modules/utils';
 import * as _ from 'lodash';
+import { testExpectedFile } from './testHelpers';
 
 let grunt: IGrunt = require('grunt');
+
+// inline strings for newline configs
+import { crlf_newline_tsconfig_json } from './tsconfig_artifact/newlineConfigs/crlf_newline_tsconfig.json';
+import { crlf_newline_tsconfig_expected_json } from './tsconfig_artifact/newlineConfigs/crlf_newline_tsconfig.expected.json';
+import { lf_newline_tsconfig_json } from './tsconfig_artifact/newlineConfigs/lf_newline_tsconfig.json';
+import { lf_newline_tsconfig_expected_json } from './tsconfig_artifact/newlineConfigs/lf_newline_tsconfig.expected.json';
+import { mixed_newline_tsconfig_json } from './tsconfig_artifact/newlineConfigs/mixed_newline_tsconfig.json';
+import { mixed_newline_tsconfig_expected_json } from './tsconfig_artifact/newlineConfigs/mixed_newline_tsconfig.expected.json';
 
 const config : {[name: string]: IGruntTargetOptions} = {
   "minimalist": <any>{
@@ -524,6 +533,16 @@ export var tests : nodeunit.ITestGroup = {
         }
 
         try {
+          // write inline string configs to test config files
+          fs.writeFileSync('./test/tsconfig/crlf_newline_tsconfig.json', crlf_newline_tsconfig_json);
+          fs.writeFileSync('./test/tsconfig/crlf_newline_tsconfig.expected.json', crlf_newline_tsconfig_expected_json);
+
+          fs.writeFileSync('./test/tsconfig/lf_newline_tsconfig.json', lf_newline_tsconfig_json);
+          fs.writeFileSync('./test/tsconfig/lf_newline_tsconfig.expected.json', lf_newline_tsconfig_expected_json);
+
+          fs.writeFileSync('./test/tsconfig/mixed_newline_tsconfig.json', mixed_newline_tsconfig_json);
+          fs.writeFileSync('./test/tsconfig/mixed_newline_tsconfig.expected.json', mixed_newline_tsconfig_expected_json);
+
           fs.readdir('test/tsconfig_artifact', processFiles);
         } catch(ex) {
           console.log(ex);
@@ -981,6 +1000,76 @@ export var tests : nodeunit.ITestGroup = {
       test.ok(result.CompilationTasks.length > 0, "expected some compilation tasks from default tsconfig.json");
       test.strictEqual(result.errors.length, 0, "expected zero errors.");
       test.strictEqual(result.warnings.length, 0, "expected zero warnings.");
+      test.done();
+    }).catch((err) => {test.ifError(err); test.done();});
+  },
+  "four spaces indent is preserved when updating tsconfig": (test: nodeunit.Test) => {
+    test.expect(1);
+    const taskTargetConfig = getConfig("minimalist");
+    taskTargetConfig.tsconfig = './test/tsconfig/four_spaces_indent_tsconfig.json';
+
+    const result = or.resolveAsync(null, taskTargetConfig, "", null, null, grunt.file.expand).then((result: IGruntTSOptions) => {
+      testExpectedFile(test, './test/tsconfig/four_spaces_indent_tsconfig.expected.json', false);
+      test.done();
+    }).catch((err) => {test.ifError(err); test.done();});
+  },
+  "tab indent is preserved when updating tsconfig": (test: nodeunit.Test) => {
+    test.expect(1);
+    const taskTargetConfig = getConfig("minimalist");
+    taskTargetConfig.tsconfig = './test/tsconfig/tab_indent_tsconfig.json';
+
+    const result = or.resolveAsync(null, taskTargetConfig, "", null, null, grunt.file.expand).then((result: IGruntTSOptions) => {
+      testExpectedFile(test, './test/tsconfig/tab_indent_tsconfig.expected.json', false);
+      test.done();
+    }).catch((err) => {test.ifError(err); test.done();});
+  },
+  "three spaces indent is preserved when updating tsconfig": (test: nodeunit.Test) => {
+    test.expect(1);
+    const taskTargetConfig = getConfig("minimalist");
+    taskTargetConfig.tsconfig = './test/tsconfig/three_spaces_indent_tsconfig.json';
+
+    const result = or.resolveAsync(null, taskTargetConfig, "", null, null, grunt.file.expand).then((result: IGruntTSOptions) => {
+      testExpectedFile(test, './test/tsconfig/three_spaces_indent_tsconfig.expected.json', false);
+      test.done();
+    }).catch((err) => {test.ifError(err); test.done();});
+  },
+  "crlf newline is preserved when updating tsconfig": (test: nodeunit.Test) => {
+    test.expect(1);
+    const taskTargetConfig = getConfig("minimalist");
+    taskTargetConfig.tsconfig = './test/tsconfig/crlf_newline_tsconfig.json';
+
+    const result = or.resolveAsync(null, taskTargetConfig, "", null, null, grunt.file.expand).then((result: IGruntTSOptions) => {
+      testExpectedFile(test, './test/tsconfig/crlf_newline_tsconfig.expected.json', false);
+      test.done();
+    }).catch((err) => {test.ifError(err); test.done();});
+  },
+  "lf newline is preserved when updating tsconfig": (test: nodeunit.Test) => {
+    test.expect(1);
+    const taskTargetConfig = getConfig("minimalist");
+    taskTargetConfig.tsconfig = './test/tsconfig/lf_newline_tsconfig.json';
+
+    const result = or.resolveAsync(null, taskTargetConfig, "", null, null, grunt.file.expand).then((result: IGruntTSOptions) => {
+      testExpectedFile(test, './test/tsconfig/lf_newline_tsconfig.expected.json', false);
+      test.done();
+    }).catch((err) => {test.ifError(err); test.done();});
+  },
+  "mixed indent uses most frequently detected indent when updating tsconfig": (test: nodeunit.Test) => {
+    test.expect(1);
+    const taskTargetConfig = getConfig("minimalist");
+    taskTargetConfig.tsconfig = './test/tsconfig/mixed_indent_tsconfig.json';
+
+    const result = or.resolveAsync(null, taskTargetConfig, "", null, null, grunt.file.expand).then((result: IGruntTSOptions) => {
+      testExpectedFile(test, './test/tsconfig/mixed_indent_tsconfig.expected.json', false);
+      test.done();
+    }).catch((err) => {test.ifError(err); test.done();});
+  },
+  "mixed newline uses most frequently detected newline when updating tsconfig": (test: nodeunit.Test) => {
+    test.expect(1);
+    const taskTargetConfig = getConfig("minimalist");
+    taskTargetConfig.tsconfig = './test/tsconfig/mixed_newline_tsconfig.json';
+
+    const result = or.resolveAsync(null, taskTargetConfig, "", null, null, grunt.file.expand).then((result: IGruntTSOptions) => {
+      testExpectedFile(test, './test/tsconfig/mixed_newline_tsconfig.expected.json', false);
       test.done();
     }).catch((err) => {test.ifError(err); test.done();});
   },

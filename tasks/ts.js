@@ -1,10 +1,4 @@
-/// <reference path="../defs/tsd.d.ts"/>
-/// <reference path="./modules/interfaces.d.ts"/>
 'use strict';
-/*
- * grunt-ts
- * Licensed under the MIT license.
- */
 var _ = require("lodash");
 var path = require("path");
 var fs = require("fs");
@@ -20,19 +14,13 @@ var optionsResolver = require("../tasks/modules/optionsResolver");
 var asyncSeries = utils.asyncSeries, timeIt = utils.timeIt;
 var fail_event = 'grunt-ts.failure';
 var pluginFn = function (grunt) {
-    /////////////////////////////////////////////////////////////////////
-    // The grunt task
-    ////////////////////////////////////////////////////////////////////
     grunt.registerMultiTask('ts', 'Compile TypeScript files', function () {
-        // tracks which index in the task "files" property is next for processing
         var filesCompilationIndex = 0;
         var done, options;
         {
             var currentGruntTask = this;
             var resolvedFiles = currentGruntTask.files;
-            // make async
             done = currentGruntTask.async();
-            // get unprocessed templates from configuration
             var rawTaskConfig = (grunt.config.getRaw(currentGruntTask.name) || {});
             var rawTargetConfig = (grunt.config.getRaw(currentGruntTask.name + '.' + currentGruntTask.target) || {});
             optionsResolver.resolveAsync(rawTaskConfig, rawTargetConfig, currentGruntTask.target, resolvedFiles, grunt.template.process, grunt.file.expand, grunt.log.verbose.writeln).then(function (result) {
@@ -58,9 +46,7 @@ var pluginFn = function (grunt) {
         }
         function proceed() {
             var srcFromVS_RelativePathsFromGruntFile = [];
-            // Run compiler
             asyncSeries(options.CompilationTasks, function (currentFiles) {
-                // Create a reference file?
                 var reference = processIndividualTemplate(options.reference);
                 var referenceFile;
                 var referencePath;
@@ -71,7 +57,6 @@ var pluginFn = function (grunt) {
                 function isReferenceFile(filename) {
                     return path.resolve(filename) === referenceFile;
                 }
-                // Create an output file?
                 var outFile = currentFiles.out;
                 var outFile_d_ts;
                 if (!!outFile) {
@@ -81,36 +66,25 @@ var pluginFn = function (grunt) {
                 function isOutFile(filename) {
                     return path.resolve(filename) === outFile_d_ts;
                 }
-                // see https://github.com/grunt-ts/grunt-ts/issues/77
                 function isBaseDirFile(filename, targetFiles) {
                     var baseDirFile = '.baseDir.ts';
                     var bd = options.baseDir || utils.findCommonPath(targetFiles, '/');
                     return path.resolve(filename) === path.resolve(path.join(bd, baseDirFile));
                 }
-                // Create an amd loader?
                 var amdloader = options.amdloader;
                 var amdloaderFile, amdloaderPath;
                 if (!!amdloader) {
                     amdloaderFile = path.resolve(amdloader);
                     amdloaderPath = path.dirname(amdloaderFile);
                 }
-                // Compiles all the files
-                // Uses the blind tsc compile task
-                // logs errors
                 function runCompilation(options, compilationInfo) {
                     grunt.log.writeln('Compiling...'.yellow);
-                    // Time the compiler process
                     var starttime = new Date().getTime();
                     var endtime;
-                    // Compile the files
                     return compileModule.compileAllFiles(options, compilationInfo)
                         .then(function (result) {
-                        // End the timer
                         endtime = new Date().getTime();
                         grunt.log.writeln('');
-                        // Analyze the results of our tsc execution,
-                        //   then tell the user our analysis results
-                        //   and mark the build as fail or success
                         if (!result) {
                             grunt.log.error('Error: No result from tsc.'.red);
                             return false;
@@ -119,17 +93,7 @@ var pluginFn = function (grunt) {
                             grunt.log.error('Error: Node was unable to run tsc.  Possibly it could not be found?'.red);
                             return false;
                         }
-                        // In TypeScript 1.3 and above, the result code corresponds to the ExitCode enum in
-                        //   TypeScript/src/compiler/sys.ts
                         var isError = (result.code !== 0);
-                        // If the compilation errors contain only type errors, JS files are still
-                        //   generated. If tsc finds type errors, it will return an error code, even
-                        //   if JS files are generated. We should check this for this,
-                        //   only type errors, and call this a successful compilation.
-                        // Assumptions:
-                        //   Level 1 errors = syntax errors - prevent JS emit.
-                        //   Level 2 errors = semantic errors - *not* prevents JS emit.
-                        //   Level 5 errors = compiler flag misuse - prevents JS emit.
                         var level1ErrorCount = 0, level5ErrorCount = 0, nonEmitPreventingWarningCount = 0;
                         var hasTS7017Error = false;
                         var hasPreventEmitErrors = _.reduce(result.output.split('\n'), function (memo, errorMsg) {
@@ -150,15 +114,12 @@ var pluginFn = function (grunt) {
                             }
                             return memo || isPreventEmitError;
                         }, false) || false;
-                        // Because we can't think of a better way to determine it,
-                        //   assume that emitted JS in spite of error codes implies type-only errors.
                         var isOnlyTypeErrors = !hasPreventEmitErrors;
                         if (hasTS7017Error) {
                             grunt.log.writeln(('Note:  You may wish to enable the suppressImplicitAnyIndexErrors' +
                                 ' grunt-ts option to allow dynamic property access by index.  This will' +
                                 ' suppress TypeScript error TS7017.').magenta);
                         }
-                        // Log error summary
                         if (level1ErrorCount + level5ErrorCount + nonEmitPreventingWarningCount > 0) {
                             if ((level1ErrorCount + level5ErrorCount > 0) || options.failOnTypeErrors) {
                                 grunt.log.write(('>> ').red);
@@ -185,12 +146,9 @@ var pluginFn = function (grunt) {
                                 grunt.log.writeln('Type errors only.');
                             }
                         }
-                        // !!! To do: To really be confident that the build was actually successful,
-                        //   we have to check timestamps of the generated files in the destination.
                         var isSuccessfulBuild = (!isError ||
                             (isError && isOnlyTypeErrors && !options.failOnTypeErrors));
                         if (isSuccessfulBuild) {
-                            // Report successful build.
                             var time = (endtime - starttime) / 1000;
                             grunt.log.writeln('');
                             var message = 'TypeScript compilation complete: ' + time.toFixed(2) + 's';
@@ -203,7 +161,6 @@ var pluginFn = function (grunt) {
                             grunt.log.writeln(message.green);
                         }
                         else {
-                            // Report unsuccessful build.
                             grunt.log.error(('Error: tsc return code: ' + result.code).yellow);
                         }
                         return isSuccessfulBuild;
@@ -215,8 +172,6 @@ var pluginFn = function (grunt) {
                         return false;
                     });
                 }
-                // Find out which files to compile, codegen etc.
-                // Then calls the appropriate functions + compile function on those files
                 function filterFilesTransformAndCompile() {
                     var filesToCompile = [];
                     if (currentFiles.src || options.vs) {
@@ -234,14 +189,10 @@ var pluginFn = function (grunt) {
                     else {
                         filesCompilationIndex += 1;
                     }
-                    // ignore directories, and clear the files of output.d.ts and baseDirFile
                     filesToCompile = filesToCompile.filter(function (file) {
                         var stats = fs.lstatSync(file);
                         return !stats.isDirectory() && !isOutFile(file) && !isBaseDirFile(file, filesToCompile);
                     });
-                    ///// Html files:
-                    // Note:
-                    //    compile html files must be before reference file creation
                     var generatedFiles = [];
                     if (options.html) {
                         var html2tsOptions_1 = {
@@ -261,23 +212,17 @@ var pluginFn = function (grunt) {
                             }
                         });
                     }
-                    ///// Template cache
-                    // Note: The template cache files do not go into generated files.
-                    // Note: You are free to generate a `ts OR js` file for template cache, both should just work
                     if (options.templateCache) {
                         if (!options.templateCache.src || !options.templateCache.dest || !options.templateCache.baseUrl) {
                             grunt.log.writeln('templateCache : src, dest, baseUrl must be specified if templateCache option is used'.red);
                         }
                         else {
-                            var templateCacheSrc = grunt.file.expand(options.templateCache.src); // manual reinterpolation
+                            var templateCacheSrc = grunt.file.expand(options.templateCache.src);
                             var templateCacheDest = path.resolve(options.templateCache.dest);
                             var templateCacheBasePath = path.resolve(options.templateCache.baseUrl);
                             templateCacheModule.generateTemplateCache(templateCacheSrc, templateCacheDest, templateCacheBasePath, (options.newLine || utils.eol));
                         }
                     }
-                    ///// Reference File
-                    // Generate the reference file
-                    // Create a reference file if specified
                     if (!!referencePath) {
                         var result = timeIt(function () {
                             return referenceModule.updateReferenceFile(filesToCompile.filter(function (f) { return !isReferenceFile(f); }), generatedFiles, referenceFile, referencePath, (options.newLine || utils.eol));
@@ -286,16 +231,12 @@ var pluginFn = function (grunt) {
                             grunt.log.writeln(('Updated reference file (' + result.time + 'ms).').green);
                         }
                     }
-                    ///// AMD loader
-                    // Create the amdLoader if specified
                     if (!!amdloaderPath) {
                         var referenceOrder = amdLoaderModule.getReferencesInOrder(referenceFile, referencePath, generatedFiles);
                         amdLoaderModule.updateAmdLoader(referenceFile, referenceOrder, amdloaderFile, amdloaderPath, currentFiles.outDir);
                     }
-                    // Transform files as needed. Currently all of this logic in is one module
-                    transformers.transformFiles(filesToCompile /*TODO: only unchanged files*/, filesToCompile, options);
+                    transformers.transformFiles(filesToCompile, filesToCompile, options);
                     currentFiles.src = filesToCompile;
-                    // Return promise to compliation
                     if (utils.shouldCompile(options)) {
                         if (filesToCompile.length > 0 || options.testExecute || utils.shouldPassThrough(options)) {
                             return runCompilation(options, currentFiles).then(function (success) {
@@ -303,7 +244,6 @@ var pluginFn = function (grunt) {
                             });
                         }
                         else {
-                            // Nothing to do
                             grunt.log.writeln('No files to compile'.red);
                             return es6_promise_1.Promise.resolve(true);
                         }
@@ -312,61 +252,42 @@ var pluginFn = function (grunt) {
                         return es6_promise_1.Promise.resolve(true);
                     }
                 }
-                // Time (in ms) when last compile took place
                 var lastCompile = 0;
-                // Watch a folder?
                 if (!!options.watch) {
-                    // get path(s)
                     var watchpath = grunt.file.expand([options.watch]);
-                    // create a file watcher for path
                     var chokidar = require('chokidar');
                     var watcher = chokidar.watch(watchpath, { ignoreInitial: true, persistent: true });
-                    // Log what we are doing
                     grunt.log.writeln(('Watching all TypeScript / Html files under : ' + watchpath).cyan);
-                    // A file has been added/changed/deleted has occurred
                     watcher
                         .on('add', function (path) {
                         handleFileEvent(path, '+++ added   ');
-                        // Reset the time for last compile call
                         lastCompile = new Date().getTime();
                     })
                         .on('change', function (path) {
                         handleFileEvent(path, '### changed ');
-                        // Reset the time for last compile call
                         lastCompile = new Date().getTime();
                     })
                         .on('unlink', function (path) {
                         handleFileEvent(path, '--- removed ');
-                        // Reset the time for last compile call
                         lastCompile = new Date().getTime();
                     })
                         .on('error', function (error) {
                         console.error('Error happened in chokidar: ', error);
                     });
                 }
-                // Reset the time for last compile call
                 lastCompile = new Date().getTime();
-                // Run initial compile
                 return filterFilesTransformAndCompile();
-                // local event to handle file event
                 function handleFileEvent(filepath, displaystr) {
                     var acceptedExtentions = ['.ts', '.tsx', '.js', '.jsx', '.html'];
                     acceptedExtentions.forEach(function (extension) {
-                        // If extension is accepted and was not just run
                         if (utils.endsWith(filepath.toLowerCase(), extension) && (new Date().getTime() - lastCompile) > 100) {
-                            // Log and run the debounced version.
                             grunt.log.writeln((displaystr + ' >>' + filepath).yellow);
                             filterFilesTransformAndCompile();
                             return;
                         }
-                        // Uncomment for debugging which files were ignored
-                        // else if ((new Date().getTime() - lastCompile) <= 100){
-                        // grunt.log.writeln((' ///'  + ' >>' + filepath).grey);
-                        // }
                     });
                 }
             }).then(function (res) {
-                // Ignore res? (either logs or throws)
                 if (!options.watch) {
                     if (res.some(function (success) {
                         return !success;

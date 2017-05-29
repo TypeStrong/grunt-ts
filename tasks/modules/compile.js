@@ -1,5 +1,3 @@
-/// <reference path="../../defs/tsd.d.ts"/>
-/// <reference path="./interfaces.d.ts"/>
 'use strict';
 Object.defineProperty(exports, "__esModule", { value: true });
 var path = require("path");
@@ -10,9 +8,6 @@ var cache = require("./cacheUtils");
 var semver = require("semver");
 var es6_promise_1 = require("es6-promise");
 exports.grunt = require('grunt');
-///////////////////////////
-// Helper
-///////////////////////////
 var executeNode;
 var executeNodeDefault = function (args, optionalInfo) {
     return new es6_promise_1.Promise(function (resolve, reject) {
@@ -22,17 +17,12 @@ var executeNodeDefault = function (args, optionalInfo) {
         }, function (error, result, code) {
             var ret = {
                 code: code,
-                // New TypeScript compiler uses stdout for user code errors. Old one used stderr.
                 output: result.stdout || result.stderr
             };
             resolve(ret);
         });
     });
 };
-/////////////////////////////////////////////////////////////////
-// Fast Compilation
-/////////////////////////////////////////////////////////////////
-// Map to store if the cache was cleared after the gruntfile was parsed
 var cacheClearedOnce = {};
 function getChangedFiles(files, targetName, verbose) {
     files = cache.getNewFilesForTarget(files, targetName);
@@ -50,15 +40,11 @@ function clearCache(targetName) {
     cache.clearCache(targetName);
     cacheClearedOnce[targetName] = true;
 }
-/////////////////////////////////////////////////////////////////////
-// tsc handling
-////////////////////////////////////////////////////////////////////
 function resolveTypeScriptBinPath() {
     var ownRoot = path.resolve(path.dirname(module.filename), '../..');
     var userRoot = path.resolve(ownRoot, '..', '..');
     var binSub = path.join('node_modules', 'typescript', 'bin');
     if (fs.existsSync(path.join(userRoot, binSub))) {
-        // Using project override
         return path.join(userRoot, binSub);
     }
     return path.join(ownRoot, binSub);
@@ -73,13 +59,10 @@ function compileResultMeansFastCacheShouldBeRefreshed(options, result) {
 exports.compileResultMeansFastCacheShouldBeRefreshed = compileResultMeansFastCacheShouldBeRefreshed;
 function compileAllFiles(options, compilationInfo) {
     var targetFiles = compilationInfo.src;
-    // Make a local copy so we can modify files without having external side effects
     var files = _.map(targetFiles, function (file) { return file; });
     var newFiles = files;
     if (options.fast === 'watch') {
-        // if this is the first time its running after this file was loaded
         if (cacheClearedOnce[exports.grunt.task.current.target] === undefined) {
-            // Then clear the cache for this target
             clearCache(options.targetName);
         }
     }
@@ -91,7 +74,6 @@ function compileAllFiles(options, compilationInfo) {
             newFiles = getChangedFiles(files, options.targetName, options.verbose);
             if (newFiles.length !== 0 || options.testExecute || utils.shouldPassThrough(options)) {
                 files = newFiles;
-                // If outDir is specified but no baseDir is specified we need to determine one
                 if (compilationInfo.outDir && !options.baseDir) {
                     options.baseDir = utils.findCommonPath(files, '/');
                 }
@@ -112,20 +94,16 @@ function compileAllFiles(options, compilationInfo) {
     var tsconfig = options.tsconfig;
     var tsc, tscVersion = '';
     if (options.compiler) {
-        // Custom compiler (task.compiler)
         exports.grunt.log.writeln('Using the custom compiler : ' + options.compiler);
         tsc = options.compiler;
         tscVersion = '';
     }
     else {
-        // the bundled OR npm module based compiler
         var tscPath = resolveTypeScriptBinPath();
         tsc = getTsc(tscPath);
         tscVersion = getTscVersion(tscPath);
         exports.grunt.log.writeln('Using tsc v' + tscVersion);
     }
-    // If baseDir is specified create a temp tsc file to make sure that `--outDir` works fine
-    // see https://github.com/grunt-ts/grunt-ts/issues/77
     if (compilationInfo.outDir && options.baseDir && files.length > 0 && !options.rootDir) {
         var baseDirFile = '.baseDir.ts', baseDirFilePath = path.join(options.baseDir, baseDirFile), settingsSource = !!tsconfig ? 'tsconfig.json' : 'Gruntfile ts `options`', settingsSection = !!tsconfig ? 'in the `compilerOptions` section' : 'under the task or ' +
             'target `options` object';
@@ -146,13 +124,10 @@ function compileAllFiles(options, compilationInfo) {
         }
         files.push(baseDirFilePath);
     }
-    // If reference and out are both specified.
-    // Then only compile the updated reference file as that contains the correct order
     if (options.reference && compilationInfo.out) {
         var referenceFile = path.resolve(options.reference);
         files = [referenceFile];
     }
-    // Quote the files to compile. Needed for command line parsing by tsc
     files = _.map(files, function (item) { return utils.possiblyQuotedRelativePath(item); });
     var args = files.slice(0);
     exports.grunt.log.verbose.writeln("TypeScript path: " + tsc);
@@ -367,9 +342,6 @@ function compileAllFiles(options, compilationInfo) {
             args.push('--outDir', compilationInfo.outDir);
         }
         if (compilationInfo.out) {
-            // We only pass --out instead of --outFile for backward-compatability reasons.
-            // It is the same for purposes of the command-line (the subtle difference is handled in the tsconfig code
-            //  and the value of --outFile is copied to --out).
             args.push('--out', compilationInfo.out);
         }
         if (compilationInfo.dest && (!compilationInfo.out) && (!compilationInfo.outDir)) {
@@ -384,7 +356,6 @@ function compileAllFiles(options, compilationInfo) {
                 }
                 if (Array.isArray(compilationInfo.dest)) {
                     if (compilationInfo.dest.length === 0) {
-                        // ignore it and do nothing.
                     }
                     else if (compilationInfo.dest.length > 0) {
                         console.warn((('WARNING: "dest" for target "' + options.targetName + '" is an array.  This is not supported by the' +
@@ -401,11 +372,9 @@ function compileAllFiles(options, compilationInfo) {
         }
         if (args.indexOf('--out') > -1 && args.indexOf('--module') > -1) {
             if (tscVersion === '' && options.compiler) {
-                // don't warn if they are using a custom compiler.
             }
             else if (semver.satisfies(tscVersion, '>=1.8.0')) {
                 if ((options.module === 'system' || options.module === 'amd')) {
-                    // this is fine.
                 }
                 else {
                     console.warn(('WARNING: TypeScript 1.8+ requires "module" to be set to' +
@@ -428,27 +397,22 @@ function compileAllFiles(options, compilationInfo) {
     if (options.additionalFlags) {
         args.push(options.additionalFlags);
     }
-    /** Reads the tsc version from the package.json of the relevant TypeScript install */
     function getTscVersion(tscPath) {
         var pkg = JSON.parse(fs.readFileSync(path.resolve(tscPath, '..', 'package.json')).toString());
         return '' + pkg.version;
     }
-    // To debug the tsc command
     if (options.verbose) {
         console.log(args.join(' ').yellow);
     }
     else {
         exports.grunt.log.verbose.writeln(args.join(' ').yellow);
     }
-    // Create a temp last command file and use that to guide tsc.
-    // Reason: passing all the files on the command line causes TSC to go in an infinite loop.
     var tempfilename = utils.getTempFile('tscommand');
     if (!tempfilename) {
         throw (new Error('cannot create temp file'));
     }
     fs.writeFileSync(tempfilename, args.join(' '));
     var command;
-    // Switch implementation if a test version of executeNode exists.
     if ('testExecute' in options) {
         if (_.isFunction(options.testExecute)) {
             command = [tsc, args.join(' ')];
@@ -461,11 +425,9 @@ function compileAllFiles(options, compilationInfo) {
         }
     }
     else {
-        // this is the normal path.
         command = [tsc, '@' + tempfilename];
         executeNode = executeNodeDefault;
     }
-    // Execute command
     return executeNode(command, options).then(function (result) {
         if (compileResultMeansFastCacheShouldBeRefreshed(options, result)) {
             resetChangedFiles(newFiles, options.targetName);

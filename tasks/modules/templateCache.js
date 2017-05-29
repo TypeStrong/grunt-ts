@@ -1,19 +1,13 @@
 "use strict";
-/// <reference path="../../defs/tsd.d.ts"/>
 Object.defineProperty(exports, "__esModule", { value: true });
 var _ = require("lodash");
 var fs = require("fs");
 var path = require("path");
 var utils = require("./utils");
-/////////////////////////////////////////////////////////////////////
-// AngularJS templateCache
-////////////////////////////////////////////////////////////////////
-// templateCache processing function
 function generateTemplateCache(src, dest, basePath, eol) {
     if (!src.length) {
         return;
     }
-    // Resolve the relative path from basePath to each src file
     var relativePaths = _.map(src, function (anHtmlFile) { return 'text!' + utils.makeRelativePath(basePath, anHtmlFile); });
     var fileNames = _.map(src, function (anHtmlFile) { return path.basename(anHtmlFile); });
     var fileVarialbeName = function (anHtmlFile) { return anHtmlFile.split('.').join('_').split('-').join('_'); };
@@ -36,14 +30,12 @@ function generateTemplateCache(src, dest, basePath, eol) {
         fileNameVariableSection: fileNameVariableSection,
         templateCachePut: templateCachePut
     });
-    // Early exit if new templateCache doesn't change
     if (fs.existsSync(dest)) {
         var originalContents = fs.readFileSync(dest).toString();
         if (originalContents === fileContent) {
             return;
         }
     }
-    // write updated contents
     fs.writeFileSync(dest, fileContent);
 }
 exports.generateTemplateCache = generateTemplateCache;
