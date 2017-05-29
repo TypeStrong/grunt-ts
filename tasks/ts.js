@@ -330,12 +330,12 @@ var pluginFn = function (grunt) {
                     // A file has been added/changed/deleted has occurred
                     watcher
                         .on('add', function (path) {
-                        handleFileEvent(path, '+++ added   ', true);
+                        handleFileEvent(path, '+++ added   ');
                         // Reset the time for last compile call
                         lastCompile = new Date().getTime();
                     })
                         .on('change', function (path) {
-                        handleFileEvent(path, '### changed ', true);
+                        handleFileEvent(path, '### changed ');
                         // Reset the time for last compile call
                         lastCompile = new Date().getTime();
                     })
@@ -353,22 +353,21 @@ var pluginFn = function (grunt) {
                 // Run initial compile
                 return filterFilesTransformAndCompile();
                 // local event to handle file event
-                function handleFileEvent(filepath, displaystr, addedOrChanged) {
-                    if (addedOrChanged === void 0) { addedOrChanged = false; }
-                    // Only ts and html :
-                    if (!utils.endsWith(filepath.toLowerCase(), '.ts') && !utils.endsWith(filepath.toLowerCase(), '.html')) {
-                        return;
-                    }
-                    // Do not run if just ran, behaviour same as grunt-watch
-                    // These are the files our run modified
-                    if ((new Date().getTime() - lastCompile) <= 100) {
+                function handleFileEvent(filepath, displaystr) {
+                    var acceptedExtentions = ['.ts', '.tsx', '.js', '.jsx', '.html'];
+                    acceptedExtentions.forEach(function (extension) {
+                        // If extension is accepted and was not just run
+                        if (utils.endsWith(filepath.toLowerCase(), extension) && (new Date().getTime() - lastCompile) > 100) {
+                            // Log and run the debounced version.
+                            grunt.log.writeln((displaystr + ' >>' + filepath).yellow);
+                            filterFilesTransformAndCompile();
+                            return;
+                        }
                         // Uncomment for debugging which files were ignored
+                        // else if ((new Date().getTime() - lastCompile) <= 100){
                         // grunt.log.writeln((' ///'  + ' >>' + filepath).grey);
-                        return;
-                    }
-                    // Log and run the debounced version.
-                    grunt.log.writeln((displaystr + ' >>' + filepath).yellow);
-                    filterFilesTransformAndCompile();
+                        // }
+                    });
                 }
             }).then(function (res) {
                 // Ignore res? (either logs or throws)

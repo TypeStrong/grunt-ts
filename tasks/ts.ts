@@ -403,12 +403,12 @@ const pluginFn = function (grunt: IGrunt) {
                     // A file has been added/changed/deleted has occurred
                     watcher
                         .on('add', function (path) {
-                        handleFileEvent(path, '+++ added   ', true);
+                        handleFileEvent(path, '+++ added   ');
                         // Reset the time for last compile call
                         lastCompile = new Date().getTime();
                     })
                         .on('change', function (path) {
-                        handleFileEvent(path, '### changed ', true);
+                        handleFileEvent(path, '### changed ');
                         // Reset the time for last compile call
                         lastCompile = new Date().getTime();
                     })
@@ -429,7 +429,7 @@ const pluginFn = function (grunt: IGrunt) {
                 return filterFilesTransformAndCompile();
 
                 // local event to handle file event
-                function handleFileEvent(filepath: string, displaystr: string, addedOrChanged: boolean = false) {
+                function handleFileEvent(filepath: string, displaystr: string) {
 
                     const acceptedExtentions = ['.ts', '.tsx', '.js', '.jsx', '.html'];
 
@@ -437,7 +437,7 @@ const pluginFn = function (grunt: IGrunt) {
                         (extension) => {
 
                             // If extension is accepted and was not just run
-                            if (utils.endsWith(filepath.toLowerCase(), extension) && (new Date().getTime() - lastCompile) > 100){
+                            if (utils.endsWith(filepath.toLowerCase(), extension) && (new Date().getTime() - lastCompile) > 100) {
 
                                 // Log and run the debounced version.
                                 grunt.log.writeln((displaystr + ' >>' + filepath).yellow);
