@@ -654,7 +654,7 @@ exports.test_baseDirSpecified = baseDirCheck(true);
 exports.test_baseDirNotSpecified = baseDirCheck(false);
 function baseDirCheck(shouldBaseDirBeIncluded) {
     return function (strings, options) {
-        return new Promise(function (resolve, reject) {
+        return new es6_promise_1.Promise(function (resolve, reject) {
             var command = strings[1].replace(/\\/g, '/');
             var isBaseDirFileNameIncluded = (command.indexOf(BASE_DIR_FILE_NAME) !== -1);
             if (isBaseDirFileNameIncluded === shouldBaseDirBeIncluded) {
