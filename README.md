@@ -130,7 +130,7 @@ For file ordering, look at [JavaScript Generation](#javascript-generation).
 |[allowUnreachableCode](#allowunreachablecode)|option|`true`, `false` (default) - Do not report errors on unreachable code.|
 |[allowUnusedLabels](#allowunusedlabels)|option|`true`, `false` (default) - Do not report errors on unused labels.|
 |[allowSyntheticDefaultImports](#allowsyntheticdefaultimports)|option|`true`, `false` (default) - Allows use "default" ES6 module import syntax with pre-ES6 libraries that don't have a default (on by default with SystemJS and not required to specify).|
-|[baseDir](#basedir)|option|`string` - Sets root directory for maintaining source structure when using outDir and fast together. Use `rootDir` for newer versions of TypeScript.|
+|[baseDir](#basedir)|option|`string` - Deprecated - use [rootDir](#rootdir) with TypeScript 1.5 or newer.  Sets root directory for maintaining source structure when using outDir and fast together.|
 |[comments](#comments)|option|`true`, `false` (default) - include comments in emitted JS.|
 |[compile](#compile)|option|`true` (default), `false` - compile TypeScript code.|
 |[compiler](#compiler)|option|`string` - path to custom compiler|
@@ -522,7 +522,7 @@ grunt.initConfig({
 
 #### baseDir
 
-When using TypeScript >= 1.5 (most common), use [rootDir](#rootDir) instead.
+Deprecated - when using TypeScript >= 1.5 (most common), use [rootDir](#rootDir) instead.
 
 When using fast compile with outDir, tsc won't guarantee the output directory structure will match the source structure. Setting baseDir helps to ensure the original source structure is mapped to the output directory. This will create a .baseDir.ts file in the baseDir location. A .baseDir.js and .baseDir.js.map will be created in the outDir.
 

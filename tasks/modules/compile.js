@@ -109,31 +109,8 @@ function compileAllFiles(options, compilationInfo) {
             }
         }
     }
-    // If baseDir is specified create a temp tsc file to make sure that `--outDir` works fine
-    // see https://github.com/grunt-ts/grunt-ts/issues/77
-    if (compilationInfo.outDir && options.baseDir && files.length > 0 && !options.rootDir) {
-        var baseDirFile = '.baseDir.ts', baseDirFilePath = path.join(options.baseDir, baseDirFile);
-        if (!fs.existsSync(baseDirFilePath)) {
-            var baseDir_Message = "// grunt-ts creates this file to help TypeScript find " +
-                "the compilation root of your project.  If you wish to get to stop creating " +
-                "it, specify a `rootDir` setting in your Gruntfile or tsconfig.  See " +
-                "https://github.com/TypeStrong/grunt-ts#rootdir for details.  Note that " +
-                "`rootDir` goes under `options`, and is case-sensitive.  This message " +
-                "was revised in grunt-ts v6.";
-            exports.grunt.file.write(baseDirFilePath, baseDir_Message);
-        }
-        files.push(baseDirFilePath);
-    }
-    // If reference and out are both specified.
-    // Then only compile the updated reference file as that contains the correct order
-    if (options.reference && compilationInfo.out) {
-        var referenceFile = path.resolve(options.reference);
-        files = [referenceFile];
-    }
-    // Quote the files to compile. Needed for command line parsing by tsc
-    files = _.map(files, function (item) { return utils.possiblyQuotedRelativePath(item); });
-    var args = files.slice(0), tsc, tscVersion = '';
     var tsconfig = options.tsconfig;
+    var tsc, tscVersion = '';
     if (options.compiler) {
         // Custom compiler (task.compiler)
         exports.grunt.log.writeln('Using the custom compiler : ' + options.compiler);
@@ -147,6 +124,37 @@ function compileAllFiles(options, compilationInfo) {
         tscVersion = getTscVersion(tscPath);
         exports.grunt.log.writeln('Using tsc v' + tscVersion);
     }
+    // If baseDir is specified create a temp tsc file to make sure that `--outDir` works fine
+    // see https://github.com/grunt-ts/grunt-ts/issues/77
+    if (compilationInfo.outDir && options.baseDir && files.length > 0 && !options.rootDir) {
+        var baseDirFile = '.baseDir.ts', baseDirFilePath = path.join(options.baseDir, baseDirFile), settingsSource = !!tsconfig ? 'tsconfig.json' : 'Gruntfile ts `options`', settingsSection = !!tsconfig ? 'in the `compilerOptions` section' : 'under the task or ' +
+            'target `options` object';
+        if (!fs.existsSync(baseDirFilePath)) {
+            var baseDir_Message = "// grunt-ts creates this file to help TypeScript find " +
+                "the compilation root of your project.  If you wish to get to stop creating " +
+                ("it, specify a `rootDir` setting in the " + settingsSource + ".  See ") +
+                "https://github.com/TypeStrong/grunt-ts#rootdir for details.  Note that " +
+                "`rootDir` goes under `options`, and is case-sensitive.  This message " +
+                "was revised in grunt-ts v6.  Note that `rootDir` requires TypeScript 1.5 " +
+                " or higher.";
+            exports.grunt.file.write(baseDirFilePath, baseDir_Message);
+        }
+        if (tscVersion && semver.satisfies(tscVersion, '>=1.5.0')) {
+            exports.grunt.log.warn(("Warning: created " + baseDirFilePath + " file because `outDir` was " +
+                ("specified in the " + settingsSource + ", but not `rootDir`.  Add `rootDir` ") +
+                (" " + settingsSection + " to fix this warning.")).magenta);
+        }
+        files.push(baseDirFilePath);
+    }
+    // If reference and out are both specified.
+    // Then only compile the updated reference file as that contains the correct order
+    if (options.reference && compilationInfo.out) {
+        var referenceFile = path.resolve(options.reference);
+        files = [referenceFile];
+    }
+    // Quote the files to compile. Needed for command line parsing by tsc
+    files = _.map(files, function (item) { return utils.possiblyQuotedRelativePath(item); });
+    var args = files.slice(0);
     exports.grunt.log.verbose.writeln("TypeScript path: " + tsc);
     if (tsconfig && tsconfig.passThrough) {
         args.push('--project', tsconfig.tsconfig);
