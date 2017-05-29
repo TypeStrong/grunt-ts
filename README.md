@@ -7,7 +7,7 @@
 Grunt-ts is an npm package that handles TypeScript compilation work in GruntJS build scripts.  It provides a [Grunt-compatible wrapper](#support-for-tsc-switches) for the `tsc` command-line compiler, and provides some [additional functionality](#grunt-ts-gruntfilejs-options) that improves the TypeScript development workflow. Grunt-ts supports compiling against [tsconfig.json](#tsconfig) or even a [Visual Studio project](#vs) directly.  Grunt-ts is itself written in [TypeScript](./tasks/ts.ts).
 
 ### Latest Changes
-Latest beta release is `6.0.0-beta.14` which is compatible with TypeScript 2.2.
+Latest beta release is `6.0.0-beta.16` which is compatible with TypeScript 2.2, and any future version of TypeScript by using [tsconfig.json passthrough](#passthrough) or [additionalFlags](#additionalflags).
 Latest stable release is `5.5.1` with built-in support for features added in TypeScript 1.8.  [Full changelog is here](CHANGELOG.md).
 
 ### How To Contribute
@@ -1580,7 +1580,7 @@ This provides the most control over how grunt-ts integrates with `tsconfig.json`
   * `ignoreSettings`: `boolean` (optional) - default is `false`.  If true, will ignore `compilerOptions` section in `tsconfig.json` (will only use settings from `Gruntfile.js` or grunt-ts defaults)
   * `overwriteFilesGlob`: `boolean` (optional) - default is `false`.  If true, will overwrite the contents of the `filesGlob` array with the contents of the `src` glob from grunt-ts.  This option is not supported if `include` is specified in the `tsconfig.json` file.
   * `updateFiles`: `boolean` (optional) - If `include` in the tsconfig.json file is not specified and there is a `filesGlob` present, default is `true`, otherwise false.  Will modify the `files` array in `tsconfig.json` to match the result of evaluating a `filesGlob` that is present **inside** `tsconfig.json` (the `files` element will **not** be updated with the results from any glob inside `Gruntfile.js` unless `overwriteFilesGlob` is also `true`).
-  * `passThrough`: `boolean` (optional) - default is `false`.  If `passThrough` is `true`, grunt-ts will run TypeScript (`tsc`) with the specified tsconfig folder, passing the `--project` option only (and anything in `additionalFlags`).  This provides support for custom compilers with custom implementations of `tsconfig.json` support.  Note: Since this entirely depends on support from `tsc`, the `tsconfig` option must be a directory (not a file) as of TypeScript 1.6.
+  * `passThrough`: `boolean` (optional) - default is `false`.  <a href="#passthrough" />If `passThrough` is `true`, grunt-ts will run TypeScript (`tsc`) with the specified tsconfig folder, passing the `--project` option only (and anything in `additionalFlags`).  This provides support for custom compilers with custom implementations of `tsconfig.json` support.  Note: Since this entirely depends on support from `tsc`, the `tsconfig` option must be a directory (not a file) as of TypeScript 1.6.
 
 
 ```js
