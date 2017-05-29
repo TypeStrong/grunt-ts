@@ -1,5 +1,5 @@
-/// <reference path="../../defs/tsd.d.ts"/>
 "use strict";
+/// <reference path="../../defs/tsd.d.ts"/>
 Object.defineProperty(exports, "__esModule", { value: true });
 var _ = require("lodash");
 var path = require("path");

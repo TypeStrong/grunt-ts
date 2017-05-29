@@ -1,5 +1,5 @@
-/// <reference path="../../defs/tsd.d.ts"/>
 "use strict";
+/// <reference path="../../defs/tsd.d.ts"/>
 Object.defineProperty(exports, "__esModule", { value: true });
 // Source based on : https://github.com/tschaub/grunt-newer/blob/master/lib/util.js
 var fs = require("fs");

@@ -1,5 +1,5 @@
-/// <reference path="../defs/tsd.d.ts" />
 "use strict";
+/// <reference path="../defs/tsd.d.ts" />
 Object.defineProperty(exports, "__esModule", { value: true });
 var grunt = require('grunt');
 var utils = require("../tasks/modules/utils");

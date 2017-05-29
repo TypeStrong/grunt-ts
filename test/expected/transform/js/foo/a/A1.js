@@ -1,6 +1,6 @@
+"use strict";
 ///ts:ref=A2
 /// <reference path="./A2.ts"/> ///ts:ref:generated
-"use strict";
 var A1 = (function () {
     function A1() {
     }
