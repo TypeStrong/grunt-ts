@@ -1,6 +1,7 @@
 # Releases
 
 ## vNext
+* FIX: Now accepts more watchable file extensions.  Thanks for the PR, first time contributor, [@LibanHassan](https://github.com/LibanHassan) (#404) (Issue not found!!! - not after Liban fixed it...)
 
 ## v6.0.0-beta.15
 * TODO: Update getting started documentation for TypeScript 2.0+ and npm 3+.
