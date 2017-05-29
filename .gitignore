@@ -23,9 +23,8 @@ test/definitelytypedtest/reference.ts
 !tasks/ts-internal.js
 !test/expected/**/*.js
 !test/expected/**/*.map
-!test/commandLineAssertions.js
-!test/optionsResolverTests.js
-!test/compilerTests.js
+!test/tsconfig_artifact/newlineConfigs/*.js
+!test/*.js
 .tscache/
 !test/tsconfig/*.json
 bin/
