@@ -1,8 +1,12 @@
 # Releases
 
 ## vNext
-* FIX: Now accepts more watchable file extensions.  Thanks for the PR, first time contributor, [@LibanHassan](https://github.com/LibanHassan) (#404) (Issue not found!!! - not after Liban fixed it...)
+* FIX: Now accepts more watchable file extensions.  Thanks for the PR, first time contributor, [@LibanHassan](https://github.com/LibanHassan) (#404) Issue not found? Not after Liban fixed it, anyway :-)
 * FIX: When using `baseDir` task option, will no longer include `.baseDir.ts` file in the compilation context.  Thanks for the PR, first time contributor [@nobuoka](https://github.com/nobuoka) (#380).  Sorry it took so long to review this PR!!!
+* FIX: When using `rootDir` with `outDir`, will no longer create a `.baseDir.ts` file.  (Requires TypeScript 1.5 or higher).
+* FIX: When using `outDir` without `rootDir`, will issue a warning.  (If using TypeScript 1.5 or higher).
+* DOCS: Indicated that `baseDir` is now deprecated.  Use `rootDir` instead, and upgrade to TypeScript 1.5 or higher already, geez... ;-)
+* FEAT: Now respects existing tsconfig.json line endings and indentation when updating.  Thanks for the PR, first time contributor, [RyanThomas73](https://github.com/RyanThomas73)
 
 ## v6.0.0-beta.15
 * TODO: Update getting started documentation for TypeScript 2.0+ and npm 3+.
