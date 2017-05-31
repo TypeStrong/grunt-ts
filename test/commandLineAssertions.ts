@@ -649,7 +649,28 @@ export const new_TypeScript_2_and_2_1_Features: ICompilePromise = (strings, opti
         command.indexOf(`--strictNullChecks`) > -1 &&
         command.indexOf(`--traceResolution`) > -1 &&
         command.indexOf(`--types "node,lodash,express"`) > -1 &&
-        command.indexOf(`--typeRoots "./sometypings,../../otherTypings"`) > -1)
+        command.indexOf(`--typeRoots "./sometypings,../../otherTypings"`) > -1 &&
+        command.indexOf(`--disableSizeLimit`) > -1)
+    {
+      resolve({
+        code: 0,
+        output: ""
+      });
+    }
+    throw `expected to see all of the new TypeScript 2 and 2.1 values in the command line and didn't.  Got this: ${command}`;
+  });
+}
+
+
+export const new_TypeScript_2_3_Features: ICompilePromise = (strings, options) => {
+  return new Promise(function(resolve, reject) {
+
+    const command = strings[1].replace(/\\/g,'/');
+
+    if (command.indexOf(`--strict`) > -1 &&
+        command.indexOf(`--checkJs`) > -1 &&
+        command.indexOf(`--downlevelIteration`) > -1 &&
+        command.indexOf(`--lib esnext,dom.iterable,es2017.sharedmemory,esnext.asynciterable`) > -1)
     {
       resolve({
         code: 0,

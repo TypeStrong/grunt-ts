@@ -67,7 +67,7 @@ module.exports = function (grunt) {
                 pretty: true
             },
             build: {
-                src: ['tasks/**/*.ts']
+                src: ['tasks/**/*.ts', 'test/commandLineAssertions.ts']
             },
             test: {
                 src: ['test/test.ts',
@@ -745,7 +745,21 @@ module.exports = function (grunt) {
                     strictNullChecks: true,
                     traceResolution: true,
                     types: ['node', 'lodash', 'express'],
-                    typeRoots: ['./sometypings','../../otherTypings']
+                    typeRoots: ['./sometypings','../../otherTypings'],
+                    disableSizeLimit: true
+                }
+            },
+            new_TypeScript_2_3_Features: {
+                test: true,
+                testExecute: commandLineAssertions.new_TypeScript_2_3_Features,
+                src: 'test/simple/ts/**/*.ts',
+                options: {
+                    allowJs: true,
+                    checkJs: true,
+                    strict: true,
+                    noImplicitThis: true,
+                    downlevelIteration: true,
+                    lib: ['esnext','dom.iterable','es2017.sharedmemory','esnext.asynciterable']
                 }
             },
             issue_392: {

@@ -240,6 +240,9 @@ function compileAllFiles(options, compilationInfo) {
         if (options.allowJs) {
             args.push('--allowJs');
         }
+        if (options.checkJs) {
+            args.push('--checkJs');
+        }
         if (options.noImplicitUseStrict) {
             args.push('--noImplicitUseStrict');
         }
@@ -293,7 +296,9 @@ function compileAllFiles(options, compilationInfo) {
                 'es7',
                 'es2016',
                 'es2017',
+                'esnext',
                 'dom',
+                'dom.iterable',
                 'webworker',
                 'scripthost',
                 'es2015.core',
@@ -307,7 +312,8 @@ function compileAllFiles(options, compilationInfo) {
                 'es2015.symbol.wellknown',
                 'es2016.array.include',
                 'es2017.object',
-                'es2017.sharedmemory'
+                'es2017.sharedmemory',
+                'esnext.asynciterable'
             ];
             options.lib.forEach(function (option) {
                 if (possibleOptions_1.indexOf((option + '').toLocaleLowerCase()) === -1) {
@@ -324,6 +330,15 @@ function compileAllFiles(options, compilationInfo) {
         }
         if (options.typeRoots) {
             args.push('--typeRoots', "\"" + _.map(options.typeRoots, function (t) { return utils.stripQuotesIfQuoted(t.trim()); }).join(',') + "\"");
+        }
+        if (options.downlevelIteration) {
+            args.push('--downlevelIteration');
+        }
+        if (options.disableSizeLimit) {
+            args.push('--disableSizeLimit');
+        }
+        if (options.strict) {
+            args.push('--strict');
         }
         args.push('--target', options.target.toUpperCase());
         if (options.module) {
