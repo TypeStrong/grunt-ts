@@ -67,7 +67,7 @@ module.exports = function (grunt) {
                 pretty: true
             },
             build: {
-                src: ['tasks/**/*.ts', 'test/commandLineAssertions.ts']
+                src: ['tasks/**/*.ts', 'test/*.ts']
             },
             test: {
                 src: ['test/test.ts',
@@ -1179,7 +1179,7 @@ module.exports = function (grunt) {
 
     // Build
     grunt.registerTask('prep', ['clean:test', 'jshint:support']);
-    grunt.registerTask('build', ['prep', 'ts-internal', 'tslint:source']);
+    grunt.registerTask('build', ['prep', 'ts-internal', 'tslint:source', 'report-time-elapsed']);
 
     // Test
     grunt.registerTask('fail', ['continue:on', 'test_fail', 'continue:off', 'validate_failure_count']);
