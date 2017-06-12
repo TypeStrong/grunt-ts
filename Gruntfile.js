@@ -168,6 +168,14 @@ module.exports = function (grunt) {
                     fast: 'never'
                 }
             },
+            files_dirdesttest: {
+                test: true,
+                files: [{ src: ['test/multifile/a/**/*.ts'], dest: 'test/multifile/a/' }],
+                options: {
+                    fast: 'never'
+                },
+                testExecute: commandLineAssertions.files_dirdesttest
+            },
             files_testsingle: {
                 test: true,
                 files: [{ src: ['test/multifile/a/**/*.ts'], dest: 'test/multifile/a/out.js' }],

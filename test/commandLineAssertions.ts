@@ -681,6 +681,25 @@ export const new_TypeScript_2_3_Features: ICompilePromise = (strings, options) =
   });
 }
 
+export const files_dirdesttest: ICompilePromise = (strings, options) => {
+  return new Promise(function(resolve, reject) {
+
+    const command = strings[1].replace(/\\/g,'/');
+
+    if (command.indexOf(`--outDir test/multifile/a/`) > -1 &&
+        command.indexOf(`test/multifile/a/a.ts`) > -1 &&
+        command.indexOf(`test/multifile/a/c.ts`) > -1 &&
+        command.indexOf(`test/multifile/a/c.ts`) > -1)
+    {
+      resolve({
+        code: 0,
+        output: ""
+      });
+    }
+    throw `expected to see three files under test/multifile/a and the --outDir switch, but didn't.  Got this: ${command}`;
+  });
+};
+
 export const honorGruntfileExcludesWhenParsingTsconfig: ICompilePromise = (strings, options) => {
   return new Promise(function(resolve, reject) {
 

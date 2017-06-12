@@ -608,6 +608,21 @@ exports.new_TypeScript_2_3_Features = function (strings, options) {
         throw "expected to see all of the new TypeScript 2 and 2.1 values in the command line and didn't.  Got this: " + command;
     });
 };
+exports.files_dirdesttest = function (strings, options) {
+    return new es6_promise_1.Promise(function (resolve, reject) {
+        var command = strings[1].replace(/\\/g, '/');
+        if (command.indexOf("--outDir test/multifile/a/") > -1 &&
+            command.indexOf("test/multifile/a/a.ts") > -1 &&
+            command.indexOf("test/multifile/a/c.ts") > -1 &&
+            command.indexOf("test/multifile/a/c.ts") > -1) {
+            resolve({
+                code: 0,
+                output: ""
+            });
+        }
+        throw "expected to see three files under test/multifile/a and the --outDir switch, but didn't.  Got this: " + command;
+    });
+};
 exports.honorGruntfileExcludesWhenParsingTsconfig = function (strings, options) {
     return new es6_promise_1.Promise(function (resolve, reject) {
         var command = strings[1].replace(/\\/g, '/');
