@@ -428,12 +428,13 @@ const pluginFn = function (grunt: IGrunt) {
                 function handleFileEvent(filepath: string, displaystr: string) {
 
                     const acceptedExtentions = ['.ts', '.tsx', '.js', '.jsx', '.html'];
+                    const lowerFilePath = filepath.toLowerCase();
 
                     acceptedExtentions.forEach(
                         (extension) => {
 
                             // If extension is accepted and was not just run
-                            if (utils.endsWith(filepath.toLowerCase(), extension) && (new Date().getTime() - lastCompile) > 100) {
+                            if (utils.endsWith(lowerFilePath, extension) && (new Date().getTime() - lastCompile) > 100) {
 
                                 // Log and run the debounced version.
                                 grunt.log.writeln((displaystr + ' >>' + filepath).yellow);

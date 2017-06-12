@@ -793,6 +793,14 @@ module.exports = function (grunt) {
                     verbose: true
                 }
             },
+            issue_402: {
+                options: {
+                    fast: 'never'
+                },
+                src: 'test/watch/src/**/*.ts',
+                watch: 'test/watch/src',
+                outDir: 'test/watch/out'
+            },
             honorGruntfileExcludesWhenParsingTsconfig: {
                 test: true,
                 src: ['test/issue_392_2/app/**/*.ts','!test/issue_392_2/app/**/*.spec.ts'],

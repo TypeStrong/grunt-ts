@@ -279,8 +279,9 @@ var pluginFn = function (grunt) {
                 return filterFilesTransformAndCompile();
                 function handleFileEvent(filepath, displaystr) {
                     var acceptedExtentions = ['.ts', '.tsx', '.js', '.jsx', '.html'];
+                    var lowerFilePath = filepath.toLowerCase();
                     acceptedExtentions.forEach(function (extension) {
-                        if (utils.endsWith(filepath.toLowerCase(), extension) && (new Date().getTime() - lastCompile) > 100) {
+                        if (utils.endsWith(lowerFilePath, extension) && (new Date().getTime() - lastCompile) > 100) {
                             grunt.log.writeln((displaystr + ' >>' + filepath).yellow);
                             filterFilesTransformAndCompile();
                             return;
