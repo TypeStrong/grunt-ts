@@ -72,6 +72,15 @@ function endsWith(str, suffix) {
     return str.indexOf(suffix, str.length - suffix.length) !== -1;
 }
 exports.endsWith = endsWith;
+function endsWithAny(str, suffixes) {
+    for (var i = 0; i < suffixes.length; i += 1) {
+        if (endsWith(str, suffixes[i])) {
+            return true;
+        }
+    }
+    return false;
+}
+exports.endsWithAny = endsWithAny;
 function possiblyQuotedRelativePath(thePath, relativeTo) {
     if (relativeTo === void 0) { relativeTo = '.'; }
     return enclosePathInQuotesIfRequired(path.relative(relativeTo, path.resolve(thePath)));
@@ -151,12 +160,12 @@ function _getAll(dirPath, exclude, getFiles) {
     var _checkExcludeResult;
     var items = [];
     if (util.isError(_checkDirResult)) {
-        return _checkDirResult;
+        throw _checkDirResult;
     }
     if (exclude) {
         _checkExcludeResult = _checkExcludeArgument(exclude);
         if (util.isError(_checkExcludeResult)) {
-            return _checkExcludeResult;
+            throw _checkExcludeResult;
         }
     }
     fs.readdirSync(dirPath).forEach(function (_item) {

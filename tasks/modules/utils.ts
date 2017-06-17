@@ -94,6 +94,20 @@ export function endsWith(str: string, suffix: string): boolean {
     return str.indexOf(suffix, str.length - suffix.length) !== -1;
 }
 
+/**
+ * Compares the end of the string with the given suffixes for literal equality.
+ *
+ * @returns {boolean} whether the string ends with any of the suffixes literally.
+ */
+export function endsWithAny(str: string, suffixes: string[]): boolean {
+    for (let i = 0; i < suffixes.length; i += 1) {
+        if (endsWith(str, suffixes[i])) {
+            return true;
+        }
+    }
+    return false;
+}
+
 export function possiblyQuotedRelativePath(thePath: string, relativeTo = '.') {
     return enclosePathInQuotesIfRequired(path.relative(relativeTo, path.resolve(thePath)));
 }
@@ -181,7 +195,7 @@ export function getTempFile(prefix?: string, dir: string = '', extension = '.tmp
      as an argument and should return true (exclude file) or false (do not exclude).
  * @returns {Array} An array of files
  */
-export function getFiles(dirPath, exclude?: (filename: string) => boolean): string[] {
+export function getFiles(dirPath: string, exclude?: (filename: string) => boolean): string[] {
     return _getAll(dirPath, exclude, true);
 };
 
@@ -193,7 +207,7 @@ export function getFiles(dirPath, exclude?: (filename: string) => boolean): stri
     as an argument and should return true (exclude dir) or false (do not exclude).
  * @returns {Array} An array of directories
  */
-export function getDirs(dirPath, exclude?: (filename: string) => boolean): string[] {
+export function getDirs(dirPath: string, exclude?: (filename: string) => boolean): string[] {
     return _getAll(dirPath, exclude, false);
 };
 
@@ -206,18 +220,18 @@ export function getDirs(dirPath, exclude?: (filename: string) => boolean): strin
  * @param {Boolean} getFiles Whether to get files (true) or directories (false).
  * @returns {Array} An array of files or directories
  */
-function _getAll(dirPath, exclude, getFiles) {
+function _getAll(dirPath: string, exclude, getFiles) {
     var _checkDirResult = _checkDirPathArgument(dirPath);
     var _checkExcludeResult;
     var items = [];
 
     if (util.isError(_checkDirResult)) {
-        return _checkDirResult;
+        throw _checkDirResult;
     }
     if (exclude) {
         _checkExcludeResult = _checkExcludeArgument(exclude);
         if (util.isError(_checkExcludeResult)) {
-            return _checkExcludeResult;
+            throw _checkExcludeResult;
         }
     }
 

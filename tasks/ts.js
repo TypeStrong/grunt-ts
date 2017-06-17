@@ -11,6 +11,7 @@ var html2tsModule = require("./modules/html2ts");
 var templateCacheModule = require("./modules/templateCache");
 var transformers = require("./modules/transformers");
 var optionsResolver = require("../tasks/modules/optionsResolver");
+var watchHelper_1 = require("./modules/watchHelper");
 var asyncSeries = utils.asyncSeries, timeIt = utils.timeIt;
 var fail_event = 'grunt-ts.failure';
 var pluginFn = function (grunt) {
@@ -252,47 +253,19 @@ var pluginFn = function (grunt) {
                         return es6_promise_1.Promise.resolve(true);
                     }
                 }
-                var lastCompile = 0;
                 if (!!options.watch) {
-                    var watchpath = grunt.file.expand([options.watch]);
-                    var chokidar = require('chokidar');
-                    var watcher = chokidar.watch(watchpath, { ignoreInitial: true, persistent: true });
-                    grunt.log.writeln(('Watching all TypeScript / Html files under : ' + watchpath).cyan);
-                    watcher
-                        .on('add', function (path) {
-                        handleFileEvent(path, '+++ added   ');
-                        lastCompile = new Date().getTime();
-                    })
-                        .on('change', function (path) {
-                        handleFileEvent(path, '### changed ');
-                        lastCompile = new Date().getTime();
-                    })
-                        .on('unlink', function (path) {
-                        handleFileEvent(path, '--- removed ');
-                        lastCompile = new Date().getTime();
-                    })
-                        .on('error', function (error) {
-                        console.error('Error happened in chokidar: ', error);
-                    });
+                    var watcher = new watchHelper_1.default(grunt.file.expand([options.watch]), '.', function (message) { return grunt.log.writeln(message); }, function (error) { return grunt.log.error(error); }, function addFile(fileName) {
+                        currentFiles.src.push(fileName);
+                    }, function removeFile(fileName) {
+                        _.remove(currentFiles.src, function (f) { return f === fileName; });
+                    }, filterFilesTransformAndCompile);
                 }
-                lastCompile = new Date().getTime();
                 return filterFilesTransformAndCompile();
-                function handleFileEvent(filepath, displaystr) {
-                    var acceptedExtentions = ['.ts', '.tsx', '.js', '.jsx', '.html'];
-                    var lowerFilePath = filepath.toLowerCase();
-                    acceptedExtentions.forEach(function (extension) {
-                        if (utils.endsWith(lowerFilePath, extension) && (new Date().getTime() - lastCompile) > 100) {
-                            grunt.log.writeln((displaystr + ' >>' + filepath).yellow);
-                            filterFilesTransformAndCompile();
-                            return;
-                        }
-                    });
+            }).then(function (results) {
+                if (options.watch) {
                 }
-            }).then(function (res) {
-                if (!options.watch) {
-                    if (res.some(function (success) {
-                        return !success;
-                    })) {
+                else {
+                    if (results.some(function (wasSuccess) { return !wasSuccess; })) {
                         if (options.emitGruntEvents) {
                             grunt.event.emit(fail_event);
                         }

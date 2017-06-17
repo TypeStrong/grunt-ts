@@ -20,9 +20,9 @@ import * as html2tsModule from './modules/html2ts';
 import * as templateCacheModule from './modules/templateCache';
 import * as transformers from './modules/transformers';
 import * as optionsResolver from '../tasks/modules/optionsResolver';
+import Watcher from './modules/watchHelper';
 const {asyncSeries, timeIt} = utils;
 const fail_event = 'grunt-ts.failure';
-
 
 const pluginFn = function (grunt: IGrunt) {
 
@@ -380,90 +380,38 @@ const pluginFn = function (grunt: IGrunt) {
                     }
                 }
 
-                // Time (in ms) when last compile took place
-                var lastCompile = 0;
 
-                // Watch a folder?
                 if (!!options.watch) {
-
-                    // get path(s)
-                    var watchpath = grunt.file.expand([options.watch]);
-
-                    // create a file watcher for path
-                    var chokidar = require('chokidar');
-                    var watcher = chokidar.watch(watchpath, { ignoreInitial: true, persistent: true });
-
-                    // Log what we are doing
-                    grunt.log.writeln(('Watching all TypeScript / Html files under : ' + watchpath).cyan);
-
-                    // A file has been added/changed/deleted has occurred
-                    watcher
-                        .on('add', function (path) {
-                        handleFileEvent(path, '+++ added   ');
-                        // Reset the time for last compile call
-                        lastCompile = new Date().getTime();
-                    })
-                        .on('change', function (path) {
-                        handleFileEvent(path, '### changed ');
-                        // Reset the time for last compile call
-                        lastCompile = new Date().getTime();
-                    })
-                        .on('unlink', function (path) {
-                        handleFileEvent(path, '--- removed ');
-                        // Reset the time for last compile call
-                        lastCompile = new Date().getTime();
-                    })
-                        .on('error', function (error) {
-                        console.error('Error happened in chokidar: ', error);
-                    });
-                }
-
-                // Reset the time for last compile call
-                lastCompile = new Date().getTime();
-
-                // Run initial compile
-                return filterFilesTransformAndCompile();
-
-                // local event to handle file event
-                function handleFileEvent(filepath: string, displaystr: string) {
-
-                    const acceptedExtentions = ['.ts', '.tsx', '.js', '.jsx', '.html'];
-                    const lowerFilePath = filepath.toLowerCase();
-
-                    acceptedExtentions.forEach(
-                        (extension) => {
-
-                            // If extension is accepted and was not just run
-                            if (utils.endsWith(lowerFilePath, extension) && (new Date().getTime() - lastCompile) > 100) {
-
-                                // Log and run the debounced version.
-                                grunt.log.writeln((displaystr + ' >>' + filepath).yellow);
-
-                                filterFilesTransformAndCompile();
-
-                                return;
-                            }
-
-                            // Uncomment for debugging which files were ignored
-                            // else if ((new Date().getTime() - lastCompile) <= 100){
-                                // grunt.log.writeln((' ///'  + ' >>' + filepath).grey);
-                            // }
-                        }
+                    const watcher = new Watcher(
+                        grunt.file.expand([options.watch]),
+                        '.',
+                        (message: string) => grunt.log.writeln(message),
+                        (error: string) => grunt.log.error(error),
+                        function addFile(fileName) {
+                            currentFiles.src.push(fileName);
+                        },
+                        function removeFile(fileName) {
+                            _.remove(currentFiles.src, f => f === fileName);
+                        },
+                        filterFilesTransformAndCompile
                     );
                 }
 
-            }).then((res: boolean[]) => {
-                // Ignore res? (either logs or throws)
-                if (!options.watch) {
-                    if (res.some((success: boolean) => {
-                        return !success;
-                    })) {
+                return filterFilesTransformAndCompile();
+
+            }).then(results => {
+                if (options.watch) {
+                    // don't end, regardless of compilation result.
+                } else {
+                    if (results.some(wasSuccess => !wasSuccess)) {
+                        // fail
                         if (options.emitGruntEvents) {
                           grunt.event.emit(fail_event);
                         }
                         done(false);
                     }
                     else {
+                        // success
                         done();
                     }
                 }
