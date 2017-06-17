@@ -1206,7 +1206,7 @@ module.exports = function (grunt) {
       'nodeunit:slow', 'tslint:transformedHtml', 'clean:testPost']);
 
     // Release
-    grunt.registerTask('release', ['build', 'test', 'report-time-elapsed']);
+    grunt.registerTask('release', ['build', 'test', 'clean', 'report-time-elapsed']);
     grunt.registerTask('default', ['release']);
 
     (function(){
