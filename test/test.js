@@ -41,10 +41,6 @@ exports.tests = {
         testHelpers_1.testDirectory(test, 'htmlSnakeModuleName');
         test.done();
     },
-    index: function (test) {
-        testHelpers_1.testDirectory(test, 'index');
-        test.done();
-    },
     transform: function (test) {
         testHelpers_1.testDirectory(test, 'transform', true);
         test.done();

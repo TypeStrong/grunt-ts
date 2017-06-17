@@ -436,6 +436,9 @@ module.exports = function (grunt) {
             },
             htmltest: {
                 test: true,
+                options: {
+                    sourceMap: false
+                },
                 src: ['test/html/**/*.ts'],
                 html: ['test/html/**/*.tpl.html'],
                 reference: 'test/html/reference.ts',
