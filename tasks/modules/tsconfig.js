@@ -88,6 +88,7 @@ function resolveAsync(applyTo, taskOptions, targetOptions, theTemplateProcessor,
                 try {
                     var content = stripBom(projectFileTextContent);
                     if (content.trim() === '') {
+                        // we are done.
                         projectSpec.extends = undefined;
                     }
                     else {
@@ -220,6 +221,9 @@ function applyCompilerOptions(applyTo, projectSpec) {
     var co = projectSpec.compilerOptions, tsconfig = applyTo.tsconfig;
     absolutePathToTSConfig = path.resolve(tsconfig.tsconfig, '..');
     if (!tsconfig.ignoreSettings && co) {
+        // Go here for the tsconfig.json documentation:
+        // https://github.com/Microsoft/TypeScript-Handbook/blob/master/pages/tsconfig.json.md
+        // There is a link to http://json.schemastore.org/tsconfig
         var sameNameInTSConfigAndGruntTS = [
             'allowJs',
             'allowSyntheticDefaultImports',
@@ -268,6 +272,7 @@ function applyCompilerOptions(applyTo, projectSpec) {
             'noUnusedParameters',
             'out',
             'outDir',
+            // outFile is handled below.
             'preserveConstEnums',
             'pretty',
             'reactNamespace',
@@ -290,9 +295,13 @@ function applyCompilerOptions(applyTo, projectSpec) {
                 result[propertyName] = co[propertyName];
             }
         });
+        // now copy the ones that don't have the same names.
+        // `outFile` was added in TypeScript 1.6 and is the same as out for command-line
+        // purposes except that `outFile` is relative to the tsconfig.json.
         if (('outFile' in co) && !('out' in result)) {
             result['out'] = co['outFile'];
         }
+        // when inside the tsconfig.json the `typeRoots` paths needs to be move relative to gruntfile
         if (('typeRoots' in co) && !('typeRoots' in result)) {
             var relPath_1 = relativePathFromGruntfileToTSConfig();
             result['typeRoots'] = _.map(co['typeRoots'], function (p) { return path.relative('.', path.resolve(relPath_1, p)).replace(/\\/g, '/'); });
@@ -326,6 +335,7 @@ function applyCompilerOptions(applyTo, projectSpec) {
     return result;
 }
 function addFilesToCompilationContext(applyTo, projectSpec) {
+    // see http://www.typescriptlang.org/docs/handbook/tsconfig-json.html
     var resolvedInclude = [], resolvedExclude = [], resolvedFiles = [];
     var result = applyTo, co = projectSpec.compilerOptions, tsconfig = applyTo.tsconfig, src = applyTo.CompilationTasks[0].src;
     if (projectSpec.exclude) {
@@ -338,6 +348,7 @@ function addFilesToCompilationContext(applyTo, projectSpec) {
                 }
             }
             catch (err) {
+                // eat it - likely a "does not exist" error.
                 verboseLogger("Warning: \"" + p + "\" was specified in tsconfig `exclude` property, but was not found on disk.");
             }
             return utils.prependIfNotStartsWith(p, '!');
@@ -448,11 +459,15 @@ function prettyJSON(object, indent, newLine) {
     if (indent === void 0) { indent = 4; }
     if (newLine === void 0) { newLine = utils.eol; }
     var cache = [];
-    var value = JSON.stringify(object, function (key, value) {
+    var value = JSON.stringify(object, 
+    // fixup circular reference
+    function (key, value) {
         if (typeof value === 'object' && value !== null) {
             if (cache.indexOf(value) !== -1) {
+                // Circular reference found, discard key
                 return;
             }
+            // Store value in our collection
             cache.push(value);
         }
         return value;

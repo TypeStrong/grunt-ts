@@ -73,7 +73,12 @@ module.exports = function (grunt) {
                 src: ['test/test.ts',
                   'test/commandLineAssertions.ts',
                   'test/optionsResolverTests.ts',
-                  'test/compilerTests.ts']
+                  'test/compilerTests.ts',
+                  'tasks/modules/interfaces.d.ts',
+                  'test/testHelpers.ts'],
+                options: {
+                    fast: 'never'
+                }
             }
         },
         nodeunit: {
@@ -123,13 +128,6 @@ module.exports = function (grunt) {
                 },
                 src: ['test/simple/ts/zoo.ts'],
                 outDir: 'test/simple_with_rootDir/js/',
-            },
-            build_nodeunit_tests: {
-                options: {
-                    fast: 'never',
-                    target: 'es5'
-                },
-                src: ['test/test.ts', 'test/testHelpers.ts', 'test/optionsResolverTests.ts', 'test/compilerTests.ts']
             },
             out_with_spaces: {
                 test: true,
@@ -1202,7 +1200,7 @@ module.exports = function (grunt) {
 
     // Test
     grunt.registerTask('fail', ['continue:on', 'test_fail', 'continue:off', 'validate_failure_count']);
-    grunt.registerTask('test', ['stageFiles', 'test_all', 'fail', 'ts:build_nodeunit_tests', 'nodeunit:fast',
+    grunt.registerTask('test', ['stageFiles', 'test_all', 'fail', 'ts-internal:test', 'nodeunit:fast',
       'nodeunit:slow', 'tslint:transformedHtml', 'clean:testPost']);
 
     // Release

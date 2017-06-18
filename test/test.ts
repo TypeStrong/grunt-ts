@@ -1,6 +1,4 @@
-/// <reference path="../defs/tsd.d.ts" />
-
-var grunt: IGrunt = require('grunt');
+const grunt: IGrunt = require('grunt');
 import * as nodeunit from 'nodeunit';
 
 import {

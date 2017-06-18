@@ -1,6 +1,4 @@
 "use strict";
-/// <reference path="../defs/tsd.d.ts"/>
-/// <reference path="../tasks/modules/interfaces.d.ts"/>
 Object.defineProperty(exports, "__esModule", { value: true });
 var es6_promise_1 = require("es6-promise");
 exports.decoratorMetadataPassed = function (strings, options) {

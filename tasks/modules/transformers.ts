@@ -1,6 +1,3 @@
-/// <reference path="../../defs/tsd.d.ts"/>
-/// <reference path="./interfaces.d.ts"/>
-
 import fs = require('fs');
 import path = require('path');
 import grunt = require('grunt');

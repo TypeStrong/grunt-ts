@@ -7,6 +7,7 @@ var utils = require("../tasks/modules/utils");
 var _ = require("lodash");
 var testHelpers_1 = require("./testHelpers");
 var grunt = require('grunt');
+// inline strings for newline configs
 var crlf_newline_tsconfig_json_1 = require("./tsconfig_artifact/newlineConfigs/crlf_newline_tsconfig.json");
 var crlf_newline_tsconfig_expected_json_1 = require("./tsconfig_artifact/newlineConfigs/crlf_newline_tsconfig.expected.json");
 var lf_newline_tsconfig_json_1 = require("./tsconfig_artifact/newlineConfigs/lf_newline_tsconfig.json");
@@ -394,6 +395,7 @@ exports.tests = {
             }).catch(function (err) { test.ifError(err); test.done(); });
         },
         "outDir works in combination with tsconfig": function (test) {
+            // as reported by @gilamran in https://github.com/TypeStrong/grunt-ts/issues/312
             var config = {
                 options: {
                     target: 'es5'
@@ -512,6 +514,7 @@ exports.tests = {
                 });
             };
             try {
+                // write inline string configs to test config files
                 fs.writeFileSync('./test/tsconfig/crlf_newline_tsconfig.json', crlf_newline_tsconfig_json_1.crlf_newline_tsconfig_json);
                 fs.writeFileSync('./test/tsconfig/crlf_newline_tsconfig.expected.json', crlf_newline_tsconfig_expected_json_1.crlf_newline_tsconfig_expected_json);
                 fs.writeFileSync('./test/tsconfig/lf_newline_tsconfig.json', lf_newline_tsconfig_json_1.lf_newline_tsconfig_json);
@@ -611,7 +614,7 @@ exports.tests = {
                 }
             };
             if (!fs.existsSync('tasks/scratch.js')) {
-                fs.writeFileSync('tasks/scratch.js', '');
+                fs.writeFileSync('tasks/scratch.js', ''); // ensure there is a scratch file there just in case it hasn't been compiled.
             }
             var result = or.resolveAsync(config, config.build, "build", [], null, grunt.file.expand).then(function (result) {
                 test.strictEqual(result.CompilationTasks.length, 1, "expected a compilation task");
@@ -743,7 +746,8 @@ exports.tests = {
         },
         "most basic tsconfig with true works": function (test) {
             test.expect(12);
-            var result = or.resolveAsync(null, getConfig("tsconfig has true")).then(function (result) {
+            var result = or.resolveAsync(null, getConfig("tsconfig has true"), null, [], null, grunt.file.expand).then(function (result) {
+                // NOTE: With tsconfig: true, this depends on the actual grunt-ts tsconfig so technically it could be wrong in the future.
                 test.strictEqual(result.tsconfig.tsconfig, path.join(path.resolve('.'), 'tsconfig.json'));
                 test.strictEqual(result.target, 'es5');
                 test.strictEqual(result.module, 'commonjs');
@@ -754,6 +758,7 @@ exports.tests = {
                 test.strictEqual(result.suppressImplicitAnyIndexErrors, true);
                 test.strictEqual(result.sourceMap, true);
                 test.strictEqual(result.emitDecoratorMetadata, undefined, 'emitDecoratorMetadata is not specified in this tsconfig.json');
+                console.log("compilation tasks", result.CompilationTasks, result.CompilationTasks[0].src);
                 test.ok(result.CompilationTasks[0].src.indexOf('tasks/ts.ts') > -1);
                 test.ok(result.CompilationTasks[0].src.indexOf('tasks/modules/compile.ts') > -1);
                 test.done();
@@ -848,6 +853,7 @@ exports.tests = {
         "paths written to filesGlob are resolved first": function (test) {
             test.expect(4);
             var cfg = getConfig("minimalist");
+            // this assumes the test gruntfile which uses the {% and %} delimiters.
             cfg.src = ["./test/{%= grunt.pathsFilesGlobProperty %}/a*.ts"];
             cfg.tsconfig = {
                 tsconfig: 'test/tsconfig/simple_filesGlob_tsconfig.json',
@@ -922,8 +928,9 @@ exports.tests = {
                     overwriteFilesGlob: false
                 }
             };
-            var result = or.resolveAsync(null, cfg).then(function (result) {
+            var result = or.resolveAsync(null, cfg, "", [], null, function () { return []; }).then(function (result) {
                 test.strictEqual(result.tsconfig.tsconfig, "tsconfig.json", "expected default to be set.");
+                console.log(result.warnings);
                 test.ok(result.CompilationTasks.length > 0, "expected some compilation tasks from default tsconfig.json");
                 test.strictEqual(result.errors.length, 0, "expected zero errors.");
                 test.strictEqual(result.warnings.length, 0, "expected zero warnings.");

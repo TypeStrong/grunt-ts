@@ -36,7 +36,8 @@
   },
   "scripts": {
     "test": "grunt test --verbose --stack",
-    "watch": "tsc -p . -w"
+    "watch": "tsc -p . -w",
+    "build": "tsc -p ."
   },
   "dependencies": {
     "chokidar": "^1.7.0",
@@ -56,6 +57,8 @@
     "typescript": "~2 || ~1"
   },
   "devDependencies": {
+    "@types/grunt": "^0.4.21",
+    "@types/nodeunit": "0.0.30",
     "grunt": "~0.4.0 || ^1.0.1",
     "grunt-continue": "0.1.0",
     "grunt-contrib-clean": "^1.0.0",

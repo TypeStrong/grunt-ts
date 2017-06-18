@@ -1,5 +1,3 @@
-/// <reference path="../../defs/tsd.d.ts"/>
-
 import _ = require('lodash');
 import path = require('path');
 import fs = require('fs');

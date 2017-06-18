@@ -1,4 +1,4 @@
-var grunt: IGrunt = require('grunt');
+const grunt: IGrunt = require('grunt');
 import utils = require('../tasks/modules/utils');
 import _ = require('lodash');
 

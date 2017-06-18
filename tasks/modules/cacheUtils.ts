@@ -1,5 +1,3 @@
-/// <reference path="../../defs/tsd.d.ts"/>
-
 // Source based on : https://github.com/tschaub/grunt-newer/blob/master/lib/util.js
 
 import fs = require('fs');

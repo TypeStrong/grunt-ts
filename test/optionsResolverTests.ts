@@ -1,5 +1,3 @@
-/// <reference path="../defs/tsd.d.ts" />
-
 import * as nodeunit from 'nodeunit';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -779,7 +777,7 @@ export var tests : nodeunit.ITestGroup = {
     },
     "most basic tsconfig with true works": (test: nodeunit.Test) => {
       test.expect(12);
-      const result = or.resolveAsync(null, getConfig("tsconfig has true")).then((result) => {
+      const result = or.resolveAsync(null, getConfig("tsconfig has true"), null, [], null, grunt.file.expand).then((result) => {
 
         // NOTE: With tsconfig: true, this depends on the actual grunt-ts tsconfig so technically it could be wrong in the future.
         test.strictEqual((<ITSConfigSupport>result.tsconfig).tsconfig, path.join(path.resolve('.'), 'tsconfig.json'));
@@ -792,7 +790,7 @@ export var tests : nodeunit.ITestGroup = {
         test.strictEqual(result.suppressImplicitAnyIndexErrors, true);
         test.strictEqual(result.sourceMap, true);
         test.strictEqual(result.emitDecoratorMetadata, undefined, 'emitDecoratorMetadata is not specified in this tsconfig.json');
-
+        console.log("compilation tasks", result.CompilationTasks, result.CompilationTasks[0].src);
         test.ok(result.CompilationTasks[0].src.indexOf('tasks/ts.ts') > -1);
         test.ok(result.CompilationTasks[0].src.indexOf('tasks/modules/compile.ts') > -1);
 
@@ -996,9 +994,9 @@ export var tests : nodeunit.ITestGroup = {
         overwriteFilesGlob: false
       }
     };
-    const result = or.resolveAsync(null, cfg).then((result) => {
+    const result = or.resolveAsync(null, cfg, "", [], null, () => []).then((result) => {
       test.strictEqual((<ITSConfigSupport>result.tsconfig).tsconfig, "tsconfig.json", "expected default to be set.");
-
+      console.log(result.warnings);
       test.ok(result.CompilationTasks.length > 0, "expected some compilation tasks from default tsconfig.json");
       test.strictEqual(result.errors.length, 0, "expected zero errors.");
       test.strictEqual(result.warnings.length, 0, "expected zero warnings.");

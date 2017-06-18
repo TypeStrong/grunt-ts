@@ -1,6 +1,3 @@
-/// <reference path="../defs/tsd.d.ts"/>
-/// <reference path="./modules/interfaces.d.ts"/>
-
 'use strict';
 
 /*

@@ -1,6 +1,3 @@
-/// <reference path="../../defs/tsd.d.ts"/>
-/// <reference path="./interfaces.d.ts"/>
-
 'use strict';
 
 import * as path from 'path';

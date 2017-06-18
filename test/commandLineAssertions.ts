@@ -1,6 +1,3 @@
-/// <reference path="../defs/tsd.d.ts"/>
-/// <reference path="../tasks/modules/interfaces.d.ts"/>
-
 import {Promise} from 'es6-promise';
 
 export const decoratorMetadataPassed : ICompilePromise = (strings, options) => {
