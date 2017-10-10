@@ -17,6 +17,7 @@ npm-debug.log
 
 /tslint.json
 /tsd.json
+/tsconfig.json
 
 /.travis.yml
 /.jshintrc
@@ -26,8 +27,14 @@ npm-debug.log
 
 /tscommand*.tmp.txt
 
+/docs
+/AUTHORS
+/*.md
+/custom.TypeScript.targets
+
 /bin
 /obj
+/.vscode
 *.user
 *.suo
 *.csproj
