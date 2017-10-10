@@ -12,7 +12,7 @@
     "url": "https://github.com/TypeStrong/grunt-ts/issues"
   },
   "license": "MIT",
-  "main": "grunt.js",
+  "main": "tasks/ts.js",
   "maintainers": [
     {
       "name": "nycdotnet",
