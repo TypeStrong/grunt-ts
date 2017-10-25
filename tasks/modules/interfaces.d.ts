@@ -183,6 +183,7 @@ interface IGruntTSOptions extends ITaskOptions, ITargetOptions {
   CompilationTasks?: IGruntTSCompilationInfo[];
   warnings: string[];
   errors: string[];
+  tsCacheDir: string;
 }
 
 interface IGruntTSCompilationInfo extends grunt.file.IFilesConfig {

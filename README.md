@@ -185,6 +185,7 @@ For file ordering, look at [JavaScript Generation](#javascript-generation).
 |[suppressImplicitAnyIndexErrors](#suppressimplicitanyindexerrors)|option|`false` (default), `true` - indicates if TypeScript should allow access to properties of an object by string indexer when `--noImplicitAny` is active, even if TypeScript doesn't know about them.|
 |[src](#src)|target|`string` or `string[]` - glob of TypeScript files to compile.|
 |[target](#target)|option|`'es5'` (default), `'es3'`, or `'es6'` - targeted ECMAScript version|
+|[tsCacheDir](#tsCacheDir)|target|`.tscache` (default), a string path where the local TS cache directory will be created when the `'fast'` option is not set to `'never'`.|
 |[tsconfig](#tsconfig)|target|true, a string path, or an object.  See [tsconfig](#tsconfig) for details.|
 |[verbose](#verbose)|option|`true`, `false` (default) - logs `tsc` command-line options to console|
 |[vs](#vs)|target|`string` referencing a `.csproj` or `.vbproj` file or, `{}` (object) (see [Visual Studio Projects](#vs) for details)|

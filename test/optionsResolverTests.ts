@@ -125,6 +125,11 @@ const config : {[name: string]: IGruntTargetOptions} = {
       config: "TestOutFile",
     }
   },
+  "has tsCacheDir set": <any>{
+    options: {
+      tsCacheDir: 'some/other/path'
+    }
+  },
   "tsconfig has true": <any>{
     tsconfig: true
   },
@@ -430,6 +435,13 @@ export var tests : nodeunit.ITestGroup = {
       const result = or.resolveAsync(config, config.build, "build").then((result) => {
         test.strictEqual(result.target, "es5");
         test.strictEqual(result.CompilationTasks[0].outDir, ".tmp");
+        test.done();
+      }).catch((err) => {test.ifError(err); test.done();});
+    },
+    "tsCacheDir default `.tscache` directory is overriden if passed in the grunt-ts task options": (test: nodeunit.Test) => {
+      test.expect(1);
+      const result = or.resolveAsync(null, getConfig("has tsCacheDir set")).then((result) => {
+        test.strictEqual(result.tsCacheDir, 'some/other/path');
         test.done();
       }).catch((err) => {test.ifError(err); test.done();});
     }

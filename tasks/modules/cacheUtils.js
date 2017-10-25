@@ -6,12 +6,11 @@ var path = require("path");
 var crypto = require("crypto");
 var grunt = require('grunt');
 var rimraf = require('rimraf');
-exports.cacheDir = '.tscache';
-function getStampPath(targetName) {
-    return path.join(exports.cacheDir, targetName, 'timestamp');
+function getStampPath(targetName, cacheDir) {
+    return path.join(cacheDir, targetName, 'timestamp');
 }
-function getLastSuccessfullCompile(targetName) {
-    var stampFile = getStampPath(targetName);
+function getLastSuccessfullCompile(targetName, cacheDir) {
+    var stampFile = getStampPath(targetName, cacheDir);
     try {
         return fs.statSync(stampFile).mtime;
     }
@@ -30,17 +29,17 @@ function anyNewerThan(paths, time) {
     return getFilesNewerThan(paths, time).length > 0;
 }
 exports.anyNewerThan = anyNewerThan;
-function filterPathsByTime(paths, targetName) {
-    var time = getLastSuccessfullCompile(targetName);
+function filterPathsByTime(paths, targetName, cacheDir) {
+    var time = getLastSuccessfullCompile(targetName, cacheDir);
     return getFilesNewerThan(paths, time);
 }
 exports.filterPathsByTime = filterPathsByTime;
-function getHashPath(filePath, targetName) {
+function getHashPath(filePath, targetName, cacheDir) {
     var hashedName = path.basename(filePath) + '-' + crypto.createHash('md5').update(filePath).digest('hex');
-    return path.join(exports.cacheDir, targetName, 'hashes', hashedName);
+    return path.join(cacheDir, targetName, 'hashes', hashedName);
 }
-function getExistingHash(filePath, targetName) {
-    var hashPath = getHashPath(filePath, targetName);
+function getExistingHash(filePath, targetName, cacheDir) {
+    var hashPath = getHashPath(filePath, targetName, cacheDir);
     var exists = fs.existsSync(hashPath);
     if (!exists) {
         return null;
@@ -53,34 +52,34 @@ function generateFileHash(filePath) {
     md5sum.update(data);
     return md5sum.digest('hex');
 }
-function filterPathsByHash(filePaths, targetName) {
+function filterPathsByHash(filePaths, targetName, cacheDir) {
     var filtered = _.filter(filePaths, function (filePath) {
-        var previous = getExistingHash(filePath, targetName);
+        var previous = getExistingHash(filePath, targetName, cacheDir);
         var current = generateFileHash(filePath);
         return previous !== current;
     });
     return filtered;
 }
-function updateHashes(filePaths, targetName) {
+function updateHashes(filePaths, targetName, cacheDir) {
     _.forEach(filePaths, function (filePath) {
-        var hashPath = getHashPath(filePath, targetName);
+        var hashPath = getHashPath(filePath, targetName, cacheDir);
         var hash = generateFileHash(filePath);
         grunt.file.write(hashPath, hash);
     });
 }
-function getNewFilesForTarget(paths, targetName) {
-    var step1 = filterPathsByTime(paths, targetName);
-    var step2 = filterPathsByHash(step1, targetName);
+function getNewFilesForTarget(paths, targetName, cacheDir) {
+    var step1 = filterPathsByTime(paths, targetName, cacheDir);
+    var step2 = filterPathsByHash(step1, targetName, cacheDir);
     return step2;
 }
 exports.getNewFilesForTarget = getNewFilesForTarget;
-function compileSuccessfull(paths, targetName) {
-    grunt.file.write(getStampPath(targetName), '');
-    updateHashes(paths, targetName);
+function compileSuccessfull(paths, targetName, cacheDir) {
+    grunt.file.write(getStampPath(targetName, cacheDir), '');
+    updateHashes(paths, targetName, cacheDir);
 }
 exports.compileSuccessfull = compileSuccessfull;
-function clearCache(targetName) {
-    var cacheDirForTarget = path.join(exports.cacheDir, targetName);
+function clearCache(targetName, cacheDir) {
+    var cacheDirForTarget = path.join(cacheDir, targetName);
     try {
         if (fs.existsSync(cacheDirForTarget)) {
             rimraf.sync(cacheDirForTarget);
