@@ -77,6 +77,7 @@ var propertiesFromTarget = ['amdloader', 'baseDir', 'html', 'htmlOutDir', 'htmlO
     'suppressImplicitAnyIndexErrors',
     'target',
     'traceResolution',
+    'tsCacheDir',
     'types',
     'typeRoots',
     'verbose'], delayTemplateExpansion = ['htmlModuleTemplate', 'htmlVarTemplate', 'htmlOutputTemplate'];
@@ -481,6 +482,9 @@ function applyGruntTSDefaults(options) {
     }
     if (!('emitGruntEvents' in options)) {
         options.emitGruntEvents = defaults_1.GruntTSDefaults.emitGruntEvents;
+    }
+    if (!('tsCacheDir' in options)) {
+        options.tsCacheDir = defaults_1.GruntTSDefaults.tsCacheDir;
     }
     return options;
 }

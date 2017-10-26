@@ -42,9 +42,9 @@ var executeNodeDefault : ICompilePromise = function(args, optionalInfo) {
 // Map to store if the cache was cleared after the gruntfile was parsed
 var cacheClearedOnce: { [targetName: string]: boolean } = {};
 
-function getChangedFiles(files, targetName: string, verbose: boolean) {
+function getChangedFiles(files, targetName: string, cacheDir: string, verbose: boolean) {
 
-    files = cache.getNewFilesForTarget(files, targetName);
+    files = cache.getNewFilesForTarget(files, targetName, cacheDir);
 
     if (verbose) {
         _.forEach(files, (file) => {
@@ -56,12 +56,12 @@ function getChangedFiles(files, targetName: string, verbose: boolean) {
     return files;
 }
 
-function resetChangedFiles(files, targetName: string) {
-    cache.compileSuccessfull(files, targetName);
+function resetChangedFiles(files, targetName: string, cacheDir: string) {
+    cache.compileSuccessfull(files, targetName, cacheDir);
 }
 
-function clearCache(targetName: string) {
-    cache.clearCache(targetName);
+function clearCache(targetName: string, cacheDir: string) {
+    cache.clearCache(targetName, cacheDir);
     cacheClearedOnce[targetName] = true;
 }
 
@@ -104,7 +104,7 @@ export function compileAllFiles(options: IGruntTSOptions, compilationInfo: IGrun
         if (cacheClearedOnce[grunt.task.current.target] === undefined) {
 
             // Then clear the cache for this target
-            clearCache(options.targetName);
+            clearCache(options.targetName, options.tsCacheDir);
         }
     }
     if (options.fast !== 'never') {
@@ -112,7 +112,7 @@ export function compileAllFiles(options: IGruntTSOptions, compilationInfo: IGrun
             grunt.log.writeln('Fast compile will not work when --out is specified. Ignoring fast compilation'.cyan);
         }
         else {
-            newFiles = getChangedFiles(files, options.targetName, options.verbose);
+            newFiles = getChangedFiles(files, options.targetName, options.tsCacheDir, options.verbose);
 
             if (newFiles.length !== 0 || options.testExecute || utils.shouldPassThrough(options)) {
                 files = newFiles;
@@ -519,7 +519,7 @@ export function compileAllFiles(options: IGruntTSOptions, compilationInfo: IGrun
     return executeNode(command, options).then((result: ICompileResult) => {
 
         if (compileResultMeansFastCacheShouldBeRefreshed(options, result)) {
-            resetChangedFiles(newFiles, options.targetName);
+            resetChangedFiles(newFiles, options.targetName, options.tsCacheDir);
         }
 
         result.fileCount = files.length;

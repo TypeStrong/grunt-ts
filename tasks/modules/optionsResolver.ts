@@ -90,6 +90,7 @@ const propertiesFromTarget = ['amdloader', 'baseDir', 'html', 'htmlOutDir', 'htm
         'suppressImplicitAnyIndexErrors',
         'target',
         'traceResolution',
+        'tsCacheDir',
         'types',
         'typeRoots',
         /* version is purposefully not supported. */
@@ -571,6 +572,10 @@ function applyGruntTSDefaults(options: IGruntTSOptions) {
 
   if (!('emitGruntEvents' in options)) {
     options.emitGruntEvents = GruntTSDefaults.emitGruntEvents;
+  }
+
+  if (!('tsCacheDir' in options)) {
+    options.tsCacheDir = GruntTSDefaults.tsCacheDir;
   }
 
   return options;

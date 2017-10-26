@@ -79,6 +79,7 @@ const TypeScriptDefaults: IGruntTSOptions = {
     targetName: '',
     templateCache: null,
     traceResolution: false,
+    tsCacheDir: '',
     types: null,
     typeRoots: null,
     verbose: false,
@@ -100,5 +101,6 @@ function applyGruntTSDefaults(options: IGruntTSOptions) {
   options.removeComments = true;
   options.failOnTypeErrors = true;
   options.emitGruntEvents = false;
+  options.tsCacheDir = '.tscache';
   return options;
 }

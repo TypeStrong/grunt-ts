@@ -78,6 +78,7 @@ var TypeScriptDefaults = {
     targetName: '',
     templateCache: null,
     traceResolution: false,
+    tsCacheDir: '',
     types: null,
     typeRoots: null,
     verbose: false,
@@ -95,6 +96,7 @@ function applyGruntTSDefaults(options) {
     options.removeComments = true;
     options.failOnTypeErrors = true;
     options.emitGruntEvents = false;
+    options.tsCacheDir = '.tscache';
     return options;
 }
 //# sourceMappingURL=defaults.js.map

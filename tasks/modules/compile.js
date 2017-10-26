@@ -24,8 +24,8 @@ var executeNodeDefault = function (args, optionalInfo) {
     });
 };
 var cacheClearedOnce = {};
-function getChangedFiles(files, targetName, verbose) {
-    files = cache.getNewFilesForTarget(files, targetName);
+function getChangedFiles(files, targetName, cacheDir, verbose) {
+    files = cache.getNewFilesForTarget(files, targetName, cacheDir);
     if (verbose) {
         _.forEach(files, function (file) {
             exports.grunt.log.writeln(('### Fast Compile >>' + file).cyan);
@@ -33,11 +33,11 @@ function getChangedFiles(files, targetName, verbose) {
     }
     return files;
 }
-function resetChangedFiles(files, targetName) {
-    cache.compileSuccessfull(files, targetName);
+function resetChangedFiles(files, targetName, cacheDir) {
+    cache.compileSuccessfull(files, targetName, cacheDir);
 }
-function clearCache(targetName) {
-    cache.clearCache(targetName);
+function clearCache(targetName, cacheDir) {
+    cache.clearCache(targetName, cacheDir);
     cacheClearedOnce[targetName] = true;
 }
 function resolveTypeScriptBinPath() {
@@ -63,7 +63,7 @@ function compileAllFiles(options, compilationInfo) {
     var newFiles = files;
     if (options.fast === 'watch') {
         if (cacheClearedOnce[exports.grunt.task.current.target] === undefined) {
-            clearCache(options.targetName);
+            clearCache(options.targetName, options.tsCacheDir);
         }
     }
     if (options.fast !== 'never') {
@@ -71,7 +71,7 @@ function compileAllFiles(options, compilationInfo) {
             exports.grunt.log.writeln('Fast compile will not work when --out is specified. Ignoring fast compilation'.cyan);
         }
         else {
-            newFiles = getChangedFiles(files, options.targetName, options.verbose);
+            newFiles = getChangedFiles(files, options.targetName, options.tsCacheDir, options.verbose);
             if (newFiles.length !== 0 || options.testExecute || utils.shouldPassThrough(options)) {
                 files = newFiles;
                 if (compilationInfo.outDir && !options.baseDir) {
@@ -430,7 +430,7 @@ function compileAllFiles(options, compilationInfo) {
     }
     return executeNode(command, options).then(function (result) {
         if (compileResultMeansFastCacheShouldBeRefreshed(options, result)) {
-            resetChangedFiles(newFiles, options.targetName);
+            resetChangedFiles(newFiles, options.targetName, options.tsCacheDir);
         }
         result.fileCount = files.length;
         fs.unlinkSync(tempfilename);
