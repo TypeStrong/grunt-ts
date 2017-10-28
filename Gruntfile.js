@@ -67,7 +67,7 @@ module.exports = function (grunt) {
                 pretty: true
             },
             build: {
-                src: ['tasks/**/*.ts']
+                src: ['tasks/**/*.ts', 'test/*.ts']
             },
             test: {
                 src: ['test/test.ts',
@@ -167,6 +167,14 @@ module.exports = function (grunt) {
                 options: {
                     fast: 'never'
                 }
+            },
+            files_dirdesttest: {
+                test: true,
+                files: [{ src: ['test/multifile/a/**/*.ts'], dest: 'test/multifile/a/' }],
+                options: {
+                    fast: 'never'
+                },
+                testExecute: commandLineAssertions.files_dirdesttest
             },
             files_testsingle: {
                 test: true,
@@ -745,7 +753,21 @@ module.exports = function (grunt) {
                     strictNullChecks: true,
                     traceResolution: true,
                     types: ['node', 'lodash', 'express'],
-                    typeRoots: ['./sometypings','../../otherTypings']
+                    typeRoots: ['./sometypings','../../otherTypings'],
+                    disableSizeLimit: true
+                }
+            },
+            new_TypeScript_2_3_Features: {
+                test: true,
+                testExecute: commandLineAssertions.new_TypeScript_2_3_Features,
+                src: 'test/simple/ts/**/*.ts',
+                options: {
+                    allowJs: true,
+                    checkJs: true,
+                    strict: true,
+                    noImplicitThis: true,
+                    downlevelIteration: true,
+                    lib: ['esnext','dom.iterable','es2017.sharedmemory','esnext.asynciterable']
                 }
             },
             issue_392: {
@@ -1165,7 +1187,7 @@ module.exports = function (grunt) {
 
     // Build
     grunt.registerTask('prep', ['clean:test', 'jshint:support']);
-    grunt.registerTask('build', ['prep', 'ts-internal', 'tslint:source']);
+    grunt.registerTask('build', ['prep', 'ts-internal', 'tslint:source', 'report-time-elapsed']);
 
     // Test
     grunt.registerTask('fail', ['continue:on', 'test_fail', 'continue:off', 'validate_failure_count']);

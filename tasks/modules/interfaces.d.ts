@@ -45,6 +45,8 @@ interface ITaskOptions {
     baseUrl: string;
     /** The character set of the input files. */
     charset: string;
+    /** Report errors in .js/.jsx files. */
+    checkJs: boolean;
     /** false to remove comments */
     comments: boolean;
     /** grunt-ts specific setting */
@@ -57,6 +59,10 @@ interface ITaskOptions {
     declarationDir: string;
     /** Show diagnostic information. */
     diagnostics: boolean;
+    /** Disable size limitation on JavaScript project. */
+    disableSizeLimit: boolean;
+    /** Provide full support for iterables when targeting ES5 or ES3. */
+    downlevelIteration: boolean;
     /** emitBOM - indicates if emitted files should include a Byte Order Mark */
     emitBOM: boolean;
     emitDecoratorMetadata: boolean;
@@ -141,6 +147,8 @@ interface ITaskOptions {
     skipDefaultLibCheck: boolean;
     sourceMap: boolean;
     sourceRoot: string;
+    /** Enable all strict type checking options. */
+    strict: boolean;
     /** Enables strict null checking mode (null and undefined are not in the domain of every type) */
     strictNullChecks: boolean;
     /** Does not emit objects marked @internal in jsdoc */

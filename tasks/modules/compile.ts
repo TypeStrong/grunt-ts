@@ -306,6 +306,9 @@ export function compileAllFiles(options: IGruntTSOptions, compilationInfo: IGrun
       if (options.allowJs) {
           args.push('--allowJs');
       }
+      if (options.checkJs) {
+          args.push('--checkJs');
+      }
       if (options.noImplicitUseStrict) {
           args.push('--noImplicitUseStrict');
       }
@@ -359,7 +362,9 @@ export function compileAllFiles(options: IGruntTSOptions, compilationInfo: IGrun
               'es7',
               'es2016',
               'es2017',
+              'esnext',
               'dom',
+              'dom.iterable',
               'webworker',
               'scripthost',
               'es2015.core',
@@ -373,7 +378,8 @@ export function compileAllFiles(options: IGruntTSOptions, compilationInfo: IGrun
               'es2015.symbol.wellknown',
               'es2016.array.include',
               'es2017.object',
-              'es2017.sharedmemory'
+              'es2017.sharedmemory',
+              'esnext.asynciterable'
               ];
 
           options.lib.forEach(option => {
@@ -392,17 +398,25 @@ export function compileAllFiles(options: IGruntTSOptions, compilationInfo: IGrun
       if (options.typeRoots) {
           args.push('--typeRoots', `"${_.map(options.typeRoots, t => utils.stripQuotesIfQuoted(t.trim())).join(',')}"`);
       }
-
+      if (options.downlevelIteration) {
+          args.push('--downlevelIteration');
+      }
+      if (options.disableSizeLimit) {
+          args.push('--disableSizeLimit');
+      }
+      if (options.strict) {
+          args.push('--strict');
+      }
 
       args.push('--target', options.target.toUpperCase());
 
       if (options.module) {
-     	  let moduleOptionString: string = ('' + options.module).toLowerCase();
-      	if ('none|amd|commonjs|system|umd|es6|es2015'.indexOf(moduleOptionString) > -1) {
+          const moduleOptionString: string = ('' + options.module).toLowerCase();
+          if ('none|amd|commonjs|system|umd|es6|es2015'.indexOf(moduleOptionString) > -1) {
               args.push('--module', moduleOptionString);
-      	} else {
-  	        console.warn('WARNING: Option "module" only supports "none" | "amd" | "commonjs" | "system" | "umd" | "es6" | "es2015" '.magenta);
-      	}
+      	  } else {
+  	          console.warn('WARNING: Option "module" only supports "none" | "amd" | "commonjs" | "system" | "umd" | "es6" | "es2015" '.magenta);
+      	  }
       }
 
       if (compilationInfo.outDir) {
