@@ -681,10 +681,29 @@ export const new_TypeScript_2_3_Features: ICompilePromise = (strings, options) =
   });
 }
 
-export const files_dirdesttest: ICompilePromise = (strings, options) => {
+
+export const new_TypeScript_2_4_thru_2_6_Features: ICompilePromise = (strings, options) => {
   return new Promise(function(resolve, reject) {
 
     const command = strings[1].replace(/\\/g,'/');
+
+    if (command.indexOf(`--noStrictGenericChecks`) > -1 &&
+        command.indexOf(`--preserveSymlinks`) > -1 &&
+        command.indexOf(`--skipLibCheck`) > -1 &&
+        command.indexOf(`--strictFunctionTypes`) > -1) {
+      resolve({
+        code: 0,
+        output: ""
+      });
+    }
+    throw `expected to see all of the new TypeScript 2 and 2.1 values in the command line and didn't.  Got this: ${command}`;
+  });
+};
+
+export const files_dirdesttest: ICompilePromise = (strings, options) => {
+  return new Promise(function(resolve, reject) {
+
+    const command = strings[1].replace(/\\/g, '/');
 
     if (command.indexOf(`--outDir test/multifile/a/`) > -1 &&
         command.indexOf(`test/multifile/a/a.ts`) > -1 &&

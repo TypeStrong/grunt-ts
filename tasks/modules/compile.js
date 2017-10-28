@@ -153,11 +153,17 @@ function compileAllFiles(options, compilationInfo) {
         if (options.noResolve) {
             args.push('--noResolve');
         }
+        if (options.noStrictGenericChecks) {
+            args.push('--noStrictGenericChecks');
+        }
         if (options.noEmitOnError) {
             args.push('--noEmitOnError');
         }
         if (options.preserveConstEnums) {
             args.push('--preserveConstEnums');
+        }
+        if (options.preserveSymlinks) {
+            args.push('--preserveSymlinks');
         }
         if (options.suppressImplicitAnyIndexErrors) {
             args.push('--suppressImplicitAnyIndexErrors');
@@ -216,6 +222,9 @@ function compileAllFiles(options, compilationInfo) {
         if (options.reactNamespace) {
             args.push('--reactNamespace', options.reactNamespace);
         }
+        if (options.skipLibCheck) {
+            args.push('--skipLibCheck');
+        }
         if (options.skipDefaultLibCheck) {
             args.push('--skipDefaultLibCheck');
         }
@@ -269,6 +278,9 @@ function compileAllFiles(options, compilationInfo) {
         }
         if (options.noUnusedParameters) {
             args.push('--noUnusedParameters');
+        }
+        if (options.strictFunctionTypes) {
+            args.push('--strictFunctionTypes');
         }
         if (options.strictNullChecks) {
             args.push('--strictNullChecks');

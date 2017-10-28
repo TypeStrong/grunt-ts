@@ -48,6 +48,7 @@
     <TypeScriptOutDir>vsproj_test</TypeScriptOutDir>
     <TypeScriptAllowSyntheticDefaultImports>true</TypeScriptAllowSyntheticDefaultImports>
     <TypeScriptStrictNullChecks>true</TypeScriptStrictNullChecks>
+    <TypeScriptNoStrictGenericChecks>true</TypeScriptNoStrictGenericChecks>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)' == 'Release'">
     <TypeScriptRemoveComments>true</TypeScriptRemoveComments>

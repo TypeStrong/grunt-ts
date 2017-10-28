@@ -128,6 +128,8 @@ interface ITaskOptions {
     /** noLib - do not auto-include the lib.d.ts file in the compilation context */
     noLib: boolean;
     noResolve: boolean;
+    /** Disable strict checking of generic signatures in function types. */
+    noStrictGenericChecks: boolean;
     /** Report errors on unused locals. */
     noUnusedLocals: boolean;
     /** Report errors on unused parameters. */
@@ -135,6 +137,8 @@ interface ITaskOptions {
     /** Const enums will be kept as enums in the emitted JS. If false, the enum values will
      * look like magic numbers with a comment in the emitted JS. */
     preserveConstEnums: boolean;
+    /** Do not resolve symlinks to their real path; treat a symlinked file like a real one. */
+    preserveSymlinks: boolean;
     /** Stylize errors and messages using color and context. */
     pretty: boolean;
     /** Specifies the object invoked for createElement and __spread when targeting 'react' JSX emit. */
@@ -143,12 +147,16 @@ interface ITaskOptions {
     removeComments: boolean;
     /** Sepecifies the root directory of input files.  Use to control the output directory structure with --outDir. */
     rootDir: string;
+    /** Skip type checking of all declaration files (*.d.ts). */
+    skipLibCheck: boolean;
     /** Treat a file as a default lib if it has '/// <reference no-default-lib="true"/> at the top */
     skipDefaultLibCheck: boolean;
     sourceMap: boolean;
     sourceRoot: string;
     /** Enable all strict type checking options. */
     strict: boolean;
+    /** Enforce contravariant function parameter comparison */
+    strictFunctionTypes: boolean;
     /** Enables strict null checking mode (null and undefined are not in the domain of every type) */
     strictNullChecks: boolean;
     /** Does not emit objects marked @internal in jsdoc */

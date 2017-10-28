@@ -18,7 +18,8 @@
         "typeRoots": ["./../node_modules/@types", "./../node_modules/types2_see_issue_391"],
         "types": ["see","issue","391"],
         "checkJs": true,
-        "allowJs": true
+        "allowJs": true,
+        "preserveSymlinks": true
     },
     "filesGlob": [
         "./defs/**/*.ts",

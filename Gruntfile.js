@@ -770,6 +770,17 @@ module.exports = function (grunt) {
                     lib: ['esnext','dom.iterable','es2017.sharedmemory','esnext.asynciterable']
                 }
             },
+            new_TypeScript_2_4_thru_2_6_Features: {
+                test: true,
+                testExecute: commandLineAssertions.new_TypeScript_2_4_thru_2_6_Features,
+                src: 'test/simple/ts/**/*.ts',
+                options: {
+                    noStrictGenericChecks: true,
+                    preserveSymlinks: true,
+                    skipLibCheck: true,
+                    strictFunctionTypes: true
+                }
+            },
             issue_392: {
                 test: true,
                 src: ['test/issue_392/app/**/*.ts',

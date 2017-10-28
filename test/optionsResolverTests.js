@@ -431,11 +431,12 @@ exports.tests = {
     },
     "Visual Studio `vs` Integration Tests": {
         "Visual Studio properties come across as expected": function (test) {
-            test.expect(1);
+            test.expect(2);
             var cfg = getConfig("vs minimalist");
             cfg.options = { sourceMap: false };
             var result = or.resolveAsync(null, cfg).then(function (result) {
                 test.strictEqual(result.allowSyntheticDefaultImports, true);
+                test.strictEqual(result.noStrictGenericChecks, true);
                 test.done();
             }).catch(function (err) { test.ifError(err); test.done(); });
         },
@@ -700,7 +701,7 @@ exports.tests = {
             }).catch(function (err) { test.ifError(err); test.done(); });
         },
         "config entries come through appropriately": function (test) {
-            test.expect(22);
+            test.expect(23);
             var cfg = getConfig("minimalist");
             cfg.tsconfig = './test/tsconfig/full_valid_tsconfig.json';
             var result = or.resolveAsync(null, cfg).then(function (result) {
@@ -720,6 +721,7 @@ exports.tests = {
                 test.strictEqual(result.listFiles, true);
                 test.strictEqual(result.checkJs, true);
                 test.strictEqual(result.allowJs, true);
+                test.strictEqual(result.preserveSymlinks, true);
                 test.strictEqual(result.types.length, 3);
                 test.ok(result.types.indexOf('issue') > -1);
                 test.strictEqual(result.typeRoots.length, 2);
