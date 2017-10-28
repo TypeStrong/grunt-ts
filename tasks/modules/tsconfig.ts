@@ -253,7 +253,7 @@ function getTSConfigSettings(raw: ITargetOptions): ITSConfigSupport {
 function applyCompilerOptions(applyTo: IGruntTSOptions, projectSpec: ITSConfigFile) {
   let result: IGruntTSOptions = applyTo || <any>{};
   const co = projectSpec.compilerOptions,
-    tsconfig: ITSConfigSupport = applyTo.tsconfig;
+    tsconfig = <ITSConfigSupport>applyTo.tsconfig;
 
   absolutePathToTSConfig = path.resolve(tsconfig.tsconfig, '..');
 
@@ -397,7 +397,7 @@ function addFilesToCompilationContext(applyTo: IGruntTSOptions, projectSpec: ITS
 
   const result: IGruntTSOptions = applyTo,
     co = projectSpec.compilerOptions,
-    tsconfig: ITSConfigSupport = applyTo.tsconfig,
+    tsconfig = <ITSConfigSupport>applyTo.tsconfig,
     src = applyTo.CompilationTasks[0].src;
 
   if (projectSpec.exclude) {

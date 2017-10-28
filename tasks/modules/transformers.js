@@ -84,10 +84,10 @@ var BaseTransformer = (function () {
     BaseTransformer.containsTransformSignature = function (line) {
         return BaseTransformer.tsSignatureMatch.test(line);
     };
+    BaseTransformer.tsSignatureMatch = /\/\/\/\s*ts\:/;
+    BaseTransformer.tsTransformerMatch = '^///\\s*ts:{0}(=?)(.*)';
     return BaseTransformer;
 }());
-BaseTransformer.tsSignatureMatch = /\/\/\/\s*ts\:/;
-BaseTransformer.tsTransformerMatch = '^///\\s*ts:{0}(=?)(.*)';
 var BaseImportExportTransformer = (function (_super) {
     __extends(BaseImportExportTransformer, _super);
     function BaseImportExportTransformer(key, variableSyntax, template, getIndexIfDir, removeExtensionFromFilePath) {

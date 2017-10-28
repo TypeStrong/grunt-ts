@@ -136,7 +136,7 @@ export function compileAllFiles(options: IGruntTSOptions, compilationInfo: IGrun
         }
     }
 
-    const tsconfig: ITSConfigSupport = options.tsconfig;
+    const tsconfig = <ITSConfigSupport>options.tsconfig;
     let tsc: string,
       tscVersion: string = '';
 
