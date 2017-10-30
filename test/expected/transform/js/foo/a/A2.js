@@ -10,7 +10,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 var A1 = require("./A1");
-var A2 = (function (_super) {
+var A2 = /** @class */ (function (_super) {
     __extends(A2, _super);
     function A2() {
         return _super !== null && _super.apply(this, arguments) || this;

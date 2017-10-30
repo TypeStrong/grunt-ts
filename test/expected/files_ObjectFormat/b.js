@@ -8,13 +8,13 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-var C = (function () {
+var C = /** @class */ (function () {
     function C() {
     }
     return C;
 }());
 /// <reference path="reference.ts"/>
-var B = (function (_super) {
+var B = /** @class */ (function (_super) {
     __extends(B, _super);
     function B() {
         return _super !== null && _super.apply(this, arguments) || this;
@@ -27,14 +27,14 @@ var B = (function (_super) {
 //grunt-end
 /// <reference path="a.ts" /> 
 /// <reference path="reference.ts"/>
-var A = (function (_super) {
+var A = /** @class */ (function (_super) {
     __extends(A, _super);
     function A() {
         return _super !== null && _super.apply(this, arguments) || this;
     }
     return A;
 }(B));
-var Animal = (function () {
+var Animal = /** @class */ (function () {
     function Animal(name) {
         this.name = name;
     }
@@ -43,7 +43,7 @@ var Animal = (function () {
     };
     return Animal;
 }());
-var Snake = (function (_super) {
+var Snake = /** @class */ (function (_super) {
     __extends(Snake, _super);
     function Snake(name) {
         return _super.call(this, name) || this;
@@ -54,7 +54,7 @@ var Snake = (function (_super) {
     };
     return Snake;
 }(Animal));
-var Horse = (function (_super) {
+var Horse = /** @class */ (function (_super) {
     __extends(Horse, _super);
     function Horse(name) {
         return _super.call(this, name) || this;

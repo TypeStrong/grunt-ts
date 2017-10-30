@@ -280,7 +280,7 @@ exports.asyncSeries = asyncSeries;
 function copyFile(srcFile, destFile, callback, encoding) {
     if (encoding === void 0) { encoding = 'utf8'; }
     fs.readFile(srcFile, encoding, function (err, data) {
-        fs.writeFile(destFile, data, encoding, function (err) {
+        fs.writeFile(destFile, data, { encoding: encoding }, function (err) {
             if (err) {
                 return callback(err);
             }

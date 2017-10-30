@@ -136,7 +136,7 @@ export function compileAllFiles(options: IGruntTSOptions, compilationInfo: IGrun
         }
     }
 
-    const tsconfig: ITSConfigSupport = options.tsconfig;
+    const tsconfig = <ITSConfigSupport>options.tsconfig;
     let tsc: string,
       tscVersion: string = '';
 
@@ -219,11 +219,17 @@ export function compileAllFiles(options: IGruntTSOptions, compilationInfo: IGrun
       if (options.noResolve) {
           args.push('--noResolve');
       }
+      if (options.noStrictGenericChecks) {
+        args.push('--noStrictGenericChecks');
+      }
       if (options.noEmitOnError) {
           args.push('--noEmitOnError');
       }
       if (options.preserveConstEnums) {
           args.push('--preserveConstEnums');
+      }
+      if (options.preserveSymlinks) {
+          args.push('--preserveSymlinks');
       }
       if (options.suppressImplicitAnyIndexErrors) {
           args.push('--suppressImplicitAnyIndexErrors');
@@ -282,6 +288,9 @@ export function compileAllFiles(options: IGruntTSOptions, compilationInfo: IGrun
       if (options.reactNamespace) {
           args.push('--reactNamespace', options.reactNamespace);
       }
+      if (options.skipLibCheck) {
+        args.push('--skipLibCheck');
+      }
       if (options.skipDefaultLibCheck) {
           args.push('--skipDefaultLibCheck');
       }
@@ -335,6 +344,9 @@ export function compileAllFiles(options: IGruntTSOptions, compilationInfo: IGrun
       }
       if (options.noUnusedParameters) {
           args.push('--noUnusedParameters');
+      }
+      if (options.strictFunctionTypes) {
+          args.push('--strictFunctionTypes');
       }
       if (options.strictNullChecks) {
           args.push('--strictNullChecks');

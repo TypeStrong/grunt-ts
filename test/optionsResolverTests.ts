@@ -449,11 +449,12 @@ export var tests : nodeunit.ITestGroup = {
 
   "Visual Studio `vs` Integration Tests": {
     "Visual Studio properties come across as expected": (test: nodeunit.Test) => {
-      test.expect(1);
+      test.expect(2);
       const cfg = getConfig("vs minimalist");
       cfg.options = <any>{sourceMap : false};
       const result = or.resolveAsync(null, cfg).then((result) => {
         test.strictEqual(result.allowSyntheticDefaultImports, true)
+        test.strictEqual(result.noStrictGenericChecks, true)
         test.done();
       }).catch((err) => {test.ifError(err); test.done();});
     },
@@ -733,7 +734,7 @@ export var tests : nodeunit.ITestGroup = {
         }).catch((err) => {test.ifError(err); test.done();});
     },
     "config entries come through appropriately": (test: nodeunit.Test) => {
-        test.expect(22);
+        test.expect(23);
         const cfg = getConfig("minimalist");
         cfg.tsconfig = './test/tsconfig/full_valid_tsconfig.json';
 
@@ -754,6 +755,7 @@ export var tests : nodeunit.ITestGroup = {
           test.strictEqual(result.listFiles, true);
           test.strictEqual(result.checkJs, true);
           test.strictEqual(result.allowJs, true);
+          test.strictEqual(result.preserveSymlinks, true);
           test.strictEqual(result.types.length, 3);
           test.ok(result.types.indexOf('issue') > -1);
           test.strictEqual(result.typeRoots.length, 2);
