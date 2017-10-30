@@ -7,7 +7,7 @@
 Grunt-ts is an npm package that handles TypeScript compilation work in GruntJS build scripts.  It provides a [Grunt-compatible wrapper](#support-for-tsc-switches) for the `tsc` command-line compiler, and provides some [additional functionality](#grunt-ts-gruntfilejs-options) that improves the TypeScript development workflow. Grunt-ts supports compiling against [tsconfig.json](#tsconfig) or even a [Visual Studio project](#vs) directly.  Grunt-ts is itself written in [TypeScript](./tasks/ts.ts).
 
 ### Latest Changes
-Latest beta release is `6.0.0-beta.16` which is compatible with TypeScript 2.2, and any future version of TypeScript by using the [tsconfig.json passthrough](#passthrough) feature, or the [additionalFlags](#additionalflags) option.
+Latest beta release is `6.0.0-beta.17` which is compatible with TypeScript 2.5, and any future version of TypeScript by using the [tsconfig.json passthrough](#passthrough) feature, or the [additionalFlags](#additionalflags) option.
 Latest stable release is `5.5.1` with built-in support for features added in TypeScript 1.8.  [Full changelog is here](CHANGELOG.md).
 
 ### How To Contribute
@@ -27,7 +27,7 @@ To install grunt-ts, you must first install TypeScript and GruntJS.
 
 ## Getting Started
 
-If you've never used GruntJS on your computer, you should [follow the detailed instructions here](/docs/DetailedGettingStartedInstructions.md) to get Node.js and the grunt-cli working.  If you're a Grunt expert, simply follow these steps:
+If you've never used GruntJS on your computer, you should [follow the detailed instructions here](/docs/DetailedGettingStartedInstructions.md) to get Node.js and the grunt-cli working.  If you're a Grunt expert, follow these steps:
 
  * Run `npm install grunt-ts` in your project directory; this will install `grunt-ts`, TypeScript, and GruntJS.
  * Add the `ts` task in your `Gruntfile.js` (see below for a minimalist one).
@@ -99,20 +99,24 @@ Grunt-ts provides explicit support for most `tsc` switches.  Any arbitrary switc
 |--noImplicitAny|[noImplicitAny](#noimplicitany)|Warn on expressions and declarations with an implied `any` type.|
 |--noImplicitUseStrict|[noImplicitUseStrict](#noimplicitusestrict)|Warn on expressions and declarations with an implied `any` type.|
 |--noImplicitReturns|[noImplicitReturns](#noimplicitreturns)|Report error when not all code paths in function return a value.|
-|--noImplicitThis|[noImplicitThis](#noImplicitThis)|Raise error on `this` expressions with an implied `any` type.|
+|--noImplicitThis|[noImplicitThis](#noimplicitthis)|Raise error on `this` expressions with an implied `any` type.|
+|--noStrictGenericChecks|[noStrictGenericChecks](#nostrictgenericchecks)|Disable strict checking of generic signatures in function types.|
 |--noLib|[noLib](#nolib)|Do not automatically include lib.d.ts is compilation context.|
 |--noResolve|[noResolve](#noresolve)|Do not add triple-slash references or module import targets to the compilation context.|
 |--out FILE|[out](#out)|Concatenate and emit output to a single file.|
 |--outDir DIRECTORY|[outDir](#outdir)|Redirect output structure to the directory.|
 |--preserveConstEnums|[preserveConstEnums](#preserveconstenums)|Const enums will be kept as enums in the emitted JS.|
+|--preserveSymlinks|[preserveSymlinks](#preservesymlinks)|Do not resolve symlinks to their real path; treat a symlinked file like a real one.|
 |--pretty|[pretty](#pretty)|Stylize errors and messages using color and context.|
 |--reactNamespace|[reactNamespace](#reactnamespace)|Specifies the object invoked for  createElement  and  __spread  when targeting 'react' JSX emit.|
 |--removeComments|[removeComments](#removecomments)|Configures if comments should be included in the output|
 |--rootDir|[rootDir](#rootdir)|Allows override of common root folder calculated by `--outDir`.|
 |--skipDefaultLibCheck|[skipDefaultLibCheck](#skipdefaultlibcheck)|Don't check a user-defined default lib file's validity.|
+|--skipLibCheck|[skipLibCheck](#skiplibcheck)|Skip type checking of all declaration files (*.d.ts).|
 |--strictNullChecks|[strictNullChecks](#strictNullChecks)|Enables strict null checking mode.|
 |--sourceMap|[sourceMap](#sourcemap)|Generates corresponding `.map` file|
 |--sourceRoot LOCATION|[sourceRoot](#sourceroot)|Specifies the location where debugger should locate TypeScript files instead of source locations.|
+|--strictFunctionTypes|[strictFunctionTypes](#strictfunctiontypes)|Enforce contravariant function parameter comparison|
 |--stripInternal|[stripInternal](#stripinternal)|does not emit members marked as @internal.|
 |--suppressExcessPropertyErrors|[suppressExcessPropertyErrors](#suppressexcesspropertyerrors)|Disables strict object literal assignment checking (experimental).|
 |--suppressImplicitAnyIndexErrors|[suppressImplicitAnyIndexErrors](#suppressimplicitanyindexerrors)|Specifies the location where debugger should locate TypeScript files instead of source locations.|
@@ -167,25 +171,29 @@ For file ordering, look at [JavaScript Generation](#javascript-generation).
 |[noImplicitThis](#noImplicitThis)|option|`true`, `false` (default) - Raise error on this expressions with an implied `any` type.|
 |[noLib](#nolib)|option|`true`, `false` (default) - do not automatically include lib.d.ts in compilation context|
 |[noResolve](#noresolve)|option|`true`, `false` (default) - for deprecated version of TypeScript|
+|[noStrictGenericChecks](#nostrictgenericchecks)|option|`true`, `false` (default) - Disable strict checking of generic signatures in function types.|
 |[options](#grunt-ts-target-options)|target||
 |[out](#out)|target|`string` - instruct `tsc` to concatenate output to this file.|
 |[outDir](#outdir)|target|`string` - instruct `tsc` to emit JS to this directory.|
 |[preserveConstEnums](#preserveconstenums)|option|`true`, `false` (default) - If true, const enums will be kept as enums in the emitted JS.|
+|[preserveSymlinks](#preservesymlinks)|option|`true`, `false` (default) - If true, do not resolve symlinks to their real path; treat a symlinked file like a real one.|
 |[pretty](#pretty)|option|`true`, `false` (default) - Stylize errors and messages using color and context.|
 |[reactNamespace](#reactnamespace)|option|`string` - Specifies the object invoked for `createElement` and `__spread` when targeting 'react' JSX emit.|
 |[reference](#reference)|target|`string` - tells grunt-ts which file to use for maintaining references|
 |[removeComments](#removecomments)|option|`true` (default), `false` - removes comments in emitted JS|
 |[rootDir](#rootdir)|option|`string` - Allows override of common root folder calculated by `--outDir`.|
 |[skipDefaultLibCheck](#skipdefaultlibcheck)|option|`true`, `false` (default) - Don't check a user-defined default lib file's validity.|
+|[skipLibCheck](#skiplibcheck)|option|`true`, `false` (default) - Skip type checking of all declaration files (*.d.ts).|
 |[sourceRoot](#sourceroot)|option|`string` - root for referencing TS files in `.js.map`|
 |[sourceMap](#sourcemap)|option|`true` (default), `false` - indicates if source maps should be generated (`.js.map`)|
+|[strictFunctionTypes](#strictNullChecks)|option|`true`, `false` (default) - Enforce contravariant function parameter comparison.|
 |[strictNullChecks](#strictNullChecks)|option|`true`, `false` (default) - Enables strict null checking mode.|
 |[stripInternal](#stripinternal)|option|`true`, `false` (default) - does not emit members marked as @internal.|
 |[suppressExcessPropertyErrors](#suppressexcesspropertyerrors)|option|`false` (default), `true` - indicates if TypeScript should disable strict object literal assignment checking (experimental)|
 |[suppressImplicitAnyIndexErrors](#suppressimplicitanyindexerrors)|option|`false` (default), `true` - indicates if TypeScript should allow access to properties of an object by string indexer when `--noImplicitAny` is active, even if TypeScript doesn't know about them.|
 |[src](#src)|target|`string` or `string[]` - glob of TypeScript files to compile.|
 |[target](#target)|option|`'es5'` (default), `'es3'`, or `'es6'` - targeted ECMAScript version|
-|[tsCacheDir](#tsCacheDir)|target|`.tscache` (default), a string path where the local TS cache directory will be created when the `'fast'` option is not set to `'never'`.|
+|[tsCacheDir](#tscachedir)|target|`./.tscache` (default), a string path where the local TS cache directory will be created when the `'fast'` option is not set to `'never'`.|
 |[tsconfig](#tsconfig)|target|true, a string path, or an object.  See [tsconfig](#tsconfig) for details.|
 |[verbose](#verbose)|option|`true`, `false` (default) - logs `tsc` command-line options to console|
 |[vs](#vs)|target|`string` referencing a `.csproj` or `.vbproj` file or, `{}` (object) (see [Visual Studio Projects](#vs) for details)|
@@ -1211,6 +1219,26 @@ grunt.initConfig({
 });
 ````
 
+#### noImplicitGenericChecks
+
+````javascript
+true | false (default)
+````
+
+Set to true to pass `--noImplicitGenericChecks` to the compiler.  Disables strict checking of generic signatures in function types.
+
+````javascript
+grunt.initConfig({
+  ts: {
+    default: {
+      options: {
+        noImplicitGenericChecks: true
+      }
+    }
+  }
+});
+````
+
 #### noLib
 
 ````javascript
@@ -1263,6 +1291,26 @@ grunt.initConfig({
     default: {
       options: {
         preserveConstEnums: true
+      }
+    }
+  }
+});
+````
+
+#### preserveSymlinks
+
+````javascript
+true | false (default)
+````
+
+Set to true to pass `--preserveSymlinks` to the compiler.  If set, TypeScript will not resolve symlinks to their real path; instead it will treat a symlinked file like a real one.
+
+````javascript
+grunt.initConfig({
+  ts: {
+    default: {
+      options: {
+        preserveSymlinks: true
       }
     }
   }
@@ -1349,7 +1397,7 @@ grunt.initConfig({
 true | false (default)
 ````
 
-Don't check a user-defined default lib file's validity.
+Don't check a user-defined default lib file's validity.  This switch is deprecated in TypeScript 2.5+ (use skipLibCheck instead).
 
 ````javascript
 grunt.initConfig({
@@ -1357,6 +1405,46 @@ grunt.initConfig({
     default: {
       options: {
         skipDefaultLibCheck: true
+      }
+    }
+  }
+});
+````
+
+#### skipLibCheck
+
+````javascript
+true | false (default)
+````
+
+Skip type checking of all declaration files (*.d.ts).
+
+````javascript
+grunt.initConfig({
+  ts: {
+    default: {
+      options: {
+        skipLibCheck: true
+      }
+    }
+  }
+});
+````
+
+#### strictFunctionTypes
+
+````javascript
+true | false (default)
+````
+
+Enforce contravariant function parameter comparison.  Under `--strictFunctionTypes`, any function type that doesn't originate from a method has its parameters compared [contravariantly](https://en.wikipedia.org/wiki/Covariance_and_contravariance_%28computer_science%29).
+
+````javascript
+grunt.initConfig({
+  ts: {
+    default: {
+      options: {
+        strictFunctionTypes: true
       }
     }
   }

@@ -2,6 +2,12 @@
 
 ## vNext
 
+## v6.0.0-beta.17
+* FEAT: Adds support for compiler features up to TypeScript 2.6 RC (strictFunctionChecks).
+* FIX: Whoops I didn't realize `skipLibCheck` and `skipDefaultLibCheck` were different.  Fixed in this release - thanks [@kierans](https://github.com/kierans) (#413).
+* FEAT: Somewhat tighter npm package due to improved .npmignore file.  Thanks to first time contributor, [@stevegreatrex](https://github.com/stevegreatrex) (#287) (#411).
+* FEAT: New support for specifying location of the tscache directory.  See docs for `tsCacheDir` for more details.  Thanks very much to first time contributor [@beebs93](https://github.com/beebs93) (#414) (#415).
+
 ## v6.0.0-beta.16
 * FIX: Now accepts more watchable file extensions.  Thanks for the PR, first time contributor, [@LibanHassan](https://github.com/LibanHassan) (#404) Issue not found? Not after Liban fixed it, anyway :-)
 * FIX: When using `baseDir` task option, will no longer include `.baseDir.ts` file in the compilation context.  Thanks for the PR, first time contributor [@nobuoka](https://github.com/nobuoka) (#380).  Sorry it took so long to review this PR!!!
