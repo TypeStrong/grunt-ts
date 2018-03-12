@@ -13,11 +13,12 @@ New features and performance improvements will be considered if they are of broa
 ## Steps To Update grunt-ts to a New Version of TypeScript
 
   * Set up a new branch in your fork of the repository.
-  * Update the dependencies section of `package.json` to the new TypeScript version and run `npm install`.
-  * Run `grunt release` and see if there are any errors.
-  * Fix the errors.
-    * Very commonly there will be "diff" errors.  Grunt-ts will generate `kdiff3` commands for all "diff" errors.  In cases where the difference is due to how the new version of TypeScript emits the JS code, simply update the expected version to match by merging the changes inside `kdiff3` and choosing `A` for all the changes.
-  * Once `grunt release` compiles cleanly, check everything in.
+  * OPTIONAL: If you wish to update grunt-ts itself to use the latest TypeScript version
+    * Update the dependencies section of `package.json` to the new TypeScript version and run `npm install`.
+    * Run `grunt release` and see if there are any errors.
+    * Fix the errors.
+      * Very commonly there will be "diff" errors.  Grunt-ts will generate `kdiff3` commands for all "diff" errors.  In cases where the difference is due to how the new version of TypeScript emits the JS code, simply update the expected version to match by merging the changes inside `kdiff3` and choosing `A` for all the changes.
+    * Once `grunt release` compiles cleanly, check everything in.
   * Now, it's necessary to update grunt-ts to support the new TypeScript version's switches.  Open `tasks/modules/optionsResolver.ts`.  Early in that file is a link to the TypeScript wiki where the compiler options are documented.  Compare that list to the switches in `propertiesFromTarget` and `propertiesFromTargetOptions`.  Add any new switches to `propertiesFromTargetOptions` unless there is an overwhelmingly strong reason to add it to the target itself.
   * Once that is done, add code to accept each of those switches to `ITaskOptions` in `tasks/modules/interfaces.d.ts`.  Provide some JSDoc if possible.
   * Next, update `tasks/modules/defaults.ts`.  First, update the `TypeScriptDefaults` variable to set the new switches to whatever tsc will do - generally `false` for booleans and `null` for everything else (essentially falsy values).  Then, if necessary, modify the function `applyGruntTSDefaults` to apply what grunt-ts should do that is different than what `tsc` does by default (this is unlikely for new TypeScript features).
