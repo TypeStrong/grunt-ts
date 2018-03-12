@@ -734,7 +734,7 @@ export var tests : nodeunit.ITestGroup = {
         }).catch((err) => {test.ifError(err); test.done();});
     },
     "config entries come through appropriately": (test: nodeunit.Test) => {
-        test.expect(23);
+        test.expect(24);
         const cfg = getConfig("minimalist");
         cfg.tsconfig = './test/tsconfig/full_valid_tsconfig.json';
 
@@ -756,6 +756,7 @@ export var tests : nodeunit.ITestGroup = {
           test.strictEqual(result.checkJs, true);
           test.strictEqual(result.allowJs, true);
           test.strictEqual(result.preserveSymlinks, true);
+          test.strictEqual(result.esModuleInterop, true);
           test.strictEqual(result.types.length, 3);
           test.ok(result.types.indexOf('issue') > -1);
           test.strictEqual(result.typeRoots.length, 2);

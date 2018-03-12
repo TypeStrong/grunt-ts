@@ -25,9 +25,9 @@ const propertiesFromTarget = ['amdloader', 'baseDir', 'html', 'htmlOutDir', 'htm
         'baseUrl',
         'charset',
         'checkJs',
-        'comments',
+        'comments',  /* grunt-ts specific */
         'compile',
-        'compiler',
+        'compiler',  /* grunt-ts specific */
         'declaration',
         'declarationDir',
         'diagnostics',
@@ -35,17 +35,18 @@ const propertiesFromTarget = ['amdloader', 'baseDir', 'html', 'htmlOutDir', 'htm
         'downlevelIteration',
         'emitBOM',
         'emitDecoratorMetadata',
-        'emitGruntEvents',
+        'emitGruntEvents',  /* grunt-ts specific */
+        'esModuleInterop',
         'experimentalAsyncFunctions',
         'experimentalDecorators',
-        'failOnTypeErrors',
-        'fast',
+        'failOnTypeErrors',  /* grunt-ts specific */
+        'fast',  /* grunt-ts specific */
         /* help purposefully not supported. */
         'forceConsistentCasingInFileNames',
-        'htmlModuleTemplate',
-        'htmlOutDir',
-        'htmlOutDirFlatten',
-        'htmlOutputTemplate',
+        'htmlModuleTemplate',  /* grunt-ts specific */
+        'htmlOutDir',  /* grunt-ts specific */
+        'htmlOutDirFlatten',  /* grunt-ts specific */
+        'htmlOutputTemplate',  /* grunt-ts specific */
         'htmlVarTemplate',
         'importHelpers',
         'inlineSourceMap',
@@ -91,6 +92,7 @@ const propertiesFromTarget = ['amdloader', 'baseDir', 'html', 'htmlOutDir', 'htm
         'strict',
         'strictFunctionTypes',
         'strictNullChecks',
+        'strictPropertyInitialization',
         'stripInternal',
         'suppressExcessPropertyErrors',
         'suppressImplicitAnyIndexErrors',
