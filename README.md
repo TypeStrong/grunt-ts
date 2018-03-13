@@ -7,11 +7,14 @@
 Grunt-ts is an npm package that handles TypeScript compilation work in GruntJS build scripts.  It provides a [Grunt-compatible wrapper](#support-for-tsc-switches) for the `tsc` command-line compiler, and provides some [additional functionality](#grunt-ts-gruntfilejs-options) that improves the TypeScript development workflow. Grunt-ts supports compiling against [tsconfig.json](#tsconfig) or even a [Visual Studio project](#vs) directly.  Grunt-ts is itself written in [TypeScript](./tasks/ts.ts).
 
 ### Latest Changes
-Latest beta release is `6.0.0-beta.17` which is compatible with TypeScript 2.5, and any future version of TypeScript by using the [tsconfig.json passthrough](#passthrough) feature, or the [additionalFlags](#additionalflags) option.
+Latest beta release is `6.0.0-beta.18` which is compatible with TypeScript 2.7, and any future version of TypeScript by using the [tsconfig.json passthrough](#passthrough) feature, or the [additionalFlags](#additionalflags) option.
 Latest stable release is `5.5.1` with built-in support for features added in TypeScript 1.8.  [Full changelog is here](CHANGELOG.md).
 
 ### How To Contribute
 Thank you for your interest in contributing!  Please see the [contributing](CONTRIBUTING.md) guide for details.
+
+### Looking for Maintainers
+Do you use grunt-ts?  Would you like to help keep it up-to-date for new TypeScript versions?  Please let [@nycdotnet](https://github.com/nycdotnet) know.
 
 ## Quickstart
 
@@ -33,7 +36,24 @@ If you've never used GruntJS on your computer, you should [follow the detailed i
  * Add the `ts` task in your `Gruntfile.js` (see below for a minimalist one).
  * Run `grunt` at the command line in your project folder to compile your TypeScript code.
 
-This minimalist `Gruntfile.js` will compile `*.ts` files in all subdirectories of the project folder, excluding anything under `node_modules`:
+This minimalist `Gruntfile.js` will compile your TypeScript project using the specified `tsconfig.json` file.  Using a `tsconfig.json` is the best way to use TypeScript:
+
+````javascript
+// 
+module.exports = function(grunt) {
+  grunt.initConfig({
+    ts: {
+      default : {
+        tsconfig: './tsconfig.json'
+      }
+    }
+  });
+  grunt.loadNpmTasks("grunt-ts");
+  grunt.registerTask("default", ["ts"]);
+};
+````
+
+If you prefer the GruntJS idiom, this minimalist `Gruntfile.js` will compile `*.ts` files in all subdirectories of the project folder, excluding anything under `node_modules`.  Please note - it is almost always better to use a `tsconfig.json` to compile your TypeScript instead of doing it this way:
 
 ````javascript
 module.exports = function(grunt) {
@@ -79,6 +99,7 @@ Grunt-ts provides explicit support for most `tsc` switches.  Any arbitrary switc
 |--allowUnusedLabels|[allowUnusedLabels](#allowunusedlabels)|Do not report errors on unused labels.|
 |--declaration|[declaration](#declaration)|Generates a `.d.ts` definitions file for compiled TypeScript files|
 |--emitDecoratorMetadata|[emitDecoratorMetadata](#emitdecoratormetadata)|Emit metadata for type/parameter decorators.|
+|--esModuleInterop|[esModuleInterop](#esmoduleinterop)|Requires default import of callable CommonJS modules but with runtime behavior like Babel or Webpack.|
 |--experimentalAsyncFunctions|[experimentalAsyncFunctions](#experimentalasyncfunctions)|Enables experimental support for proposed ECMAScript async functions|
 |--experimentalDecorators|[experimentalDecorators](#experimentaldecorators)|Enables experimental support for proposed ECMAScript decorators|
 |--forceConsistentCasingInFileNames|[forceConsistentCasingInFileNames](#forceConsistentCasingInFileNames)|Disallow inconsistently-cased references to the same file.|
@@ -113,10 +134,12 @@ Grunt-ts provides explicit support for most `tsc` switches.  Any arbitrary switc
 |--rootDir|[rootDir](#rootdir)|Allows override of common root folder calculated by `--outDir`.|
 |--skipDefaultLibCheck|[skipDefaultLibCheck](#skipdefaultlibcheck)|Don't check a user-defined default lib file's validity.|
 |--skipLibCheck|[skipLibCheck](#skiplibcheck)|Skip type checking of all declaration files (*.d.ts).|
-|--strictNullChecks|[strictNullChecks](#strictNullChecks)|Enables strict null checking mode.|
 |--sourceMap|[sourceMap](#sourcemap)|Generates corresponding `.map` file|
 |--sourceRoot LOCATION|[sourceRoot](#sourceroot)|Specifies the location where debugger should locate TypeScript files instead of source locations.|
+|--strict|[strict](#strict)|Macro for all strict behavior|
 |--strictFunctionTypes|[strictFunctionTypes](#strictfunctiontypes)|Enforce contravariant function parameter comparison|
+|--strictNullChecks|[strictNullChecks](#strictNullChecks)|Enables strict null checking mode.|
+|--strictPropertyInitialization|[strictPropertyInitialization](#strictpropertyinitialization)|Ensure properties are initialized before use|
 |--stripInternal|[stripInternal](#stripinternal)|does not emit members marked as @internal.|
 |--suppressExcessPropertyErrors|[suppressExcessPropertyErrors](#suppressexcesspropertyerrors)|Disables strict object literal assignment checking (experimental).|
 |--suppressImplicitAnyIndexErrors|[suppressImplicitAnyIndexErrors](#suppressimplicitanyindexerrors)|Specifies the location where debugger should locate TypeScript files instead of source locations.|
@@ -141,6 +164,7 @@ For file ordering, look at [JavaScript Generation](#javascript-generation).
 |[declaration](#declaration)|option|`true`, `false` (default) - indicates that definition files should be emitted.|
 |[emitDecoratorMetadata](#emitdecoratormetadata)|option|`true`, `false` (default) - set to true to emit metadata for proposed ECMAScript decorators (will enable experimentalDecorators)|
 |[emitGruntEvents](#emitgruntevents)|option|`true`, `false` (default) - set to true to raise an event in Grunt upon failed builds.|
+|[esModuleInterop](#esmoduleinterop)|option|`true`, `false` (default) - set to true to enable the interop behavior.|
 |[experimentalAsyncFunctions](#experimentalasyncfunctions)|option|`true`, `false` (default) - set to true to enable support for proposed ECMAScript async functions (in ES6 mode only)|
 |[experimentalDecorators](#experimentaldecorators)|option|`true`, `false` (default) - set to true to enable support for proposed ECMAScript decorators|
 |[failOnTypeErrors](#failontypeerrors)|option|`true` (default), `false` - fail Grunt pipeline if there is a type error.  (See also [noEmitOnError](#noemithelpers))|
@@ -186,8 +210,10 @@ For file ordering, look at [JavaScript Generation](#javascript-generation).
 |[skipLibCheck](#skiplibcheck)|option|`true`, `false` (default) - Skip type checking of all declaration files (*.d.ts).|
 |[sourceRoot](#sourceroot)|option|`string` - root for referencing TS files in `.js.map`|
 |[sourceMap](#sourcemap)|option|`true` (default), `false` - indicates if source maps should be generated (`.js.map`)|
+|[strict](#strict)|option|`true`, `false` (default) - Macro for all strict behavior.|
 |[strictFunctionTypes](#strictNullChecks)|option|`true`, `false` (default) - Enforce contravariant function parameter comparison.|
 |[strictNullChecks](#strictNullChecks)|option|`true`, `false` (default) - Enables strict null checking mode.|
+|[strictPropertyInitialization](#strictpropertyinitialization)|option|`true`, `false` (default) - Enables strict null checking mode.|
 |[stripInternal](#stripinternal)|option|`true`, `false` (default) - does not emit members marked as @internal.|
 |[suppressExcessPropertyErrors](#suppressexcesspropertyerrors)|option|`false` (default), `true` - indicates if TypeScript should disable strict object literal assignment checking (experimental)|
 |[suppressImplicitAnyIndexErrors](#suppressimplicitanyindexerrors)|option|`false` (default), `true` - indicates if TypeScript should allow access to properties of an object by string indexer when `--noImplicitAny` is active, even if TypeScript doesn't know about them.|
@@ -658,6 +684,24 @@ grunt.initConfig({
   ts: {
     options: {
       emitDecoratorMetadata: true
+    }
+  }
+});
+````
+
+#### esModuleInterop
+
+````javascript
+true | false (default)
+````
+
+A new compatability mode to enable consistent runtime behavior with Babel and Webpack with regards to callable default ES module imports.  See the [TypeScript 2.7 Anouncement blog post](https://blogs.msdn.microsoft.com/typescript/2018/01/31/announcing-typescript-2-7/) for more details.
+
+````javascript
+grunt.initConfig({
+  ts: {
+    options: {
+      esModuleInterop: true
     }
   }
 });
@@ -1431,6 +1475,26 @@ grunt.initConfig({
 });
 ````
 
+#### strict
+
+````javascript
+true | false (default)
+````
+
+The strict property is a macro to enable all of the strict checks in TypeScript
+
+````javascript
+grunt.initConfig({
+  ts: {
+    default: {
+      options: {
+        strict: true
+      }
+    }
+  }
+});
+````
+
 #### strictFunctionTypes
 
 ````javascript
@@ -1465,6 +1529,26 @@ grunt.initConfig({
     default: {
       options: {
         strictNullChecks: true
+      }
+    }
+  }
+});
+````
+
+#### strictPropertyInitialization
+
+````javascript
+true | false (default)
+````
+
+The strictPropertyInitialization property ensures that properties are initialized before use
+
+````javascript
+grunt.initConfig({
+  ts: {
+    default: {
+      options: {
+        strictPropertyInitialization: true
       }
     }
   }

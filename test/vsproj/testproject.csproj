@@ -49,6 +49,7 @@
     <TypeScriptAllowSyntheticDefaultImports>true</TypeScriptAllowSyntheticDefaultImports>
     <TypeScriptStrictNullChecks>true</TypeScriptStrictNullChecks>
     <TypeScriptNoStrictGenericChecks>true</TypeScriptNoStrictGenericChecks>
+    <TypeScriptESModuleInterop>true</TypeScriptESModuleInterop>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)' == 'Release'">
     <TypeScriptRemoveComments>true</TypeScriptRemoveComments>

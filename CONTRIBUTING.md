@@ -2,13 +2,12 @@
 
 Thank you for your interest in contributing!
 
-This project is in a mature maintenance phase.  This means that the grunt-ts maintainers are focused on the following:
+This project is in a mature maintenance phase.  This means that the grunt-ts [maintainer](https://github.com/nycdotnet) is focused on the following:
 
   * Compatibility with the latest stable version of TypeScript (native support for new switches, etc.)
   * Reliability enhancements such as bug fixes with tests
 
-New features and performance improvements will be considered if they are of broad benefit and well documented/covered with adequate tests.  Before you start coding, please open an issue to discuss your idea!
-
+New features (other than compatibility with new TypeScript versions) are no longer being considered.  I would love some help if you want to contribute compatability updates, though!  Please reach out.
 
 ## Steps To Update grunt-ts to a New Version of TypeScript
 

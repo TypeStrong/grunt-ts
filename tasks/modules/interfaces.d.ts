@@ -196,7 +196,7 @@ interface ICompileResult {
 }
 
 interface ICompilePromise {
-  (args: string[], options?: IGruntTSOptions): Promise<ICompileResult>;
+  (args: string[], options?: Partial<IGruntTSOptions>): Promise<ICompileResult>;
 }
 
 interface IGruntTSOptions extends ITaskOptions, ITargetOptions {

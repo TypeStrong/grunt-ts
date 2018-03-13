@@ -223,7 +223,7 @@ class UnknownTransformer extends BaseTransformer implements ITransformer {
 export function transformFiles(
     changedFiles: string[],
     targetFiles: string[],
-    options: IGruntTSOptions) {
+    options: Partial<IGruntTSOptions>) {
 
     currentTargetDirs = getTargetFolders(targetFiles);
     currentTargetFiles = targetFiles;
