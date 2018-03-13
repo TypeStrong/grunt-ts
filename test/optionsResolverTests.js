@@ -421,6 +421,38 @@ exports.tests = {
                 test.done();
             }).catch(function (err) { test.ifError(err); test.done(); });
         },
+        "out overrides out in tsconfig": function (test) {
+            var config = {
+                options: {
+                    target: 'es5'
+                },
+                build: {
+                    out: 'myfile.js',
+                    tsconfig: 'test/tsconfig/test_simple_with_out.json',
+                }
+            };
+            var result = or.resolveAsync(config, config.build, "build").then(function (result) {
+                test.strictEqual(result.target, "es5");
+                test.strictEqual(result.CompilationTasks[0].out, "myfile.js");
+                test.done();
+            }).catch(function (err) { test.ifError(err); test.done(); });
+        },
+        "out overrides outFile in tsconfig": function (test) {
+            var config = {
+                options: {
+                    target: 'es5'
+                },
+                build: {
+                    out: 'myfile2.js',
+                    tsconfig: 'test/tsconfig/test_simple_with_outfile.json',
+                }
+            };
+            var result = or.resolveAsync(config, config.build, "build").then(function (result) {
+                test.strictEqual(result.target, "es5");
+                test.strictEqual(result.CompilationTasks[0].out, "myfile2.js");
+                test.done();
+            }).catch(function (err) { test.ifError(err); test.done(); });
+        },
         "tsCacheDir default `.tscache` directory is overriden if passed in the grunt-ts task options": function (test) {
             test.expect(1);
             var result = or.resolveAsync(null, getConfig("has tsCacheDir set")).then(function (result) {

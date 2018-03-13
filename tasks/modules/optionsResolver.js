@@ -369,7 +369,7 @@ function copyCompilationTasks(options, resolvedFiles, outputInfo) {
                 newCompilationTask.outDir = outputInfo.outDir;
             }
             if ('out' in outputInfo) {
-                newCompilationTask.outDir = outputInfo.outDir;
+                newCompilationTask.out = outputInfo.out;
             }
             options.CompilationTasks.push(newCompilationTask);
         }

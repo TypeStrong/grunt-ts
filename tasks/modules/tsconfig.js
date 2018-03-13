@@ -163,10 +163,10 @@ function resolve_output_locations(options, projectSpec) {
         && projectSpec
         && projectSpec.compilerOptions) {
         options.CompilationTasks.forEach(function (compilationTask) {
-            if (projectSpec.compilerOptions.out) {
+            if (projectSpec.compilerOptions.out && !compilationTask.out) {
                 compilationTask.out = path.normalize(projectSpec.compilerOptions.out).replace(/\\/g, '/');
             }
-            if (projectSpec.compilerOptions.outFile) {
+            if (projectSpec.compilerOptions.outFile && !compilationTask.out) {
                 compilationTask.out = path.normalize(path.join(relativePathFromGruntfileToTSConfig(), projectSpec.compilerOptions.outFile)).replace(/\\/g, '/');
             }
             if (projectSpec.compilerOptions.outDir) {

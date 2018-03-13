@@ -39,7 +39,6 @@ export function resolveAsync(applyTo: Partial<IGruntTSOptions>,
     try {
       const taskTSConfig = getTSConfigSettings(taskOptions);
       const targetTSConfig = getTSConfigSettings(targetOptions);
-
       let tsconfig: ITSConfigSupport = null;
 
       if (taskTSConfig) {
@@ -186,13 +185,13 @@ function resolve_output_locations(options: Partial<IGruntTSOptions>, projectSpec
       && options.CompilationTasks.length > 0
       && projectSpec
       && projectSpec.compilerOptions) {
-    options.CompilationTasks.forEach((compilationTask) => {
-        if (projectSpec.compilerOptions.out) {
+    options.CompilationTasks.forEach(compilationTask => {
+        if (projectSpec.compilerOptions.out && !compilationTask.out) {
           compilationTask.out = path.normalize(
             projectSpec.compilerOptions.out
           ).replace(/\\/g, '/');
         }
-        if (projectSpec.compilerOptions.outFile) {
+        if (projectSpec.compilerOptions.outFile  && !compilationTask.out) {
           compilationTask.out = path.normalize(path.join(
             relativePathFromGruntfileToTSConfig(),
             projectSpec.compilerOptions.outFile)).replace(/\\/g, '/');

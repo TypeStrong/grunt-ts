@@ -205,8 +205,8 @@ function resolveOutputOptions(rawTaskOptions:
     const props = ['outDir', 'out'];
     const options = [rawTaskOptions, rawTargetOptions];
 
-    options.forEach((opt) => {
-      props.forEach((prop) => {
+    options.forEach(opt => {
+      props.forEach(prop => {
         if (opt && (prop in opt)) {
           result[prop] = opt[prop];
         }
@@ -436,7 +436,7 @@ function copyCompilationTasks(options: Partial<IGruntTSOptions>,
         newCompilationTask.outDir = outputInfo.outDir;
       }
       if ('out' in outputInfo) {
-        newCompilationTask.outDir = outputInfo.outDir;
+        newCompilationTask.out = outputInfo.out;
       }
       options.CompilationTasks.push(newCompilationTask);
     }

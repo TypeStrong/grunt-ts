@@ -2,6 +2,9 @@
 
 ## vNext
 
+## v6.0.0-beta.19
+* FIX: using out in conjunction with a tsconfig.json was broken.  Thanks for the report [@jkanchelov](https://github.com/jkanchelov).  (#409)
+
 ## v6.0.0-beta.18
 * FEAT: Adds support for compiler features up to TypeScript 2.7 (`esModuleInterop`, `strictPropertyInitialization`, `esnext` module type).
 * DOCS: Recommend using tsconfig.json over GruntJS-style `src` setup.
