@@ -25,9 +25,9 @@ const propertiesFromTarget = ['amdloader', 'baseDir', 'html', 'htmlOutDir', 'htm
         'baseUrl',
         'charset',
         'checkJs',
-        'comments',
+        'comments',  /* grunt-ts specific */
         'compile',
-        'compiler',
+        'compiler',  /* grunt-ts specific */
         'declaration',
         'declarationDir',
         'diagnostics',
@@ -35,17 +35,18 @@ const propertiesFromTarget = ['amdloader', 'baseDir', 'html', 'htmlOutDir', 'htm
         'downlevelIteration',
         'emitBOM',
         'emitDecoratorMetadata',
-        'emitGruntEvents',
+        'emitGruntEvents',  /* grunt-ts specific */
+        'esModuleInterop',
         'experimentalAsyncFunctions',
         'experimentalDecorators',
-        'failOnTypeErrors',
-        'fast',
+        'failOnTypeErrors',  /* grunt-ts specific */
+        'fast',  /* grunt-ts specific */
         /* help purposefully not supported. */
         'forceConsistentCasingInFileNames',
-        'htmlModuleTemplate',
-        'htmlOutDir',
-        'htmlOutDirFlatten',
-        'htmlOutputTemplate',
+        'htmlModuleTemplate',  /* grunt-ts specific */
+        'htmlOutDir',  /* grunt-ts specific */
+        'htmlOutDirFlatten',  /* grunt-ts specific */
+        'htmlOutputTemplate',  /* grunt-ts specific */
         'htmlVarTemplate',
         'importHelpers',
         'inlineSourceMap',
@@ -91,6 +92,7 @@ const propertiesFromTarget = ['amdloader', 'baseDir', 'html', 'htmlOutDir', 'htm
         'strict',
         'strictFunctionTypes',
         'strictNullChecks',
+        'strictPropertyInitialization',
         'stripInternal',
         'suppressExcessPropertyErrors',
         'suppressImplicitAnyIndexErrors',
@@ -127,10 +129,10 @@ export function resolveAsync(rawTaskOptions: ITargetOptions,
                         resolvedFiles: IGruntTSCompilationInfo[] = [],
                         theTemplateProcessor: typeof templateProcessor = null,
                         theGlobExpander: typeof globExpander = null,
-                        theVerboseLogger: typeof verboseLogger = null): Promise<IGruntTSOptions> {
+                        theVerboseLogger: typeof verboseLogger = null): Promise<Partial<IGruntTSOptions>> {
 
-  let result = emptyOptionsResolveResult();
-  return new Promise<IGruntTSOptions>((resolve, reject) => {
+  let result : Partial<IGruntTSOptions> = emptyOptionsResolveResult();
+  return new Promise<Partial<IGruntTSOptions>>((resolve, reject) => {
 
 
     if (theTemplateProcessor && typeof theTemplateProcessor === 'function') {
@@ -163,8 +165,8 @@ export function resolveAsync(rawTaskOptions: ITargetOptions,
     result = applyGruntOptions(result, rawTargetOptions);
     result = copyCompilationTasks(result, resolvedFiles, resolveOutputOptions(rawTaskOptions, rawTargetOptions));
 
-    resolveVSOptionsAsync(result, rawTaskOptions, rawTargetOptions, templateProcessor).then((result) => {
-      resolveTSConfigAsync(result, rawTaskOptions, rawTargetOptions, templateProcessor, globExpander, verboseLogger).then((result) => {
+    resolveVSOptionsAsync(result, rawTaskOptions, rawTargetOptions, templateProcessor).then(result => {
+      resolveTSConfigAsync(result, rawTaskOptions, rawTargetOptions, templateProcessor, globExpander, verboseLogger).then(result => {
 
         result = addressAssociatedOptionsAndResolveConflicts(result);
         result = enclosePathsInQuotesIfRequired(result);
@@ -177,7 +179,7 @@ export function resolveAsync(rawTaskOptions: ITargetOptions,
         }
 
         return resolve(result);
-      }).catch((tsConfigError) => {
+      }).catch(tsConfigError => {
         if (tsConfigError.message) {
           result.errors.push('tsconfig error: ' + tsConfigError.message);
         } else {
@@ -185,7 +187,7 @@ export function resolveAsync(rawTaskOptions: ITargetOptions,
         }
         return resolve(result);
       });
-    }).catch((vsConfigError) => {
+    }).catch(vsConfigError => {
       if (vsConfigError.message) {
         result.errors.push('Visual Studio config issue: ' + vsConfigError.message);
       } else {
@@ -227,8 +229,7 @@ function emptyOptionsResolveResult() {
   };
 }
 
-function logAdditionalConfigurationWarnings(options: IGruntTSOptions) {
-
+function logAdditionalConfigurationWarnings(options: Partial<IGruntTSOptions>) {
   return options;
 }
 
@@ -387,7 +388,7 @@ function resolveAndWarnOnConfigurationIssues(task: ITargetOptions,
     }
 }
 
-function applyGruntOptions(applyTo: IGruntTSOptions, gruntOptions: ITargetOptions): IGruntTSOptions {
+function applyGruntOptions(applyTo: Partial<IGruntTSOptions>, gruntOptions: ITargetOptions): Partial<IGruntTSOptions> {
 
     if (gruntOptions) {
 
@@ -419,7 +420,9 @@ function applyGruntOptions(applyTo: IGruntTSOptions, gruntOptions: ITargetOption
     return applyTo;
 }
 
-function copyCompilationTasks(options: IGruntTSOptions, resolvedFiles: IGruntTSCompilationInfo[], outputInfo: {outDir?: string, out?: string}) {
+function copyCompilationTasks(options: Partial<IGruntTSOptions>,
+  resolvedFiles: IGruntTSCompilationInfo[],
+  outputInfo: {outDir?: string, out?: string}) {
 
   if (!utils.hasValue(options.CompilationTasks)) {
     options.CompilationTasks = [];
@@ -471,7 +474,7 @@ function copyCompilationTasks(options: IGruntTSOptions, resolvedFiles: IGruntTSC
   return options;
 }
 
-function enclosePathsInQuotesIfRequired(options: IGruntTSOptions) {
+function enclosePathsInQuotesIfRequired(options: Partial<IGruntTSOptions>) {
   if (options.rootDir) {
     options.rootDir = utils.enclosePathInQuotesIfRequired(options.rootDir);
   }
@@ -484,7 +487,7 @@ function enclosePathsInQuotesIfRequired(options: IGruntTSOptions) {
   return options;
 }
 
-function addressAssociatedOptionsAndResolveConflicts(options: IGruntTSOptions) {
+function addressAssociatedOptionsAndResolveConflicts(options: Partial<IGruntTSOptions>) {
 
   if (options.emitDecoratorMetadata) {
     options.experimentalDecorators = true;
@@ -534,7 +537,7 @@ function addressAssociatedOptionsAndResolveConflicts(options: IGruntTSOptions) {
   return options;
 }
 
-function applyGruntTSDefaults(options: IGruntTSOptions) {
+function applyGruntTSDefaults(options: Partial<IGruntTSOptions>) {
 
   if (!('sourceMap' in options) && !('inlineSourceMap' in options)) {
     options.sourceMap = GruntTSDefaults.sourceMap;

@@ -35,7 +35,7 @@ const pluginFn = function (grunt: IGrunt) {
         let filesCompilationIndex = 0;
 
         let done: grunt.task.AsyncResultCatcher,
-          options: IGruntTSOptions;
+          options: Partial<IGruntTSOptions>;
 
         {
           const currentGruntTask: grunt.task.IMultiTask<ITargetOptions> = this;
@@ -129,7 +129,7 @@ const pluginFn = function (grunt: IGrunt) {
                 // Compiles all the files
                 // Uses the blind tsc compile task
                 // logs errors
-                function runCompilation(options: IGruntTSOptions, compilationInfo: IGruntTSCompilationInfo): Promise<boolean> {
+                function runCompilation(options: Partial<IGruntTSOptions>, compilationInfo: IGruntTSCompilationInfo): Promise<boolean> {
                     grunt.log.writeln('Compiling...'.yellow);
 
                     // Time the compiler process

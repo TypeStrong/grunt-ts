@@ -282,6 +282,12 @@ function compileAllFiles(options, compilationInfo) {
         if (options.strictFunctionTypes) {
             args.push('--strictFunctionTypes');
         }
+        if (options.esModuleInterop) {
+            args.push('--esModuleInterop');
+        }
+        if (options.strictPropertyInitialization) {
+            args.push('--strictPropertyInitialization');
+        }
         if (options.strictNullChecks) {
             args.push('--strictNullChecks');
         }
@@ -355,11 +361,12 @@ function compileAllFiles(options, compilationInfo) {
         args.push('--target', options.target.toUpperCase());
         if (options.module) {
             var moduleOptionString = ('' + options.module).toLowerCase();
-            if ('none|amd|commonjs|system|umd|es6|es2015'.indexOf(moduleOptionString) > -1) {
+            if ('none|amd|commonjs|system|umd|es6|es2015|esnext'.indexOf(moduleOptionString) > -1) {
                 args.push('--module', moduleOptionString);
             }
             else {
-                console.warn('WARNING: Option "module" only supports "none" | "amd" | "commonjs" | "system" | "umd" | "es6" | "es2015" '.magenta);
+                console.warn(('WARNING: Option "module" only supports "none" | "amd" | "commonjs" |' +
+                    ' "system" | "umd" | "es6" | "es2015" | "esnext" ').magenta);
             }
         }
         if (compilationInfo.outDir) {

@@ -781,6 +781,16 @@ module.exports = function (grunt) {
                     strictFunctionTypes: true
                 }
             },
+            new_TypeScript_2_6_final_and_2_7_Features: {
+                test: true,
+                testExecute: commandLineAssertions.new_TypeScript_2_6_final_and_2_7_Features,
+                src: 'test/simple/ts/**/*.ts',
+                options: {
+                    esModuleInterop: true,
+                    strictPropertyInitialization: true,
+                    module: 'esnext'
+                }
+            },
             issue_392: {
                 test: true,
                 src: ['test/issue_392/app/**/*.ts',

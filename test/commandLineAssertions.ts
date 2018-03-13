@@ -696,7 +696,25 @@ export const new_TypeScript_2_4_thru_2_6_Features: ICompilePromise = (strings, o
         output: ""
       });
     }
-    throw `expected to see all of the new TypeScript 2 and 2.1 values in the command line and didn't.  Got this: ${command}`;
+    throw `expected to see all of the new TypeScript 2.4/2.5/2.6 values in the command line and didn't.  Got this: ${command}`;
+  });
+};
+
+
+export const new_TypeScript_2_6_final_and_2_7_Features: ICompilePromise = (strings, options) => {
+  return new Promise(function(resolve, reject) {
+
+    const command = strings[1].replace(/\\/g,'/');
+
+    if (command.indexOf(`--esModuleInterop`) > -1 &&
+        command.indexOf(`--strictPropertyInitialization`) > -1 &&
+        command.indexOf(`--module esnext`) > -1) {
+      resolve({
+        code: 0,
+        output: ""
+      });
+    }
+    throw `expected to see all of the new TypeScript 2.6 and 2.7 values in the command line and didn't.  Got this: ${command}`;
   });
 };
 

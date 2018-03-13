@@ -126,6 +126,7 @@ function applyVSSettings(options, vsSettings) {
         'DeclarationDir': 'declarationDir',
         'EmitBOM': 'emitBom',
         'EmitDecoratorMetadata': 'emitDecoratorMetadata',
+        'ESModuleInterop': 'esModuleInterop',
         'ExperimentalAsyncFunctions': 'experimentalAsyncFunctions',
         'ExperimentalDecorators': 'experimentalDecorators',
         'ForceConsistentCasingInFileNames': 'forceConsistentCasingInFileNames',
@@ -160,6 +161,7 @@ function applyVSSettings(options, vsSettings) {
         'SourceRoot': 'sourceRoot',
         'StrictFunctionTypes': 'strictFunctionTypes',
         'StrictNullChecks': 'strictNullChecks',
+        'StrictPropertyInitialization': 'strictPropertyInitialization',
         'SuppressExcessPropertyErrors': 'suppressExcessPropertyErrors',
         'SuppressImplicitAnyIndexErrors': 'suppressImplicitAnyIndexErrors',
         'Target': 'target'

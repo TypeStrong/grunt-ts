@@ -22,7 +22,7 @@ let detectedIndentString = '    ', detectedNewline = utils.eol;
 
 const gruntfileFolder = path.resolve('.');
 
-export function resolveAsync(applyTo: IGruntTSOptions,
+export function resolveAsync(applyTo: Partial<IGruntTSOptions>,
   taskOptions: ITargetOptions,
   targetOptions: ITargetOptions,
   theTemplateProcessor: (templateString: string, options: any) => string,
@@ -34,7 +34,7 @@ export function resolveAsync(applyTo: IGruntTSOptions,
   gruntfileGlobs = getGlobs(taskOptions, targetOptions);
   verboseLogger = theVerboseLogger || ((logText: string) => {});
 
-  return new Promise<IGruntTSOptions>((resolve, reject) => {
+  return new Promise<Partial<IGruntTSOptions>>((resolve, reject) => {
 
     try {
       const taskTSConfig = getTSConfigSettings(taskOptions);
@@ -134,7 +134,7 @@ export function resolveAsync(applyTo: IGruntTSOptions,
 }
 
 
-function handleBadConfiguration(options: IGruntTSOptions, projectSpec: ITSConfigFile) {
+function handleBadConfiguration(options: Partial<IGruntTSOptions>, projectSpec: ITSConfigFile) {
   if (projectSpec.compilerOptions) {
     if (projectSpec.compilerOptions.out && projectSpec.compilerOptions.outFile) {
       options.warnings.push('Warning: `out` and `outFile` should not be used together in tsconfig.json.');
@@ -181,7 +181,7 @@ function getGlobs(taskOptions: ITargetOptions, targetOptions: ITargetOptions) {
   }
 }
 
-function resolve_output_locations(options: IGruntTSOptions, projectSpec: ITSConfigFile) {
+function resolve_output_locations(options: Partial<IGruntTSOptions>, projectSpec: ITSConfigFile) {
   if (options.CompilationTasks
       && options.CompilationTasks.length > 0
       && projectSpec
@@ -250,7 +250,7 @@ function getTSConfigSettings(raw: ITargetOptions): ITSConfigSupport {
   }
 }
 
-function applyCompilerOptions(applyTo: IGruntTSOptions, projectSpec: ITSConfigFile) {
+function applyCompilerOptions(applyTo: Partial<IGruntTSOptions>, projectSpec: ITSConfigFile) {
   let result: IGruntTSOptions = applyTo || <any>{};
   const co = projectSpec.compilerOptions,
     tsconfig = <ITSConfigSupport>applyTo.tsconfig;
@@ -279,6 +279,7 @@ function applyCompilerOptions(applyTo: IGruntTSOptions, projectSpec: ITSConfigFi
       'downlevelIteration',
       'emitBOM',
       'emitDecoratorMetadata',
+      'esModuleInterop',
       'experimentalAsyncFunctions',
       'experimentalDecorators',
       'forceConsistentCasingInFileNames',
@@ -326,6 +327,7 @@ function applyCompilerOptions(applyTo: IGruntTSOptions, projectSpec: ITSConfigFi
       'strict',
       'strictFunctionTypes',
       'strictNullChecks',
+      'strictPropertyInitialization',
       'stripInternal',
       'suppressExcessPropertyIndexErrors',
       'suppressImplicitAnyIndexErrors',

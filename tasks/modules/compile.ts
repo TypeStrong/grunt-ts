@@ -85,12 +85,12 @@ function getTsc(binPath: string): string {
     return path.join(binPath, 'tsc');
 }
 
-export function compileResultMeansFastCacheShouldBeRefreshed(options: IGruntTSOptions, result: ICompileResult) {
+export function compileResultMeansFastCacheShouldBeRefreshed(options: Partial<IGruntTSOptions>, result: ICompileResult) {
   return (options.fast !== 'never' &&
     (result.code === 0 || (result.code === 2 && !options.failOnTypeErrors)));
 }
 
-export function compileAllFiles(options: IGruntTSOptions, compilationInfo: IGruntTSCompilationInfo): Promise<ICompileResult> {
+export function compileAllFiles(options: Partial<IGruntTSOptions>, compilationInfo: IGruntTSCompilationInfo): Promise<ICompileResult> {
 
     let targetFiles: string[] = compilationInfo.src;
 
@@ -348,6 +348,12 @@ export function compileAllFiles(options: IGruntTSOptions, compilationInfo: IGrun
       if (options.strictFunctionTypes) {
           args.push('--strictFunctionTypes');
       }
+      if (options.esModuleInterop) {
+          args.push('--esModuleInterop');
+      }
+      if (options.strictPropertyInitialization) {
+          args.push('--strictPropertyInitialization');
+      }
       if (options.strictNullChecks) {
           args.push('--strictNullChecks');
       }
@@ -424,10 +430,11 @@ export function compileAllFiles(options: IGruntTSOptions, compilationInfo: IGrun
 
       if (options.module) {
           const moduleOptionString: string = ('' + options.module).toLowerCase();
-          if ('none|amd|commonjs|system|umd|es6|es2015'.indexOf(moduleOptionString) > -1) {
+          if ('none|amd|commonjs|system|umd|es6|es2015|esnext'.indexOf(moduleOptionString) > -1) {
               args.push('--module', moduleOptionString);
       	  } else {
-  	          console.warn('WARNING: Option "module" only supports "none" | "amd" | "commonjs" | "system" | "umd" | "es6" | "es2015" '.magenta);
+              console.warn(('WARNING: Option "module" only supports "none" | "amd" | "commonjs" |' +
+                ' "system" | "umd" | "es6" | "es2015" | "esnext" ').magenta);
       	  }
       }
 

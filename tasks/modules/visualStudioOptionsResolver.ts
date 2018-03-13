@@ -8,14 +8,14 @@ import * as _ from 'lodash';
 
 let templateProcessor: (templateString: string, options: any) => string = null;
 
-export function resolveVSOptionsAsync(applyTo: IGruntTSOptions,
+export function resolveVSOptionsAsync(applyTo: Partial<IGruntTSOptions>,
   taskOptions: ITargetOptions,
   targetOptions: ITargetOptions,
   theTemplateProcessor: (templateString: string, options: any) => string) {
 
   templateProcessor = theTemplateProcessor;
 
-  return new Promise<IGruntTSOptions>((resolve, reject) => {
+  return new Promise<Partial<IGruntTSOptions>>((resolve, reject) => {
 
     {
       const vsTask: IVisualStudioProjectSupport = getVSSettings(taskOptions),
@@ -78,7 +78,7 @@ export function resolveVSOptionsAsync(applyTo: IGruntTSOptions,
   });
 }
 
-function resolve_out_and_outDir(options: IGruntTSOptions, taskOptions: IGruntTargetOptions,
+function resolve_out_and_outDir(options: Partial<IGruntTSOptions>, taskOptions: IGruntTargetOptions,
     targetOptions: IGruntTargetOptions) {
   if (options.CompilationTasks && options.CompilationTasks.length > 0) {
     options.CompilationTasks.forEach((compilationTask) => {
@@ -96,7 +96,7 @@ function resolve_out_and_outDir(options: IGruntTSOptions, taskOptions: IGruntTar
 }
 
 
-function applyVSOptions(options: IGruntTSOptions, vsSettings: csproj2ts.TypeScriptSettings) {
+function applyVSOptions(options: Partial<IGruntTSOptions>, vsSettings: csproj2ts.TypeScriptSettings) {
   let ignoreFiles = false, ignoreSettings = false;
 
   if (typeof options.vs !== 'string') {
@@ -137,7 +137,7 @@ function relativePathToVSProjectFolderFromGruntfile(settings: csproj2ts.TypeScri
   return path.resolve(settings.VSProjectDetails.ProjectFileName, '..');
 }
 
-function applyVSSettings(options: IGruntTSOptions, vsSettings: csproj2ts.TypeScriptSettings) {
+function applyVSSettings(options: Partial<IGruntTSOptions>, vsSettings: csproj2ts.TypeScriptSettings) {
 
   // Visit this page for MSBuild documentation:
   // https://github.com/Microsoft/TypeScript-Handbook/blob/master/pages/Compiler%20Options%20in%20MSBuild.md
@@ -152,6 +152,7 @@ function applyVSSettings(options: IGruntTSOptions, vsSettings: csproj2ts.TypeScr
     'DeclarationDir': 'declarationDir',
     'EmitBOM': 'emitBom',
     'EmitDecoratorMetadata': 'emitDecoratorMetadata',
+    'ESModuleInterop': 'esModuleInterop',
     'ExperimentalAsyncFunctions': 'experimentalAsyncFunctions',
     'ExperimentalDecorators': 'experimentalDecorators',
     'ForceConsistentCasingInFileNames': 'forceConsistentCasingInFileNames',
@@ -187,6 +188,7 @@ function applyVSSettings(options: IGruntTSOptions, vsSettings: csproj2ts.TypeScr
     'SourceRoot': 'sourceRoot',
     'StrictFunctionTypes': 'strictFunctionTypes',
     'StrictNullChecks': 'strictNullChecks',
+    'StrictPropertyInitialization': 'strictPropertyInitialization',
     'SuppressExcessPropertyErrors': 'suppressExcessPropertyErrors',
     'SuppressImplicitAnyIndexErrors': 'suppressImplicitAnyIndexErrors',
     'Target': 'target'

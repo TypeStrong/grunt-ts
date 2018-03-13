@@ -19,7 +19,8 @@
         "types": ["see","issue","391"],
         "checkJs": true,
         "allowJs": true,
-        "preserveSymlinks": true
+        "preserveSymlinks": true,
+        "esModuleInterop": true
     },
     "filesGlob": [
         "./defs/**/*.ts",

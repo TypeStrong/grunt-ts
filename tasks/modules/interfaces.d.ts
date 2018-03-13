@@ -68,6 +68,8 @@ interface ITaskOptions {
     emitDecoratorMetadata: boolean;
     /** grunt-ts setting to emit events in Grunt */
     emitGruntEvents: boolean;
+    /** Requires default import of callable CommonJS modules but with runtime behavior like Babel or Webpack */
+    esModuleInterop: boolean;
     /** Enables experimental support for ES7 async functions - required for async prior to TypeScript 2 */
     experimentalAsyncFunctions: string;
     experimentalDecorators: boolean;
@@ -159,6 +161,8 @@ interface ITaskOptions {
     strictFunctionTypes: boolean;
     /** Enables strict null checking mode (null and undefined are not in the domain of every type) */
     strictNullChecks: boolean;
+    /** Ensures each instance property is initialized before use */
+    strictPropertyInitialization: boolean;
     /** Does not emit objects marked @internal in jsdoc */
     stripInternal: boolean;
     /** Disables strict object literal assignment checking */
@@ -192,7 +196,7 @@ interface ICompileResult {
 }
 
 interface ICompilePromise {
-  (args: string[], options?: IGruntTSOptions): Promise<ICompileResult>;
+  (args: string[], options?: Partial<IGruntTSOptions>): Promise<ICompileResult>;
 }
 
 interface IGruntTSOptions extends ITaskOptions, ITargetOptions {

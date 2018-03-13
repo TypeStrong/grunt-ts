@@ -11,5 +11,5 @@ var boo = snakeModuleName.tpl_html_module.snakeModuleName_tpl_html_variable;
 //grunt-start
 /// <reference path="src/snake-module-name.tpl.html.ts" />
 /// <reference path="src/foo.ts" />
-//grunt-end 
+//grunt-end
 //# sourceMappingURL=out.js.map

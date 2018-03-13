@@ -405,11 +405,11 @@ export function readAndParseJSONFromFileSync(fileName: string, encoding = 'utf8'
 }
 
 
-export function shouldCompile(options: IGruntTSOptions) {
+export function shouldCompile(options: Partial<IGruntTSOptions>) {
   return !!options.compile;
 }
 
-export function shouldPassThrough(options: IGruntTSOptions) {
+export function shouldPassThrough(options: Partial<IGruntTSOptions>) {
   return (options.tsconfig && (<ITSConfigSupport>options.tsconfig).passThrough);
 }
 

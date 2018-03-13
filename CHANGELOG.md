@@ -2,6 +2,10 @@
 
 ## vNext
 
+## v6.0.0-beta.18
+* FEAT: Adds support for compiler features up to TypeScript 2.7 (`esModuleInterop`, `strictPropertyInitialization`, `esnext` module type).
+* DOCS: Recommend using tsconfig.json over GruntJS-style `src` setup.
+
 ## v6.0.0-beta.17
 * FEAT: Adds support for compiler features up to TypeScript 2.6 RC (strictFunctionChecks).
 * FIX: Whoops I didn't realize `skipLibCheck` and `skipDefaultLibCheck` were different.  Fixed in this release - thanks [@kierans](https://github.com/kierans) (#413).
