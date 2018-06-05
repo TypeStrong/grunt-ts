@@ -33,6 +33,7 @@ const TypeScriptDefaults: IGruntTSOptions = {
     experimentalDecorators: false,
     failOnTypeErrors: null,
     fast: null,
+    forceCompileRegex: null,
     forceConsistentCasingInFileNames: false,
     html: null,
     htmlModuleTemplate: null,
