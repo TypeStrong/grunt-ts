@@ -169,7 +169,7 @@ For file ordering, look at [JavaScript Generation](#javascript-generation).
 |[experimentalDecorators](#experimentaldecorators)|option|`true`, `false` (default) - set to true to enable support for proposed ECMAScript decorators|
 |[failOnTypeErrors](#failontypeerrors)|option|`true` (default), `false` - fail Grunt pipeline if there is a type error.  (See also [noEmitOnError](#noemithelpers))|
 |[fast](#fast)|option|`'watch'` (default), `'always'`, `'never'` - how to decide on a "fast" grunt-ts compile.|
-|[forceCompileRegex](#forceCompileRegex)|option| - Prevents files from being cached matching the given regex.|
+|[forceCompileRegex](#forceCompileRegex)|option|Prevents files matching the given regex from being cached.|
 |[files](#files)|target|Sets of files to compile and optional output destination|
 |[forceConsistentCasingInFileNames](#forceconsistentcasinginfilenames)|option|`true`, `false` (default) - Disallow inconsistently-cased references to the same file.|
 |[html](#html)|target|`string` or `string[]` - glob to HTML templates|
