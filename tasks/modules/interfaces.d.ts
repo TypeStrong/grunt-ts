@@ -77,6 +77,8 @@ interface ITaskOptions {
     failOnTypeErrors: boolean;
     /** grunt-ts specific setting - never | always | watch (default) */
     fast: string;
+    /** grunt-ts specific setting - never cached files regex */
+    forceCompileRegex: string;
     /** Disallow inconsistently-cased references to the same file. */
     forceConsistentCasingInFileNames: boolean;
     /** grunt-ts specific setting - template against which the HTML will be generated */
