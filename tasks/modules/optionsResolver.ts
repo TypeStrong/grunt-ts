@@ -41,6 +41,7 @@ const propertiesFromTarget = ['amdloader', 'baseDir', 'html', 'htmlOutDir', 'htm
         'experimentalDecorators',
         'failOnTypeErrors',  /* grunt-ts specific */
         'fast',  /* grunt-ts specific */
+        'forceCompileRegex',  /* grunt-ts specific */
         /* help purposefully not supported. */
         'forceConsistentCasingInFileNames',
         'htmlModuleTemplate',  /* grunt-ts specific */
