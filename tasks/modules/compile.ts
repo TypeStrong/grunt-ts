@@ -117,18 +117,18 @@ export function compileAllFiles(options: Partial<IGruntTSOptions>, compilationIn
             if (newFiles.length !== 0 || options.testExecute || utils.shouldPassThrough(options)) {
                 if (options.forceCompileRegex) {
                     const regex = new RegExp(options.forceCompileRegex);
-                    
+
                     // Finds all force compile files
                     const additionalFiles = files.filter((file) => {
                         return regex.test(file);
                     });
-                    
+
                     // Adds them to newFiles and unique the array
                     newFiles = newFiles.concat(additionalFiles).filter((value, index, self) => {
                         return self.indexOf(value) === index;
                     });
                 }
-                
+
                 files = newFiles;
 
                 // If outDir is specified but no baseDir is specified we need to determine one

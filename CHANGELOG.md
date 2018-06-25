@@ -2,6 +2,9 @@
 
 ## vNext
 
+## v6.0.0-beta.20
+* FEATURE: Adds support for a RegEx to exclude files from the fast cache.  Thanks for the PR to first-time contributor [@shuky19](https://github.com/shuky19).  (#422)
+
 ## v6.0.0-beta.19
 * FIX: using out in conjunction with a tsconfig.json was broken.  Thanks for the report [@jkanchelov](https://github.com/jkanchelov).  (#409)
 

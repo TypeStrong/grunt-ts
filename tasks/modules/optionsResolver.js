@@ -32,6 +32,7 @@ var propertiesFromTarget = ['amdloader', 'baseDir', 'html', 'htmlOutDir', 'htmlO
     'experimentalDecorators',
     'failOnTypeErrors',
     'fast',
+    'forceCompileRegex',
     'forceConsistentCasingInFileNames',
     'htmlModuleTemplate',
     'htmlOutDir',

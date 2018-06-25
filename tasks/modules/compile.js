@@ -73,6 +73,15 @@ function compileAllFiles(options, compilationInfo) {
         else {
             newFiles = getChangedFiles(files, options.targetName, options.tsCacheDir, options.verbose);
             if (newFiles.length !== 0 || options.testExecute || utils.shouldPassThrough(options)) {
+                if (options.forceCompileRegex) {
+                    var regex_1 = new RegExp(options.forceCompileRegex);
+                    var additionalFiles = files.filter(function (file) {
+                        return regex_1.test(file);
+                    });
+                    newFiles = newFiles.concat(additionalFiles).filter(function (value, index, self) {
+                        return self.indexOf(value) === index;
+                    });
+                }
                 files = newFiles;
                 if (compilationInfo.outDir && !options.baseDir) {
                     options.baseDir = utils.findCommonPath(files, '/');

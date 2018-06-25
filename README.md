@@ -6,15 +6,15 @@
 
 Grunt-ts is an npm package that handles TypeScript compilation work in GruntJS build scripts.  It provides a [Grunt-compatible wrapper](#support-for-tsc-switches) for the `tsc` command-line compiler, and provides some [additional functionality](#grunt-ts-gruntfilejs-options) that improves the TypeScript development workflow. Grunt-ts supports compiling against [tsconfig.json](#tsconfig) or even a [Visual Studio project](#vs) directly.  Grunt-ts is itself written in [TypeScript](./tasks/ts.ts).
 
-### Latest Changes
-Latest beta release is `6.0.0-beta.19` which is compatible with TypeScript 2.7, and any future version of TypeScript by using the [tsconfig.json passthrough](#passthrough) feature, or the [additionalFlags](#additionalflags) option.
-Latest stable release is `5.5.1` with built-in support for features added in TypeScript 1.8.  [Full changelog is here](CHANGELOG.md).
+### Looking for Maintainers
+Do you use grunt-ts?  Would you like to help keep it up-to-date for new TypeScript versions?  Please let [@nycdotnet](https://github.com/nycdotnet) know.
 
 ### How To Contribute
 Thank you for your interest in contributing!  Please see the [contributing](CONTRIBUTING.md) guide for details.
 
-### Looking for Maintainers
-Do you use grunt-ts?  Would you like to help keep it up-to-date for new TypeScript versions?  Please let [@nycdotnet](https://github.com/nycdotnet) know.
+### Latest Changes
+Latest beta release is `6.0.0-beta.20` which is compatible with TypeScript 2.7, and any future version of TypeScript by using the [tsconfig.json passthrough](#passthrough) feature, or the [additionalFlags](#additionalflags) option.
+Latest stable release is `5.5.1` with built-in support for features added in TypeScript 1.8.  [Full changelog is here](CHANGELOG.md).
 
 ## Quickstart
 
@@ -171,6 +171,7 @@ For file ordering, look at [JavaScript Generation](#javascript-generation).
 |[fast](#fast)|option|`'watch'` (default), `'always'`, `'never'` - how to decide on a "fast" grunt-ts compile.|
 |[forceCompileRegex](#forceCompileRegex)|option|Prevents files matching the given regex from being cached.|
 |[files](#files)|target|Sets of files to compile and optional output destination|
+|forceCompileRegex|option|`string` representing a `RegEx` - If specified, files that match the RegEx will be included in the compilation context with fast even if they would have otherwise been excluded.|
 |[forceConsistentCasingInFileNames](#forceconsistentcasinginfilenames)|option|`true`, `false` (default) - Disallow inconsistently-cased references to the same file.|
 |[html](#html)|target|`string` or `string[]` - glob to HTML templates|
 |[htmlModuleTemplate](#htmlmoduletemplate)|option|`string` - HTML template namespace|

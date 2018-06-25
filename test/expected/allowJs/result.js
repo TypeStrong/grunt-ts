@@ -5,8 +5,8 @@ function writeIt(value) {
 exports.writeIt = writeIt;
 System.register("allowJsConsumer", ["allowJsLibrary"], function (exports_1, context_1) {
     "use strict";
-    var allowJsLibrary_1;
     var __moduleName = context_1 && context_1.id;
+    var allowJsLibrary_1;
     return {
         setters: [
             function (allowJsLibrary_1_1) {
