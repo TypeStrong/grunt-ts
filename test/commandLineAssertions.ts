@@ -783,7 +783,9 @@ export const issue_397: ICompilePromise = (strings, options) => {
 }
 
 
-
+export const issue_426_1 = simpleCommandLineCheck("--baseUrl .");
+export const issue_426_2 = simpleCommandLineCheck("--baseUrl ./");
+export const issue_426_3 = simpleCommandLineCheck("--baseUrl ./app");
 export const test_noLib = simpleCommandLineCheck("--noLib");
 export const test_emitBOM = simpleCommandLineCheck("--emitBOM");
 export const test_locale = simpleCommandLineCheck("--locale ja-jp");
