@@ -110,6 +110,7 @@ function resolveAsync(rawTaskOptions, rawTargetOptions, targetName, resolvedFile
     if (theVerboseLogger === void 0) { theVerboseLogger = null; }
     var result = emptyOptionsResolveResult();
     return new es6_promise_1.Promise(function (resolve, reject) {
+        var _a, _b;
         if (theTemplateProcessor && typeof theTemplateProcessor === 'function') {
             templateProcessor = theTemplateProcessor;
         }
@@ -131,9 +132,9 @@ function resolveAsync(rawTaskOptions, rawTargetOptions, targetName, resolvedFile
         fixMissingOptions(rawTaskOptions);
         fixMissingOptions(rawTargetOptions);
         {
-            var _a = resolveAndWarnOnConfigurationIssues(rawTaskOptions, rawTargetOptions, targetName), errors = _a.errors, warnings = _a.warnings;
-            (_b = result.errors).push.apply(_b, errors);
-            (_c = result.warnings).push.apply(_c, warnings);
+            var _c = resolveAndWarnOnConfigurationIssues(rawTaskOptions, rawTargetOptions, targetName), errors = _c.errors, warnings = _c.warnings;
+            (_a = result.errors).push.apply(_a, errors);
+            (_b = result.warnings).push.apply(_b, warnings);
         }
         result = applyGruntOptions(result, rawTaskOptions);
         result = applyGruntOptions(result, rawTargetOptions);
@@ -167,7 +168,6 @@ function resolveAsync(rawTaskOptions, rawTargetOptions, targetName, resolvedFile
             }
             return resolve(result);
         });
-        var _b, _c;
     });
 }
 exports.resolveAsync = resolveAsync;
