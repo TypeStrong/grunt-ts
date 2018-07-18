@@ -814,6 +814,33 @@ module.exports = function (grunt) {
                     verbose: true
                 }
             },
+            issue_426_1: {
+                test: true,
+                tsconfig: 'test/issue_426_baseUrl/src/issue_426_1.tsconfig.json',
+                testExecute: commandLineAssertions.issue_426_1,
+                options: {
+                    fast: 'never',
+                    verbose: true
+                }
+            },
+            issue_426_2: {
+                test: true,
+                tsconfig: 'test/issue_426_baseUrl/src/issue_426_2.tsconfig.json',
+                testExecute: commandLineAssertions.issue_426_2,
+                options: {
+                    fast: 'never',
+                    verbose: true
+                }
+            },
+            issue_426_3: {
+                test: true,
+                tsconfig: 'test/issue_426_baseUrl/src/issue_426_3.tsconfig.json',
+                testExecute: commandLineAssertions.issue_426_3,
+                options: {
+                    fast: 'never',
+                    verbose: true
+                }
+            },
             honorGruntfileExcludesWhenParsingTsconfig: {
                 test: true,
                 src: ['test/issue_392_2/app/**/*.ts','!test/issue_392_2/app/**/*.spec.ts'],

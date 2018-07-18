@@ -688,6 +688,9 @@ exports.issue_397 = function (strings, options) {
         throw "expected to see typeRoots files to be relative (See GitHub issue 397).  Got this: " + command;
     });
 };
+exports.issue_426_1 = simpleCommandLineCheck("--baseUrl .");
+exports.issue_426_2 = simpleCommandLineCheck("--baseUrl ./");
+exports.issue_426_3 = simpleCommandLineCheck("--baseUrl ./app");
 exports.test_noLib = simpleCommandLineCheck("--noLib");
 exports.test_emitBOM = simpleCommandLineCheck("--emitBOM");
 exports.test_locale = simpleCommandLineCheck("--locale ja-jp");

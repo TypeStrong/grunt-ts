@@ -304,7 +304,7 @@ function compileAllFiles(options, compilationInfo) {
             args.push('--traceResolution');
         }
         if (options.baseUrl) {
-            args.push('--baseUrl', utils.possiblyQuotedRelativePath(options.baseUrl));
+            args.push('--baseUrl', utils.enclosePathInQuotesIfRequired(options.baseUrl));
         }
         if (options.charset) {
             args.push('--charset', options.charset);
