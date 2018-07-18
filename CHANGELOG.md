@@ -2,6 +2,9 @@
 
 ## vNext
 
+## v6.0.0-beta.21
+* FIX: Resolves baseUrl appearing blank under certain circumstances.  Thanks for the PR to first-time contributor [@beyerleinf](https://github.com/beyerleinf).  (#426)
+
 ## v6.0.0-beta.20
 * FEATURE: Adds support for a RegEx to exclude files from the fast cache.  Thanks for the PR to first-time contributor [@shuky19](https://github.com/shuky19).  (#422)
 

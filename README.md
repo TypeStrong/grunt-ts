@@ -13,8 +13,8 @@ Do you use grunt-ts?  Would you like to help keep it up-to-date for new TypeScri
 Thank you for your interest in contributing!  Please see the [contributing](CONTRIBUTING.md) guide for details.
 
 ### Latest Changes
-Latest beta release is `6.0.0-beta.20` which is compatible with TypeScript 2.7, and any future version of TypeScript by using the [tsconfig.json passthrough](#passthrough) feature, or the [additionalFlags](#additionalflags) option.
-Latest stable release is `5.5.1` with built-in support for features added in TypeScript 1.8.  [Full changelog is here](CHANGELOG.md).
+Latest recommended release is `6.0.0-beta.21`, which is compatible with TypeScript 2.7, and any future version of TypeScript by using the [tsconfig.json passthrough](#passthrough) feature, or the [additionalFlags](#additionalflags) option.
+Latest "stable" (though very old at this point) release is `5.5.1` with built-in support for features up to TypeScript 1.8.  [Full changelog is here](CHANGELOG.md).
 
 ## Quickstart
 
