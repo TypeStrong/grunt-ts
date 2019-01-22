@@ -4,7 +4,9 @@
 
 ## TypeScript Compilation Task for GruntJS
 
-Grunt-ts is an npm package that handles TypeScript compilation work in GruntJS build scripts.  It provides a [Grunt-compatible wrapper](#support-for-tsc-switches) for the `tsc` command-line compiler, and provides some [additional functionality](#grunt-ts-gruntfilejs-options) that improves the TypeScript development workflow. Grunt-ts supports compiling against [tsconfig.json](#tsconfig) or even a [Visual Studio project](#vs) directly.  Grunt-ts is itself written in [TypeScript](./tasks/ts.ts).
+Grunt-ts is an npm package that handles TypeScript compilation work in GruntJS build scripts.  This project, much like Grunt itself, is now in a mature maintenance phase and no significant features will be considered.  New maintainers welcome!
+
+Grunt-ts provides a [Grunt-compatible wrapper](#support-for-tsc-switches) for the `tsc` command-line compiler, and provides some [additional functionality](#grunt-ts-gruntfilejs-options) that improves the TypeScript development workflow. Grunt-ts supports compiling against [tsconfig.json](#tsconfig) or even a [Visual Studio project](#vs) directly.  Grunt-ts is itself written in [TypeScript](./tasks/ts.ts).
 
 ### Looking for Maintainers
 Do you use grunt-ts?  Would you like to help keep it up-to-date for new TypeScript versions?  Please let [@nycdotnet](https://github.com/nycdotnet) know.
@@ -13,7 +15,7 @@ Do you use grunt-ts?  Would you like to help keep it up-to-date for new TypeScri
 Thank you for your interest in contributing!  Please see the [contributing](CONTRIBUTING.md) guide for details.
 
 ### Latest Changes
-Latest recommended release is `6.0.0-beta.21`, which has native support for features added in TypeScript 2.7, and is compatible with any future version of TypeScript by using the [tsconfig.json passthrough](#passthrough) feature, or the [additionalFlags](#additionalflags) option.
+Latest recommended release is `6.0.0-beta.22`, which has native support for features added in TypeScript 2.7, and is compatible with any future version of TypeScript by using the [tsconfig.json passthrough](#passthrough) feature, or the [additionalFlags](#additionalflags) option.
 Latest "stable" (though very old at this point) release is `5.5.1` with built-in support for features up to TypeScript 1.8.  [Full changelog is here](CHANGELOG.md).
 
 ## Quickstart
@@ -1968,9 +1970,6 @@ module.exports = function(grunt) {
   /* rest of config */
 };
 ````
-
-Note that it is not currently possible to force TypeScript to emit all JavaScript with a particular line ending, but a switch to allow that is under discussion here: https://github.com/Microsoft/TypeScript/issues/1693
-
 
 ## Video Examples
 **TypeScript programming using grunt-ts (YouTube):**

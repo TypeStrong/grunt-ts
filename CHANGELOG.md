@@ -2,6 +2,9 @@
 
 ## vNext
 
+## v6.0.0-beta.22
+* FIX: Loosen Grunt peer dependency to any 1.0 version.  Thanks for the PR [@danielrentz](https://github.com/danielrentz).  (#431)
+
 ## v6.0.0-beta.21
 * FIX: Resolves baseUrl appearing blank under certain circumstances.  Thanks for the PR to first-time contributor [@beyerleinf](https://github.com/beyerleinf).  (#426)
 
