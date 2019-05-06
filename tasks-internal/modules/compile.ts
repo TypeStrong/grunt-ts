@@ -470,7 +470,7 @@ export function compileAllFiles(options: IGruntTSOptions, compilationInfo: IGrun
 
     // Create a temp last command file and use that to guide tsc.
     // Reason: passing all the files on the command line causes TSC to go in an infinite loop.
-    let tempfilename = utils.getTempFile('tscommand');
+    let tempfilename = utils.getTempFile('tscommand', path.resolve(__dirname) + "/.tscache");
     if (!tempfilename) {
         throw (new Error('cannot create temp file'));
     }
