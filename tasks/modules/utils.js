@@ -124,6 +124,9 @@ function getTempFile(prefix, dir, extension) {
     if (dir === void 0) { dir = ''; }
     if (extension === void 0) { extension = '.tmp.txt'; }
     prefix = (prefix ? prefix + '-' : '');
+    if (dir !== '' && !fs.existsSync(dir)) {
+        fs.mkdirSync(dir);
+    }
     var attempts = 100;
     do {
         var name = prefix + getRandomHex(8) + extension;

@@ -153,6 +153,11 @@ export function getRandomHex(length: number = 16): string {
  */
 export function getTempFile(prefix?: string, dir: string = '', extension = '.tmp.txt'): string {
     prefix = (prefix ? prefix + '-' : '');
+
+    if (dir !== '' && !fs.existsSync(dir)) {
+        fs.mkdirSync(dir);
+    }
+
     var attempts = 100;
     do {
         var name: string = prefix + getRandomHex(8) + extension;
