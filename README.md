@@ -75,7 +75,7 @@ A more extensive sample `Gruntfile.js` is available [here](https://github.com/Ty
 
 ## Grunt-ts Features
 
- * Allows use of all standard GruntJS functionality such as use of customizable task targets, globbing, use of the `files` object (for instantiating multiple independent `tsc` runs in a single target), etc.
+ * Allows use of all standard GruntJS functionality such as the use of customizable task targets, globbing, use of the `files` object (for instantiating multiple independent `tsc` runs in a single target), etc.
  * Allows the developer to [select a custom TypeScript compiler version](#compiler) for their project, or even use a custom (in-house) version.
  * Supports [most switches](#support-for-tsc-switches) of the `tsc` TypeScript Compiler via options in the gruntfile `ts` task, and also supports switch overrides per-target.
  * Supports [Visual Studio Projects](#vs) as a compile target for identifying TypeScript files, setting up compile configuration, or both.
