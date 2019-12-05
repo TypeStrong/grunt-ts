@@ -88,6 +88,7 @@ A more extensive sample `Gruntfile.js` is available [here](https://github.com/Ty
  * [Encodes HTML](#html) files as TypeScript variables (for HTML templating engines)
  * Performs live file [watching](#watch) (compile on save)
  * Enables ["Fast" compile](#fast) when using external modules
+ * Please not that Grunt-ts does not support the [Path Mapping](https://www.typescriptlang.org/docs/handbook/module-resolution.html#path-mapping) feature as it is not supported by `tsc` from the command-line
 
 ## Support for tsc Switches
 
