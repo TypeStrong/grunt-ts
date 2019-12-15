@@ -450,7 +450,7 @@ function compileAllFiles(options, compilationInfo) {
     else {
         exports.grunt.log.verbose.writeln(args.join(' ').yellow);
     }
-    var tempfilename = utils.getTempFile('tscommand');
+    var tempfilename = utils.getTempFile('tscommand', path.resolve(__dirname) + '/.tscache');
     if (!tempfilename) {
         throw (new Error('cannot create temp file'));
     }

@@ -427,7 +427,7 @@ function compileAllFiles(options, compilationInfo) {
     }
     // Create a temp last command file and use that to guide tsc.
     // Reason: passing all the files on the command line causes TSC to go in an infinite loop.
-    var tempfilename = utils.getTempFile('tscommand');
+    var tempfilename = utils.getTempFile('tscommand', path.resolve(__dirname) + "/.tscache");
     if (!tempfilename) {
         throw (new Error('cannot create temp file'));
     }
